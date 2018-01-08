@@ -1,2 +1,0 @@
-# The Data Science Lifecycle
-
