@@ -26,11 +26,11 @@ section_labels: ## Add section labels
 build: ## Run build steps
 	make notebooks section_labels
 
-serve: build
+serve: build ## Run gitbook to preview changes locally
 	gitbook install
 	gitbook serve
 
-deploy:
+deploy: ## Publish gitbook
 ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/gh-pages)
 	@echo "Please check out the deployment branch, gh-pages, if you want to deploy your revisions."
 	@echo "You might also need to bring the deployment branch up to date by merging it with the staging branch."
