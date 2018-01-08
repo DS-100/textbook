@@ -12,7 +12,7 @@ Practically speaking, this involves the following process:
 
 It is quite common for more questions and problems to emerge after the last
 step of this process, and we can thus repeatedly engage in this procedure to
-discover new characteristics of our world. This fortuitous feedback loop is so
+discover new characteristics of our world. This positive feedback loop is so
 central to our work that we call it the **data science lifecycle**.
 
 If the data science lifecycle is as easy to conduct as it is to state, there
