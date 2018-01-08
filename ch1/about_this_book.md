@@ -1,4 +1,4 @@
-# About This Book
+## About This Book
 
 Before we continue, it is important for us to state our assumptions about the
 reader.
