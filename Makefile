@@ -13,6 +13,7 @@ notebooks: ## Convert notebooks to HTML pages
 	@echo "${BLUE}=============================${NOCOLOR}"
 
 	python convert_notebooks_to_html_partial.py
+	touch SUMMARY.md
 
 	@echo "${BLUE}    Done, output is in notebooks-html${NOCOLOR}"
 	@echo ""

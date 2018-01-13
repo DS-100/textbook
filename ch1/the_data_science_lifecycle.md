@@ -15,9 +15,10 @@ step of this process, and we can thus repeatedly engage in this procedure to
 discover new characteristics of our world. This positive feedback loop is so
 central to our work that we call it the **data science lifecycle**.
 
-If the data science lifecycle is as easy to conduct as it is to state, there
+If the data science lifecycle were as easy to conduct as it is to state, there
 would be no need for textbooks about the the subject. Fortunately, each of the
 steps in the lifecycle contain numerous challenges that reveal powerful and
-often surprising insights.
+often surprising insights that form the foundation of making thoughtful
+decisions using data.
 
 As in Data 8, we will begin with an example.
