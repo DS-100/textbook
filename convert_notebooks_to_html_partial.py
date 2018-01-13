@@ -141,11 +141,11 @@ def _extract_cells(html):
         if '# HIDDEN' in str(div):
             div['class'].append('hidden')
 
-    def remove_empty_spans_and_prompts(tag):
+    def remove_prompts_and_styles(tag):
         for t in (tag.find_all('div', class_='prompt')
-                  + tag.find_all('span', text='None')):
+                  + tag.find_all('style')):
             t.decompose()
-    [remove_empty_spans_and_prompts(div) for div in divs]
+    [remove_prompts_and_styles(div) for div in divs]
 
     return '\n'.join(map(str, divs))
 
