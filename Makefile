@@ -48,3 +48,6 @@ endif
 	git push origin gh-pages
 	@echo ""
 	@echo "${BLUE}Done, see book at ${BOOK_URL}.${NOCOLOR}"
+	@echo "${BLUE}Updating Binder image in background (you will see${NOCOLOR}"
+	@echo "${BLUE}JSON output in your terminal once built).${NOCOLOR}"
+	curl -s https://mybinder.org/build/gh/DS-100/textbook/master | grep '"ready"' &
