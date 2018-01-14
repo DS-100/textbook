@@ -3,7 +3,7 @@
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
 
-BOOK_URL=https://ds100.gitbooks.io/principles-and-techniques-of-data-science/content/
+BOOK_URL=https://ds100.gitbooks.io/textbook/content/
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -15,7 +15,7 @@ notebooks: ## Convert notebooks to HTML pages
 	python convert_notebooks_to_html_partial.py
 	touch SUMMARY.md
 
-	@echo "${BLUE}    Done, output is in notebooks-html${NOCOLOR}"
+	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
 	@echo ""
 
 section_labels: ## Add section labels
@@ -47,4 +47,4 @@ endif
 	@echo "${BLUE}=========================${NOCOLOR}"
 	git push origin gh-pages
 	@echo ""
-	@echo "${BLUE}    Done, see book at ${BOOK_URL}.${NOCOLOR}"
+	@echo "${BLUE}Done, see book at ${BOOK_URL}.${NOCOLOR}"
