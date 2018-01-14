@@ -32,10 +32,10 @@ serve: build ## Run gitbook to preview changes locally
 	gitbook serve
 
 deploy: ## Publish gitbook
-ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/gh-pages)
-	@echo "Please check out the deployment branch, gh-pages, if you want to deploy your revisions."
+ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/master)
+	@echo "Please check out the deployment branch, master, if you want to deploy your revisions."
 	@echo "You might also need to bring the deployment branch up to date by merging it with the staging branch."
-	@echo "For example: 'git checkout gh-pages && git pull && git merge staging && make deploy'"
+	@echo "For example: 'git checkout master && git pull && git merge staging && make deploy'"
 	@echo "(Current branch: $(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)))"
 	exit 1
 endif
@@ -45,7 +45,7 @@ endif
 	git commit -m "Build textbook"
 	@echo "${BLUE}Deploying book to Gitbook.${NOCOLOR}"
 	@echo "${BLUE}=========================${NOCOLOR}"
-	git push origin gh-pages
+	git push origin master
 	@echo ""
 	@echo "${BLUE}Done, see book at ${BOOK_URL}.${NOCOLOR}"
 	@echo "${BLUE}Updating Binder image in background (you will see${NOCOLOR}"
