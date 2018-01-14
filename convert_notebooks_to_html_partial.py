@@ -26,6 +26,14 @@ wrapper = """
 </div>
 """
 
+# This code will at the start of each notebook to set the working directory to
+# the correct folder
+init_folder_cell = nbformat.v4.new_code_cell(source="""
+# HIDDEN
+import os
+os.chdir('notebooks')
+""")
+
 # Use ExtractOutputPreprocessor to extract the images to separate files
 config = Config()
 config.HTMLExporter.preprocessors = [
@@ -92,6 +100,7 @@ def convert_notebooks_to_html_partial(notebook_paths):
         }
 
         notebook = nbformat.read(notebook_path, 4)
+        notebook.cells.insert(0, init_folder_cell)
         raw_html, resources = html_exporter.from_notebook_node(
             notebook,
             resources=extract_output_config,
