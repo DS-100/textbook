@@ -17,15 +17,13 @@ import nbformat
 from nbconvert import HTMLExporter
 from traitlets.config import Config
 
-preamble = """
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [['$','$']],
-      processEscapes: true
-    }
-  });
-</script>
+wrapper = """
+<div id="ipython-notebook">
+    <div class="buttons">
+        <a class="interact-button" href="{interact_link}">Open on DataHub</a>
+    </div>
+    {html}
+</div>
 """
 
 # Use ExtractOutputPreprocessor to extract the images to separate files
@@ -99,7 +97,7 @@ def convert_notebooks_to_html_partial(notebook_paths):
             resources=extract_output_config,
         )
 
-        html = preamble + _extract_cells(raw_html)
+        html = _extract_cells(raw_html)
 
         # Get dependencies from notebook
         matches = list(DATASET_REGEX.finditer(
@@ -109,11 +107,10 @@ def convert_notebooks_to_html_partial(notebook_paths):
                        [filename]
         paths = '&'.join([PATH_PREFIX.format(dep) for dep in dependencies])
 
-        with_wrapper = """<div id="ipython-notebook">
-            <a class="interact-button" href="{interact_link}">Interact</a>
-            {html}
-        </div>""".format(interact_link=INTERACT_LINK.format(paths=paths),
-                         html=html)
+        with_wrapper = wrapper.format(
+            interact_link=INTERACT_LINK.format(paths=paths),
+            html=html,
+        )
 
         # Remove newlines before closing div tags
         final_output = CLOSING_DIV_REGEX.sub('</div>', with_wrapper)
