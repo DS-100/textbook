@@ -11,6 +11,7 @@ http://nbconvert.readthedocs.org/en/latest/nbconvert_library.html#using-differen
 import glob
 import re
 import os
+from textwrap import dedent
 
 import bs4
 import nbformat
@@ -25,14 +26,6 @@ wrapper = """
     {html}
 </div>
 """
-
-# This code will at the start of each notebook to set the working directory to
-# the correct folder
-init_folder_cell = nbformat.v4.new_code_cell(source="""
-# HIDDEN
-import os
-os.chdir('notebooks')
-""")
 
 # Use ExtractOutputPreprocessor to extract the images to separate files
 config = Config()
@@ -55,19 +48,7 @@ NOTEBOOK_IMAGE_DIR = 'notebooks-images'
 INTERACT_LINK = 'http://datahub.berkeley.edu/user-redirect/interact?repo=https://github.com/DS-100/textbook&{paths}' # noqa
 
 # The prefix for each notebook + its dependencies
-PATH_PREFIX = 'path=notebooks/{}'
-
-# The regex used to find file dependencies for notebooks. I could have used
-# triple quotes here but it messes up Python syntax highlighting :(
-DATASET_REGEX = re.compile(
-    r"read_table\("        # We look for a line containing read_table(
-    r"('|\")"              # Then either a single or double quote
-    r"(?P<dataset>"        # Start our named match -- dataset
-    r"    (?!https?://)"   # Don't match http(s) since those aren't local files
-    r"    \w+.csv\w*"      # It has to have .csv in there (might end in .gz)
-    r")"                   # Finish our match
-    r"\1\)"                # Make sure the quotes match
-, re.VERBOSE)
+PATH_PREFIX = 'path={}'
 
 # Used to ensure all the closing div tags are on the same line for Markdown to
 # parse them properly
@@ -80,9 +61,9 @@ def convert_notebooks_to_html_partial(notebook_paths):
     """
     for notebook_path in notebook_paths:
         # Computes <name>.ipynb from notebooks/<name>.ipynb
-        filename = notebook_path.split('/')[-1]
+        path, filename = os.path.split(notebook_path)
         # Computes <name> from <name>.ipynb
-        basename = filename.split('.')[0]
+        basename, _ = os.path.splitext(filename)
         # Computes <name>.html from notebooks/<name>.ipynb
         outfile_name = basename + '.html'
 
@@ -100,7 +81,7 @@ def convert_notebooks_to_html_partial(notebook_paths):
         }
 
         notebook = nbformat.read(notebook_path, 4)
-        notebook.cells.insert(0, init_folder_cell)
+        notebook.cells.insert(0, _preamble_cell(path))
         raw_html, resources = html_exporter.from_notebook_node(
             notebook,
             resources=extract_output_config,
@@ -108,16 +89,9 @@ def convert_notebooks_to_html_partial(notebook_paths):
 
         html = _extract_cells(raw_html)
 
-        # Get dependencies from notebook
-        matches = list(DATASET_REGEX.finditer(
-            '\n'.join([cell['source'] for cell in notebook.cells])
-        ))
-        dependencies = [match.group('dataset') for match in matches] + \
-                       [filename]
-        paths = '&'.join([PATH_PREFIX.format(dep) for dep in dependencies])
-
         with_wrapper = wrapper.format(
-            interact_link=INTERACT_LINK.format(paths=paths),
+            interact_link=INTERACT_LINK.format(
+                paths=PATH_PREFIX.format(notebook_path)),
             html=html,
         )
 
@@ -125,7 +99,7 @@ def convert_notebooks_to_html_partial(notebook_paths):
         final_output = CLOSING_DIV_REGEX.sub('</div>', with_wrapper)
 
         # Write out HTML
-        outfile_path = os.path.join(os.curdir, NOTEBOOK_HTML_DIR, outfile_name)
+        outfile_path = os.path.join(NOTEBOOK_HTML_DIR, outfile_name)
         with open(outfile_path, 'w') as outfile:
             outfile.write(final_output)
 
@@ -156,8 +130,20 @@ def _extract_cells(html):
     return '\n'.join(map(str, divs))
 
 
+def _preamble_cell(path):
+    """
+    This cell is inserted at the start of each notebook to set the working
+    directory to the correct folder.
+    """
+    return nbformat.v4.new_code_cell(source=dedent("""
+        # HIDDEN
+        import os
+        os.chdir('{}')
+    """.format(path)))
+
+
 if __name__ == '__main__':
-    notebook_paths = glob.glob('notebooks/*.ipynb')
+    notebook_paths = glob.glob('notebooks/**/*.ipynb', recursive=True)
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)
     convert_notebooks_to_html_partial(notebook_paths)
