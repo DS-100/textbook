@@ -3,7 +3,10 @@
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
 
+VERSION=v1
+
 BOOK_URL=https://ds100.gitbooks.io/textbook/content/
+LIVE_URL=https://ds100.gitbooks.io/textbook/content/v/$(VERSION)
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -34,8 +37,7 @@ serve: build ## Run gitbook to preview changes locally
 deploy: ## Publish gitbook
 ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/master)
 	@echo "Please check out the deployment branch, master, if you want to deploy your revisions."
-	@echo "You might also need to bring the deployment branch up to date by merging it with the staging branch."
-	@echo "For example: 'git checkout master && git pull && git merge staging && make deploy'"
+	@echo "For example: 'git checkout master && make deploy'"
 	@echo "(Current branch: $(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)))"
 	exit 1
 endif
@@ -51,3 +53,20 @@ endif
 	@echo "${BLUE}Updating Binder image in background (you will see${NOCOLOR}"
 	@echo "${BLUE}JSON output in your terminal once built).${NOCOLOR}"
 	curl -s https://mybinder.org/build/gh/DS-100/textbook/master | grep '"ready"' &
+
+deploy-live: ## Publish gitbook to live student version
+ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/master)
+	@echo "Please check out the deployment branch, master, if you want to deploy your revisions."
+	@echo "For example: 'git checkout master && make deploy'"
+	@echo "(Current branch: $(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)))"
+	exit 1
+endif
+	git pull
+	git checkout $(VERSION)
+	git rebase master
+	@echo "${BLUE}Deploying book to live Gitbook.${NOCOLOR}"
+	@echo "${BLUE}=========================${NOCOLOR}"
+	git push origin $(VERSION)
+	git checkout master
+	@echo ""
+	@echo "${BLUE}Done, see book at ${LIVE_URL}.${NOCOLOR}"
