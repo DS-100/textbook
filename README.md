@@ -3,7 +3,7 @@
 **By [Sam Lau][sam], [Joey Gonzalez][joey], and [Deb Nolan][deb].**
 
 This is the textbook for
-[DS100, the Principles and Techniques of Data Science course at UC Berkeley][ds100].
+[Data 100, the Principles and Techniques of Data Science course at UC Berkeley][ds100].
 
 DS100 is the upper-division data science course intended to be taken after
 [Data 8, the Foundations of Data Science course][data8].
