@@ -9,3 +9,7 @@
   - [2.1 Dewey Defeats Truman](ch2/dewey_truman.md)
   - [2.2 Probability Sampling](ch2/probability_sampling.md)
   - [2.3 SRS vs. "Big Data"](ch2/srs_vs_big_data.md)
+- [3. Tabular Data and `pandas`](ch3/tabular_data.md)
+  - [Indexes, Slicing, and Sorting](ch3/indexes_slicing_sorting.md)
+  - [Grouping and Pivoting](ch3/grouping_pivoting.md)
+  - [Apply, Strings, and Plotting](ch3/apply_strings_plotting.md)
