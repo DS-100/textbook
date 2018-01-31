@@ -15,4 +15,4 @@
   - [3.3 Apply, Strings, and Plotting](ch3/apply_strings_plotting.md)
 - [4. Data Cleaning](ch4/data_cleaning.md)
   - [4.1 Cleaning the Calls Dataset](ch4/cleaning_1.md)
-  - [4.1 Cleaning the Stops Dataset](ch4/cleaning_2.md)
+  - [4.2 Cleaning the Stops Dataset](ch4/cleaning_2.md)
