@@ -13,3 +13,5 @@
   - [3.1 Indexes, Slicing, and Sorting](ch3/indexes_slicing_sorting.md)
   - [3.2 Grouping and Pivoting](ch3/grouping_pivoting.md)
   - [3.3 Apply, Strings, and Plotting](ch3/apply_strings_plotting.md)
+- [4. Data Cleaning](ch4/data_cleaning.md)
+  - [4.1 Cleaning the Calls Dataset](ch4/cleaning_1.md)
