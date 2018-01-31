@@ -52,7 +52,8 @@ endif
 	@echo "${BLUE}Done, see book at ${BOOK_URL}.${NOCOLOR}"
 	@echo "${BLUE}Updating Binder image in background (you will see${NOCOLOR}"
 	@echo "${BLUE}JSON output in your terminal once built).${NOCOLOR}"
-	curl -s https://mybinder.org/build/gh/DS-100/textbook/master | grep '"ready"' &
+	curl -s https://mybinder.org/build/gh/DS-100/textbook/master |\
+		sed -E 's/.*"message": "([^"]+)\\n".*/\1/' &
 
 deploy-live: ## Publish gitbook to live student version
 ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/master)
