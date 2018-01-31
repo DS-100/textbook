@@ -8,7 +8,7 @@ VERSION=v1
 BOOK_URL=https://ds100.gitbooks.io/textbook/content/
 LIVE_URL=https://ds100.gitbooks.io/textbook/content/v/$(VERSION)
 
-BINDER_REGEXP=.*"message": "([^"]+)\\n".*
+BINDER_REGEXP=.*"message": "([^"]+)".*
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -54,6 +54,9 @@ endif
 	@echo "${BLUE}Done, see book at ${BOOK_URL}.${NOCOLOR}"
 	@echo "${BLUE}Updating Binder image in background (you will see${NOCOLOR}"
 	@echo "${BLUE}JSON output in your terminal once built).${NOCOLOR}"
+	make ping_binder
+
+ping_binder: ## Force-updates BinderHub image
 	curl -s https://mybinder.org/build/gh/DS-100/textbook/master |\
 		grep -E '${BINDER_REGEXP}' |\
 		sed -E 's/${BINDER_REGEXP}/\1/' &
