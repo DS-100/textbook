@@ -301,10 +301,10 @@ Berkeley, CA
 
  
  
-<div id="6e96d4b4-8637-4139-adce-c9776295418c"></div>
+<div id="d420fd4d-ba67-4d57-99d9-1d098821a87d"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#6e96d4b4-8637-4139-adce-c9776295418c');
+var element = $('#d420fd4d-ba67-4d57-99d9-1d098821a87d');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "967b6424709545f9bbb7f6517ce5e234", "version_major": 2, "version_minor": 0}
@@ -535,7 +535,7 @@ var element = $('#6e96d4b4-8637-4139-adce-c9776295418c');
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Are-there-any-missing-values-that-were-filled-in?">Are there any missing values that were filled in?<a class="anchor-link" href="#Are-there-any-missing-values-that-were-filled-in?">¶</a></h3><p>From the missing value check above we can see that the Block_Location column has Berkeley, CA recorded if the location was missing.</p>
-<p>In addition, an inspection of the <code>calls</code> table shows us that the EVENTDT column has the correct dates but records 12am for all of its times. Instead, the times are in the EVENTTM column. As a data cleaning step, we might want to merge the EVENTDT and EVENTTM columns to record both date and time in one field.</p></div></div></div>
+<p>In addition, an inspection of the <code>calls</code> table shows us that the EVENTDT column has the correct dates but records 12am for all of its times. Instead, the times are in the EVENTTM column.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -664,6 +664,83 @@ var element = $('#6e96d4b4-8637-4139-adce-c9776295418c');
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>As a data cleaning step, we want to merge the EVENTDT and EVENTTM columns to record both date and time in one field. If we define a function that takes in a DF and returns a new DF, we can later use <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pipe.html"><code>pd.pipe</code></a> to apply all transformations in one go.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">combine_event_datetimes</span><span class="p">(</span><span class="n">calls</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+        <span class="c1"># Combine date and time strings</span>
+        <span class="n">calls</span><span class="p">[</span><span class="s1">'EVENTDT'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="n">calls</span><span class="p">[</span><span class="s1">'EVENTTM'</span><span class="p">],</span>
+        <span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">calls</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">EVENTDTTM</span><span class="o">=</span><span class="n">combined</span><span class="p">)</span>
+
+<span class="c1"># To peek at the result without mutating the calls DF:</span>
+<span class="n">calls</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_event_datetimes</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENO</th>
+      <th>OFFENSE</th>
+      <th>EVENTDT</th>
+      <th>EVENTTM</th>
+      <th>...</th>
+      <th>BLKADDR</th>
+      <th>City</th>
+      <th>State</th>
+      <th>EVENTDTTM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17091420</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/23/2017 12:00:00 AM</td>
+      <td>06:00</td>
+      <td>...</td>
+      <td>2500 LE CONTE AVE</td>
+      <td>Berkeley</td>
+      <td>CA</td>
+      <td>2017-07-23 06:00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>17020462</td>
+      <td>THEFT FROM PERSON</td>
+      <td>04/13/2017 12:00:00 AM</td>
+      <td>08:45</td>
+      <td>...</td>
+      <td>2200 SHATTUCK AVE</td>
+      <td>Berkeley</td>
+      <td>CA</td>
+      <td>2017-04-13 08:45:00</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 12 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Which-parts-of-the-data-were-entered-by-a-human?">Which parts of the data were entered by a human?<a class="anchor-link" href="#Which-parts-of-the-data-were-entered-by-a-human?">¶</a></h3><p>It looks like most of the data columns are machine-recorded, including the date, time, day of week, and location of the event.</p>
 <p>In addition, the OFFENSE and CVLEGEND columns appear to contain consistent values. We can check the unique values in each column to see if anything was misspelled:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
@@ -760,17 +837,19 @@ Name: BLKADDR, dtype: object</pre></div></div></div></div></div>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">calls_with_coords</span> <span class="o">=</span> <span class="n">calls</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">calls</span><span class="p">[</span><span class="s1">'Block_Location'</span><span class="p">]</span>
-    <span class="c1"># Get coords from string</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="c1"># Remove parens from coords</span>
-    <span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="c1"># Split latitude and longitude</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">'Latitude'</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">'Longitude'</span><span class="p">})</span>
-<span class="p">)</span>
-<span class="n">calls_with_coords</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">split_lat_lon</span><span class="p">(</span><span class="n">calls</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">calls</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">calls</span><span class="p">[</span><span class="s1">'Block_Location'</span><span class="p">]</span>
+        <span class="c1"># Get coords from string</span>
+        <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># Remove parens from coords</span>
+        <span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># Split latitude and longitude</span>
+        <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">'Latitude'</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">'Longitude'</span><span class="p">})</span>
+    <span class="p">)</span>
+
+<span class="n">calls</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">split_lat_lon</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -826,69 +905,9 @@ Name: BLKADDR, dtype: object</pre></div></div></div></div></div>
       <td>37.869363</td>
       <td>-122.268028</td>
     </tr>
-    <tr>
-      <th>2</th>
-      <td>17050275</td>
-      <td>BURGLARY AUTO</td>
-      <td>08/24/2017 12:00:00 AM</td>
-      <td>18:30</td>
-      <td>...</td>
-      <td>Berkeley</td>
-      <td>CA</td>
-      <td>37.865491</td>
-      <td>-122.310065</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>5505</th>
-      <td>17018126</td>
-      <td>DISTURBANCE</td>
-      <td>04/01/2017 12:00:00 AM</td>
-      <td>12:22</td>
-      <td>...</td>
-      <td>Berkeley</td>
-      <td>CA</td>
-      <td>37.850001</td>
-      <td>-122.275963</td>
-    </tr>
-    <tr>
-      <th>5506</th>
-      <td>17090665</td>
-      <td>THEFT MISD. (UNDER $950)</td>
-      <td>04/01/2017 12:00:00 AM</td>
-      <td>12:00</td>
-      <td>...</td>
-      <td>Berkeley</td>
-      <td>CA</td>
-      <td>37.874489</td>
-      <td>-122.271072</td>
-    </tr>
-    <tr>
-      <th>5507</th>
-      <td>17049700</td>
-      <td>SEXUAL ASSAULT MISD.</td>
-      <td>08/22/2017 12:00:00 AM</td>
-      <td>20:02</td>
-      <td>...</td>
-      <td>Berkeley</td>
-      <td>CA</td>
-      <td>37.866761</td>
-      <td>-122.258779</td>
-    </tr>
   </tbody>
 </table>
-<p>5508 rows × 13 columns</p></div></div></div></div></div></div>
+<p>2 rows × 13 columns</p></div></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -967,11 +986,93 @@ Name: BLKADDR, dtype: object</pre></div></div></div></div></div>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">calls_final</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">calls_with_coords</span>
-    <span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">day_of_week</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">'CVDOW'</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'CVDOW'</span><span class="p">,</span> <span class="s1">'InDbDate'</span><span class="p">,</span> <span class="s1">'Block_Location'</span><span class="p">,</span> <span class="s1">'City'</span><span class="p">,</span> <span class="s1">'State'</span><span class="p">])</span>
-<span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">match_weekday</span><span class="p">(</span><span class="n">calls</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">calls</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">day_of_week</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">'CVDOW'</span><span class="p">)</span>
+<span class="n">calls</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">match_weekday</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENO</th>
+      <th>OFFENSE</th>
+      <th>EVENTDT</th>
+      <th>EVENTTM</th>
+      <th>...</th>
+      <th>BLKADDR</th>
+      <th>City</th>
+      <th>State</th>
+      <th>Day</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17091420</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/23/2017 12:00:00 AM</td>
+      <td>06:00</td>
+      <td>...</td>
+      <td>2500 LE CONTE AVE</td>
+      <td>Berkeley</td>
+      <td>CA</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>17038302</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/02/2017 12:00:00 AM</td>
+      <td>22:00</td>
+      <td>...</td>
+      <td>BOWDITCH STREET &amp; CHANNING WAY</td>
+      <td>Berkeley</td>
+      <td>CA</td>
+      <td>Sunday</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 12 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We'll drop columns we no longer need:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">drop_unneeded_cols</span><span class="p">(</span><span class="n">calls</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">calls</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'CVDOW'</span><span class="p">,</span> <span class="s1">'InDbDate'</span><span class="p">,</span> <span class="s1">'Block_Location'</span><span class="p">,</span> <span class="s1">'City'</span><span class="p">,</span>
+                               <span class="s1">'State'</span><span class="p">,</span> <span class="s1">'EVENTDT'</span><span class="p">,</span> <span class="s1">'EVENTTM'</span><span class="p">])</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, we'll pipe the <code>calls</code> DF through all the functions we've defined:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">calls_final</span> <span class="o">=</span> <span class="p">(</span><span class="n">calls</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_event_datetimes</span><span class="p">)</span>
+               <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">split_lat_lon</span><span class="p">)</span>
+               <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">match_weekday</span><span class="p">)</span>
+               <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_unneeded_cols</span><span class="p">))</span>
 <span class="n">df_interact</span><span class="p">(</span><span class="n">calls_final</span><span class="p">)</span>
 </pre></div></div></div></div>
 
@@ -989,13 +1090,13 @@ Name: BLKADDR, dtype: object</pre></div></div></div></div></div>
 
  
  
-<div id="a6c89696-9967-4ccd-a624-7d05b002158f"></div>
+<div id="c37a5ac9-4adb-41a1-8bf6-8da5d177513e"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#a6c89696-9967-4ccd-a624-7d05b002158f');
+var element = $('#c37a5ac9-4adb-41a1-8bf6-8da5d177513e');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id": "13b5c71a6b3a4dfd827d63da36f02fce", "version_major": 2, "version_minor": 0}
+{"model_id": "180d3f2d1d494fdeb26f3228a56f6758", "version_major": 2, "version_minor": 0}
 </script></div></div>
 
 <div class="output_area">
@@ -1004,9 +1105,18 @@ var element = $('#a6c89696-9967-4ccd-a624-7d05b002158f');
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>(5508 rows, 9 columns) total
+<pre>(5508 rows, 8 columns) total
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The Calls dataset is now ready for further data analysis. In the next section, we will clean the Stops dataset.</p></div></div></div></div>
+<p>The Calls dataset is now ready for further data analysis. In the next section, we will clean the Stops dataset.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input hidden">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Save data to CSV for other chapters</span>
+<span class="n">calls_final</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'../ch5/data/calls.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div></div></div></div></div></div>
