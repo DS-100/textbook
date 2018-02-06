@@ -45,7 +45,10 @@ NOTEBOOK_IMAGE_DIR = 'notebooks-images'
 
 # The prefix for the interact button links. The path format string gets filled
 # in with the notebook as well as any datasets the notebook requires.
-INTERACT_LINK = 'http://data100.datahub.berkeley.edu/user-redirect/interact?repo=https://github.com/DS-100/textbook&{paths}' # noqa
+INTERACT_LINK = (
+    'http://data100.datahub.berkeley.edu/user-redirect/interact'
+    '?repo=https://github.com/DS-100/textbook&{paths}'
+)
 
 # The prefix for each notebook + its dependencies
 PATH_PREFIX = 'path={}'
@@ -60,12 +63,16 @@ def convert_notebooks_to_html_partial(notebook_paths):
     Converts notebooks in notebook_paths to HTML partials in NOTEBOOK_HTML_DIR
     """
     for notebook_path in notebook_paths:
-        # Computes <name>.ipynb from notebooks/<name>.ipynb
+        # Computes <name>.ipynb from notebooks/ch1/<name>.ipynb
         path, filename = os.path.split(notebook_path)
+        # Computes ch1 from notebooks/ch1
+        _, chapter = os.path.split(path)
         # Computes <name> from <name>.ipynb
         basename, _ = os.path.splitext(filename)
         # Computes <name>.html from notebooks/<name>.ipynb
         outfile_name = basename + '.html'
+        # Computes <name>.md from notebooks/<name>.ipynb
+        mdfile_name = basename + '.md'
 
         # This results in images like AB_5_1.png for a notebook called AB.ipynb
         unique_image_key = basename
@@ -91,7 +98,8 @@ def convert_notebooks_to_html_partial(notebook_paths):
 
         with_wrapper = wrapper.format(
             interact_link=INTERACT_LINK.format(
-                paths=PATH_PREFIX.format(notebook_path)),
+                paths=PATH_PREFIX.format(notebook_path)
+            ),
             html=html,
         )
 
@@ -109,6 +117,11 @@ def convert_notebooks_to_html_partial(notebook_paths):
             final_image_path = '{}/{}'.format(NOTEBOOK_IMAGE_DIR, image_name)
             with open(final_image_path, 'wb') as outimage:
                 outimage.write(image_data)
+
+        # Write out Markdown placeholder
+        with open(os.path.join(chapter, mdfile_name), 'w') as outfile:
+            outfile.write('!INCLUDE "../{}"\n'.format(outfile_path))
+
         print(outfile_path + " written.")
 
 
@@ -119,12 +132,14 @@ def _extract_cells(html):
     divs = doc.find_all('div', class_='cell')
     for div in divs:
         if '# HIDDEN' in str(div):
-            div['class'].append('hidden')
+            div.find('div', class_='input')['class'].append('hidden')
 
     def remove_prompts_and_styles(tag):
-        for t in (tag.find_all('div', class_='prompt')
-                  + tag.find_all('style')):
+        for t in (
+            tag.find_all('div', class_='prompt') + tag.find_all('style')
+        ):
             t.decompose()
+
     [remove_prompts_and_styles(div) for div in divs]
 
     return '\n'.join(map(str, divs))
@@ -135,11 +150,20 @@ def _preamble_cell(path):
     This cell is inserted at the start of each notebook to set the working
     directory to the correct folder.
     """
-    return nbformat.v4.new_code_cell(source=dedent("""
-        # HIDDEN
-        import os
-        os.chdir('{}')
-    """.format(path)))
+    code = dedent(
+        '''
+    # HIDDEN
+    # Clear previously defined variables
+    for var in list(locals().keys()):
+        if not var.startswith('__'):
+            del globals()[var]
+
+    # Set directory for data loading to work properly
+    import os
+    os.chdir(os.path.expanduser('~/{}'))
+    '''.format(path)
+    )
+    return nbformat.v4.new_code_cell(source=code)
 
 
 if __name__ == '__main__':
