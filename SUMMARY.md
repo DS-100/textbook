@@ -19,4 +19,6 @@
 - [5. Exploratory Data Analysis](ch5/eda.md)
   - [5.1 Structure and Joins](ch5/eda_structure.md)
   - [5.2 Granularity](ch5/eda_granularity.md)
-  - [5.2 Scope and Temporality](ch5/eda_scope_temp.md)
+  - [5.3 Scope](ch5/eda_scope.md)
+  - [5.4 Temporality](ch5/eda_temp.md)
+  - [5.5 Faithfulness](ch5/eda_faithfulness.md)

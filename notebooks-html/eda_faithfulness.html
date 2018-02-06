@@ -1,0 +1,189 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/interact?repo=https://github.com/DS-100/textbook&path=notebooks/ch5/eda_faithfulness.ipynb">Open on DataHub</a></div>
+    <div class="cell border-box-sizing code_cell rendered">
+<div class="input hidden">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">locals</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'__'</span><span class="p">):</span>
+        <span class="k">del</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">var</span><span class="p">]</span>
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">'~/notebooks/ch5'</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input hidden">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">'talk'</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Faithfulness">Faithfulness<a class="anchor-link" href="#Faithfulness">¶</a></h2><p>We describe a dataset as "faithful" if we believe it accurately captures reality. Typically, untrustworthy datasets contain:</p>
+<p><strong>Unrealistic or incorrect values</strong></p>
+<p>For example, dates in the future, locations that don't exist, negative counts, or large outliers.</p>
+<p><strong>Violations of obvious dependencies</strong></p>
+<p>For example, age and birthday for individuals don't match.</p>
+<p><strong>Hand-entered data</strong></p>
+<p>As we have seen, these are typically filled with spelling errors and inconsistencies.</p>
+<p><strong>Clear signs of data falsification</strong></p>
+<p>For example, repeated names, fake looking email addresses, or repeated use of uncommon names or fields.</p>
+<p>Notice the many similarities to data cleaning. As we have mentioned, we often go back and forth between data cleaning and EDA, especially when determining data faithfulness. For example, visualizations often help us identify strange entries in the data.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">calls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'data/calls.csv'</span><span class="p">)</span>
+<span class="n">calls</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENO</th>
+      <th>OFFENSE</th>
+      <th>EVENTDT</th>
+      <th>EVENTTM</th>
+      <th>...</th>
+      <th>BLKADDR</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Day</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17091420</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/23/2017 12:00:00 AM</td>
+      <td>06:00</td>
+      <td>...</td>
+      <td>2500 LE CONTE AVE</td>
+      <td>37.876965</td>
+      <td>-122.260544</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>17038302</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/02/2017 12:00:00 AM</td>
+      <td>22:00</td>
+      <td>...</td>
+      <td>BOWDITCH STREET &amp; CHANNING WAY</td>
+      <td>37.867209</td>
+      <td>-122.256554</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>17049346</td>
+      <td>THEFT MISD. (UNDER $950)</td>
+      <td>08/20/2017 12:00:00 AM</td>
+      <td>23:20</td>
+      <td>...</td>
+      <td>2900 CHANNING WAY</td>
+      <td>37.867948</td>
+      <td>-122.250664</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>17091319</td>
+      <td>THEFT MISD. (UNDER $950)</td>
+      <td>07/09/2017 12:00:00 AM</td>
+      <td>04:15</td>
+      <td>...</td>
+      <td>2100 RUSSELL ST</td>
+      <td>37.856719</td>
+      <td>-122.266672</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>17044238</td>
+      <td>DISTURBANCE</td>
+      <td>07/30/2017 12:00:00 AM</td>
+      <td>01:16</td>
+      <td>...</td>
+      <td>TELEGRAPH AVENUE &amp; DURANT AVE</td>
+      <td>37.867816</td>
+      <td>-122.258994</td>
+      <td>Sunday</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 9 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">calls</span><span class="p">[</span><span class="s1">'CASENO'</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ebb2898&gt;</pre></div></div>
+
+<div class="output_area">
+
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/eda_faithfulness_4_1.png"/></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice the unexpected clusters at 17030000 and 17090000. By plotting the distribution of case numbers, we can quickly see anomalies in the data. In this case, we might guess that two different teams of police use different sets of case numbers for their calls.</p>
+<p>Exploring the data often reveals anomalies; if fixable, we can then apply data cleaning techniques.</p></div></div></div></div>
