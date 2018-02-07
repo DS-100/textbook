@@ -21,6 +21,7 @@ from traitlets.config import Config
 wrapper = """
 <div id="ipython-notebook">
     <div class="buttons">
+        <a class="interact-button" id="nbinteract" href="#">Run Widgets</a>
         <a class="interact-button" href="{interact_link}">Open on DataHub</a>
     </div>
     {html}
