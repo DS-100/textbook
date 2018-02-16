@@ -18,6 +18,8 @@ notebooks: ## Convert notebooks to HTML pages
 	@echo "${BLUE}=============================${NOCOLOR}"
 
 	python convert_notebooks_to_html_partial.py
+	# Generate markdown files for revisions
+	jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True notebooks/**/*.ipynb
 	touch SUMMARY.md
 
 	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
