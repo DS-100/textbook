@@ -46,9 +46,9 @@ surely make the question more precise as we go.
 
 **In Data 100, we will study various methods to collect data.**
 
-Let's begin by looking at our data, the roster of student first names that we've downloaded from a previous offering of Data 100.
+Let's begin by looking at our data: the roster of student first names that we've downloaded from a previous offering of Data 100.
 
-Don't worry if you don't understand the code for now; we'll introduce the libraries in more depth later. Instead, focus on the process and the charts that we show.
+Don't worry if you don't understand the code for now; we'll introduce the libraries in more depth later. Instead, focus on the process and the plots that we show.
 
 
 ```python
@@ -68,4 +68,4 @@ students['Name'] = students['Name'].str.lower()
 students
 ```
 
-Now that our data are in a format that's easier for us to work with, let's proceed to exploratory data analysis.
+Now that our data are in a format that's easier for us to work with, we proceed to exploratory data analysis.
