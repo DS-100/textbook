@@ -9,10 +9,12 @@
 Data visualization is an essential tool for data science at every step of
 analysis, from data cleaning to EDA to communicating conclusions and
 predictions. Because human minds are highly developed for visual perception, a
-well-chosen plot can often reveal trends and anolmalies in the data much faster
+well-chosen plot can often reveal trends and anomalies in the data much faster
 than a textual description.
 
-In this chapter, we introduce the most useful visualizations for data analysis
-and when to use each one. We also explain how to spot misleading visualizations
-and how to improve visualizations using data tranformations, smoothing, and
+To effectively use data visualizations, you must be proficient with both the
+programming tools to generate plots and principles of visualization. In this
+chapter we will introduce `seaborn` and `matplotlib`, our tools of choice for
+creating plots. We will also learn how to spot misleading visualizations and
+how to improve visualizations using data transformations, smoothing, and
 dimensionality reduction.
