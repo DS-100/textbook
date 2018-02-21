@@ -13,15 +13,13 @@ import re
 import os
 from textwrap import dedent
 
-import bs4
 import nbformat
-from nbconvert import HTMLExporter
+from nbinteract import InteractExporter
 from traitlets.config import Config
 
 wrapper = """
 <div id="ipython-notebook">
     <div class="buttons">
-        <a class="interact-button" id="nbinteract" href="#">Run Widgets</a>
         <a class="interact-button" href="{interact_link}">Open on DataHub</a>
     </div>
     {html}
@@ -30,13 +28,13 @@ wrapper = """
 
 # Use ExtractOutputPreprocessor to extract the images to separate files
 config = Config()
-config.HTMLExporter.preprocessors = [
+config.InteractExporter.preprocessors = [
     'nbconvert.preprocessors.ExtractOutputPreprocessor',
 ]
 
 # Output a HTML partial, not a complete page
-html_exporter = HTMLExporter(config=config)
-html_exporter.template_file = 'basic'
+html_exporter = InteractExporter(config=config)
+html_exporter.template_file = 'gitbook'
 
 # Output notebook HTML partials into this directory
 NOTEBOOK_HTML_DIR = 'notebooks-html'
@@ -90,12 +88,10 @@ def convert_notebooks_to_html_partial(notebook_paths):
 
         notebook = nbformat.read(notebook_path, 4)
         notebook.cells.insert(0, _preamble_cell(path))
-        raw_html, resources = html_exporter.from_notebook_node(
+        html, resources = html_exporter.from_notebook_node(
             notebook,
             resources=extract_output_config,
         )
-
-        html = _extract_cells(raw_html)
 
         with_wrapper = wrapper.format(
             interact_link=INTERACT_LINK.format(
@@ -124,26 +120,6 @@ def convert_notebooks_to_html_partial(notebook_paths):
             outfile.write('!INCLUDE "../{}"\n'.format(outfile_path))
 
         print(outfile_path + " written.")
-
-
-def _extract_cells(html):
-    """Return a html partial of divs with cell contents."""
-    doc = bs4.BeautifulSoup(html, 'html5lib')
-
-    divs = doc.find_all('div', class_='cell')
-    for div in divs:
-        if '# HIDDEN' in str(div):
-            div.find('div', class_='input')['class'].append('hidden')
-
-    def remove_prompts_and_styles(tag):
-        for t in (
-            tag.find_all('div', class_='prompt') + tag.find_all('style')
-        ):
-            t.decompose()
-
-    [remove_prompts_and_styles(div) for div in divs]
-
-    return '\n'.join(map(str, divs))
 
 
 def _preamble_cell(path):
