@@ -34,13 +34,9 @@ def df_interact(df):
 
 We generally use different types of charts to visualize quantitative (numerical) data and qualitative (ordinal or nominal) data.
 
-For quantitative data, we often use:
+For quantitative data, we most often use histograms, box plots, and scatter plots.
 
-- Histograms
-- Box plots
-- Scatter plots
-
-Let's discuss each of these plots using the [seaborn plotting library](http://seaborn.pydata.org/) for Python. We will use a dataset containing information about passengers aboard the Titanic.
+We can use the [seaborn plotting library](http://seaborn.pydata.org/) to create these plots in Python. We will use a dataset containing information about passengers aboard the Titanic.
 
 
 ```python
@@ -61,23 +57,16 @@ df_interact(ti)
 
 ### Histograms
 
-We can see that the dataset contains one row for every passenger. Each row includes the age of the passenger and the amount the passenger paid for a ticket. Let's visualize this numerical data using a histogram. `pandas` has built-in support for plotting:
+We can see that the dataset contains one row for every passenger. Each row includes the age of the passenger and the amount the passenger paid for a ticket. Let's visualize the ages using a histogram. We can use seaborn's `distplot` function:
 
 
 ```python
 # Adding a semi-colon at the end tells Jupyter not to output the
 # usual <matplotlib.axes._subplots.AxesSubplot> line
-ti['age'].plot.hist();
-```
-
-We can also use seaborn's `distplot`:
-
-
-```python
 sns.distplot(ti['age']);
 ```
 
-By default, seaborn's `distplot` function will output a smoothed curve that roughly fits the distribution. We can also add a rugplot to see where the individual points fall:
+By default, seaborn's `distplot` function will output a smoothed curve that roughly fits the distribution. We can also add a rugplot which marks each individual point on the x-axis:
 
 
 ```python
@@ -139,7 +128,7 @@ sns.distplot(ti.loc[ti['who'] == 'child', 'fare']);
 You may have noticed that the `boxplot` call to make separate box plots for the `who` column was simpler than the equivalent code to make an overlaid histogram. Although `sns.distplot` takes in an array or Series of data, most other seaborn functions allow you to pass in a DataFrame and specify which column to plot on the x and y axes. For example:
 
 ```python
-# Plots the fare column on the x-axis
+# Plots the `fare` column of the `ti` DF on the x-axis
 sns.boxplot(x='fare', data=ti);
 ```
 
