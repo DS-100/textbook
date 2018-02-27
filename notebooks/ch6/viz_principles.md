@@ -68,7 +68,7 @@ plt.title('Percent Change in Number of Procedures')
 plt.xlabel('')
 plt.ylabel('Percent Change')
 plt.ylim(-0.6, 0.6)
-plt.axhline(y=0, c='black')
+plt.axhline(y=0, c='black');
 ```
 
 When selecting the x and y-axis limits we prefer to focus on the region with the bulk of the data, especially when working with long-tailed data. Consider the following plot and its zoomed in version to its right:
