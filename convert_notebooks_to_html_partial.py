@@ -20,21 +20,25 @@ from traitlets.config import Config
 wrapper = """
 <div id="ipython-notebook">
     <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
         <a class="interact-button" href="{interact_link}">Open on DataHub</a>
     </div>
     {html}
 </div>
 """
 
-# Use ExtractOutputPreprocessor to extract the images to separate files
-config = Config()
-config.InteractExporter.preprocessors = [
-    'nbconvert.preprocessors.ExtractOutputPreprocessor',
-]
+config = Config(
+    InteractExporter=dict(
+        # Use ExtractOutputPreprocessor to extract the images to separate files
+        preprocessors=['nbconvert.preprocessors.ExtractOutputPreprocessor'],
+        template_file='gitbook',
+        button_at_top=False,
+    )
+)
 
-# Output a HTML partial, not a complete page
 html_exporter = InteractExporter(config=config)
-html_exporter.template_file = 'gitbook'
 
 # Output notebook HTML partials into this directory
 NOTEBOOK_HTML_DIR = 'notebooks-html'
