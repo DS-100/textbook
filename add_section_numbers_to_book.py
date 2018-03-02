@@ -97,32 +97,34 @@ def add_section_labels(lines, section=(0, 0, 0)):
     if not is_link(line):
         return [line, *add_section_labels(rest, section)]
 
-    before, after = line.split('[')
+    # Unfinished chapters aren't linked in the sidebar
+    if '[' not in line:
+        before, after = line.split(' ', maxsplit=1)
+        bracket = ' '
+    else:
+        before, after = line.split('[', maxsplit=1)
+        bracket = '['
+
     after = LABEL_RE.sub('', after)
 
     # We only increment the numbering for a section *after* the recursion since
     # we can't tell ahead of time whether the next link is nested.
     if is_subsubpart(line):
-        labeled_line = ('{}[{}.{}.{} {}'
-                        .format(before, part, subpart, subsubpart + 1, after))
+        labeled_line = (
+            f'{before}{bracket}{part}.{subpart}.{subsubpart + 1} {after}'
+        )
         return [
             labeled_line,
             *add_section_labels(rest, (part, subpart, subsubpart + 1))
         ]
     elif is_subpart(line):
-        labeled_line = ('{}[{}.{} {}'
-                        .format(before, part, subpart + 1, after))
+        labeled_line = f'{before}{bracket}{part}.{subpart + 1} {after}'
         return [
-            labeled_line,
-            *add_section_labels(rest, (part, subpart + 1, 0))
+            labeled_line, *add_section_labels(rest, (part, subpart + 1, 0))
         ]
     else:
-        labeled_line = ('{}[{}. {}'
-                        .format(before, part + 1, after))
-        return [
-            labeled_line,
-            *add_section_labels(rest, (part + 1, 0, 0))
-        ]
+        labeled_line = f'{before}{bracket}{part + 1}. {after}'
+        return [labeled_line, *add_section_labels(rest, (part + 1, 0, 0))]
 
 
 def read_summary():
@@ -192,8 +194,23 @@ def test():
         '  * [3.2 Getting Started](/introduction/Getting_Started.md)',
     ]
 
+    test3 = [
+        '# Table of Contents',
+        '* [1. Read Me](/README.md)',
+        '* [Read Me 2](/README.md)',
+        '* Unfinished chapter',
+    ]
+
+    res3 = [
+        '# Table of Contents',
+        '* [1. Read Me](/README.md)',
+        '* [2. Read Me 2](/README.md)',
+        '* 3. Unfinished chapter',
+    ]
+
     assert add_section_labels(test1) == res1
     assert add_section_labels(test2) == res2
+    assert add_section_labels(test3) == res3
 
     print('Tests pass')
 

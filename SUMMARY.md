@@ -29,3 +29,7 @@
   * [6.4 Principles of Visualization](ch6/viz_principles.md)
   * [6.5 Principles of Visualization 2](ch6/viz_principles_2.md)
   * [6.6 Visualization Philosophy](ch6/viz_philosophy.md)
+* [7. Web Technologies [In Progress]]()
+* [8. Working With Text [In Progress]]()
+* [9. Databases and SQL [In Progress]]()
+* [10. Modeling and Estimation]()
