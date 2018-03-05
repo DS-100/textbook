@@ -118,8 +118,6 @@ def try_thetas_interact(theta, y_vals, xlims, cost_fn=mse_cost):
     plt.axvline(theta, linestyle='--')
     plt.xlim(*xlims)
     plt.yticks([])
-    plt.legend()
-    
     print(f'Cost for theta = {theta}: {cost_fn(theta, y_vals):.2f}')
 
 def mse_interact(theta, y_vals, xlims):
@@ -169,10 +167,13 @@ Let's try some values of $ \theta $.
 
 
 ```python
+# HIDDEN
 try_thetas(thetas=np.arange(13, 17.1, 0.5),
            y_vals=tips['pcttip'],
            xlims=(0, 30))
 ```
+
+As before, we've created an interactive widget to test different values of $ \theta $.
 
 
 ```python
@@ -353,6 +354,8 @@ plt.ylabel('Proportion per Percent');
 
 ### Summary
 
-First, we restrict our model to only make a single number as its prediction for all tables. Next, we assume that the waiter's dataset of tips is similar to the population distribution of tip percentages. If this assumption holds, predicting $ 16.08\% $ will give us the most accurate predictions that we can given our data.
+First, we restricted our model to only make a single number as its prediction for all tables. Next, we assume that the waiter's dataset of tips is similar to the population distribution of tip percentages. If this assumption holds, predicting $ 16.08\% $ will give us the most accurate predictions that we can given our data.
 
-In this case, we say that the model is accurate if it minimizes the squared difference between the predictions and the actual values.
+To be more precise, we say that the model is accurate if it minimizes the squared difference between the predictions and the actual values.
+
+Although our model is simple, it illustrates concepts that we'll see over and over again. Future chapters will introduce complicated models. Still, we will discuss each model's assumptions, define cost functions, and find the model that minimizes the cost. It is very helpful to understand this process for simple models before attempting to understand complex ones.

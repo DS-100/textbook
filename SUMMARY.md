@@ -32,4 +32,7 @@
 * [7. Web Technologies [In Progress]]()
 * [8. Working With Text [In Progress]]()
 * [9. Databases and SQL [In Progress]]()
-* [10. Modeling and Estimation]()
+* [10. Modeling and Estimation](ch10/modeling_estimation.md)
+  * [10.1 A Simple Model](ch10/modeling_simple.md)
+  * [10.2 Cost Functions](ch10/modeling_cost_functions.md)
+  * [10.3 Absolute Cost and Huber Cost](ch10/modeling_abs_huber.md)
