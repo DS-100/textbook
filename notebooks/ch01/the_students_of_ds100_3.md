@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#What's-in-a-Name?" data-toc-modified-id="What's-in-a-Name?-1">What's in a Name?</a></span><ul class="toc-item"><li><span><a href="#Inferring-Sex-From-Name" data-toc-modified-id="Inferring-Sex-From-Name-1.1">Inferring Sex From Name</a></span></li><li><span><a href="#Inferring-Age-From-Name" data-toc-modified-id="Inferring-Age-From-Name-1.2">Inferring Age From Name</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

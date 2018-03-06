@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#The-Students-of-Data-100" data-toc-modified-id="The-Students-of-Data-100-1">The Students of Data 100</a></span></li><li><span><a href="#Question-Formulation" data-toc-modified-id="Question-Formulation-2">Question Formulation</a></span></li><li><span><a href="#Data-Acquisition-and-Cleaning" data-toc-modified-id="Data-Acquisition-and-Cleaning-3">Data Acquisition and Cleaning</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN

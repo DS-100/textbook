@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Exploratory-Data-Analysis" data-toc-modified-id="Exploratory-Data-Analysis-1">Exploratory Data Analysis</a></span></li><li><span><a href="#What's-in-a-Name?" data-toc-modified-id="What's-in-a-Name?-2">What's in a Name?</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN
