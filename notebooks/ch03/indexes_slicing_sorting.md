@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Getting-Started" data-toc-modified-id="Getting-Started-1">Getting Started</a></span></li><li><span><a href="#Indexes,-Slicing,-and-Sorting" data-toc-modified-id="Indexes,-Slicing,-and-Sorting-2">Indexes, Slicing, and Sorting</a></span><ul class="toc-item"><li><span><a href="#Breaking-the-Problem-Down" data-toc-modified-id="Breaking-the-Problem-Down-2.1">Breaking the Problem Down</a></span></li><li><span><a href="#Slicing-using-.loc" data-toc-modified-id="Slicing-using-.loc-2.2">Slicing using <code>.loc</code></a></span><ul class="toc-item"><li><span><a href="#Slicing-rows-using-a-predicate" data-toc-modified-id="Slicing-rows-using-a-predicate-2.2.1">Slicing rows using a predicate</a></span></li></ul></li><li><span><a href="#Sorting-Rows" data-toc-modified-id="Sorting-Rows-2.3">Sorting Rows</a></span></li></ul></li><li><span><a href="#In-Conclusion" data-toc-modified-id="In-Conclusion-3">In Conclusion</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN

@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Visualization-Principles" data-toc-modified-id="Visualization-Principles-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>Visualization Principles</a></span><ul class="toc-item"><li><span><a href="#Principles-of-Scale" data-toc-modified-id="Principles-of-Scale-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>Principles of Scale</a></span></li><li><span><a href="#Principles-of-Conditioning" data-toc-modified-id="Principles-of-Conditioning-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>Principles of Conditioning</a></span></li><li><span><a href="#Principles-of-Perception" data-toc-modified-id="Principles-of-Perception-1.3"><span class="toc-item-num">1.3&nbsp;&nbsp;</span>Principles of Perception</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN
@@ -19,7 +22,7 @@ pd.options.display.max_columns = 8
 
 ## Visualization Principles
 
-Now that we have the tools to create and alter plots, we turn to key principles for data visualization. Much like other parts of data science, it is difficult to precisely assign a number that measures how effective a specific visualization is. Still, there are general principles that make visualizations much more effective at showing trends in the data. We discuss six categories of principles: scale, conditioning, perception, transformation, context, and smooothing.
+Now that we have the tools to create and alter plots, we turn to key principles for data visualization. Much like other parts of data science, it is difficult to precisely assign a number that measures how effective a specific visualization is. Still, there are general principles that make visualizations much more effective at showing trends in the data. We discuss six categories of principles: scale, conditioning, perception, transformation, context, and smoothing.
 
 ### Principles of Scale
 
@@ -120,7 +123,7 @@ A second important property of human perception is that we are generally more ac
 
 ![viz_gdp.png](https://github.com/DS-100/textbook/raw/master/assets/viz_gdp.png)
 
-By numerical value, South Africa has twice the GSP of Algeria but it's not easy to tell from the plot above. Instead, we can plot the GDPs on a dot plot:
+By numerical value, South Africa has twice the GDP of Algeria but it's not easy to tell from the plot above. Instead, we can plot the GDPs on a dot plot:
 
 ![viz_gdp_v2.png](https://github.com/DS-100/textbook/raw/master/assets/viz_gdp_v2.png)
 

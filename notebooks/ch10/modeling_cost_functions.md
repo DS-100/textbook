@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Cost-Functions" data-toc-modified-id="Cost-Functions-1">Cost Functions</a></span><ul class="toc-item"><li><span><a href="#Our-First-Cost-Function:-Mean-Squared-Error" data-toc-modified-id="Our-First-Cost-Function:-Mean-Squared-Error-1.1">Our First Cost Function: Mean Squared Error</a></span></li><li><span><a href="#A-Shorthand" data-toc-modified-id="A-Shorthand-1.2">A Shorthand</a></span></li><li><span><a href="#Finding-the-Best-Value-of-$-\theta-$" data-toc-modified-id="Finding-the-Best-Value-of-$-\theta-$-1.3">Finding the Best Value of $ \theta $</a></span></li><li><span><a href="#The-Minimizing-Value-of-the-Mean-Squared-Error" data-toc-modified-id="The-Minimizing-Value-of-the-Mean-Squared-Error-1.4">The Minimizing Value of the Mean Squared Error</a></span></li><li><span><a href="#Back-to-the-Original-Dataset" data-toc-modified-id="Back-to-the-Original-Dataset-1.5">Back to the Original Dataset</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.6">Summary</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

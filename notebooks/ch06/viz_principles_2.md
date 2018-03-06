@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Visualization-Principles-Continued" data-toc-modified-id="Visualization-Principles-Continued-1">Visualization Principles Continued</a></span><ul class="toc-item"><li><span><a href="#Principles-of-Transformation" data-toc-modified-id="Principles-of-Transformation-1.1">Principles of Transformation</a></span></li><li><span><a href="#Principles-of-Context" data-toc-modified-id="Principles-of-Context-1.2">Principles of Context</a></span></li><li><span><a href="#Principles-of-Smoothing" data-toc-modified-id="Principles-of-Smoothing-1.3">Principles of Smoothing</a></span><ul class="toc-item"><li><span><a href="#Kernel-Density-Estimation-Details" data-toc-modified-id="Kernel-Density-Estimation-Details-1.3.1">Kernel Density Estimation Details</a></span></li><li><span><a href="#Smoothing-a-Scatter-Plot" data-toc-modified-id="Smoothing-a-Scatter-Plot-1.3.2">Smoothing a Scatter Plot</a></span></li></ul></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

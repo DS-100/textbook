@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Visualizing-Quantitative-Data" data-toc-modified-id="Visualizing-Quantitative-Data-1">Visualizing Quantitative Data</a></span><ul class="toc-item"><li><span><a href="#Histograms" data-toc-modified-id="Histograms-1.1">Histograms</a></span></li><li><span><a href="#Box-plots" data-toc-modified-id="Box-plots-1.2">Box plots</a></span></li><li><span><a href="#Brief-Aside-on-Using-Seaborn" data-toc-modified-id="Brief-Aside-on-Using-Seaborn-1.3">Brief Aside on Using Seaborn</a></span></li><li><span><a href="#Scatter-Plots" data-toc-modified-id="Scatter-Plots-1.4">Scatter Plots</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

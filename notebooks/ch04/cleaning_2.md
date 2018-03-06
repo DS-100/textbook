@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Cleaning-The-Stops-Dataset" data-toc-modified-id="Cleaning-The-Stops-Dataset-1">Cleaning The Stops Dataset</a></span><ul class="toc-item"><li><span><a href="#Are-there-missing-values?" data-toc-modified-id="Are-there-missing-values?-1.1">Are there missing values?</a></span></li><li><span><a href="#Are-there-any-missing-values-that-were-filled-in?" data-toc-modified-id="Are-there-any-missing-values-that-were-filled-in?-1.2">Are there any missing values that were filled in?</a></span></li><li><span><a href="#Which-parts-of-the-data-were-entered-by-a-human?" data-toc-modified-id="Which-parts-of-the-data-were-entered-by-a-human?-1.3">Which parts of the data were entered by a human?</a></span></li></ul></li><li><span><a href="#Conclusion" data-toc-modified-id="Conclusion-2">Conclusion</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN

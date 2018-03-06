@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Investigating-Berkeley-Police-Data" data-toc-modified-id="Investigating-Berkeley-Police-Data-1">Investigating Berkeley Police Data</a></span><ul class="toc-item"><li><span><a href="#Understanding-the-Data-Generation" data-toc-modified-id="Understanding-the-Data-Generation-1.1">Understanding the Data Generation</a></span></li></ul></li><li><span><a href="#Cleaning-The-Calls-Dataset" data-toc-modified-id="Cleaning-The-Calls-Dataset-2">Cleaning The Calls Dataset</a></span><ul class="toc-item"><li><span><a href="#Are-there-missing-values?" data-toc-modified-id="Are-there-missing-values?-2.1">Are there missing values?</a></span></li><li><span><a href="#Are-there-any-missing-values-that-were-filled-in?" data-toc-modified-id="Are-there-any-missing-values-that-were-filled-in?-2.2">Are there any missing values that were filled in?</a></span></li><li><span><a href="#Which-parts-of-the-data-were-entered-by-a-human?" data-toc-modified-id="Which-parts-of-the-data-were-entered-by-a-human?-2.3">Which parts of the data were entered by a human?</a></span></li><li><span><a href="#Final-Touchups" data-toc-modified-id="Final-Touchups-2.4">Final Touchups</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Grouping-and-Pivoting" data-toc-modified-id="Grouping-and-Pivoting-1">Grouping and Pivoting</a></span><ul class="toc-item"><li><span><a href="#Breaking-the-Problem-Down" data-toc-modified-id="Breaking-the-Problem-Down-1.1">Breaking the Problem Down</a></span></li><li><span><a href="#Grouping" data-toc-modified-id="Grouping-1.2">Grouping</a></span></li><li><span><a href="#Grouping-on-Multiple-Columns" data-toc-modified-id="Grouping-on-Multiple-Columns-1.3">Grouping on Multiple Columns</a></span></li><li><span><a href="#Pivoting" data-toc-modified-id="Pivoting-1.4">Pivoting</a></span></li></ul></li><li><span><a href="#In-Conclusion" data-toc-modified-id="In-Conclusion-2">In Conclusion</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN
