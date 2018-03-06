@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Temporality" data-toc-modified-id="Temporality-1">Temporality</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN

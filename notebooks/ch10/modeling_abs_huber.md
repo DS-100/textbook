@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Absolute-and-Huber-Cost" data-toc-modified-id="Absolute-and-Huber-Cost-1">Absolute and Huber Cost</a></span><ul class="toc-item"><li><span><a href="#Comparing-MSE-and-Mean-Absolute-Cost" data-toc-modified-id="Comparing-MSE-and-Mean-Absolute-Cost-1.1">Comparing MSE and Mean Absolute Cost</a></span></li><li><span><a href="#Outliers" data-toc-modified-id="Outliers-1.2">Outliers</a></span></li><li><span><a href="#Minimizing-the-Mean-Absolute-Loss" data-toc-modified-id="Minimizing-the-Mean-Absolute-Loss-1.3">Minimizing the Mean Absolute Loss</a></span></li><li><span><a href="#MSE-and-Mean-Absolute-Cost-Comparison" data-toc-modified-id="MSE-and-Mean-Absolute-Cost-Comparison-1.4">MSE and Mean Absolute Cost Comparison</a></span></li><li><span><a href="#The-Huber-Cost" data-toc-modified-id="The-Huber-Cost-1.5">The Huber Cost</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

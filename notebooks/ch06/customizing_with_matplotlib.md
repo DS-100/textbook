@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Customizing-Plots-using-matplotlib" data-toc-modified-id="Customizing-Plots-using-matplotlib-1">Customizing Plots using <code>matplotlib</code></a></span><ul class="toc-item"><li><span><a href="#Customizing-Figures-and-Axes" data-toc-modified-id="Customizing-Figures-and-Axes-1.1">Customizing Figures and Axes</a></span></li><li><span><a href="#Customizing-Marks" data-toc-modified-id="Customizing-Marks-1.2">Customizing Marks</a></span></li><li><span><a href="#Aribitrary-text-and-LaTeX-support" data-toc-modified-id="Aribitrary-text-and-LaTeX-support-1.3">Aribitrary text and LaTeX support</a></span></li><li><span><a href="#Customizing-a-seaborn-plot-using-matplotlib" data-toc-modified-id="Customizing-a-seaborn-plot-using-matplotlib-1.4">Customizing a <code>seaborn</code> plot using <code>matplotlib</code></a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

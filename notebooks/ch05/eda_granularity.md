@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Granularity" data-toc-modified-id="Granularity-1">Granularity</a></span></li><li><span><a href="#Granularity-Checklist" data-toc-modified-id="Granularity-Checklist-2">Granularity Checklist</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN

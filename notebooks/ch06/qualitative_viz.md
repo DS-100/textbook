@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Visualizing-Qualitative-Data" data-toc-modified-id="Visualizing-Qualitative-Data-1">Visualizing Qualitative Data</a></span><ul class="toc-item"><li><span><a href="#Bar-Charts" data-toc-modified-id="Bar-Charts-1.1">Bar Charts</a></span></li><li><span><a href="#Dot-Charts" data-toc-modified-id="Dot-Charts-1.2">Dot Charts</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN

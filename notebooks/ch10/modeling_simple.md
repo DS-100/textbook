@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Models" data-toc-modified-id="Models-1">Models</a></span><ul class="toc-item"><li><span><a href="#A-Simple-Model" data-toc-modified-id="A-Simple-Model-1.1">A Simple Model</a></span></li><li><span><a href="#Cost-Function-Intuition" data-toc-modified-id="Cost-Function-Intuition-1.2">Cost Function Intuition</a></span></li></ul></li></ul></div>
+
 
 ```python
 # HIDDEN
