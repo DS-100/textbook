@@ -20,6 +20,10 @@ notebooks: ## Convert notebooks to HTML pages
 	python convert_notebooks_to_html_partial.py
 	# Generate markdown files for revisions
 	jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True notebooks/**/*.ipynb
+
+	git add notebooks-html notebooks-images notebooks/**/*.{md,png}
+	git commit -m "Build notebooks"
+
 	touch SUMMARY.md
 
 	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
