@@ -36,3 +36,7 @@
   * [10.1 A Simple Model](ch10/modeling_simple.md)
   * [10.2 Cost Functions](ch10/modeling_cost_functions.md)
   * [10.3 Absolute Cost and Huber Cost](ch10/modeling_abs_huber.md)
+* [11. Gradient Descent](ch11/gradient_descent.md)
+  * [11.1 Basic Numerical Optimization](ch11/gradient_basics.md)
+  * [11.2 Defining Gradient Descent](ch11/gradient_descent_define.md)
+
