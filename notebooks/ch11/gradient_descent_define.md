@@ -295,14 +295,23 @@ $$
 
 The gradient of the Huber cost is:
 
+![](https://github.com/DS-100/textbook/raw/master/assets/gradient_huber.png)
+
+(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)
+
+
+```python
+# HIDDEN
+
+'''
 $$
 \nabla_\theta L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     -(y_i - \theta) &  | y_i - \theta | \le \delta \\
     - \delta \cdot \text{sign} (y_i - \theta) & \text{otherwise}
 \end{cases}
 $$
-
-(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)
+'''
+```
 
 
 ```python
