@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Visualization-Principles" data-toc-modified-id="Visualization-Principles-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>Visualization Principles</a></span><ul class="toc-item"><li><span><a href="#Principles-of-Scale" data-toc-modified-id="Principles-of-Scale-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>Principles of Scale</a></span></li><li><span><a href="#Principles-of-Conditioning" data-toc-modified-id="Principles-of-Conditioning-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>Principles of Conditioning</a></span></li><li><span><a href="#Principles-of-Perception" data-toc-modified-id="Principles-of-Perception-1.3"><span class="toc-item-num">1.3&nbsp;&nbsp;</span>Principles of Perception</a></span></li></ul></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Visualization-Principles" data-toc-modified-id="Visualization-Principles-1">Visualization Principles</a></span><ul class="toc-item"><li><span><a href="#Principles-of-Scale" data-toc-modified-id="Principles-of-Scale-1.1">Principles of Scale</a></span></li><li><span><a href="#Principles-of-Conditioning" data-toc-modified-id="Principles-of-Conditioning-1.2">Principles of Conditioning</a></span></li><li><span><a href="#Principles-of-Perception" data-toc-modified-id="Principles-of-Perception-1.3">Principles of Perception</a></span></li></ul></li></ul></div>
 
 
 ```python
