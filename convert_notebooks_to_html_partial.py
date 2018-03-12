@@ -54,7 +54,7 @@ INTERACT_LINK = (
 )
 
 # The prefix for each notebook + its dependencies
-PATH_PREFIX = 'path={}'
+PATH_PREFIX = 'subPath={}'
 
 # Used to ensure all the closing div tags are on the same line for Markdown to
 # parse them properly
