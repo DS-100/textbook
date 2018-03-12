@@ -49,7 +49,7 @@ NOTEBOOK_IMAGE_DIR = 'notebooks-images'
 # The prefix for the interact button links. The path format string gets filled
 # in with the notebook as well as any datasets the notebook requires.
 INTERACT_LINK = (
-    'http://data100.datahub.berkeley.edu/user-redirect/interact'
+    'http://data100.datahub.berkeley.edu/user-redirect/git-pull'
     '?repo=https://github.com/DS-100/textbook&{paths}'
 )
 
