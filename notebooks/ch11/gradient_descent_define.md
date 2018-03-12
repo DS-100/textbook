@@ -22,6 +22,7 @@ pd.options.display.max_columns = 8
 
 
 ```python
+# HIDDEN
 tips = sns.load_dataset('tips')
 tips['pcttip'] = tips['tip'] / tips['total_bill'] * 100
 ```
@@ -91,11 +92,6 @@ For example, suppose we are using MSE cost for the simple dataset $ y = [ 12, 13
 pts = np.array([12, 13, 15, 16, 17])
 plot_cost(pts, (11, 18), mse_cost)
 plot_theta_on_cost(pts, 12, mse_cost)
-```
-
-
-```python
-grad_mse_cost(12, pts)
 ```
 
 We'd like to choose a new value for $ \theta $ that decreases the cost. To do this, we look at the slope of the cost function at $ \theta = 12 $:
