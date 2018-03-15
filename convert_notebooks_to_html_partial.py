@@ -1,4 +1,5 @@
-"""
+"""Usage: convert_notebooks_to_html_partial.py [NOTEBOOKS ...]
+
 This script takes the .ipynb files in the notebooks/ folder and removes the
 hidden cells as well as the newlines before closing </div> tags so that the
 resulting HTML partial can be embedded in a Gitbook page easily.
@@ -6,12 +7,17 @@ resulting HTML partial can be embedded in a Gitbook page easily.
 For reference:
 https://nbconvert.readthedocs.org/en/latest/nbconvert_library.html
 http://nbconvert.readthedocs.org/en/latest/nbconvert_library.html#using-different-preprocessors
+
+Arguments:
+    NOTEBOOKS  Notebook files to convert. By default, will convert all
+               notebooks in the notebooks/ folder.
 """
 
 import glob
 import re
 import os
 from textwrap import dedent
+from docopt import docopt
 
 import nbformat
 from nbinteract import InteractExporter
@@ -135,9 +141,7 @@ def _preamble_cell(path):
         '''
     # HIDDEN
     # Clear previously defined variables
-    for var in list(locals().keys()):
-        if not var.startswith('__'):
-            del globals()[var]
+    %reset -f
 
     # Set directory for data loading to work properly
     import os
@@ -148,7 +152,10 @@ def _preamble_cell(path):
 
 
 if __name__ == '__main__':
-    notebook_paths = glob.glob('notebooks/**/*.ipynb', recursive=True)
+    arguments = docopt(__doc__)
+    notebooks = arguments['NOTEBOOKS'] or glob.glob(
+        'notebooks/**/*.ipynb', recursive=True
+    )
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)
-    convert_notebooks_to_html_partial(notebook_paths)
+    convert_notebooks_to_html_partial(notebooks)
