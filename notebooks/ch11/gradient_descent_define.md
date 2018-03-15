@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#MInimizing-the-Huber-cost" data-toc-modified-id="MInimizing-the-Huber-cost-1.4">MInimizing the Huber cost</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#Minimizing-the-Huber-cost" data-toc-modified-id="Minimizing-the-Huber-cost-1.4">Minimizing the Huber cost</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div>
 
 
 ```python
@@ -276,7 +276,7 @@ We can see that gradient quickly finds the same solution as the analytic method:
 np.mean([12, 13, 15, 16, 17])
 ```
 
-### MInimizing the Huber cost
+### Minimizing the Huber cost
 
 Now, we can apply gradient descent to minimize the Huber cost on our dataset of tip percentages.
 
@@ -291,23 +291,14 @@ $$
 
 The gradient of the Huber cost is:
 
-![](https://github.com/DS-100/textbook/raw/master/assets/gradient_huber.png)
-
-(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)
-
-
-```python
-# HIDDEN
-
-'''
 $$
-\nabla_\theta L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+\nabla_{\theta} L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     -(y_i - \theta) &  | y_i - \theta | \le \delta \\
     - \delta \cdot \text{sign} (y_i - \theta) & \text{otherwise}
 \end{cases}
 $$
-'''
-```
+
+(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)
 
 
 ```python

@@ -19,9 +19,7 @@
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="c1"># Clear previously defined variables</span>
-<span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">locals</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
-        <span class="k">del</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">var</span><span class="p">]</span>
+<span class="o">%</span><span class="k">reset</span> -f
 
 <span class="c1"># Set directory for data loading to work properly</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -30,7 +28,7 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#MInimizing-the-Huber-cost" data-toc-modified-id="MInimizing-the-Huber-cost-1.4">MInimizing the Huber cost</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div></div></div></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#Minimizing-the-Huber-cost" data-toc-modified-id="Minimizing-the-Huber-cost-1.4">Minimizing the Huber cost</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -544,7 +542,7 @@ Wall time: 3.02 ms
 <pre>14.6</pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="MInimizing-the-Huber-cost">MInimizing the Huber cost<a class="anchor-link" href="#MInimizing-the-Huber-cost">&#182;</a></h3><p>Now, we can apply gradient descent to minimize the Huber cost on our dataset of tip percentages.</p>
+<h3 id="Minimizing-the-Huber-cost">Minimizing the Huber cost<a class="anchor-link" href="#Minimizing-the-Huber-cost">&#182;</a></h3><p>Now, we can apply gradient descent to minimize the Huber cost on our dataset of tip percentages.</p>
 <p>The Huber cost is:</p>
 $$
 L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
@@ -552,26 +550,12 @@ L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
      \delta (|y_i - \theta| - \frac{1}{2} \delta ) &amp; \text{otherwise}
 \end{cases}
 $$<p>The gradient of the Huber cost is:</p>
-<p><img src="https://github.com/DS-100/textbook/raw/master/assets/gradient_huber.png" alt=""></p>
-<p>(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  style="display:none;"
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">$$</span>
-<span class="sd">\nabla_\theta L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}</span>
-<span class="sd">    -(y_i - \theta) &amp;  | y_i - \theta | \le \delta \\</span>
-<span class="sd">    - \delta \cdot \text{sign} (y_i - \theta) &amp; \text{otherwise}</span>
-<span class="sd">\end{cases}</span>
-<span class="sd">$$</span>
-<span class="sd">&#39;&#39;&#39;</span>
-</pre></div></div></div></div></div>
+$$
+\nabla_{\theta} L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    -(y_i - \theta) &amp;  | y_i - \theta | \le \delta \\
+    - \delta \cdot \text{sign} (y_i - \theta) &amp; \text{otherwise}
+\end{cases}
+$$<p>(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
