@@ -39,4 +39,8 @@
 * [11. Gradient Descent](ch11/gradient_descent.md)
   * [11.1 Basic Numerical Optimization](ch11/gradient_basics.md)
   * [11.2 Defining Gradient Descent](ch11/gradient_descent_define.md)
+* [12. Linear Regression](ch12/linear_models.md)
+  * [12.1 Defining a Simple Linear Model](ch12/linear_tips.md)
+  * [12.2 Fitting the Model](ch12/linear_grad.md)
+  * [12.3 Multiple Linear Regression](ch12/linear_multiple.md)
 
