@@ -1,4 +1,5 @@
-.PHONY: help build notebooks serve deploy
+CHAPTERS=$(shell ls -1 | grep -E ^ch\\d+$)
+.PHONY: help build notebooks serve deploy $(CHAPTERS)
 
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
@@ -34,6 +35,13 @@ section_labels: ## Add section labels
 
 	python add_section_numbers_to_book.py
 	@echo
+
+chNN: ## Converts a specific chapter's notebooks (e.g. make ch02)
+	@echo To use this command, replace NN with the chapter number. Example:
+	@echo "  make ch01"
+
+$(CHAPTERS): ## Converts a specific chapter's notebooks (e.g. make ch02)
+	python convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
 
 build: ## Run build steps
 	make notebooks section_labels
