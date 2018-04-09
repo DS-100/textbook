@@ -11,8 +11,12 @@ DS100 is the upper-division data science course intended to be taken after
 The contents of this book are licensed for free consumption under the following license:
 [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
+If you are interested in setting up the textbook for local development, see the
+[the setup guide][setup].
+
 [sam]: http://www.samlau.me/
 [joey]: https://people.eecs.berkeley.edu/~jegonzal/
 [deb]: https://www.stat.berkeley.edu/~nolan/
 [data8]: http://data8.org/
 [ds100]: http://www.ds100.org/
+[setup]: https://github.com/DS-100/textbook/blob/master/SETUP.md
