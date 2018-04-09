@@ -61,3 +61,12 @@ To run the textbook locally, run:
 ```bash
 make serve
 ```
+
+This starts a local Gitbook server that you can view by visiting
+http://localhost:4000/ in your web browser.
+
+If you create or modify a Markdown file, the Gitbook server will automatically
+refresh.
+
+If you create or modify a notebook, you will have to run `make build` in order
+to regenerate the Markdown files and refresh the Gitbook server.
