@@ -43,4 +43,7 @@
   * [12.1 Defining a Simple Linear Model](ch12/linear_tips.md)
   * [12.2 Fitting the Model](ch12/linear_grad.md)
   * [12.3 Multiple Linear Regression](ch12/linear_multiple.md)
+* [13. Feature Engineering](ch13/feature_engineering.md)
+  * [13.1 One-Hot Encoding](ch13/feature_one_hot.md)
+  * [13.2 Polynomial Regression](ch13/feature_polynomial.md)
 
