@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#One-Hot-Encoding-for-Categorial-Data" data-toc-modified-id="One-Hot-Encoding-for-Categorial-Data-1">One-Hot Encoding for Categorial Data</a></span><ul class="toc-item"><li><span><a href="#The-Walmart-dataset" data-toc-modified-id="The-Walmart-dataset-1.1">The Walmart dataset</a></span></li><li><span><a href="#Fitting-a-Model-Using-Scikit-Learn" data-toc-modified-id="Fitting-a-Model-Using-Scikit-Learn-1.2">Fitting a Model Using Scikit-Learn</a></span></li><li><span><a href="#The-One-Hot-Encoding" data-toc-modified-id="The-One-Hot-Encoding-1.3">The One-Hot Encoding</a></span></li><li><span><a href="#One-Hot-Encoding-in-Scikit-Learn" data-toc-modified-id="One-Hot-Encoding-in-Scikit-Learn-1.4">One-Hot Encoding in Scikit-Learn</a></span></li><li><span><a href="#Fitting-a-Model-Using-the-Transformed-Data" data-toc-modified-id="Fitting-a-Model-Using-the-Transformed-Data-1.5">Fitting a Model Using the Transformed Data</a></span></li><li><span><a href="#Model-Diagnosis" data-toc-modified-id="Model-Diagnosis-1.6">Model Diagnosis</a></span></li></ul></li><li><span><a href="#Summary" data-toc-modified-id="Summary-2">Summary</a></span></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#The-Walmart-dataset" data-toc-modified-id="The-Walmart-dataset-1">The Walmart dataset</a></span></li><li><span><a href="#Fitting-a-Model-Using-Scikit-Learn" data-toc-modified-id="Fitting-a-Model-Using-Scikit-Learn-2">Fitting a Model Using Scikit-Learn</a></span></li><li><span><a href="#The-One-Hot-Encoding" data-toc-modified-id="The-One-Hot-Encoding-3">The One-Hot Encoding</a></span></li><li><span><a href="#One-Hot-Encoding-in-Scikit-Learn" data-toc-modified-id="One-Hot-Encoding-in-Scikit-Learn-4">One-Hot Encoding in Scikit-Learn</a></span></li><li><span><a href="#Fitting-a-Model-Using-the-Transformed-Data" data-toc-modified-id="Fitting-a-Model-Using-the-Transformed-Data-5">Fitting a Model Using the Transformed Data</a></span></li><li><span><a href="#Model-Diagnosis" data-toc-modified-id="Model-Diagnosis-6">Model Diagnosis</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-7">Summary</a></span></li></ul></div>
 
 
 ```python
@@ -22,9 +22,7 @@ pd.options.display.max_rows = 7
 pd.options.display.max_columns = 8
 ```
 
-## One-Hot Encoding for Categorial Data
-
-### The Walmart dataset
+## The Walmart dataset
 
 In 2014, Walmart released some of its sales data as part of a competition to predict the weekly sales of its stores. We've taken a subset of their data and loaded it below.
 
@@ -38,7 +36,7 @@ The data contains several interesting features, including whether a week contain
 
 Our goal is to create a model that predicts the `Weekly_Sales` variable using the other variables in our data. Using a linear regression model we directly can use the `Temperature`, `Fuel_Price`, and `Unemployment` columns because they contain numerical data.
 
-### Fitting a Model Using Scikit-Learn
+## Fitting a Model Using Scikit-Learn
 
 In previous sections we have seen how to take the gradient of the cost function and use gradient descent to fit a model. To do this, we had to define Python functions for our model, the cost function, the gradient of the cost function, and the gradient descent algorithm. While this was important to demonstrate how the concepts work, in this section we will instead use a machine learning library called [`scikit-learn`](http://scikit-learn.org/) which allows us to fit a model with less code.
 
@@ -104,7 +102,7 @@ sns.pointplot(x='Weekly_Sales', y='MarkDown', data=walmart, order=markdowns);
 
 However, both `IsHoliday` and `MarkDown` columns contain categorical data, not numerical, so we cannot use them as-is for regression.
 
-### The One-Hot Encoding
+## The One-Hot Encoding
 
 Fortunately, we can perform a **one-hot encoding** transformation on these categorical variables to convert them into numerical variables. The transformation works as follows: create a new column for every unique value in a categorical variable. The column contains a $1$ if the variable originally had the corresponding value, otherwise the column contains a $0$. For example, the `MarkDown` column below contains the following values:
 
@@ -133,7 +131,7 @@ Notice that the first value in the data is "No Markdown", and thus only the last
 
 Each row of the resulting table will contain a single column containing $1$; the rest will contain $0$. The name "one-hot" reflects the fact that only one column is "hot" (marked with a $1$).
 
-### One-Hot Encoding in Scikit-Learn
+## One-Hot Encoding in Scikit-Learn
 
 To perform one-hot encoding we can use `scikit-learn`'s [`DictVectorizer`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.DictVectorizer.html) class. To use the class, we have to convert our dataframe into a list of dictionaries. The DictVectorizer class automatically one-hot encodes the categorical data (which needs to be strings) and leaves numerical data untouched.
 
@@ -159,7 +157,7 @@ pd.DataFrame(data=encoded_X, columns=encoder.feature_names_)
 
 The numerical variables (fuel price, temperature, and unemployment) are left as numbers. The categorical variables (holidays and markdown) are one-hot encoded. When we use the new matrix of data to fit a linear regression model, we will generate one parameter for each column of the data. Since this data matrix contains eleven columns, the model will have twelve parameters since we fit extra parameter for the intercept term.
 
-### Fitting a Model Using the Transformed Data
+## Fitting a Model Using the Transformed Data
 
 We can now use the `encoded_X` variable for linear regression.
 
@@ -196,7 +194,7 @@ plt.xlabel('Predictions using numerical features')
 plt.ylabel('Predictions using all features');
 ```
 
-### Model Diagnosis
+## Model Diagnosis
 
 Why might this be the case? We can examine the parameters that both models learn. The table below shows the weights learned by the classifier that only used numerical variables without one-hot encoding:
 
