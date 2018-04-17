@@ -1,4 +1,6 @@
+# Generate chapter list
 CHAPTERS=$(shell ls -1 | grep -E ^ch\\d+$)
+
 .PHONY: help build notebooks serve deploy $(CHAPTERS)
 
 BLUE=\033[0;34m
