@@ -1,0 +1,1435 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch09/sql_basics.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch09&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
+<div class="toc"><ul class="toc-item"><li><span><a href="#SQL" data-toc-modified-id="SQL-1">SQL</a></span><ul class="toc-item"><li><span><a href="#Executing-SQL-Queries-through-pandas" data-toc-modified-id="Executing-SQL-Queries-through-pandas-1.1">Executing SQL Queries through <code>pandas</code></a></span></li></ul></li><li><span><a href="#SQL-Syntax" data-toc-modified-id="SQL-Syntax-2">SQL Syntax</a></span><ul class="toc-item"><li><span><a href="#SELECT-and-FROM" data-toc-modified-id="SELECT-and-FROM-2.1">SELECT and FROM</a></span></li><li><span><a href="#WHERE" data-toc-modified-id="WHERE-2.2">WHERE</a></span></li><li><span><a href="#Aggregate-Functions" data-toc-modified-id="Aggregate-Functions-2.3">Aggregate Functions</a></span></li><li><span><a href="#GROUP-BY-and-HAVING" data-toc-modified-id="GROUP-BY-and-HAVING-2.4">GROUP BY and HAVING</a></span></li><li><span><a href="#ORDER-BY-and-LIMIT" data-toc-modified-id="ORDER-BY-and-LIMIT-2.5">ORDER BY and LIMIT</a></span></li><li><span><a href="#Conceptual-SQL-Evaluation" data-toc-modified-id="Conceptual-SQL-Evaluation-2.6">Conceptual SQL Evaluation</a></span></li></ul></li><li><span><a href="#Summary" data-toc-modified-id="Summary-3">Summary</a></span></li></ul></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+
+<span class="c1"># Delete the database if it already exists</span>
+<span class="n">dbfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;sql_basics.db&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">dbfile</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+    
+
+<span class="kn">import</span> <span class="nn">sqlalchemy</span>
+
+<span class="c1"># pd.read_sql takes in a parameter for a SQLite engine, which we create below</span>
+<span class="n">sqlite_uri</span> <span class="o">=</span> <span class="s2">&quot;sqlite:///sql_basics.db&quot;</span>
+<span class="n">sqlite_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">sqlite_uri</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+
+<span class="c1"># Creating a table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE TABLE prices(</span>
+<span class="s2">    retailer TEXT,</span>
+<span class="s2">    product TEXT,</span>
+<span class="s2">    price FLOAT);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+
+<span class="c1"># Inserting records into the table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">INSERT INTO prices VALUES </span>
+<span class="s2">  (&#39;Best Buy&#39;, &#39;Galaxy S9&#39;, 719.00),</span>
+<span class="s2">  (&#39;Best Buy&#39;, &#39;iPod&#39;, 200.00),</span>
+<span class="s2">  (&#39;Amazon&#39;, &#39;iPad&#39;, 450.00),</span>
+<span class="s2">  (&#39;Amazon&#39;, &#39;Battery pack&#39;,  24.87),</span>
+<span class="s2">  (&#39;Amazon&#39;, &#39;Chromebook&#39;, 249.99),</span>
+<span class="s2">  (&#39;Target&#39;, &#39;iPod&#39;, 215.00),</span>
+<span class="s2">  (&#39;Target&#39;, &#39;Surface Pro&#39;, 799.00),</span>
+<span class="s2">  (&#39;Target&#39;, &#39;Google Pixel 2&#39;, 659.00),</span>
+<span class="s2">  (&#39;Walmart&#39;, &#39;Chromebook&#39;, 238.79);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="s1">&#39;Best Buy&#39;</span><span class="p">,</span> <span class="s1">&#39;Galaxy S9&#39;</span><span class="p">,</span> <span class="mf">719.00</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Best Buy&#39;</span><span class="p">,</span> <span class="s1">&#39;iPod&#39;</span><span class="p">,</span> <span class="mf">200.00</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Amazon&#39;</span><span class="p">,</span> <span class="s1">&#39;iPad&#39;</span><span class="p">,</span> <span class="mf">450.00</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Amazon&#39;</span><span class="p">,</span> <span class="s1">&#39;Battery pack&#39;</span><span class="p">,</span> <span class="mf">24.87</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Amazon&#39;</span><span class="p">,</span> <span class="s1">&#39;Chromebook&#39;</span><span class="p">,</span> <span class="mf">249.99</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="s1">&#39;iPod&#39;</span><span class="p">,</span> <span class="mf">215.00</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface Pro&#39;</span><span class="p">,</span> <span class="mf">799.00</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="s1">&#39;Google Pixel 2&#39;</span><span class="p">,</span> <span class="mf">659.00</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;Walmart&#39;</span><span class="p">,</span> <span class="s1">&#39;Chromebook&#39;</span><span class="p">,</span> <span class="mf">238.79</span><span class="p">]],</span>
+                 <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;retailer&#39;</span><span class="p">,</span> <span class="s1">&#39;product&#39;</span><span class="p">,</span> <span class="s1">&#39;price&#39;</span><span class="p">])</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="SQL">SQL<a class="anchor-link" href="#SQL">&#182;</a></h2><p><strong>SQL</strong> (Structured Query Language) is a programming language that has operations to define, logically organize, manipulate, and perform calculations on data stored in a relational database management system (RDBMS).</p>
+<p>SQL is a declarative language. This means that the user only needs to specify <em>what</em> kind of data they want, not <em>how</em> to obtain it. An example is shown below, with an imperative example for comparison:</p>
+<ul>
+<li><strong>Declarative</strong>: Compute the table with columns "x" and "y" from table "A" where the values in "y" are greater than 100.00.</li>
+<li><strong>Imperative</strong>: For each record in table "A", check if the record contains a value of "y" greater than 100. If so, then store the record's "x" and "y" attributes in a new table. Return the new table.</li>
+</ul>
+<p>In this chapter, we will write SQL queries as Python strings, then use <code>pandas</code> to execute the SQL query and read the result into a <code>pandas</code> DataFrame. As we walk through the basics of SQL syntax, we'll also occasionally show <code>pandas</code> equivalents for comparison purposes.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Executing-SQL-Queries-through-pandas">Executing SQL Queries through <code>pandas</code><a class="anchor-link" href="#Executing-SQL-Queries-through-pandas">&#182;</a></h3><p>To execute SQL queries from Python, we will connect to a database using the <a href="http://docs.sqlalchemy.org/en/latest/core/tutorial.html">sqlalchemy</a> library. Then we can use the <code>pandas</code> function <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_sql.html">pd.read_sql</a> to execute SQL queries through this connection.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sqlalchemy</span>
+
+<span class="c1"># pd.read_sql takes in a parameter for a SQLite engine, which we create below</span>
+<span class="n">sqlite_uri</span> <span class="o">=</span> <span class="s2">&quot;sqlite:///sql_basics.db&quot;</span>
+<span class="n">sqlite_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">sqlite_uri</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This database contains one relation: <code>prices</code>. To display the relation we run a SQL query. Calling <code>read_sql</code> will execute the SQL query on the RDBMS, then return the results in a <code>pandas</code> DataFrame.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT * </span>
+<span class="s2">FROM prices</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>Galaxy S9</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+      <td>Surface Pro</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+      <td>Google Pixel 2</td>
+      <td>659.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Later in this section we will compare SQL queries with <code>pandas</code> method calls so we've created an identical DataFrame in <code>pandas</code>.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prices</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>Galaxy S9</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+      <td>Surface Pro</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+      <td>Google Pixel 2</td>
+      <td>659.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="SQL-Syntax">SQL Syntax<a class="anchor-link" href="#SQL-Syntax">&#182;</a></h2><p>All SQL queries take the general form below:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="p">[</span><span class="k">DISTINCT</span><span class="p">]</span> <span class="o">&lt;</span><span class="k">column</span> <span class="n">expression</span> <span class="n">list</span><span class="o">&gt;</span>
+<span class="k">FROM</span> <span class="o">&lt;</span><span class="n">relation</span><span class="o">&gt;</span>
+<span class="p">[</span><span class="k">WHERE</span> <span class="o">&lt;</span><span class="n">predicate</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="p">[</span><span class="k">GROUP</span> <span class="k">BY</span> <span class="o">&lt;</span><span class="k">column</span> <span class="n">list</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="p">[</span><span class="k">HAVING</span> <span class="o">&lt;</span><span class="n">predicate</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="p">[</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="o">&lt;</span><span class="k">column</span> <span class="n">list</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="p">[</span><span class="k">LIMIT</span> <span class="o">&lt;</span><span class="nb">number</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+<p>Note that:</p>
+<ol>
+<li><strong>Everything in [square brackets] is optional.</strong> A valid SQL query only needs a <code>SELECT</code> and a <code>FROM</code> statement.</li>
+<li><strong>SQL SYNTAX IS GENERALLY WRITTEN IN CAPITAL LETTERS.</strong> Although capitalization isn't required, it is common practice to write SQL syntax in capital letters. It also helps to visually structure your query for others to read.</li>
+<li><code>FROM</code> query blocks can reference one or more tables, although in this section we will only look at one table at a time for simplicity.</li>
+</ol></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="SELECT-and-FROM">SELECT and FROM<a class="anchor-link" href="#SELECT-and-FROM">&#182;</a></h3><p>The two mandatory statements in a SQL query are:</p>
+<ul>
+<li><code>SELECT</code> indicates the columns that we want to view.</li>
+<li><code>FROM</code> indicates the tables from which we are selecting these columns.</li>
+</ul>
+<p>To display the entire <code>prices</code> table, we run:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT * </span>
+<span class="s2">FROM prices</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>Galaxy S9</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+      <td>Surface Pro</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+      <td>Google Pixel 2</td>
+      <td>659.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>SELECT *</code> returns every column in the original relation. To display only the retailers that are represented in <code>prices</code>, we add the <code>retailer</code> column to the <code>SELECT</code> statement.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT retailer</span>
+<span class="s2">FROM prices</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If we want a list of unique retailers, we can call the <code>DISTINCT</code> function to omit repeated values.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT DISTINCT(retailer)</span>
+<span class="s2">FROM prices</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Walmart</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This would be the functional equivalent of the following <code>pandas</code> code:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;retailer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([&#39;Best Buy&#39;, &#39;Amazon&#39;, &#39;Target&#39;, &#39;Walmart&#39;], dtype=object)</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Each RDBMS comes with its own set of functions that can be applied to attributes in the <code>SELECT</code> list, such as comparison operators, mathematical functions and operators, and string functions and operators. In Data 100 we use PostgreSQL, a mature RDBMS that comes with hundreds of such functions. The complete list is available <a href="https://www.postgresql.org/docs/9.2/static/functions.html">here</a>. Keep in mind that each RDBMS has a different set of functions for use in <code>SELECT</code>.</p>
+<p>The following code converts all retailer names to uppercase and halves the product prices.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT</span>
+<span class="s2">    UPPER(retailer) AS retailer_caps,</span>
+<span class="s2">    product,</span>
+<span class="s2">    price / 2 AS half_price</span>
+<span class="s2">FROM prices</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer_caps</th>
+      <th>product</th>
+      <th>half_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>BEST BUY</td>
+      <td>Galaxy S9</td>
+      <td>359.500</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BEST BUY</td>
+      <td>iPod</td>
+      <td>100.000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>AMAZON</td>
+      <td>iPad</td>
+      <td>225.000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>AMAZON</td>
+      <td>Battery pack</td>
+      <td>12.435</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AMAZON</td>
+      <td>Chromebook</td>
+      <td>124.995</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>TARGET</td>
+      <td>iPod</td>
+      <td>107.500</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>TARGET</td>
+      <td>Surface Pro</td>
+      <td>399.500</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>TARGET</td>
+      <td>Google Pixel 2</td>
+      <td>329.500</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>WALMART</td>
+      <td>Chromebook</td>
+      <td>119.395</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice that we can <strong>alias</strong> the columns (assign another name) with <code>AS</code> so that the columns appear with this new name in the output table. This does not modify the names of the columns in the source relation.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="WHERE">WHERE<a class="anchor-link" href="#WHERE">&#182;</a></h3><p>The <code>WHERE</code> clause allows us to specify certain constraints for the returned data; these constraints are often referred to as <strong>predicates</strong>. For example, to retrieve only gadgets that are under $500:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT *</span>
+<span class="s2">FROM prices</span>
+<span class="s2">WHERE price &lt; 500</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also use the operators <code>AND</code>, <code>OR</code>, and <code>NOT</code> to further constrain our SQL query. To find an item on Amazon without a battery pack under $300, we write:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT *</span>
+<span class="s2">FROM prices</span>
+<span class="s2">WHERE retailer = &#39;Amazon&#39;</span>
+<span class="s2">    AND NOT product = &#39;Battery pack&#39;</span>
+<span class="s2">    AND price &lt; 300</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The equivalent operation in <code>pandas</code> is:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prices</span><span class="p">[(</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;retailer&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Amazon&#39;</span><span class="p">)</span> 
+   <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Battery pack&#39;</span><span class="p">)</span>
+   <span class="o">&amp;</span> <span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">300</span><span class="p">)]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There's a subtle difference that's worth noting: the index of the Chromebook in the SQL query is 0, whereas the corresponding index in the DataFrame is 4. This is because SQL queries always return a new table with indices counting up from 0, whereas <code>pandas</code> subsets a portion of the DataFrame <code>prices</code> and returns it with the original indices. We can use <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.reset_index.html">pd.DataFrame.reset_index</a> to reset the indices in <code>pandas</code>.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Aggregate-Functions">Aggregate Functions<a class="anchor-link" href="#Aggregate-Functions">&#182;</a></h3><p>So far, we've only worked with data from the existing rows in the table; that is, all of our returned tables have been some subset of the entries found in the table. But to conduct data analysis, we'll want to compute aggregate values over our data. In SQL, these are called <strong>aggregate functions</strong>.</p>
+<p>If we want to find the average price of all gadgets in the <code>prices</code> relation:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT AVG(price) AS avg_price</span>
+<span class="s2">FROM prices</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>avg_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>395.072222</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Equivalently, in <code>pandas</code>:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prices</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>395.0722222222222</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A complete list of PostgreSQL aggregate functions can be found <a href="https://www.postgresql.org/docs/9.2/static/functions.html">here</a>. Though we're using PostgreSQL as our primary version of SQL in Data 100, keep in mind that there are many other variations of SQL (MySQL, SQLite, etc.) that use different function names and have different functions available.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="GROUP-BY-and-HAVING">GROUP BY and HAVING<a class="anchor-link" href="#GROUP-BY-and-HAVING">&#182;</a></h3><p>With aggregate functions, we can execute more complicated SQL queries. To operate on more granular aggregate data, we can use the following two clauses:</p>
+<ul>
+<li><code>GROUP BY</code> takes a list of columns and groups the table like the <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.groupby.html">pd.DataFrame.groupby</a> function in <code>pandas</code>.</li>
+<li><code>HAVING</code> is functionally similar to <code>WHERE</code>, but is used exclusively to apply predicates to aggregated data. (Note that in order to use <code>HAVING</code>, it must be preceded by a <code>GROUP BY</code> clause.)</li>
+</ul>
+<p><strong>Important</strong>: When using <code>GROUP BY</code>, all columns in the <code>SELECT</code> clause must be either listed in the <code>GROUP BY</code> clause or have an aggregate function applied to them.</p>
+<p>We can use these statements to find the maximum price at each retailer.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT retailer, MAX(price) as max_price</span>
+<span class="s2">FROM prices</span>
+<span class="s2">GROUP BY retailer</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>max_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Amazon</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Walmart</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's say we have a client with expensive taste and only want to find retailers that sell gadgets over $700. Note that we must use <code>HAVING</code> to define predicates on aggregated columns; we can't use <code>WHERE</code> to filter an aggregated column. To compute a list of retailers and accompanying prices that satisfy our needs, we run:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT retailer, MAX(price) as max_price</span>
+<span class="s2">FROM prices</span>
+<span class="s2">GROUP BY retailer</span>
+<span class="s2">HAVING max_price &gt; 700</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>max_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>719.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Target</td>
+      <td>799.0</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For comparison, we recreate the same table in <code>pandas</code>:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">max_prices</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;retailer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">max_prices</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">max_prices</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">700</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price</th>
+    </tr>
+    <tr>
+      <th>retailer</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Best Buy</th>
+      <td>719.0</td>
+    </tr>
+    <tr>
+      <th>Target</th>
+      <td>799.0</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="ORDER-BY-and-LIMIT">ORDER BY and LIMIT<a class="anchor-link" href="#ORDER-BY-and-LIMIT">&#182;</a></h3><p>These clauses allow us to control the presentation of the data:</p>
+<ul>
+<li><code>ORDER BY</code> lets us present the data in lexicographic order of column values. By default, ORDER BY uses ascending order (<code>ASC</code>) but we can specify descending order using <code>DESC</code>.</li>
+<li><code>LIMIT</code> controls how many tuples are displayed.</li>
+</ul>
+<p>Let's display the three cheapest items in our <code>prices</code> table:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT *</span>
+<span class="s2">FROM prices</span>
+<span class="s2">ORDER BY price ASC</span>
+<span class="s2">LIMIT 3</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note that we didn't have to include the <code>ASC</code> keyword since <code>ORDER BY</code> returns data in ascending order by default.
+For comparison, in <code>pandas</code>:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prices</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>(Again, we see that the indices are out of order in the <code>pandas</code> DataFrame. As before, <code>pandas</code> returns a view on our DataFrame <code>prices</code>, whereas SQL is displaying a new table each time that we execute a query.)</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conceptual-SQL-Evaluation">Conceptual SQL Evaluation<a class="anchor-link" href="#Conceptual-SQL-Evaluation">&#182;</a></h3><p>Clauses in a SQL query are executed in a specific order. Unfortunately, this order differs from the order that the clauses are written in a SQL query. From first executed to last:</p>
+<ol>
+<li><code>FROM</code>: One or more source tables</li>
+<li><code>WHERE</code>: Apply selection qualifications (eliminate rows)</li>
+<li><code>GROUP BY</code>: Form groups and aggregate</li>
+<li><code>HAVING</code>: Eliminate groups</li>
+<li><code>SELECT</code>: Select columns</li>
+</ol>
+<p><strong>Note on <code>WHERE</code> vs. <code>HAVING</code></strong>: Since the <code>WHERE</code> clause is processed before applying <code>GROUP BY</code>, the <code>WHERE</code> clause cannot make use of aggregated values. To define predicates based on aggregated values, we must use the <code>HAVING</code> clause.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We have introduced SQL syntax and the most important SQL statements needed to conduct data analysis using a relational database management system.</p></div></div></div></div>
