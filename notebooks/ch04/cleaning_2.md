@@ -222,5 +222,5 @@ The decisions made during data cleaning impact all future analyses. For example,
 ```python
 # HIDDEN
 # Save data to CSV for other chapters
-stops_final.to_csv('../ch5/data/stops.csv', index=False)
+# stops_final.to_csv('../ch5/data/stops.csv', index=False)
 ```
