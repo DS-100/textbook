@@ -1,0 +1,639 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch13/feature_cv.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch13&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Cross-Validation" data-toc-modified-id="Cross-Validation-1">Cross-Validation</a></span></li><li><span><a href="#Issues-with-Training-Error" data-toc-modified-id="Issues-with-Training-Error-2">Issues with Training Error</a></span></li><li><span><a href="#Train-Validation-Test-Split" data-toc-modified-id="Train-Validation-Test-Split-3">Train-Validation-Test Split</a></span></li><li><span><a href="#Training-Error-and-Test-Error" data-toc-modified-id="Training-Error-and-Test-Error-4">Training Error and Test Error</a></span></li><li><span><a href="#Feature-Selection-for-Ice-Cream-Ratings" data-toc-modified-id="Feature-Selection-for-Ice-Cream-Ratings-5">Feature Selection for Ice Cream Ratings</a></span></li><li><span><a href="#K-Fold-Cross-Validation" data-toc-modified-id="K-Fold-Cross-Validation-6">K-Fold Cross-Validation</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-7">Summary</a></span></li></ul></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">linear_model</span> <span class="k">as</span> <span class="n">lm</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">KFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">PolynomialFeatures</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
+                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
+                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">ice</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;icecream.csv&#39;</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Cross-Validation">Cross-Validation<a class="anchor-link" href="#Cross-Validation">&#182;</a></h2><p>In the previous section, we observe that the model cost on the training set, the dataset used to fit the model, can mislead. Adding more features to the data causes the training error to decrease. However, adding too many features causes overfitting—our model makes predictions based on patterns in the data generated by noise rather than the underlying phenomenon. To properly evaluate and select features, we turn to a technique called <strong>cross-validation</strong>.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Issues-with-Training-Error">Issues with Training Error<a class="anchor-link" href="#Issues-with-Training-Error">&#182;</a></h2><p>Using degree 10 polynomial features on the dataset below results in a perfectly accurate model for the training data. Unfortunately, this model fails to generalize to previously-unseen data from the population.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">PolynomialFeatures</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
+
+<span class="n">trans_ten</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">X_ten</span> <span class="o">=</span> <span class="n">trans_ten</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span>
+
+<span class="n">clf_ten</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_ten</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ice</span><span class="p">))</span>
+<span class="n">y_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ice</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ice</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">],</span> <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">])</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">clf_ten</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">trans_ten</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Degree 10 polynomial fit&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">clf_ten</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">trans_ten</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ice</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_devs</span><span class="p">,</span>
+            <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_devs</span><span class="p">,</span>
+            <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Degree 10 poly, second set of data&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/feature_cv_8_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We cannot use the training error to pick features to add to the data since the training error will always favor more features. In order to accurately perform feature selection, we must check the model's error on data that is not used to fit the model.</p>
+<h2 id="Train-Validation-Test-Split">Train-Validation-Test Split<a class="anchor-link" href="#Train-Validation-Test-Split">&#182;</a></h2><p>To accomplish this, we randomly split the original dataset into three disjoint subsets:</p>
+<ul>
+<li>Training set: The data used to fit the model.</li>
+<li>Validation set: The data used to select features.</li>
+<li>Test set: The data used to report the model's final accuracy.</li>
+</ul>
+<p>After splitting, we select a set of features and a model based on the following procedure:</p>
+<ol>
+<li>For each potential set of features, fit a model using the training set. The error of a model on the training set is its <em>training error</em>.</li>
+<li>Check the error of each model on the validation set: its <em>validation error</em>. Select the model that achieves the lowest validation error. This is the final choice of features and model.</li>
+<li>Calculate the <em>test error</em>, error of the final model on the test set. This is the final reported accuracy of the model. We are forbidden from adjusting the features or model to increase test error; doing so effectively converts the test set into a validation set. Instead, we must collect a new test set after making further changes to the features or the model.</li>
+</ol>
+<p>The second step in the process above is called <strong>cross-validation</strong> (sometimes abbreviated as CV). Cross-validation allows us to more accurately determine the set of features to keep in the final model than using the training error alone.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Size of the train-validation-test split</strong></p>
+<p>The train-validation-test split commonly uses 70% of the data as the training set, 15% as the validation set, and the remaining 15% as the test set. Increasing the size of the training set helps model accuracy but causes more variation in the validation and test error.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-Error-and-Test-Error">Training Error and Test Error<a class="anchor-link" href="#Training-Error-and-Test-Error">&#182;</a></h2><p>A model is of little use to us if it fails to generalize to unseen data from the population. The test error provides an accurate representation of the model's performance on new data since we do not use the test set to train the model or select features.</p>
+<p>In general, the training error decreases as we add complexity to our model with additional features or more complex prediction mechanisms. The test error, on the other hand, decreases up to a certain amount of complexity then increases again as the model overfits the training set.</p>
+<p><img src="https://raw.githubusercontent.com/DS-100/textbook/master/assets/feature_train_test_error.png" alt="feature_train_test_error.png"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Feature-Selection-for-Ice-Cream-Ratings">Feature Selection for Ice Cream Ratings<a class="anchor-link" href="#Feature-Selection-for-Ice-Cream-Ratings">&#182;</a></h2><p>We use the complete model selection process, including cross-validation, to select a model that predicts ice cream ratings from ice cream sweetness. The complete ice cream dataset is shown below.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">ice</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;icecream.csv&#39;</span><span class="p">)</span>
+<span class="n">transformer</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]])</span>
+  
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;overall&#39;</span><span class="p">]])</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">rating_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+
+<span class="c1">#ice.plot.scatter(&#39;sweetness&#39;, &#39;overall&#39;)</span>
+<span class="c1">#plt.plot(xs, rating_pred)</span>
+<span class="c1">#plt.title(&#39;Degree 2 polynomial fit&#39;);</span>
+
+<span class="n">temp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">])</span>
+<span class="n">temp</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rating_pred</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">x_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">))</span>
+<span class="n">y_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">))</span>
+<span class="n">temp</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_devs</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">temp</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_devs</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ice</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">temp</span><span class="p">,</span> <span class="n">ice</span><span class="p">])</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ice</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sweetness</th>
+      <th>overall</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.60</td>
+      <td>3.09</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3.50</td>
+      <td>3.17</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.69</td>
+      <td>3.46</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>11.00</td>
+      <td>5.90</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>11.70</td>
+      <td>5.50</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>11.90</td>
+      <td>5.40</td>
+    </tr>
+  </tbody>
+</table>
+<p>309 rows × 2 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We've included a scatter plot of the overall rating versus ice cream sweetness below.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ice</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">],</span> <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Ice Cream Rating vs. Sweetness&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Sweetness&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Rating&#39;</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/feature_cv_16_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We first partition our data into a training dataset, validation dataset, and test dataset using <code>scikit-learn</code>'s <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html"><code>sklearn.model_selection.train_test_split</code></a> method to perform a 70/15/15% train-validation-test split.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+
+<span class="n">valid_size</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">46</span>
+
+<span class="c1"># To perform a three-way split, we need to call train_test_split twice - once</span>
+<span class="c1"># for the test set, one for the validation set.</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]],</span> <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">],</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">)</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">valid_size</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;  Training set size: {len(X_train)}&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Validation set size: {len(X_valid)}&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;      Test set size: {len(X_test)}&#39;</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>  Training set size: 217
+Validation set size: 46
+      Test set size: 46
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We now fit polynomial regression models using the training set <code>X_train</code> and <code>y_train</code>, one for each polynomial degree from 1 to 10.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">PolynomialFeatures</span>
+
+<span class="c1"># First, we add polynomial features to X_train</span>
+<span class="n">transformers</span> <span class="o">=</span> <span class="p">[</span><span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">deg</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+<span class="n">X_train_polys</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="n">transformers</span><span class="p">]</span>
+
+<span class="c1"># Display the X_train with degree 5 polynomial features</span>
+<span class="n">X_train_polys</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[     1.  ,      7.09,     50.27,    356.4 ,   2526.88,  17915.59],
+       [     1.  ,      9.88,     97.61,    964.43,   9528.57,  94142.28],
+       [     1.  ,     10.12,    102.41,   1036.43,  10488.71, 106145.74],
+       ...,
+       [     1.  ,     11.4 ,    129.96,   1481.54,  16889.6 , 192541.46],
+       [     1.  ,      5.2 ,     27.04,    140.61,    731.16,   3802.04],
+       [     1.  ,      9.86,     97.22,    958.59,   9451.65,  93193.28]])</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Next, we train a linear regression classifier for each featurized dataset.</span>
+<span class="c1"># We set fit_intercept=False since the PolynomialFeatures transformer adds the</span>
+<span class="c1"># bias column for us.</span>
+<span class="n">clfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_poly</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">X_train_poly</span> <span class="ow">in</span> <span class="n">X_train_polys</span><span class="p">]</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>After training the models, we evaluate the mean squared error of each model on the validation set.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_actual</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_pred</span> <span class="o">-</span> <span class="n">y_actual</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># To make predictions on the validation set we need to add polynomial features</span>
+<span class="c1"># to the validation set too.</span>
+<span class="n">X_valid_polys</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="n">transformers</span><span class="p">]</span>
+
+<span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid_poly</span><span class="p">)</span>
+               <span class="k">for</span> <span class="n">clf</span><span class="p">,</span> <span class="n">X_valid_poly</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clfs</span><span class="p">,</span> <span class="n">X_valid_polys</span><span class="p">)]</span>
+
+<span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_cost</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">cv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">:</span> <span class="n">costs</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Degree&#39;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">display</span><span class="p">(</span><span class="n">cv_df</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Validation Error</th>
+    </tr>
+    <tr>
+      <th>Degree</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>0.304539</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.043109</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.043629</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.043187</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.043868</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.043878</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.043909</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.044971</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.047573</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.046913</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can see that as we use higher degree polynomial features, the validation error decreases and increases again.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Validation Error vs. Polynomial Degree&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Polynomial Degree&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">);</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.0427</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Zoomed In&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Polynomial Degree&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/feature_cv_26_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Examining the validation errors reveals the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and report its test error.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">best_trans</span> <span class="o">=</span> <span class="n">transformers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">best_clf</span> <span class="o">=</span> <span class="n">clfs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">training_error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">best_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">validation_error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">best_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="n">test_error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">best_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">best_trans</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)),</span> <span class="n">y_test</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Degree 2 polynomial&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;  Training error: </span><span class="si">{training_error:0.3f}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Validation error: </span><span class="si">{validation_error:0.3f}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;      Test error: </span><span class="si">{test_error:0.3f}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Degree 2 polynomial
+  Training error: 0.042
+Validation error: 0.043
+      Test error: 0.063
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="K-Fold-Cross-Validation">K-Fold Cross-Validation<a class="anchor-link" href="#K-Fold-Cross-Validation">&#182;</a></h2><p><strong>$ k $-fold cross-validation</strong> is a common modification of the train-test-split procedure above to reduce variation in validation error. Instead of splitting the original dataset into separate training, validation, and test sets, we create a train-test split.</p>
+<p>To compute a model's validation error, we split the training set into $ k $ equally-sized subsets: <em>$k$ folds</em>. We use one of these folds as the validation set and train the model using the remaining $ k-1 $ folds. Since there are $ k $ folds total, we train the model $ k $ times and compute $ k $ validation errors. We report the model's final validation error as the average of the $ k $ validation errors.</p>
+<p>The diagram below illustrates the technique when using five folds.</p>
+<p><img src="https://github.com/DS-100/textbook/blob/master/assets/feature_5_fold_cv.jpg?raw=true" alt="feature_5_fold_cv.jpg"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>$k$-fold cross-validation takes more computation time since we typically have to refit each model from scratch for each fold. However, it computes a more accurate validation error by averaging multiple errors together for each model.</p>
+<p>The <code>scikit-learn</code> library provides a convenient <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html"><code>sklearn.model_selection.KFold</code></a> class to implement $k$-fold cross-validation.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We use the widely useful cross-validation technique to perform feature and model selection. After computing a train-validation-test split on the original dataset, we use the following procedure to train and choose a model.</p>
+<ol>
+<li>For each potential set of features, fit a model using the training set. The error of a model on the training set is its <em>training error</em>.</li>
+<li>Check the error of each model on the validation set: its <em>validation error</em>. Alternatively, use $k$-fold cross-validation to compute a validation error. Select the model that achieves the lowest validation error. This is the final choice of features and model.</li>
+<li>Calculate the <em>test error</em>, error of the final model on the test set. This is the final reported accuracy of the model. We are forbidden from adjusting the features or model to increase test error; doing so effectively converts the test set into a validation set. Instead, we must collect a new test set after making further changes to the features or the model.</li>
+</ol></div></div></div></div>
