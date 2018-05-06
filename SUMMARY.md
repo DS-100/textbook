@@ -71,3 +71,4 @@
   * [17.1 pandas](ch17/ref_pandas.md)
   * [17.2 seaborn](ch17/ref_seaborn.md)
   * [17.3 matplotlib](ch17/ref_matplotlib.md)
+* [18. Appendix: Contributors](ch18/contributors.md)
