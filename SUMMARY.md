@@ -67,3 +67,7 @@
   * [16.2 Logistic Model](ch16/classification_log_model.md)
   * [16.3 Logistic Cost](ch16/classification_cost.md)
   * [16.4 Using Logistic Regression](ch16/classification_log_reg.md)
+* [17. Reference Tables](ch17/ref_intro.md)
+  * [17.1 pandas](ch17/ref_pandas.md)
+  * [17.1 seaborn](ch17/ref_seaborn.md)
+  * [17.2 matplotlib](ch17/ref_matplotlib.md)
