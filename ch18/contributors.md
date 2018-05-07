@@ -8,6 +8,7 @@ for the textbook.
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | **Ananth Agarwal** | [9.1][] (Relational Databases), [9.2][] (SQL Queries), [13.3][] (Cross-Validation)                                                        |
 | **Ashley Chien**   | [9.3][] (SQL Joins), Reference Table Appendix                                                                                             |
+| **Andrew Do**      | [8.1][] (Python String Methods), [8.2][] (Regular Expressions), [8.3][] (Regex in Python and pandas)                                      |
 | **Tiffany Jann**   | [7.1][] (HTTP), [11.3][] (Convexity)                                                                                                      |
 | **Andrew Kim**     | [7.1][] (HTTP), [8.1][] (Python String Methods), [8.2][] (Regular Expressions), [8.3][] (Regex in Python and pandas)                      |
 | **Jun Seo Park**   | [9.1][] (Relational Databases), [9.2][] (SQL Queries), Reference Table Appendix                                                           |
