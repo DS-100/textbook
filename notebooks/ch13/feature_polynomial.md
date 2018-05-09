@@ -303,7 +303,7 @@ plt.ylim(3, 7);
 
 We can see that in this case, degree two polynomial features work better than both no transformation and degree ten polynomial features.
 
-This raises the natural question: in general, how do we determine which degree polynomial to fit? Although we are tempted to use the mean squared cost to pick the best polynomial, we have seen that using the cost the model produces on the original set of data will tend towards models that are too complex. Instead, we want to evaluate our model on data that is not used to fit parameters.
+This raises the natural question: in general, how do we determine which degree polynomial to fit? Although we are tempted to use the cost on the training dataset to pick the best polynomial, we have seen that using this cost can pick a model that is too complex. Instead, we want to evaluate our model on data that is not used to fit parameters.
 
 ## Summary
 
