@@ -266,4 +266,4 @@ Note that the linearity of expectation holds for any $ X $ and $ Y $ even if the
 
 ## Summary
 
-In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence. Expectation and variance are simple descriptions of a random variable's center and spread. We use the versatility of random variables to describe data generation, cleaning, and modeling.
+In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence. Expectation and variance are simple descriptions of a random variable's center and spread. We use the versatility of random variables to describe data generation and modeling.

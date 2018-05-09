@@ -184,15 +184,17 @@ We can look at examples of some of these errors.
 
 
 ```python
+# This page doesn't exist, so we get a 404 page not found error
 url = "https://www.youtube.com/404errorwow"
 errorResponse = requests.get(url)
-print(errorResponse) # This page doesn't exist, so we get a 404 error back! Try opening this URL in your browser!
+print(errorResponse)
 ```
 
 
 ```python
-url = "https://httpstat.us/500"    # This website forces errors to happen at certain paths in the site.
-serverResponse = requests.get(url) # This specific page forces a 500 error so we can inspect it.
+# This specific page results in a 500 server error
+url = "https://httpstat.us/500"
+serverResponse = requests.get(url)
 print(serverResponse)
 ```
 

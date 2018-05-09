@@ -106,7 +106,7 @@ plot_tangent_on_cost(pts, 12, mse_cost)
 
 The slope is negative, which means that increasing $ \theta $ will decrease the cost.
 
-If $ \theta = 16.5 $ on the other hand, the slope would be positive:
+If $ \theta = 16.5 $ on the other hand, the slope of the cost function is positive:
 
 
 ```python
@@ -116,9 +116,9 @@ plot_cost(pts, (11, 18), mse_cost)
 plot_tangent_on_cost(pts, 16.5, mse_cost)
 ```
 
-Which means that decreasing $ \theta $ will decrease the cost.
+When the slope is positive, decreasing $ \theta $ will decrease the cost.
 
-Thus, the slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the cost. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $ \theta $ should move in the negative direction. Mathematically, we write:
+The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the cost. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $ \theta $ should move in the negative direction. Mathematically, we write:
 
 $$
 \theta_{t+1} = \theta_t - \frac{\partial}{\partial \theta} L(\theta, y)
@@ -331,4 +331,4 @@ print()
 
 ### Summary
 
-Gradient descent gives us a generic way to minimize a cost function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and cost functions increase in complexity, we will turn to gradient descent again and again as our tool of choice for model fitting.
+Gradient descent gives us a generic way to minimize a cost function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and cost functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.
