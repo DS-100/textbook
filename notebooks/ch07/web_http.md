@@ -44,10 +44,10 @@ GET /html HTTP/1.1
 Host: httpbin.org
 User-Agent: curl/7.55.1
 Accept: */*
-
+{blank_line}
 ```
 
-This message follows a specific format: it starts with `GET /html HTTP/1.1` which indicates that the message is an HTTP `GET` request to the `/html` page. Each of the three lines that follow form HTTP headers, optional information that `curl` sends to the server. The HTTP headers have the format `{name}: {value}`. Finally, the blank line at the end of the message tells the server that the message ends after three headers.
+This message follows a specific format: it starts with `GET /html HTTP/1.1` which indicates that the message is an HTTP `GET` request to the `/html` page. Each of the three lines that follow form HTTP headers, optional information that `curl` sends to the server. The HTTP headers have the format `{name}: {value}`. Finally, the blank line at the end of the message tells the server that the message ends after three headers. Note that we've marked the blank line with `{blank_line}` in the snippet above; in the actual message `{blank_line}` is replaced with a blank line.
 
 The client's computer then uses the Internet to send this message to the `https://httpbin.org` web server. The server processes the request, and sends the following response:
 
@@ -56,10 +56,10 @@ HTTP/1.1 200 OK
 Connection: keep-alive
 Server: meinheld/0.6.1
 Date: Wed, 11 Apr 2018 18:15:03 GMT
-
+{blank_line}
 ```
 
-The first line of the response states that the request completed successfully. The following three lines form the HTTP response headers, optional information that the server sends back to the client. Finally, the blank line at the end of the message tells the client that the server finished sending its response headers and will send the response body:
+The first line of the response states that the request completed successfully. The following three lines form the HTTP response headers, optional information that the server sends back to the client. Finally, the blank line at the end of the message tells the client that the server has finished sending its response headers and will next send the response body:
 
 ```
 <html>
