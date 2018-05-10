@@ -188,4 +188,4 @@ L(\hat{\theta}, X, y)
 \end{aligned}
 $$
 
-To minimize the cost above, we adjust $ \hat{\theta} $ until we find the best combination of weights regardless of how large the weights are themselves. However, we have found that larger weights for more complex features result in high model variance. If could instead alter the cost function to penalize large weight values, the resulting model will have lower variance. We use regularization to add this penalty.
+To minimize the cost above, we adjust $ \hat{\theta} $ until we find the best combination of weights regardless of how large the weights are themselves. However, we have found that larger weights for more complex features result in high model variance. If we could instead alter the cost function to penalize large weight values, the resulting model will have lower variance. We use regularization to add this penalty.
