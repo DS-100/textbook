@@ -44,6 +44,7 @@ chNN: ## Converts a specific chapter's notebooks (e.g. make ch02)
 
 $(CHAPTERS): ## Converts a specific chapter's notebooks (e.g. make ch02)
 	python convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
+	jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True notebooks/$@/*.ipynb
 
 build: ## Run build steps
 	make notebooks section_labels
