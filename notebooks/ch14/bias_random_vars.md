@@ -23,13 +23,13 @@ pd.options.display.max_columns = 8
 
 ## Expectation and Variance
 
-Almost all real-world phenomena contain some degree of randomness, making data generation and collection inherently random processes. Since we fit our models on these data, our models also contain randomness. To represent these random processes mathematically, we use random variables.
+Almost all real-world phenomena contain some degree of randomness, making data generation and collection inherently random processes. Since we fit our models on this data, our models also contain randomness. To represent these random processes mathematically, we use random variables.
 
 ### Random Variables
 
 A **random variable** is an algebraic variable that represents a numerical value determined by a probabilistic event. We typically use capital letters like $ X $ or $ Y $ to denote a random variable.
 
-We must always specify what a given random variable represents. For example, we may write that the random variable $ X $ represents the number of heads in 10 coin flips. The definition of a random variable determines the values it can take on. In this example, $ X $ may only take on values between $ 0 $ and $ 10 $.
+We must always specify what a given random variable represents. For example, we may write that the random variable $ X $ represents the number of heads in 10 coin flips. From the definition of a random variable we must be able to determine the possible values that the variable can take on. In this example, $ X $ may only take on values between $ 0 $ and $ 10 $.
 
 We must also be able to determine the probability that the the random variable takes on each value. For example, the probability that $ X = 0 $ is written as $ P(X = 0) = (0.5)^{10} $.
 
@@ -45,7 +45,7 @@ $$
 2) \text{ For all } x \in \mathbb{X}, 0 \leq \mathbb{P}(X = x) \leq 1
 $$
 
-The first rule states that the probabilities for all possible values of $ X $ sum to $ 1 $.
+The first rule states that the probabilities for each value of $ X $ sum to $ 1 $.
 
 The second rule states that each individual probability for a given value of $ X $ must be between $ 0 $ and $ 1 $.
 
@@ -78,7 +78,7 @@ $$
 \end{aligned}
 $$
 
-Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ never takes on the value $ 3.5 $.
+Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ itself can never take on the value $ 3.5 $.
 
 **Example:** Suppose we have a small dataset of four people:
 
@@ -143,7 +143,7 @@ $$
 \end{aligned}
 $$
 
-Since $ \mathbb{E}[Z] = 0 $, we expect that in the long run the difference between the ages of the people in a sample of size 2 will be 0.
+Since $ \mathbb{E}[Z] = 0 $, we expect that in the long run the difference between the people in a sample of size 2 will be 0.
 
 #### Linearity of Expectation
 
@@ -167,61 +167,11 @@ $$
 
 where $X$ and $Y$ are random variables, and $c$ is a constant.
 
-In words, the expectation of a sum of any two random variables is equal to the sum of the expectations of the variables.
+In words, the expectation of a sum of any two random variables is equal to the sum of the expectations of the variables. The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other!
 
 In the previous example, we saw that $ Z = X - Y $. Thus,  $ \mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] $. 
 
 Now we can calculate $ \mathbb{E}[X] $ and  $ \mathbb{E}[Y] $ separately from each other. Since $ \mathbb{E}[X] = \mathbb{E}[Y] = 50.75 $, $ \mathbb{E}[Z] = 50.75 - 50.75 = 0 $.
-
-The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! To highlight an example of this, let us now consider the case in which we sample two people from the same dataset as above but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$. Now $X$ and $Y$ are not independent; for example, if we know $X = 51$, then $Y \neq 51$. We find the joint distribution of $X$ and $Y$ as follows:
-
-<table>
-  <tr>
-    <th></th>
-    <th>$Y=50$</th>
-    <th>$Y=51$</th>
-    <th>$Y=52$</th>
-  </tr>
-  <tr>
-    <td>$X=50$</td>
-    <td>2/12</td>
-    <td>2/12</td>
-    <td>2/12</td>
-  </tr>
-  <tr>
-    <td>$X=51$</td>
-    <td>2/12</td>
-    <td>0</td>
-    <td>1/12</td>
-  </tr>
-  <tr>
-    <td>$X=52$</td>
-    <td>2/12</td>
-    <td>1/12</td>
-    <td>0</td>
-  </tr>
-</table>
-
-With this, we can find $\mathbb{E}[Z]$ as before:
-
-$$
-\begin{aligned}
-\mathbb{E}[Z]
-&= (-2) \cdot P(Z = -2) + (-1) \cdot P(Z = -1) + \ldots + (2) \cdot P(Z = 2) \\
-&= (-2) \cdot \frac{2}{12} + (-1) \cdot \frac{3}{12}+ \ldots + (2) \cdot \frac{2}{12} \\
-&= 0
-\end{aligned}
-$$
-
-We can also find the PMF of $Y$ with the table:
-
-$$
-P(Y = 50) = P(Y = 50, X = 50) + P(Y = 50, X = 51) + P(Y = 50, X = 52) = \frac{2}{12} + \frac{2}{12} + \frac{2}{12} = \frac{1}{2} \\
-P(Y = 51) = \frac{2}{12} + 0 + \frac{1}{12} = \frac{1}{4} \\
-P(Y = 52) = \frac{2}{12} + \frac{1}{12} + 0 = \frac{1}{4}
-$$
-
-Thus, we have shown that $Y$ has the same PMF as $X$, which means that they have the same expectation as well. Since the linearity of expectation holds for dependent random variables, we could have simply used this fact to conclude that $\mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] = 50.75 - 50.75 = 0$.
 
 Note that the linearity of expectation only holds for linear combinations of random variables. For example, $ \mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y] $ is not a linear combination of $ X $ and $ Y $. In this case, $ \mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y] $ is true in general only for independent random variables.
 
@@ -235,7 +185,7 @@ Var(X) &= \mathbb{E}[(X - \mathbb{E}[X])^2] \\
 \end{aligned}
 $$
 
-The above formula states that the variance of $ X $ is the average squared distance from $ X $'s expected value.
+The above formula states that the variance of $ X $ is the average squared distance from $ X $'s center.
 
 With some algebraic manipulation that we omit for brevity, we may also equivalently write:
 
@@ -273,20 +223,20 @@ plt.title('PMF of $Y$')
 plt.tight_layout();
 ```
 
-$ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
+$ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. However, $ Y $'s distribution has a higher spread than $ X $'s and so we expect that $ Var(Y) $ is larger than $ Var(X) $.
 
 $$
 \begin{aligned}
 Var(X)
-&= \mathbb{E}[X^2] - \mathbb{E}[X]^2 \\
-&= \mathbb{E}[X^2] - 0^2 \\
+&= \mathbb{E}[(X - \mathbb{E}[X])^2] \\
+&= \mathbb{E}[(X - 0)^2] \\
 &= \mathbb{E}[X^2] \\
 &= (-1)^2 P(X = -1) + (1)^2 P(X = 1) \\
 &= 1 \cdot 0.5 + 1 \cdot 0.5 \\
 &= 1 \\\\
 Var(Y)
-&= \mathbb{E}[Y^2] - \mathbb{E}[Y]^2 \\
-&= \mathbb{E}[Y^2] - 0^2 \\
+&= \mathbb{E}[(Y - \mathbb{E}[Y])^2] \\
+&= \mathbb{E}[(Y - 0)^2] \\
 &= \mathbb{E}[Y^2] \\
 &= (-2)^2 P(Y = -2) + (-1)^2 P(Y = -1) + (1)^2 P(Y = 1) + (2)^2 P(Y = 2) \\
 &= 4 \cdot 0.25 + 1 \cdot 0.25 + 1 \cdot 0.25 + 4 \cdot 0.25\\
@@ -313,28 +263,6 @@ Var(X + Y) = Var(X) + Var(Y)
 $$
 
 Note that the linearity of expectation holds for any $ X $ and $ Y $ even if they are dependent; $ Var(X + Y) = Var(X) + Var(Y) $ holds only when $ X $ and $ Y $ are independent.
-
-### Generalization
-
-Suppose we want to use a random variable $X$ to a simulate a biased coin with $P(Heads) = p$. We can say that $X = 1$ if the coin flip is heads, and $X = 0$ if the coin flip is tails. Therefore, $P(X = 1) = p$, and $P(X = 0) = 1 - p$. This type of binary random variable is called a Bernoulli random variable; we can calculate its expected value and variance as follows:
-
-$$\mathbb{E}[X] = 1 \times p + 0 \times (1 - p) = p$$
-
-$$Var(X) = \mathbb{E}[X^2] - \mathbb{E}[X]^2 = 1^2 \times p + 0^2 \times (1 - p) - p^2 = p - p^2 = p(1 - p)$$
-
-#### Sample Means
-
-Suppose we flip a coin with some unknown bias $p$ a total of $n$ times and find the proportion of heads that we get. Let us call this proportion $\hat{p}$. If we wanted to estimate $P(Heads)$, we might intuitively believe that $\hat{p}$ is a good guess. Now, we can use our newly gained knowledge of random variables, expectation, and variance to confirm this intuition.
-
-Note that $\hat{p}$ itself is a random variable; thus, it must have some underlying distribution that we can find. If we let $X_i$ be a Bernoulli random variable for the $i^{th}$ coin flip (note that the $X_i$'s are independent since they represent independent coin flips), then we can mathematically determine that $\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i$. We can then calculate the expected value, variance, and standard deviation of $\hat{p}$ as follows:
-
-$$\mathbb{E}[\frac{1}{n} \sum_{i=1}^{n} X_i] = \frac{1}{n} \sum_{i=1}^{n}\mathbb{E}[X_i] = \frac{1}{n} \times np = p$$
-
-$$Var(\frac{1}{n} \sum_{i=1}^{n} X_i) = \frac{1}{n^2} \sum_{i=1}^{n}Var(X_i) = \frac{1}{n^2} \times np(1-p) = \frac{p(1-p)}{n}$$
-
-The expected value of $\hat{p}$, the sample proportion, is the same as $p$, the true proportion! This is why we sometimes call the sample proportion an *unbiased estimator* of the true proportion, although we will leave the formal definiton of bias for the last section of this chapter.
-
-Furthermore, the variance of the sample proportion gives us a measure of how much error we should expect if we use $\hat{p}$ to estimate $p$. As we increase the number of samples $n$, the error of our estimator decreases, and $\hat{p}$ converges to $p$. This fact is known as the law of large numbers.
 
 ## Summary
 
