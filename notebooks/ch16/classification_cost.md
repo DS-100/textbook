@@ -195,4 +195,4 @@ The surprisingly simple gradient expression allows us to fit a logistic model to
 
 ## Summary
 
-The cross entropy cost is the cost function that we use to fit the logistic model. Since it is a convex function, we use gradient descent to fit the model to the cost. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
+The cross entropy cost that we use to fit the logistic model. Since it is a convex function, we use gradient descent to fit the model to the cost. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
