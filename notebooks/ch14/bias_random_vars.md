@@ -23,13 +23,13 @@ pd.options.display.max_columns = 8
 
 ## Expectation and Variance
 
-Almost all real-world phenomena contain some degree of randomness, making data generation and collection inherently random processes. Since we fit our models on this data, our models also contain randomness. To represent these random processes mathematically, we use random variables.
+Almost all real-world phenomena contain some degree of randomness, making data generation and collection inherently random processes. Since we fit our models on these data, our models also contain randomness. To represent these random processes mathematically, we use random variables.
 
 ### Random Variables
 
 A **random variable** is an algebraic variable that represents a numerical value determined by a probabilistic event. We typically use capital letters like $ X $ or $ Y $ to denote a random variable.
 
-We must always specify what a given random variable represents. For example, we may write that the random variable $ X $ represents the number of heads in 10 coin flips. From the definition of a random variable we must be able to determine the possible values that the variable can take on. In this example, $ X $ may only take on values between $ 0 $ and $ 10 $.
+We must always specify what a given random variable represents. For example, we may write that the random variable $ X $ represents the number of heads in 10 coin flips. The definition of a random variable determines the values it can take on. In this example, $ X $ may only take on values between $ 0 $ and $ 10 $.
 
 We must also be able to determine the probability that the the random variable takes on each value. For example, the probability that $ X = 0 $ is written as $ P(X = 0) = (0.5)^{10} $.
 
@@ -45,7 +45,7 @@ $$
 2) \text{ For all } x \in \mathbb{X}, 0 \leq \mathbb{P}(X = x) \leq 1
 $$
 
-The first rule states that the probabilities for each value of $ X $ sum to $ 1 $.
+The first rule states that the probabilities for all possible values of $ X $ sum to $ 1 $.
 
 The second rule states that each individual probability for a given value of $ X $ must be between $ 0 $ and $ 1 $.
 
@@ -78,7 +78,7 @@ $$
 \end{aligned}
 $$
 
-Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ itself can never take on the value $ 3.5 $.
+Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ never takes on the value $ 3.5 $.
 
 **Example:** Suppose we have a small dataset of four people:
 
@@ -143,7 +143,7 @@ $$
 \end{aligned}
 $$
 
-Since $ \mathbb{E}[Z] = 0 $, we expect that in the long run the difference between the people in a sample of size 2 will be 0.
+Since $ \mathbb{E}[Z] = 0 $, we expect that in the long run the difference between the ages of the people in a sample of size 2 will be 0.
 
 #### Linearity of Expectation
 
@@ -185,7 +185,7 @@ Var(X) &= \mathbb{E}[(X - \mathbb{E}[X])^2] \\
 \end{aligned}
 $$
 
-The above formula states that the variance of $ X $ is the average squared distance from $ X $'s center.
+The above formula states that the variance of $ X $ is the average squared distance from $ X $'s expected value.
 
 With some algebraic manipulation that we omit for brevity, we may also equivalently write:
 
@@ -223,7 +223,7 @@ plt.title('PMF of $Y$')
 plt.tight_layout();
 ```
 
-$ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. However, $ Y $'s distribution has a higher spread than $ X $'s and so we expect that $ Var(Y) $ is larger than $ Var(X) $.
+$ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
 
 $$
 \begin{aligned}
