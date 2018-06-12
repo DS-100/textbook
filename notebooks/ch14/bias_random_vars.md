@@ -338,4 +338,4 @@ Furthermore, the variance of the sample proportion gives us a measure of how muc
 
 ## Summary
 
-In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence. Expectation and variance are simple descriptions of a random variable's center and spread. We use the versatility of random variables to describe data generation and modeling.
+In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely; each outcome must have a well-defined probability of occurrence. Expectation and variance are simple descriptions of a random variable's center and spread. We use the versatility of random variables to describe data generation and modeling.
