@@ -82,6 +82,31 @@ The expression above abstracts over the specific loss function; regardless of th
 
 By minimizing the cost, we select the model parameters that best fit our observed dataset. Thus far, we have refrained from making statements about the population that generated the dataset. In reality, however, we are quite interested in making good predictions on the entire population, not just our data that we have already seen.
 
+## Example: Cost Minimization
+
+Let's say we have a dataset composing of $n$ $X_i, y_i $ pairs, and that we decided on a model $ y_i^* = f_\hat{\theta} (X_i) = \hat{\theta} \cdot \log(X_i) $ to predict $ y_i $ values. What $\hat{\theta}$ would we need to choose to minimize our average squared loss?
+
+First, we write out our cost function, where $X, y$ represent the entire dataset:
+
+$$ L(\hat{\theta}, X, y) =  \frac{1}{n} \sum_{i=1}^{n} \ell(y_i, f_\hat{\theta} (X_i)) =  \frac{1}{n} \sum_{i=1}^{n} (y_i -\hat{\theta} \cdot \log(X_i))^2  $$
+
+Remember, to minimize a function, we must take a derivative with respect to the value we're trying to optimize. Then, we set that equation to zero and solve for the critical point. In this case, we are trying to find the optimal $\hat{\theta}$.
+
+$$ \frac{\partial}{\partial \hat{\theta}}L(\hat{\theta}, X, y) =  \frac{\partial}{\partial \hat{\theta}}  \frac{1}{n} \sum_{i=1}^{n} (y_i -\hat{\theta} \cdot \log(X_i))^2 $$
+
+After using the chain rule to simplify:
+
+$$ \frac{\partial}{\partial \hat{\theta}}L(\hat{\theta}, X, y) =  \frac{1}{n} \sum_{i=1}^{n} 2 \cdot \log(X_i) \cdot (y_i -\hat{\theta} \cdot \log(X_i)) = \frac{2}{n} (\sum_{i=1}^{n} y_i \cdot \log(X_i) - \hat{\theta}\cdot \sum_{i=1}^{n}  \log(X_i)^2 )$$
+
+To solve for the optimal $\hat{\theta}$, we set this equation to zero:
+$$\frac{2}{n} (\sum_{i=1}^{n} y_i \cdot \log(X_i) - \hat{\theta}\cdot \sum_{i=1}^{n}  \log(X_i)^2 ) = 0$$
+
+$$ \sum_{i=1}^{n} y_i \cdot \log(X_i) = \hat{\theta}\cdot \sum_{i=1}^{n}  \log(X_i)^2 $$
+$$ \hat{\theta} = \dfrac{\sum_{i=1}^{n} y_i \cdot \log(X_i)}{\sum_{i=1}^{n}  \log(X_i)^2} $$
+
+
+We have now found a value for $\hat{\theta}$ that minimizes the average squared loss for our $X, y$ dataset. Note that because the squared loss is a smooth/convex function, we are able to minimize the theta value analytically. For other loss functions such as the absolute loss, we would not be able to use the same process, because the absolute value is not a convex function.
+
 ## Risk
 
 If our observed dataset $ X $ and $ y $ are drawn at random from a given population, our observed data are random variables. If our observed data are random variables, our model parameters are also random variables—each time we collect a new set of data and fit a model, the parameters of the model $ f_\hat{\theta} (x) $ will be slightly different.
