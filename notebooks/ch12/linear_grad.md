@@ -69,13 +69,13 @@ L(\hat{\theta}, x, y)
 \end{aligned}
 $$
 
-Note that we have modified our loss function to reflect the addition of an explanatory variable in our new model. In this case, $ x $ is a vector containing the individual total bills, $ y $ is a vector containing the individual tip amounts, and $ \hat{\theta} $ is a vector: $ \theta = [ \hat{\theta_1}, \hat{\theta_0} ] $.
+Note that we have modified our loss function to reflect the addition of an explanatory variable in our new model. Now, $ x $ is a vector containing the individual total bills, $ y $ is a vector containing the individual tip amounts, and $ \hat{\theta} $ is a vector: $ \theta = [ \hat{\theta_1}, \hat{\theta_0} ] $.
 
 Using a linear model with the squared error also goes by the name of least-squares linear regression. We can use gradient descent to find the $ \theta $ that minimizes the cost.
 
 **An Aside on Using Correlation**
 
-If you have seen least-squares linear regression before, you may recognize that we can compute the correlation coefficient and use it to determine $ \hat{\theta_1} $ and $ \hat{\theta_0} $. This is simpler and faster to compute than using gradient descent for this specific problem, similar to how computing the mean was simpler than using gradient descent to fit a constant model. We will use gradient descent anyway because it is a general-purpose method of cost minimization that still works when we later introduce models that do not have analytic solutions. In fact, in many real-world scenarios we will use gradient descent even when an analytic solution exists, because the analytic solution is too computationally expensive to compute.
+If you have seen least-squares linear regression before, you may recognize that we can compute the correlation coefficient and use it to determine $ \hat{\theta_1} $ and $ \hat{\theta_0} $. This is simpler and faster to compute than using gradient descent for this specific problem, similar to how computing the mean was simpler than using gradient descent to fit a constant model. We will use gradient descent anyway because it is a general-purpose method of cost minimization that still works when we later introduce models that do not have analytic solutions. In fact, in many real-world scenarios we will use gradient descent even when an analytic solution exists because computing the analytic solution can take longer than gradient descent, especially on large datasets.
 
 ## Derivative of the MSE cost
 
@@ -168,9 +168,11 @@ y_vals = np.array([4, 5])
 assert np.allclose(grad_mse_cost(thetas, x_vals, y_vals), [0, 0])
 ```
 
-Like in Chapter 11, we use a `minimize` function that finds the optimal theta, but also accounts for our explanatory variable. It has the function signature (body omitted):
+We'll use the previously defined `minimize` function that runs gradient descent, accounting for our new explanatory variable. It has the function signature (body omitted):
 
-`minimize(cost_fn, grad_cost_fn, x_vals, y_vals, alpha, progress)`
+```python
+minimize(cost_fn, grad_cost_fn, x_vals, y_vals)
+```
 
 Finally, we run gradient descent!
 
@@ -181,12 +183,12 @@ Finally, we run gradient descent!
 thetas = minimize(mse_cost, grad_mse_cost, tips['total_bill'], tips['tip'])
 ```
 
-Looking at the output of our call to the `minimize` function, gradient descent converged to the theta values of $\theta_0 = 0.01$ and $\theta_1 = 0.14$. Our linear model is:
+We can see that gradient descent converged to the theta values of $\theta_0 = 0.01$ and $\theta_1 = 0.14$. Our linear model is:
 
-`y = 0.14x + 0.01`
+$y = 0.14x + 0.01$
 
 
-Using our estimated thetas, we can plot our predictions with the scatter plot of tip vs. total bill.
+We can use our estimated thetas to make and plot our predictions alongside the original data points.
 
 
 ```python

@@ -35,7 +35,7 @@ tips.head()
 sns.distplot(tips['tip'], bins=25);
 ```
 
-As we have covered previously, if we choose a constant model and the mean squared error cost function, our model will predict the mean of the tip amount:
+As we have covered previously, if we choose a constant model and the mean squared error cost, our model will predict the mean of the tip amount:
 
 
 ```python
@@ -60,23 +60,24 @@ Although the average tip amount is \$3, if a table orders \$40 worth of food we 
 Let's briefly review our current toolbox for modeling and estimation and define some new notation so that we can better represent the additional complexity that linear models have.
 
 ## Defining a Simple Linear Model
-(At this point, we only use one variable from our dataset. Multiple linear regression is the next section.)
 
 We are interested in predicting the tip amount based on the total bill of a table. We use $ y $ to represent the tip amount, the variable we are trying to predict. We use $ x $ to represent the total bill, the variable we use for prediction. 
 
-We define $ f_\theta $ to be a linear model depending on $ x $, signifying the true mechanism by which our data are generated:
+We define a linear model $ f_\theta $ that depends on $ x $:
 
 $$
 f_\theta (x) = \theta_1 x + \theta_0
 $$
 
-$ f_\theta (x) $ assumes that in truth, $ y $ has a perfectly linear relationship with $ x $. However, our observed data do not follow a perfectly straight line because of some random noise $ \epsilon $ (note that *noise is different than *error*, which we deal with later). Mathematically, we account for this by adding a noise term:
+and treat it as the true generating function of the data.
+
+$ f_\theta (x) $ assumes that in truth, $ y $ has a perfectly linear relationship with $ x $. However, our observed data do not follow a perfectly straight line because of some random noise $ \epsilon $. Mathematically, we account for this by adding a noise term:
 
 $$
 y = f_\theta (x) + \epsilon
 $$
 
-An interpretation is that if the assumption that $ y $ has a perfectly linear relationship with $ x $ holds, we are able to somehow find the exact values of $ \theta_1 $ and $ \theta_0 $, and we magically have no random noise, we will be able to perfectly predict the amount of tip the waiter will get for all tables, forever. Of course, we cannot completely fulfill any of these criteria in practice. Instead, we will estimate $ \theta_1 $ and $ \theta_0 $ using our dataset.
+If the assumption that $ y $ has a perfectly linear relationship with $ x $ holds, and we are able to somehow find the exact values of $ \theta_1 $ and $ \theta_0 $, and we magically have no random noise, we will be able to perfectly predict the amount of tip the waiter will get for all tables, forever. Of course, we cannot completely fulfill any of these criteria in practice. Instead, we will estimate $ \theta_1 $ and $ \theta_0 $ using our dataset to make our predictions as accurate as possible.
 
 ### Estimating the Linear Model
 
