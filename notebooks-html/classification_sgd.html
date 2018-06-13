@@ -1,0 +1,74 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch16/classification_sgd.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch16&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Limitations-of-Gradient-Descent">Limitations of Gradient Descent<a class="anchor-link" href="#Limitations-of-Gradient-Descent">&#182;</a></h1><p>In chapter 11, we covered the gradient descent algorithm, which is used to converge at the $\theta$ parameters that minimize a loss function $L(\theta, y)$.</p>
+<p>$$
+\theta_{t+1} = \theta_t - \alpha \cdot \nabla_\theta L(\theta, y)
+$$</p>
+<p>We can replace  $\nabla_\theta L(\theta, y)$ with the gradient of the cross entropy cost that we previously derived to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $, the gradient descent algorithm becomes:</p>
+<p>$$
+\theta_{t+1} = \theta_t - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right)
+$$</p>
+<p>By definition, the gradient of the cross entropy cost is the average of the gradient of the loss over all $n$ observations. This is then computed at each iteration $t$ of the gradient descent algorithm. For large $n$, this can become a computationally expensive algorithm.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Stochastic-Gradient-Descent">Stochastic Gradient Descent<a class="anchor-link" href="#Stochastic-Gradient-Descent">&#182;</a></h1><p>An alternative to gradient descent is <strong>stochastic gradient descent</strong>, in which we approximate the gradient by taking a sample of observations. The gradient of the loss function in stochastic gradient descent is below, with $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $.</p>
+<p>$$
+\nabla_\theta L(\theta, y) \approx -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i
+$$</p>
+<p>$\mathcal{B}$ is a batch of data points that we randomly sample from the $n$ observations. At each iteration of stochastic gradient descent, we will make an estimate of the true gradient of the loss function using a new randomly sampled batch. Because $\mathcal{B}$ is a simple random sample, the expectation of the gradient of the loss function over the batch is equal to the true gradient over all $n$ observations. In other words, on average, we expect that stochastic gradient descent will converge to the $\theta$ parameters that minimize the loss function.</p>
+<h2 id="Selecting-the-batch-size">Selecting the batch size<a class="anchor-link" href="#Selecting-the-batch-size">&#182;</a></h2><p>Stochastic gradient descent generally refers to an algorithm with a batch size of 1, and mini-batch gradient descent is often used to describe algorithms with a randomly sampled batch of size smaller than $n$. In practice, stochastic gradient descent is used as an umbrella term that encompasses both concepts.</p>
+<p>Batch sizes are generally set to small numbers such as 1 or 2 to allow us to minimize computational cost. If we have access to a parallel machine (such as a GPU or a distributed computing system), we can increase the batch size to take advantage of the hardware. By running the algorithm in parallel, we could compute the gradient over a larger batch size in the same amount of time that the machine would take for a batch size of 1.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Visualizing-Stochastic-Gradient-Descent">Visualizing Stochastic Gradient Descent<a class="anchor-link" href="#Visualizing-Stochastic-Gradient-Descent">&#182;</a></h1></div></div></div></div>
