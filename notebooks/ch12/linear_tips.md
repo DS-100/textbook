@@ -35,7 +35,7 @@ tips.head()
 sns.distplot(tips['tip'], bins=25);
 ```
 
-As we have covered previously, if we choose a constant model and the mean squared error cost our model will predict the mean of the tip amount:
+As we have covered previously, if we choose a constant model and the mean squared error cost, our model will predict the mean of the tip amount:
 
 
 ```python
@@ -59,23 +59,25 @@ Although the average tip amount is \$3, if a table orders \$40 worth of food we 
 
 Let's briefly review our current toolbox for modeling and estimation and define some new notation so that we can better represent the additional complexity that linear models have.
 
-## Defining a Linear Model
+## Defining a Simple Linear Model
 
-We are interested in predicting the tip amount based on the total bill of a table. We use $ y $ to represent the tip amount, the variable we are trying to predict. We use $ x $ to represent the total bill, the variable we use for prediction. Our model assumes that in truth, $ y $ has a perfectly linear relationship with $ x $. However, our observed data do not follow a perfectly straight line because of some random noise $ \epsilon $. Mathematically, we write:
+We are interested in predicting the tip amount based on the total bill of a table. We use $ y $ to represent the tip amount, the variable we are trying to predict. We use $ x $ to represent the total bill, the variable we use for prediction. 
 
-$$
-y = f_\theta (x) + \epsilon
-$$
-
-where
+We define a linear model $ f_\theta $ that depends on $ x $:
 
 $$
 f_\theta (x) = \theta_1 x + \theta_0
 $$
 
-This means that if the assumptions of our model hold, we are able to somehow find the exact values of $ \theta_1 $ and $ \theta_0 $, and we magically have no random noise, we will be able to perfectly predict the amount of tip the waiter will get for all tables, forever. Of course, we cannot completely fulfill any of these criteria in practice. Instead, we will estimate $ \theta_1 $ and $ \theta_0 $ using our dataset.
+and treat it as the true generating function of the data.
 
-(Note that we use $ f_\theta (x) $ to signify the true mechanism by which our data are generated. For example, our constant model assumed that the population tip amounts did not depend on $ x $ so for the constant model we would write $f_\theta (x) = \theta $.)
+$ f_\theta (x) $ assumes that in truth, $ y $ has a perfectly linear relationship with $ x $. However, our observed data do not follow a perfectly straight line because of some random noise $ \epsilon $. Mathematically, we account for this by adding a noise term:
+
+$$
+y = f_\theta (x) + \epsilon
+$$
+
+If the assumption that $ y $ has a perfectly linear relationship with $ x $ holds, and we are able to somehow find the exact values of $ \theta_1 $ and $ \theta_0 $, and we magically have no random noise, we will be able to perfectly predict the amount of tip the waiter will get for all tables, forever. Of course, we cannot completely fulfill any of these criteria in practice. Instead, we will estimate $ \theta_1 $ and $ \theta_0 $ using our dataset to make our predictions as accurate as possible.
 
 ### Estimating the Linear Model
 
@@ -85,6 +87,6 @@ $$
 f_\hat{\theta} (x) = \hat{\theta_1} x + \hat{\theta_0}
 $$
 
-Sometimes you will see $ h(x) $ written instead of $ f_\hat{\theta} (x) $; the "$ h $" stands for hypothesis.
+Sometimes you will see $ h(x) $ written instead of $ f_\hat{\theta} (x) $; the "$ h $" stands for hypothesis, as $ f_\hat{\theta} (x) $ is our hypothesis of $ f_{\theta} (x) $.
 
 In order to determine $ \hat{\theta_1} $ and $ \hat{\theta_0} $, we choose a cost function and minimize it using gradient descent.
