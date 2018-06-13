@@ -97,6 +97,10 @@ plt.ylabel(r'$f_\hat{\theta}(x)$')
 plt.title(r'Model predictions for $ \hat{\theta} = 0.5 $');
 ```
 
+
+![png](classification_log_model_files/classification_log_model_7_0.png)
+
+
 We want to constrain $ f_\hat{\theta}(x) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\theta}(x) $ to correspond to high probabilities and small values to low probabilities.
 
 ## The Logistic Function
@@ -130,6 +134,10 @@ plt.title(r'Sigmoid function')
 plt.xlabel('$ t $')
 plt.ylabel(r'$ \sigma(t) $');
 ```
+
+
+![png](classification_log_model_files/classification_log_model_10_0.png)
+
 
 Observe that the sigmoid function $ \sigma(t) $ takes in any real number $ \mathbb{R} $ and outputs only numbers between 0 and 1. The function is monotonically increasing on its input $ t $; large values of $ t $ correspond to values closer to 1, as desired. This is not a coincidence—the sigmoid function may be derived from a log ratio of probabilities, although we omit the derivation for brevity.
 
@@ -173,6 +181,10 @@ plt.xlabel('$x$')
 plt.ylabel(r'$ f_\hat{\theta}(x) $')
 plt.tight_layout()
 ```
+
+
+![png](classification_log_model_files/classification_log_model_14_0.png)
+
 
 We see that changing $ \hat{\theta} $ changes the sharpness of the curve; the further away from $ 0 $, the sharper the curve.
 
