@@ -77,50 +77,69 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Risk-and-Cost-Minimization">Risk and Cost Minimization<a class="anchor-link" href="#Risk-and-Cost-Minimization">&#182;</a></h2><p>In order to make predictions using data, we define a model, select a cost function, and fit the model's parameters by minimizing the cost. For example, to conduct least squares linear regression, we select the model:</p>
-$$
+<p>$$
 \begin{aligned}
 f_\hat{\theta} (x) &amp;= \hat{\theta} \cdot x
 \end{aligned}
-$$<p>And the cost function:</p>
-$$
+$$</p>
+<p>And the cost function:</p>
+<p>$$
 \begin{aligned}
 L(\hat{\theta}, X, y)
 &amp;= \frac{1}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))^2\\
 \end{aligned}
-$$<p>As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict.</p></div></div></div>
+$$</p>
+<p>As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict. $ X_i $is the $i$'th row of $ X $ and $ y_i $ is the $i$'th entry of y.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Observe that our cost function is the average of the loss function values for each row of our data. If we define the loss function:</p>
-$$
+<p>Observe that our cost function is the average of the loss function values for each row of our data. If we define the squared loss function:</p>
+<p>$$
 \begin{aligned}
-\ell(y, f_\hat{\theta} (x))
+\ell(y_i, f_\hat{\theta} (x))
 &amp;= (y_i - f_\hat{\theta} (x))^2
 \end{aligned}
-$$<p>Then we may rewrite our cost function more simply:</p>
-$$
+$$</p>
+<p>Then we may rewrite our cost function more simply:</p>
+<p>$$
 \begin{aligned}
 L(\hat{\theta}, X, y)
 &amp;= \frac{1}{n} \sum_{i} \ell(y_i, f_\hat{\theta} (X_i))
 \end{aligned}
-$$<p>The expression above abstracts over the specific loss function; regardless of the loss function we choose, our cost is the average loss.</p>
+$$</p>
+<p>The expression above abstracts over the specific loss function; regardless of the loss function we choose, our cost is the average loss.</p>
 <p>By minimizing the cost, we select the model parameters that best fit our observed dataset. Thus far, we have refrained from making statements about the population that generated the dataset. In reality, however, we are quite interested in making good predictions on the entire population, not just our data that we have already seen.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Risk">Risk<a class="anchor-link" href="#Risk">&#182;</a></h2><p>If our observed dataset $ X $ and $ y $ are drawn at random from a given population, our observed data are random variables. If our observed data are random variables, our model parameters are also random variablesâ€”each time we collect a new set of data and fit a model, the parameters of the model $ f_\hat{\theta} (x) $ will be slightly different.</p>
+<h2 id="Example:-Cost-Minimization">Example: Cost Minimization<a class="anchor-link" href="#Example:-Cost-Minimization">&#182;</a></h2><p>Let's say we have a dataset composing of $n$ $X_i, y_i $ pairs, and that we decided on a model $ y_i^* = f_\hat{\theta} (X_i) = \hat{\theta} \cdot \log(X_i) $ to predict $ y_i $ values. What $\hat{\theta}$ would we need to choose to minimize our average squared loss?</p>
+<p>First, we write out our cost function, where $X, y$ represent the entire dataset:</p>
+<p>$$ L(\hat{\theta}, X, y) =  \frac{1}{n} \sum_{i=1}^{n} \ell(y_i, f_\hat{\theta} (X_i)) =  \frac{1}{n} \sum_{i=1}^{n} (y_i -\hat{\theta} \cdot \log(X_i))^2  $$</p>
+<p>Remember, to minimize a function, we must take a derivative with respect to the value we're trying to optimize. Then, we set that equation to zero and solve for the critical point. In this case, we are trying to find the optimal $\hat{\theta}$.</p>
+<p>$$ \frac{\partial}{\partial \hat{\theta}}L(\hat{\theta}, X, y) =  \frac{\partial}{\partial \hat{\theta}}  \frac{1}{n} \sum_{i=1}^{n} (y_i -\hat{\theta} \cdot \log(X_i))^2 $$</p>
+<p>After using the chain rule to simplify:</p>
+<p>$$ \frac{\partial}{\partial \hat{\theta}}L(\hat{\theta}, X, y) =  \frac{1}{n} \sum_{i=1}^{n} 2 \cdot \log(X_i) \cdot (y_i -\hat{\theta} \cdot \log(X_i)) = \frac{2}{n} (\sum_{i=1}^{n} y_i \cdot \log(X_i) - \hat{\theta}\cdot \sum_{i=1}^{n}  \log(X_i)^2 )$$</p>
+<p>To solve for the optimal $\hat{\theta}$, we set this equation to zero:
+$$\frac{2}{n} (\sum_{i=1}^{n} y_i \cdot \log(X_i) - \hat{\theta}\cdot \sum_{i=1}^{n}  \log(X_i)^2 ) = 0$$</p>
+<p>$$ \sum_{i=1}^{n} y_i \cdot \log(X_i) = \hat{\theta}\cdot \sum_{i=1}^{n}  \log(X_i)^2 $$
+$$ \hat{\theta} = \dfrac{\sum_{i=1}^{n} y_i \cdot \log(X_i)}{\sum_{i=1}^{n}  \log(X_i)^2} $$</p>
+<p>We have now found a value for $\hat{\theta}$ that minimizes the average squared loss for our $X, y$ dataset. Note that because the squared loss is a smooth/convex function, we are able to minimize the theta value analytically. For other loss functions such as the absolute loss, we would not be able to use the same process, because the absolute value is not a convex function.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Risk">Risk<a class="anchor-link" href="#Risk">&#182;</a></h2><p>If our observed dataset $ X $ and $ y $ are drawn at random from a given population, our observed data are random variables. If our observed data are random variables, our model parameters are also random variables—each time we collect a new set of data and fit a model, the parameters of the model $ f_\hat{\theta} (x) $ will be slightly different.</p>
 <p>Suppose we draw one more input-output pair $z, \gamma $ from our population at random. The loss that our model produces on this value is:</p>
-$$
+<p>$$
 \begin{aligned}
 \ell(\gamma, f_\hat{\theta} (z))
 \end{aligned}
-$$<p>Notice that this loss is a random variable; the loss changes for different sets of observed data $ X $ and $ y $ and different points $z, \gamma $ from our population.</p></div></div></div>
+$$</p>
+<p>Notice that this loss is a random variable; the loss changes for different sets of observed data $ X $ and $ y $ and different points $z, \gamma $ from our population.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The <strong>risk</strong> for a model $ f_\hat{\theta} $ is the expected value of the loss above for all training data $ X $, $ y $ and all points $ z$, $ \gamma $ in the population:</p>
-$$
+<p>$$
 \begin{aligned}
-R(f_\hat{\theta}) = \mathbb{E}[ \ell(\gamma, f_\hat{\theta} (z)) ]
+R(f_\hat{\theta}(x)) = \mathbb{E}[ \ell(\gamma, f_\hat{\theta} (z)) ]
 \end{aligned}
-$$</div></div></div>
+$$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Notice that the risk is an expectation of a random variable and is thus <em>not</em> random itself. The expected value of fair six-sided die rolls is 3.5 even though the rolls themselves are random.</p>
@@ -128,25 +147,27 @@ $$</div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Empirical-Risk">Empirical Risk<a class="anchor-link" href="#Empirical-Risk">&#182;</a></h2><p>Reality, however, is not so kind. If we substitute in the definition of expectation into the formula for the true risk, we get:</p>
-$$
+<p>$$
 \begin{aligned}
 R(f_\hat{\theta})
 &amp;= \mathbb{E}[ \ell(\gamma, f_\hat{\theta} (z)) ] \\
 &amp;= \sum_\gamma \sum_z \ell(\gamma, f_\hat{\theta} (z)) P(\gamma, z) \\
 \end{aligned}
-$$<p>To further simplify this expression, we need to know $ P(\gamma, z)  $, the global probability distribution of observing any point in the population. Unfortunately, this is not so easy. Suppose we are trying to predict the tip amount based on the size of the table. What is the probability that a table of three people gives a tip of $14.50? If we knew the distribution of points exactly, we wouldn't have to collect data or fit a modelâ€”we would already know the most likely tip amount for any given table.</p></div></div></div>
+$$</p>
+<p>To further simplify this expression, we need to know $ P(\gamma, z)  $, the global probability distribution of observing any point in the population. Unfortunately, this is not so easy. Suppose we are trying to predict the tip amount based on the size of the table. What is the probability that a table of three people gives a tip of $14.50? If we knew the distribution of points exactly, we wouldn't have to collect data or fit a model—we would already know the most likely tip amount for any given table.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Although we do not know the exact distribution of the population, we can approximate it using the observed dataset $ X $ and $ y $. If $ X $ and $ y $ are drawn at random from our population, the distribution of points in $ X $ and $ y $ is similar to the population distribution. Thus, we treat $ X $ and $ y $ as our population. Then, the probability that any input-output pair $ X_i $, $ y_i $ appear is $ \frac{1}{n} $ since each pair appears once out of $ n $ points total.</p>
 <p>This allows us to calculate the <strong>empirical risk</strong>, an approximation for the true risk:</p>
-$$
+<p>$$
 \begin{aligned}
 \hat R(f_\hat{\theta})
 &amp;= \mathbb{E}[ \ell(y_i, f_\hat{\theta} (X_i)) ] \\
 &amp;= \sum_{i=1}^n \ell(y_i, f_\hat{\theta} (X_i)) \frac{1}{n} \\
 &amp;= \frac{1}{n} \sum_{i=1}^n \ell(y_i, f_\hat{\theta} (X_i)) 
 \end{aligned}
-$$<p>If our dataset is large and the data are drawn at random from the population, the empirical risk $ \hat R(f_\hat{\theta}) $ is close to the true risk $ R(f_\hat{\theta}) $. This allows us to pick the model that minimizes the empirical risk.</p></div></div></div>
+$$</p>
+<p>If our dataset is large and the data are drawn at random from the population, the empirical risk $ \hat R(f_\hat{\theta}) $ is close to the true risk $ R(f_\hat{\theta}) $. This allows us to pick the model that minimizes the empirical risk.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Notice that this expression is the cost function at the start of the section! By minimizing the average loss, we also minimize the empirical risk. This explains why we often use the average loss as our cost function instead of the maximum loss, for example.</p></div></div></div>
