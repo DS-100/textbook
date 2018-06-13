@@ -21,8 +21,6 @@ notebooks: ## Convert notebooks to HTML pages
 	@echo "${BLUE}=============================${NOCOLOR}"
 
 	python convert_notebooks_to_html_partial.py
-	# Generate markdown files for revisions
-	jupyter nbconvert --to markdown --TemplateExporter.exclude_output=True notebooks/**/*.ipynb
 
 	git add notebooks-html notebooks-images notebooks/**/*.{md,png}
 	git commit -m "Build notebooks"
