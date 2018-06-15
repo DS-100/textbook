@@ -209,43 +209,51 @@ The cost function for logistic models is based on cross-entropy loss. Since it i
 
 ## KL Divergence and Cross-Entropy Cost
 
-As noted at the beginning of the section, the goal is to closely approximate the real data distribution using a logistic model with parameters $\theta$:
+### Defining KL Divergence
+
+As noted at the beginning of the section, the goal in our binary classification example is to closely approximate the real data distribution using a logistic model with parameters $\theta$:
 
 $$ \hat{P_\theta}(y = 1 | x) \approx P(y = 1 | x) $$
 
-**Kullback–Leibler (KL) divergence** provides a measure of the difference between two probability distributions. It reveals how much information is lost by using the model to approximate the real distribution. KL-divergence, also called relative entropy, has its roots in information theory (beyond the scope of DS 100).
+**Kullback–Leibler (KL) divergence** provides a measure of the difference between two probability distributions. It reveals how imprecise the probability distribution output by a logistic regression model is relative to the data. KL-divergence, also called relative entropy, has its roots in information theory (beyond the scope of DS 100).
 
 The KL divergence between two distributions $P$ and $\hat{P_\theta}$ for a single data point $(x, y)$ is given by:
 
-$$D(P || \hat{P}) = \sum_{k=0}^{K-1} P(y = k | x) \ln \left(\frac{P(y = k | x)}{\hat{P_\theta}(y = k | x)}\right)$$
+$$D(P || \hat{P_\theta}) = \sum_{k=0}^{K-1} P(y = k | x) \ln \left(\frac{P(y = k | x)}{\hat{P_\theta}(y = k | x)}\right)$$
 
 $K$ represents the number of possible outcomes, so in the case of binary classification $K = 2$. 
 
 The best $\theta$ minimizes the average KL divergence of the entire dataset of $n$ points:
 
-$$\text{arg min}_{\theta} \frac{1}{n} \sum_{i=1}^{n} \sum_{k=0}^{K-1} P(y_i = k | x_i) \ln \left(\frac{P(y_i = k | x_i)}{\hat{P_\theta}(y_i = k | x_i)}\right)$$
+$$\displaystyle\arg \min_{\substack{\theta}} \frac{1}{n} \sum_{i=1}^{n} \sum_{k=0}^{K-1} P(y_i = k | x_i) \ln \left(\frac{P(y_i = k | x_i)}{\hat{P_\theta}(y_i = k | x_i)}\right)$$
 
 Average KL divergence can be interpreted as the average log difference between the two distributions $P$ and $\hat{P_\theta}$ weighted by $P$. The structure of the equation has two important implications:
 
 * KL divergence does not penalize mismatch for rare events with respect to $P$. If the model predicts a high probability for an event that is actually rare, then both $P(k)$ and $\ln \left(\frac{P(k)}{\hat{P}(k)}\right)$ are low so the divergence is also low. However, if the model predicts a low probability for an event that is actually common, then the divergence is high. 
-* KL divergence is not symmetric: $$D(P || \hat{P}) \neq D(\hat{P} || P)$$
+* KL divergence is not symmetric: $$D(P || \hat{P_\theta}) \neq D(\hat{P_\theta} || P)$$ In other words, the divergence of $\hat{P_\theta}$ from $P$ is not the same as the divergence of $P$ from $\hat{P_\theta}$.
 
-The logarithm of the ratio of probabilities hints back to the cross-entropy cost equation. In fact, minimizing average KL divergence is equivalent to minimizing average cross-entropy loss. The rest of this section walks through an algebraic derivation of cross-entropy cost from average KL divergence.
+We can deduce that a logistic regression model that accurately predicts common events has a lower divergence from the real distribution than does a model that accurately predicts rare events but varies widely on common events. 
+
+### Deriving Cross-Entropy Cost from KL Divergence
+
+The logarithm of the ratio of probabilities in the average KL divergence equation hints back to our study of the cross-entropy cost equation. In fact, minimizing average KL divergence is equivalent to minimizing average cross-entropy cost. The rest of this section walks through an algebraic derivation of cross-entropy cost from average KL divergence.
 
 Using properties of logarithms, we can rewrite the weighted log ratio:
 $$P(y_i = k | x_i) \ln \left(\frac{P(y_i = k | x_i)}{\hat{P_\theta}(y_i = k | x_i)}\right) = P(y_i = k | x_i) \ln P(y_i = k | x_i) - P(y_i = k | x_i) \ln \hat{P_\theta}(y_i = k | x_i)$$
 
-Note that since the first term produced doesn't depend on $\theta$, it doesn't affect the arg min and can be removed from the equation. The resulting equation is the cross-entropy cost of the model $\hat{P_\theta}$:
+Note that since the first term produced doesn't depend on $\theta$, it doesn't affect $\displaystyle\arg \min_{\substack{\theta}}$ and can be removed from the equation. The resulting equation is the cross-entropy cost of the model $\hat{P_\theta}$:
 
-$$\text{arg min}_{\theta} \frac{1}{n} \sum_{i=1}^{n} \sum_{k=0}^{K-1} -P(y_i = k | x_i) \ln \hat{P_\theta}(y_i = k | x_i)$$
+$$\displaystyle\arg \min_{\substack{\theta}} \frac{1}{n} \sum_{i=1}^{n} \sum_{k=0}^{K-1} -P(y_i = k | x_i) \ln \hat{P_\theta}(y_i = k | x_i)$$
 
 
 We can now substitute equivalent terms to further simplify the equation to its more familiar form. Expanding the innermost summation over $K$ results in the following:
 
-$$- P(y_i = 0 | x_i) \ln \hat{P_\theta}(y_i = 0 | x_i) + P(y_i = 1 | x_i) \ln \hat{P_\theta}(y_i = 1 | x_i)$$
+$$\displaystyle\arg \min_{\substack{\theta}} \frac{1}{n} \sum_{i=1}^{n} - P(y_i = 0 | x_i) \ln \hat{P_\theta}(y_i = 0 | x_i) - P(y_i = 1 | x_i) \ln \hat{P_\theta}(y_i = 1 | x_i)$$
 
-Remembering that for our binary model, $y_i$ is the probability that $y_i = 1$, $P(y_i = 1 | x_i)$ is just $y_i$ and $P(y_i = 0 | x_i)$ is $1 - y_i$. The model's probability distribution $\hat{P_\theta}$ is given by the output of the sigmoid function from the beginning of the section. Putting this all together, we arrive at the cross-entropy cost equation.
+The label $y_i$ is either 0 or 1. Since it is a known value, the probability that $y_i = 1$, $P(y_i = 1 | x_i)$, is equal to $y_i$ and $P(y_i = 0 | x_i)$ is equal to $1 - y_i$. The model's probability distribution $\hat{P_\theta}$ is given by the output of the sigmoid function from the beginning of the section. Putting it all together, we arrive at the cross-entropy cost equation:
 
-$$ \text{arg min}_{\theta} \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) \right) $$
+$$ \displaystyle\arg \min_{\substack{\theta}} \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(x_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(x_i) \right) $$
 
+### Summary
 
+Minimizing average KL divergence also minimizes average cross-entropy cost. We can reduce the divergence of logistic regression models by selecting features that accurately classify common data. For a more in-depth study of cross-entropy and KL divergence, interested readers are encouraged to consult resources on information theory.
