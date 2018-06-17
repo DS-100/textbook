@@ -71,6 +71,10 @@ ax.plot([0, 1, 2, 3], [1, 3, 4, 3])
 plt.show()
 ```
 
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_7_0.png)
+
+
 To customize the plot, we can use other methods on the axes object:
 
 
@@ -90,6 +94,10 @@ ax.set_xlabel('x')
 ax.set_ylabel('y');
 ```
 
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_9_0.png)
+
+
 As a shortcut, `matplotlib` has plotting methods on the `plt` module itself that will automatically initialize a figure and axes.
 
 
@@ -101,6 +109,10 @@ plt.plot(x, np.sin(x))
 # existing figure and axes are reused.
 plt.scatter(x, np.cos(x));
 ```
+
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_11_0.png)
+
 
 The `plt` module has analogous methods to an axes, so we can recreate one of the plots above using `plt` shorthands.
 
@@ -122,6 +134,10 @@ plt.xlim(-1, 11)
 plt.ylim(-1.2, 1.2);
 ```
 
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_13_0.png)
+
+
 ### Customizing Marks
 
 To change properties of the plot marks themselves (e.g. the lines in the plot above), we can pass additional arguments into `plt.plot`.
@@ -130,6 +146,10 @@ To change properties of the plot marks themselves (e.g. the lines in the plot ab
 ```python
 plt.plot(x, np.sin(x), linestyle='--', color='purple');
 ```
+
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_15_0.png)
+
 
 Checking the `matplotlib` documentation is the easiest way to figure out which arguments are available for each method. Another way is to store the returned line object:
 
@@ -235,6 +255,10 @@ ax.annotate('annotate', xy=(2, 1), xytext=(3, 4),
 ax.axis([0, 10, 0, 10]);
 ```
 
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_18_0.png)
+
+
 ### Customizing a `seaborn` plot using `matplotlib`
 
 Now that we've seen how to use `matplotlib` to customize a plot, we can use the same methods to customize `seaborn` plots since `seaborn` creates plots using `matplotlib` behind-the-scenes.
@@ -251,12 +275,116 @@ ti = sns.load_dataset('titanic').dropna().reset_index(drop=True)
 ti.head()
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>pclass</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>...</th>
+      <th>deck</th>
+      <th>embark_town</th>
+      <th>alive</th>
+      <th>alone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>...</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+      <td>yes</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>...</td>
+      <td>C</td>
+      <td>Southampton</td>
+      <td>yes</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>1</td>
+      <td>male</td>
+      <td>54.0</td>
+      <td>...</td>
+      <td>E</td>
+      <td>Southampton</td>
+      <td>no</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>3</td>
+      <td>female</td>
+      <td>4.0</td>
+      <td>...</td>
+      <td>G</td>
+      <td>Southampton</td>
+      <td>yes</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>1</td>
+      <td>female</td>
+      <td>58.0</td>
+      <td>...</td>
+      <td>C</td>
+      <td>Southampton</td>
+      <td>yes</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 15 columns</p>
+</div>
+
+
+
 We'll start with this plot:
 
 
 ```python
 sns.lmplot(x='age', y='fare', hue='who', data=ti, fit_reg=False);
 ```
+
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_22_0.png)
+
 
 We can see that the plot needs a title and better labels for the x and y-axes. In addition, the two people with the most expensive fares survived, so we can annotate them on our plot.
 
@@ -271,5 +399,9 @@ plt.ylabel('Fare in USD')
 plt.annotate('Both survived', xy=(35, 500), xytext=(35, 420),
              arrowprops=dict(facecolor='black', shrink=0.05));
 ```
+
+
+![png](customizing_with_matplotlib_files/customizing_with_matplotlib_24_0.png)
+
 
 In practice, we use `seaborn` to quickly explore the data and then turn to `matplotlib` for fine-tuning once we decide on the plots to use in a paper or presentation.
