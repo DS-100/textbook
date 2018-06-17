@@ -75,7 +75,7 @@ R(f_\hat{\theta}) = (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 + \text{Var}
 \end{aligned}
 $$
 
-The first term in this expression, $ (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 $, is a mathematical expression for the bias of the model. (Technically, this term represents the biased squared, $\text{bias}^2$). The bias is equal to zero if in the long run our choice of model $ f_\hat{\theta}(z) $ predicts the same outcomes produced by the population process $ f_\theta(z) $. The bias is high if our choice of model makes poor predictions of the population process even when we have the entire population as our dataset.
+The first term in this expression, $ (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 $, is a mathematical expression for the bias of the model. (Technically, this term represents the biased squared, $\text{bias}^2$.) The bias is equal to zero if in the long run our choice of model $ f_\hat{\theta}(z) $ predicts the same outcomes produced by the population process $ f_\theta(z) $. The bias is high if our choice of model makes poor predictions of the population process even when we have the entire population as our dataset.
 
 The second term in this expression, $ \text{Var}(f_\hat{\theta}(z)) $, represents the model variance. The variance is low when the model's predictions don't change much when the model is trained on different datasets from the population. The variance is high when the model's predictions change greatly when the model is trained on different datasets from the population.
 
@@ -144,7 +144,7 @@ plt.title('One set of observed data');
 ![png](bias_modeling_files/bias_modeling_12_0.png)
 
 
-Suppose we draw many sets of data from the population and fit a simple linear model, to each one. Below, we plot the population data generation scheme in blue and the model predictions in green.
+Suppose we draw many sets of data from the population and fit a simple linear model to each one. Below, we plot the population data generation scheme in blue and the model predictions in green.
 
 
 ```python
@@ -230,21 +230,24 @@ The bias-variance tradeoff allows us to more precisely describe the modeling phe
 
 Underfitting is typically caused by too much bias; overfitting is typically caused by too much model variance.
 
-Collecting more data reduces variance. In the extreme case that we can collect all the data for something, we would be able to create a model with zero variance- meaning that it predicts every single point correctly. One recent trend is to select a model with low bias and high intrinsic variance (e.g. a neural network) and collect many data points so that the model variance is low enough to make accurate predictions. While effective in practice, collecting enough data for these models tends to require large amounts of time and money.
+Collecting more data reduces variance. For example, the model variance of linear regression goes down by a factor of $ 1
+/n $, where $ n $ is the number of data points. Thus, doubling the dataset halves the model variance, and collecting many data points will cause the variance to approach 0. One rece end is to select a model with low bias and high intrinsic variance (e.g. a neural network) and collect many data points so that the model variance is low enough to make accurate predictions. While effective in practice, collecting enough data for these models tends to require large amounts of time and money.
 
 Collecting more data reduces bias if the model can fit the population process exactly. If the model is inherently incapable of modeling the population (as in the example above), even infinite data cannot get rid of model bias.
 
 Adding a useful feature to the data, such as a quadratic feature when the underlying process is quadratic, reduces bias. Adding a useless feature rarely increases bias.
 
-Adding a feature, whether useful or not, typically increases model variance. This is due to the fact that more features potentially will overfit the model:causing the model to be too specific for the training data, and not allow the model to generalize to potential unseen data. In order to increase a model's prediction accuracy, a new feature should decrease bias more than it increases variance. 
+Adding a feature, whether useful or not, typically increases model variance. This does so because each new feature addas a a new model parameter, increasing the total number of models. In order to increase a model's prediction accuracy, a new feature should decrease bias more than it increases variance. 
 
-A lack of features will typically increase bias, and cause underfitting. Without the necessary amount of features, one won't be able to create a model that captures the underlying trend of the data. This leads to high bias because the model will rarely be able to predict the correct value, even for datapoints that we already know. 
+Removing features will typically increase bias and can cause underfitting. For example if the underlying data comes from a quadratic curve, removing the quadratic feature and only using a simple linear model won't capture the trend of the data. 
 
 The plot below is helpful in summarizing the takeaways mentioned above:
 
 ![bias_modeling_bias_var_plot.png](https://raw.githubusercontent.com/DS-100/textbook/master/assets/bias_modeling_bias_var_plot.png)
 
-As we add more data, we shift our plot to the right and down:
+As model complexity increases, we will be able to predict better values for our training set, but not extrapolate well to the test set. By decreasing model complexity, the bias will be higher for the training set, but there will be less model variance.
+
+As we add more data, we shift our plot to the right and down, reducing bias and variance:
 
 ![bias_modeling_bias_var_shiftt.png](https://raw.githubusercontent.com/DS-100/textbook/master/assets/bias_modeling_bias_var_shift.png)
 
