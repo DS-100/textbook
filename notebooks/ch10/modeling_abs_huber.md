@@ -101,6 +101,10 @@ compare_mse_abs(thetas=[11, 12, 13, 14, 15, 16],
                 y_vals=[14], xlims=(10, 17))
 ```
 
+
+![png](modeling_abs_huber_files/modeling_abs_huber_8_0.png)
+
+
 We see that the MSE cost is usually higher than the mean absolute cost since the error is squared. Let's see what happens when have five points: $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $
 
 
@@ -110,6 +114,10 @@ compare_mse_abs(thetas=[12, 13, 14, 15, 16, 17],
                 y_vals=[12.1, 12.8, 14.9, 16.3, 17.2],
                 xlims=(11, 18))
 ```
+
+
+![png](modeling_abs_huber_files/modeling_abs_huber_10_0.png)
+
 
 Remember that the actual cost values themselves are not very interesting to us; they are only useful for comparing different values of $ \theta $. Once we choose a cost function, we will look for the $ \theta $ that produces the least cost. Thus, we are interested in whether the cost functions are minimized by different values of $ \theta $.
 
@@ -131,6 +139,10 @@ plt.ylabel('Cost')
 plt.legend();
 ```
 
+
+![png](modeling_abs_huber_files/modeling_abs_huber_12_0.png)
+
+
 Then, we compute more values of $ \theta $ so that the curve is smooth:
 
 
@@ -148,6 +160,10 @@ plt.xlabel(r'$ \theta $ Values')
 plt.ylabel('Cost')
 plt.legend();
 ```
+
+
+![png](modeling_abs_huber_files/modeling_abs_huber_14_0.png)
+
 
 Then, we zoom into the region between 1.5 and 5 on the y-axis to see the difference in minima more clearly. We've marked the minima with dotted lines.
 
@@ -173,6 +189,10 @@ plt.ylabel('Cost')
 plt.ylim(1.5, 5)
 plt.legend();
 ```
+
+
+![png](modeling_abs_huber_files/modeling_abs_huber_16_0.png)
+
 
 We've found empirically that the MSE cost and mean absolute cost can be minimized by different values of $ \theta $ for the same dataset. However, we don't have a good sense of when they will differ and more importantly, why they differ.
 
@@ -221,6 +241,10 @@ def compare_mse_abs_curves(y3=14):
 interact(compare_mse_abs_curves, y3=(14, 25));
 ```
 
+
+    A Jupyter Widget
+
+
 We've shown the curves for $ y_3 = 14 $ and $ y_3 = 25 $ below.
 
 
@@ -230,10 +254,18 @@ compare_mse_abs_curves(y3=14)
 ```
 
 
+![png](modeling_abs_huber_files/modeling_abs_huber_22_0.png)
+
+
+
 ```python
 # HIDDEN
 compare_mse_abs_curves(y3=25)
 ```
+
+
+![png](modeling_abs_huber_files/modeling_abs_huber_23_0.png)
+
 
 As we move the point further away from the rest of the data, the MSE cost curve moves with it. When $ y_3 = 14 $, both MSE and mean absolute cost will be minimized by the same value of $ \theta $ at $ \theta = 13 $. However, when $ y_3 = 25 $, the MSE curve will tell us that the best $ \theta $ is around 16.7 while the mean absolute cost will still say that $ \theta = 13 $ is best.
 
@@ -293,6 +325,10 @@ def points_and_cost(y_vals, xlim, cost_fn=abs_cost):
 points_and_cost(np.array([10, 11, 12, 14, 15]), (9, 16))
 ```
 
+
+![png](modeling_abs_huber_files/modeling_abs_huber_27_0.png)
+
+
 However, when we have an even number of points, the cost is minimized when $ \theta $ is any value in between the two central points.
 
 
@@ -301,6 +337,10 @@ However, when we have an even number of points, the cost is minimized when $ \th
 points_and_cost(np.array([10, 11, 14, 15]), (9, 16))
 ```
 
+
+![png](modeling_abs_huber_files/modeling_abs_huber_29_0.png)
+
+
 This is not the case when we use the MSE cost:
 
 
@@ -308,6 +348,10 @@ This is not the case when we use the MSE cost:
 # HIDDEN
 points_and_cost(np.array([10, 11, 14, 15]), (9, 16), mse_cost)
 ```
+
+
+![png](modeling_abs_huber_files/modeling_abs_huber_31_0.png)
+
 
 ### MSE and Mean Absolute Cost Comparison
 
@@ -344,6 +388,10 @@ plt.legend()
 plt.savefig('huber_loss.pdf')
 ```
 
+
+![png](modeling_abs_huber_files/modeling_abs_huber_34_0.png)
+
+
 We can see that the Huber cost is smooth, unlike the mean absolute cost. The Huber cost also increases at a linear rate, unlike the quadratic rate of the mean squared cost.
 
 The Huber cost does have a drawback, however. Notice that it transitions from the MSE to the mean absolute cost once $ \theta $ gets far enough from the point. We can tweak this "far enough" to get different cost curves. For example, we can make it transition once $ \theta $ is just one unit away from the observation:
@@ -360,6 +408,10 @@ plt.legend()
 plt.savefig('huber_loss.pdf')
 ```
 
+
+![png](modeling_abs_huber_files/modeling_abs_huber_36_0.png)
+
+
 Or we can make it transition when $ \theta $ is ten units away from the observation:
 
 
@@ -373,6 +425,10 @@ plt.ylabel(r"Loss")
 plt.legend()
 plt.savefig('huber_loss.pdf')
 ```
+
+
+![png](modeling_abs_huber_files/modeling_abs_huber_38_0.png)
+
 
 This choice results in a different cost curve and can thus result in different values of $ \theta $. If we want to use the Huber cost function, we have the additional task of setting this transition point to a suitable value.
 

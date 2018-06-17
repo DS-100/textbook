@@ -538,7 +538,7 @@ print(f'theta: {thetas} | cost: {mse_cost(thetas, X, y):.2f}')
     theta: [-13.72  -0.    -0.01   0.75] | cost: 11.65
     CPU times: user 8.81 ms, sys: 3.11 ms, total: 11.9 ms
     Wall time: 9.22 ms
-    
+
 
 According to gradient descent, our linear model is:
 
@@ -662,7 +662,7 @@ print(f'Prediction for first row: '
 ```
 
     Prediction for first row: 15.45
-    
+
 
 We've included a widget below to pan through the predictions and the data used to make the prediction:
 
@@ -690,7 +690,7 @@ df_interact(with_predictions)
 
 
     (392 rows, 5 columns) total
-    
+
 
 We can also plot the residuals of our predictions (actual values - predicted values):
 
@@ -867,7 +867,7 @@ print(f'theta: {thetas_all} | cost: {mse_cost(thetas_all, X, y):.2f}')
     theta: [-17.22  -0.49   0.02  -0.02  -0.01   0.08   0.75   1.43] | cost: 10.85
     CPU times: user 10.9 ms, sys: 3.51 ms, total: 14.4 ms
     Wall time: 11.7 ms
-    
+
 
 According to gradient descent, our linear model is:
 
