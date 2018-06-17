@@ -32,6 +32,114 @@ tips = sns.load_dataset('tips')
 tips
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>16.99</td>
+      <td>1.01</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.34</td>
+      <td>1.66</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>21.01</td>
+      <td>3.50</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>241</th>
+      <td>22.67</td>
+      <td>2.00</td>
+      <td>Male</td>
+      <td>Yes</td>
+      <td>Sat</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>242</th>
+      <td>17.82</td>
+      <td>1.75</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sat</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>243</th>
+      <td>18.78</td>
+      <td>3.00</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Thur</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+<p>244 rows × 7 columns</p>
+</div>
+
+
+
 We can plot a histogram of the tip amounts:
 
 
@@ -40,6 +148,10 @@ sns.distplot(tips['tip'], bins=np.arange(0, 10.1, 0.25), rug=True)
 plt.xlabel('Tip Amount in Dollars')
 plt.ylabel('Proportion per Dollar');
 ```
+
+
+![png](modeling_simple_files/modeling_simple_5_0.png)
+
 
 There are already some interesting patterns in the data. For example, there is a clear mode at \$2 and most tips seem to be in multiples of \$0.50.
 
@@ -53,6 +165,10 @@ plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
 
+
+![png](modeling_simple_files/modeling_simple_7_0.png)
+
+
 It looks like one table left our waiter a tip of 70%! However, most of the tips percentages are under 30%. Let's zoom into that part of the distribution.
 
 
@@ -62,6 +178,10 @@ plt.xlim(0, 30)
 plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
+
+
+![png](modeling_simple_files/modeling_simple_9_0.png)
+
 
 We can the distribution is roughly centered at 15% with another potential mode at 20%. Suppose our waiter is interested in predicting how much percent tip he will get from a given table. To address this question, we can create a model for how much tip the waiter will get.
 
@@ -94,6 +214,10 @@ plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
 
+
+![png](modeling_simple_files/modeling_simple_13_0.png)
+
+
 Let's suppose we are trying to compare two choices for $\theta$: 10% and 15%. We can mark both of these choices on our distribution:
 
 
@@ -109,6 +233,10 @@ plt.xlim(0, 30)
 plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
+
+
+![png](modeling_simple_files/modeling_simple_15_0.png)
+
 
 Intuitively, it looks like choosing $ \theta = 15 $ makes more sense than $ \theta = 10 $ given our dataset. Why is this? When we look at the points in our data, we can see that more points fall close to 15 than they do to 10.
 
