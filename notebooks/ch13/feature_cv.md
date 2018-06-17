@@ -99,6 +99,10 @@ plt.title('Degree 10 poly, second set of data')
 plt.ylim(3, 7);
 ```
 
+
+![png](feature_cv_files/feature_cv_7_0.png)
+
+
 We cannot use the training error to pick features to add to the data since the training error will always favor more features. In order to accurately perform feature selection, we must check the model's error on data that is not used to fit the model.
 
 ## Train-Validation-Test Split
@@ -165,6 +169,74 @@ ice = pd.concat([temp, ice])
 ice
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sweetness</th>
+      <th>overall</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.60</td>
+      <td>3.09</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3.50</td>
+      <td>3.17</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.69</td>
+      <td>3.46</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>11.00</td>
+      <td>5.90</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>11.70</td>
+      <td>5.50</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>11.90</td>
+      <td>5.40</td>
+    </tr>
+  </tbody>
+</table>
+<p>309 rows × 2 columns</p>
+</div>
+
+
+
 We've included a scatter plot of the overall rating versus ice cream sweetness below.
 
 
@@ -175,6 +247,10 @@ plt.title('Ice Cream Rating vs. Sweetness')
 plt.xlabel('Sweetness')
 plt.ylabel('Rating');
 ```
+
+
+![png](feature_cv_files/feature_cv_15_0.png)
+
 
 We first partition our data into a training dataset, validation dataset, and test dataset using `scikit-learn`'s [`sklearn.model_selection.train_test_split`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) method to perform a 70/15/15% train-validation-test split.
 
@@ -197,6 +273,11 @@ print(f'Validation set size: {len(X_valid)}')
 print(f'      Test set size: {len(X_test)}')
 ```
 
+      Training set size: 217
+    Validation set size: 46
+          Test set size: 46
+
+
 We now fit polynomial regression models using the training set `X_train` and `y_train`, one for each polynomial degree from 1 to 10.
 
 
@@ -213,6 +294,19 @@ X_train_polys = [transformer.fit_transform(X_train)
 # Display the X_train with degree 5 polynomial features
 X_train_polys[4]
 ```
+
+
+
+
+    array([[     1.  ,      7.09,     50.27,    356.4 ,   2526.88,  17915.59],
+           [     1.  ,      9.88,     97.61,    964.43,   9528.57,  94142.28],
+           [     1.  ,     10.12,    102.41,   1036.43,  10488.71, 106145.74],
+           ...,
+           [     1.  ,     11.4 ,    129.96,   1481.54,  16889.6 , 192541.46],
+           [     1.  ,      5.2 ,     27.04,    140.61,    731.16,   3802.04],
+           [     1.  ,      9.86,     97.22,    958.59,   9451.65,  93193.28]])
+
+
 
 
 ```python
@@ -251,6 +345,78 @@ display(cv_df)
 pd.options.display.max_rows = 7
 ```
 
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Validation Error</th>
+    </tr>
+    <tr>
+      <th>Degree</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>0.304539</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.043109</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.043629</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.043187</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.043868</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.043878</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.043909</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.044971</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.047573</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.046913</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 We can see that as we use higher degree polynomial features, the validation error decreases and increases again.
 
 
@@ -276,6 +442,10 @@ plt.ylabel('Validation Error')
 plt.tight_layout();
 ```
 
+
+![png](feature_cv_files/feature_cv_25_0.png)
+
+
 Examining the validation errors reveals the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and report its test error.
 
 
@@ -292,6 +462,12 @@ print(f'  Training error: {training_error:0.3f}')
 print(f'Validation error: {validation_error:0.3f}')
 print(f'      Test error: {test_error:0.3f}')
 ```
+
+    Degree 2 polynomial
+      Training error: 0.042
+    Validation error: 0.043
+          Test error: 0.063
+
 
 ## K-Fold Cross-Validation
 

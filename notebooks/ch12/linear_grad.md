@@ -183,7 +183,22 @@ Finally, we run gradient descent!
 thetas = minimize(mse_cost, grad_mse_cost, tips['total_bill'], tips['tip'])
 ```
 
-We can see that gradient descent converged to the theta values of $\theta_0 = 0.01$ and $\theta_1 = 0.14$. Our linear model is:
+    theta: [0. 0.] | cost: 10.896283606557377
+    theta: [0.   0.07] | cost: 3.8937622006094705
+    theta: [0.  0.1] | cost: 1.9359443267168215
+    theta: [0.01 0.12] | cost: 1.388538448286097
+    theta: [0.01 0.13] | cost: 1.235459416905535
+    theta: [0.01 0.14] | cost: 1.1926273731479433
+    theta: [0.01 0.14] | cost: 1.1806184944517062
+    theta: [0.01 0.14] | cost: 1.177227251696266
+    theta: [0.01 0.14] | cost: 1.1762453624313751
+    theta: [0.01 0.14] | cost: 1.1759370980989148
+    theta: [0.01 0.14] | cost: 1.175817178966766
+    CPU times: user 272 ms, sys: 67.3 ms, total: 339 ms
+    Wall time: 792 ms
+
+
+We can see that gradient descent converges to the theta values of $\theta_0 = 0.01$ and $\theta_1 = 0.14$. Our linear model is:
 
 $y = 0.14x + 0.01$
 
@@ -200,5 +215,9 @@ plt.title('Tip amount vs. Total Bill')
 plt.xlabel('Total Bill')
 plt.ylabel('Tip Amount');
 ```
+
+
+![png](linear_grad_files/linear_grad_17_0.png)
+
 
 We can see that if a table's bill is \$10, our model will predict that the waiter gets around \$1.50 in tip. Similarly, if a table's bill is \$40, our model will predict a tip of around \$6.00.

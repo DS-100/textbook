@@ -31,9 +31,100 @@ tips.head()
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>16.99</td>
+      <td>1.01</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.34</td>
+      <td>1.66</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>21.01</td>
+      <td>3.50</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>23.68</td>
+      <td>3.31</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>24.59</td>
+      <td>3.61</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
 ```python
 sns.distplot(tips['tip'], bins=25);
 ```
+
+
+![png](linear_tips_files/linear_tips_4_0.png)
+
 
 As we have covered previously, if we choose a constant model and the mean squared error cost, our model will predict the mean of the tip amount:
 
@@ -41,6 +132,13 @@ As we have covered previously, if we choose a constant model and the mean square
 ```python
 np.mean(tips['tip'])
 ```
+
+
+
+
+    2.9982786885245902
+
+
 
 This means that if a new party orders a meal and the waiter asks us how much tip he will likely receive, we will say "around \$3", no matter how large the table is or how much their total bill was.
 
@@ -55,13 +153,17 @@ plt.xlabel('Total Bill')
 plt.ylabel('Tip Amount');
 ```
 
+
+![png](linear_tips_files/linear_tips_8_0.png)
+
+
 Although the average tip amount is \$3, if a table orders \$40 worth of food we would certainly expect that the waiter receives more than \$3 of tip. Thus, we would like to alter our model so that it makes predictions based on the variables in our dataset instead of blindly predicting the mean tip amount. To do this, we use a linear model instead of constant one.
 
 Let's briefly review our current toolbox for modeling and estimation and define some new notation so that we can better represent the additional complexity that linear models have.
 
 ## Defining a Simple Linear Model
 
-We are interested in predicting the tip amount based on the total bill of a table. We use $ y $ to represent the tip amount, the variable we are trying to predict. We use $ x $ to represent the total bill, the variable we use for prediction. 
+We are interested in predicting the tip amount based on the total bill of a table. Let $ y $ represent the tip amount, the variable we are trying to predict. Let $ x $ represent the total bill, the variable we use for prediction. 
 
 We define a linear model $ f_\theta $ that depends on $ x $:
 
@@ -69,7 +171,7 @@ $$
 f_\theta (x) = \theta_1 x + \theta_0
 $$
 
-and treat it as the true generating function of the data.
+We treat $ f_\theta (x) $ as the underlying function that generated the data.
 
 $ f_\theta (x) $ assumes that in truth, $ y $ has a perfectly linear relationship with $ x $. However, our observed data do not follow a perfectly straight line because of some random noise $ \epsilon $. Mathematically, we account for this by adding a noise term:
 

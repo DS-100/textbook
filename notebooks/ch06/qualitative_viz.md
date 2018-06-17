@@ -51,6 +51,13 @@ ti = sns.load_dataset('titanic').reset_index(drop=True)
 df_interact(ti)
 ```
 
+
+    A Jupyter Widget
+
+
+    (891 rows, 15 columns) total
+
+
 ### Bar Charts
 
 In `seaborn`, there are two types of bar charts. The first type uses the `countplot` method to count up the number of times each category appears in a column.
@@ -63,15 +70,27 @@ sns.countplot(x='alive', data=ti);
 ```
 
 
+![png](qualitative_viz_files/qualitative_viz_6_0.png)
+
+
+
 ```python
 sns.countplot(x='class', data=ti);
 ```
+
+
+![png](qualitative_viz_files/qualitative_viz_7_0.png)
+
 
 
 ```python
 # As with box plots, we can break down each category further using color
 sns.countplot(x='alive', hue='class', data=ti);
 ```
+
+
+![png](qualitative_viz_files/qualitative_viz_8_0.png)
+
 
 The `barplot` method, on the other hand, groups the DataFrame by a categorical column and plots the height of the bars according to the average of a numerical column within each group.
 
@@ -81,12 +100,59 @@ The `barplot` method, on the other hand, groups the DataFrame by a categorical c
 sns.barplot(x='alive', y='age', data=ti);
 ```
 
+
+![png](qualitative_viz_files/qualitative_viz_10_0.png)
+
+
 The height of each bar can be computed by grouping the original DataFrame and averaging the `age` column:
 
 
 ```python
 ti[['alive', 'age']].groupby('alive').mean()
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+    </tr>
+    <tr>
+      <th>alive</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>no</th>
+      <td>30.626179</td>
+    </tr>
+    <tr>
+      <th>yes</th>
+      <td>28.343690</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 By default, the `barplot` method will also compute a bootstrap 95% confidence interval for each averaged value, marked as the black lines in the bar chart above. The confidence intervals show that if the dataset contained a random sample of Titanic passengers, the difference between passenger age for those that survived and those that didn't is not statistically significant at the 5% significance level.
 
@@ -96,6 +162,10 @@ These confidence intervals take long to generate when we have larger datasets so
 ```python
 sns.barplot(x='alive', y='age', data=ti, ci=False);
 ```
+
+
+![png](qualitative_viz_files/qualitative_viz_14_0.png)
+
 
 ### Dot Charts
 
@@ -107,6 +177,10 @@ Dot charts are similar to bar charts. Instead of plotting bars, dot charts mark 
 sns.pointplot(x='alive', y='age', data=ti);
 ```
 
+
+![png](qualitative_viz_files/qualitative_viz_16_0.png)
+
+
 Dot charts are most useful when comparing changes across categories:
 
 
@@ -116,8 +190,16 @@ sns.pointplot(x='class', y='survived', data=ti);
 ```
 
 
+![png](qualitative_viz_files/qualitative_viz_18_0.png)
+
+
+
 ```python
 # Shows the proportion of survivors for each passenger class,
 # split by whether the passenger was an adult male
 sns.pointplot(x='class', y='survived', hue='adult_male', data=ti);
 ```
+
+
+![png](qualitative_viz_files/qualitative_viz_19_0.png)
+
