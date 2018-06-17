@@ -100,10 +100,22 @@ plot_theta_on_cost(pts, -21, quartic_cost)
 ```
 
 
+![png](gradient_convexity_files/gradient_convexity_6_0.png)
+
+
+
 ```python
 # HIDDEN
 plot_one_gd_iter(pts, -21, quartic_cost, grad_quartic_cost)
 ```
+
+    old theta: -21
+    new theta: -9.944999999999999
+
+
+
+![png](gradient_convexity_files/gradient_convexity_7_1.png)
+
 
 
 ```python
@@ -111,17 +123,41 @@ plot_one_gd_iter(pts, -21, quartic_cost, grad_quartic_cost)
 plot_one_gd_iter(pts, -9.9, quartic_cost, grad_quartic_cost)
 ```
 
+    old theta: -9.9
+    new theta: -12.641412
+
+
+
+![png](gradient_convexity_files/gradient_convexity_8_1.png)
+
+
 
 ```python
 # HIDDEN
 plot_one_gd_iter(pts, -12.6, quartic_cost, grad_quartic_cost)
 ```
 
+    old theta: -12.6
+    new theta: -14.162808
+
+
+
+![png](gradient_convexity_files/gradient_convexity_9_1.png)
+
+
 
 ```python
 # HIDDEN
 plot_one_gd_iter(pts, -14.2, quartic_cost, grad_quartic_cost)
 ```
+
+    old theta: -14.2
+    new theta: -14.497463999999999
+
+
+
+![png](gradient_convexity_files/gradient_convexity_10_1.png)
+
 
 On this cost function and $ \theta $ value, gradient descent converges to $ \theta = -14.5 $, producing a cost of roughly 8. However, the global minimum for this cost function is $ \theta = 18 $, corresponding to a cost of nearly zero. From this example, we observe that gradient descent finds a *local minimum* which may not necessarily have the same cost as the *global minimum*.
 
@@ -134,6 +170,10 @@ pts = np.array([-2, -1, 1])
 plot_cost(pts, (-5, 5), mse_cost)
 ```
 
+
+![png](gradient_convexity_files/gradient_convexity_12_0.png)
+
+
 Running gradient descent on this cost function with an appropriate learning rate will always find the globally optimal $ \theta $ since the sole local minimum is also the global minimum.
 
 The mean absolute error cost sometimes has multiple local minima. However, all the local minima produce the globally lowest cost possible.
@@ -144,6 +184,10 @@ The mean absolute error cost sometimes has multiple local minima. However, all t
 pts = np.array([-1, 1])
 plot_cost(pts, (-5, 5), abs_cost)
 ```
+
+
+![png](gradient_convexity_files/gradient_convexity_14_0.png)
+
 
 On this cost function, gradient descent will converge to one of the local minima in the range $ [-1, 1] $. Since all of these local minima have the lowest cost possible for this function, gradient descent will still return an optimal choice of $ \theta $.
 
@@ -167,6 +211,10 @@ plot_cost(pts, (-23, 25), quartic_cost)
 plot_connected_thetas(pts, -12, 12, quartic_cost)
 ```
 
+
+![png](gradient_convexity_files/gradient_convexity_18_0.png)
+
+
 Thus, this cost function is non-convex.
 
 For the MSE cost, all lines connecting two points of the graph appear above the graph. We plot one such line below.
@@ -178,6 +226,10 @@ pts = np.array([0])
 plot_cost(pts, (-23, 25), mse_cost)
 plot_connected_thetas(pts, -12, 12, mse_cost)
 ```
+
+
+![png](gradient_convexity_files/gradient_convexity_21_0.png)
+
 
 The mathematical definition of convexity gives us a precise way of determining whether a function is convex. In this textbook, we will omit mathematical proofs of convexity and will instead state whether a chosen cost function is convex.
 

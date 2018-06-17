@@ -6,7 +6,7 @@ continuous, numerical estimations based on data. We now turn our attention to
 data. For example, weather stations are interested in predicting whether
 tomorrow will be rainy or not using the weather conditions today.
 
-Together, regression and classification compose the major approaches for
+Together, regression and classification compose the primary approaches for
 _supervised learning_, the general task of learning a model based on observed
 input-output pairs.
 

@@ -60,6 +60,7 @@ $$
 
 As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict. $ X_i $ is the $i$'th row of $ X $ and $ y_i $ is the $i$'th entry of y.
 
+
 Observe that our cost function is the average of the loss function values for each row of our data. If we define the squared loss function:
 
 $$

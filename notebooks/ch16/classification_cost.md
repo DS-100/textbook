@@ -76,6 +76,10 @@ plt.xlabel('Distance from Basket (ft)')
 plt.ylabel('Shot Made');
 ```
 
+
+![png](classification_cost_files/classification_cost_5_0.png)
+
+
 Noticing the large cluster of made shots close to the basket and the smaller cluster of missed shots further from the basket, we expect that a logistic model fitted on this data might look like:
 
 
@@ -98,6 +102,10 @@ plt.title('Possible logistic model fit')
 plt.xlabel('Distance from Basket (ft)')
 plt.ylabel('Shot Made');
 ```
+
+
+![png](classification_cost_files/classification_cost_7_0.png)
+
 
 Although we can use the mean squared error cost function as we have for linear regression, for a logistic model this cost function is non-convex and thus difficult to optimize.
 

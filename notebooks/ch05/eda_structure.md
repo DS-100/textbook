@@ -44,6 +44,18 @@ The structure of a dataset refers to the "shape" of the data files. At a basic l
 !head data/Berkeley_PD_-_Calls_for_Service.csv
 ```
 
+    CASENO,OFFENSE,EVENTDT,EVENTTM,CVLEGEND,CVDOW,InDbDate,Block_Location,BLKADDR,City,State
+    17091420,BURGLARY AUTO,07/23/2017 12:00:00 AM,06:00,BURGLARY - VEHICLE,0,08/29/2017 08:28:05 AM,"2500 LE CONTE AVE
+    Berkeley, CA
+    (37.876965, -122.260544)",2500 LE CONTE AVE,Berkeley,CA
+    17020462,THEFT FROM PERSON,04/13/2017 12:00:00 AM,08:45,LARCENY,4,08/29/2017 08:28:00 AM,"2200 SHATTUCK AVE
+    Berkeley, CA
+    (37.869363, -122.268028)",2200 SHATTUCK AVE,Berkeley,CA
+    17050275,BURGLARY AUTO,08/24/2017 12:00:00 AM,18:30,BURGLARY - VEHICLE,4,08/29/2017 08:28:06 AM,"200 UNIVERSITY AVE
+    Berkeley, CA
+    (37.865491, -122.310065)",200 UNIVERSITY AVE,Berkeley,CA
+
+
 The Stops dataset, on the other hand, is a JSON (JavaScript Object Notation) file.
 
 
@@ -53,6 +65,18 @@ The Stops dataset, on the other hand, is a JSON (JavaScript Object Notation) fil
 !echo '...'
 !tail -n 5 data/stops.json
 ```
+
+    {
+      "meta" : {
+        "view" : {
+          "id" : "6e9j-pj9p",
+          "name" : "Berkeley PD - Stop Data",
+    ...
+    , [ 31079, "C2B606ED-7872-4B0B-BC9B-4EF45149F34B", 31079, 1496269085, "932858", 1496269085, "932858", null, "2017-00024245", "2017-04-30T22:59:26", " UNIVERSITY AVE/6TH ST", "T", "BM2TWN; ", null, null ]
+    , [ 31080, "8FADF18D-7FE9-441D-8709-7BFEABDACA7A", 31080, 1496269085, "932858", 1496269085, "932858", null, "2017-00024250", "2017-04-30T23:19:27", " UNIVERSITY AVE /  WEST ST", "T", "HM4TCS; ", "37.8698757000001", "-122.286550846" ]
+    , [ 31081, "F60BD2A4-8C47-4BE7-B1C6-4934BE9DF838", 31081, 1496269085, "932858", 1496269085, "932858", null, "2017-00024254", "2017-04-30T23:38:34", " CHANNING WAY /  BOWDITCH ST", "1194", "AR; ", "37.867207539", "-122.256529377" ]
+     ]
+    }
 
 Of course, there are many other types of data formats. Here is a list of the most common formats:
 
@@ -102,6 +126,89 @@ people
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Color</th>
+      <th>Number</th>
+      <th>Sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Joey</td>
+      <td>blue</td>
+      <td>42</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Weiwei</td>
+      <td>blue</td>
+      <td>50</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Joey</td>
+      <td>green</td>
+      <td>8</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Karina</td>
+      <td>green</td>
+      <td>7</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Fernando</td>
+      <td>pink</td>
+      <td>-9</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Nhi</td>
+      <td>blue</td>
+      <td>3</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Sam</td>
+      <td>pink</td>
+      <td>-42</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
 ```python
 email = pd.DataFrame(
     [["Deb",  "deborah_nolan@berkeley.edu"],
@@ -116,6 +223,73 @@ email = pd.DataFrame(
 email
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>User Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Deb</td>
+      <td>deborah_nolan@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Sam</td>
+      <td>samlau95@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>John</td>
+      <td>doe@nope.com</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Joey</td>
+      <td>jegonzal@cs.berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Weiwei</td>
+      <td>weiwzhang@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Weiwei</td>
+      <td>weiwzhang+123@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Karina</td>
+      <td>kgoot@berkeley.edu</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 To match up each person with his or her email, we can join the two tables on the columns that contain the usernames. We must then decide what to do about people that appear in one table but not the other. For example, Fernando appears in the `people` table but not the `email` table. We have several types of joins for each strategy of matching missing values. One of the more common joins is the *inner join*, where any row that doesn't have a match is dropped in the final result:
 
 
@@ -123,6 +297,96 @@ To match up each person with his or her email, we can join the two tables on the
 # Fernando, Nhi, Deb, and John don't appear
 people.merge(email, how='inner', left_on='Name', right_on='User Name')
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Color</th>
+      <th>Number</th>
+      <th>Sex</th>
+      <th>User Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Joey</td>
+      <td>blue</td>
+      <td>42</td>
+      <td>M</td>
+      <td>Joey</td>
+      <td>jegonzal@cs.berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Joey</td>
+      <td>green</td>
+      <td>8</td>
+      <td>M</td>
+      <td>Joey</td>
+      <td>jegonzal@cs.berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Weiwei</td>
+      <td>blue</td>
+      <td>50</td>
+      <td>F</td>
+      <td>Weiwei</td>
+      <td>weiwzhang@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Weiwei</td>
+      <td>blue</td>
+      <td>50</td>
+      <td>F</td>
+      <td>Weiwei</td>
+      <td>weiwzhang+123@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Karina</td>
+      <td>green</td>
+      <td>7</td>
+      <td>F</td>
+      <td>Karina</td>
+      <td>kgoot@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Sam</td>
+      <td>pink</td>
+      <td>-42</td>
+      <td>M</td>
+      <td>Sam</td>
+      <td>samlau95@berkeley.edu</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 There are four basic joins that we use most often: inner, full (sometimes called "outer"), left, and right joins. Below is a diagram to show the difference between these types of joins.
 
@@ -143,6 +407,10 @@ def join_demo(join_type):
     
 interact(join_demo, join_type=['inner', 'outer', 'left', 'right']);
 ```
+
+
+    A Jupyter Widget
+
 
 ## Structure Checklist
 
