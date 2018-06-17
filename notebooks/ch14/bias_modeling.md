@@ -126,6 +126,10 @@ plt.plot(population_x, population_y)
 plt.title('True underlying data generation process');
 ```
 
+
+![png](bias_modeling_files/bias_modeling_10_0.png)
+
+
 If we randomly draw a dataset from the population, we may end up with the following:
 
 
@@ -136,7 +140,12 @@ plt.scatter(xs, ys, s=10)
 plt.title('One set of observed data');
 ```
 
+
 Suppose we draw many sets of data from the population and fit a simple linear model, to each one. Below, we plot the population data generation scheme in blue and the model predictions in green.
+
+
+![png](bias_modeling_files/bias_modeling_12_0.png)
+
 
 
 ```python
@@ -149,6 +158,10 @@ for x_start, x_end, y_start, y_end in random_lines:
 
 plt.title('Population vs. linear model predictions');
 ```
+
+
+![png](bias_modeling_files/bias_modeling_14_0.png)
+
 
 The plot above clearly shows that a linear model will make prediction errors for this population. We may decompose the prediction errors into bias, variance, and irreducible noise. We illustrate bias of our model by showing that the long-run average linear model will predict different outcomes than the population process:
 
@@ -166,6 +179,10 @@ plt.title('Bias of linear model')
 plt.legend();
 ```
 
+
+![png](bias_modeling_files/bias_modeling_16_0.png)
+
+
 The variance of our model is the variation of the model predictions around the long-run average model:
 
 
@@ -181,6 +198,10 @@ plt.plot([avg_line.x_start, avg_line.x_end],
 plt.title('Variance of linear model');
 ```
 
+
+![png](bias_modeling_files/bias_modeling_18_0.png)
+
+
 Finally, we illustrate the irreducible error by showing the deviations of the observed points from the underlying population process.
 
 
@@ -193,6 +214,10 @@ xs, ys = draw(100)
 plt.scatter(xs, ys, s=10)
 plt.title('Irreducible error');
 ```
+
+
+![png](bias_modeling_files/bias_modeling_20_0.png)
+
 
 ## Bias-Variance In Practice
 
