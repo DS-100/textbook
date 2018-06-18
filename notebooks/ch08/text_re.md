@@ -151,7 +151,7 @@ re.sub(regex, '-', messy_dates)
 
 ## `re.split`
 
-`re.sub(pattern, string)` splits the input `string` each time the regex `pattern` appears. This method behaves like the Python string method `str.split` but uses a regex to make the split.
+`re.split(pattern, string)` splits the input `string` each time the regex `pattern` appears. This method behaves like the Python string method `str.split` but uses a regex to make the split.
 
 In the code below, we use `re.split` to split chapter names from their page numbers in a table of contents for a book.
 
