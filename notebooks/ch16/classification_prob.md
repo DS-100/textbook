@@ -57,7 +57,7 @@ def jitter_df(df, x_col, y_col):
 
 ## Regression on Probabilities
 
-In a popular sport called basketball, players score by shooting a ball through a hoop. One such player, LeBron James, is widely considered one of the best basketball players ever for his incredible ability to score.
+In basketball, players score by shooting a ball through a hoop. One such player, LeBron James, is widely considered one of the best basketball players ever for his incredible ability to score.
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/LeBron_James_%2831944491583%29.jpg" alt="LeBron James (31944491583).jpg" height="480" width="308">
 
@@ -68,6 +68,114 @@ LeBron plays in the National Basketball Association (NBA), the United States's p
 lebron = pd.read_csv('lebron.csv')
 lebron
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>game_date</th>
+      <th>minute</th>
+      <th>opponent</th>
+      <th>action_type</th>
+      <th>shot_type</th>
+      <th>shot_distance</th>
+      <th>shot_made</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20170415</td>
+      <td>10</td>
+      <td>IND</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20170415</td>
+      <td>11</td>
+      <td>IND</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20170415</td>
+      <td>14</td>
+      <td>IND</td>
+      <td>Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>20170612</td>
+      <td>46</td>
+      <td>GSW</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>382</th>
+      <td>20170612</td>
+      <td>47</td>
+      <td>GSW</td>
+      <td>Turnaround Fadeaway shot</td>
+      <td>2PT Field Goal</td>
+      <td>14</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>383</th>
+      <td>20170612</td>
+      <td>48</td>
+      <td>GSW</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>384 rows × 7 columns</p>
+</div>
+
+
 
 This dataset contains one row containing the following attributes of every shot LeBron attempted:
 
@@ -81,9 +189,9 @@ This dataset contains one row containing the following attributes of every shot 
 
 We would like to use this dataset to predict whether LeBron will make future shots. This is a *classification problem*; we predict a category, not a continuous number as we do in regression.
 
-Nonetheless, we may reframe this classification problem as a type of regression problem by predicting the *probability* that a shot will go in. For example, we expect that the probability that LeBron makes a shot is lower when he is farther away from the basket.
+We may reframe this classification problem as a type of regression problem by predicting the *probability* that a shot will go in. For example, we expect that the probability that LeBron makes a shot is lower when he is farther away from the basket.
 
-We plot the shot attempts below, showing the distance from the basket on the x-axis and whether made the shot on the y-axis. We've jittered the points slightly on the y-axis to mitigate overplotting.
+We plot the shot attempts below, showing the distance from the basket on the x-axis and whether he made the shot on the y-axis. We've jittered the points slightly on the y-axis to mitigate overplotting.
 
 
 ```python
@@ -95,6 +203,10 @@ sns.lmplot(x='shot_distance', y='shot_made',
            scatter_kws={'alpha': 0.3})
 plt.title('LeBron shot make vs. shot distance');
 ```
+
+
+![png](classification_prob_files/classification_prob_9_0.png)
+
 
 We can see that LeBron tends to make most shots when he is within five feet of the basket. A simple least squares linear regression model fit on this data produces the following predictions:
 
@@ -108,6 +220,10 @@ sns.lmplot(x='shot_distance', y='shot_made',
            scatter_kws={'alpha': 0.4})
 plt.title('Simple linear regression');
 ```
+
+
+![png](classification_prob_files/classification_prob_11_0.png)
+
 
 This regression predicts a continuous value. To perform classification, however, we need to convert this value into a category: a shot make or a miss. We can accomplish this by setting a cutoff. If the regression predicts a value greater than 0.5, we predict that the shot will make. Otherwise, we predict that the shot will miss.
 
@@ -124,6 +240,10 @@ sns.lmplot(x='shot_distance', y='shot_made',
 plt.axhline(y=0.5, linestyle='--', c='g')
 plt.title('Cutoff for classification');
 ```
+
+
+![png](classification_prob_files/classification_prob_13_0.png)
+
 
 In the steps above, we attempt to perform a regression to predict the probability that a shot will go in. If our regression produces a probability, setting a cutoff of 0.5 means that we predict that a shot will go in when our model thinks the shot going in is more likely than the shot missing.
 

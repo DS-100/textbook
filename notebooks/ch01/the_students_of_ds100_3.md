@@ -39,6 +39,13 @@ What else can we discover about our class based on first names? We might conside
 students['Name'][5]
 ```
 
+
+
+
+    'jerry'
+
+
+
 From this name we can infer that the student is likely a male. We can also take a guess at the student's age. For example, if we happen to know that Jerry was a very popular baby name in 1998, we might guess that this student is around twenty years old.
 
 This thinking gives us two new questions to investigate:
@@ -80,9 +87,96 @@ babynames
 ```
 
 
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>F</td>
+      <td>9217</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>F</td>
+      <td>3860</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>2587</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2081</th>
+      <td>Verna</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>2082</th>
+      <td>Winnie</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>2083</th>
+      <td>Winthrop</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 4 columns</p>
+</div>
+
+
+
+
 ```python
 ls -alh babynames.csv
 ```
+
+    -rw-r--r--  1 sam  staff    30M Jan 22 15:31 babynames.csv
+
 
 It looks like the dataset contains names, the sex given to the baby, the number of babies with that name, and the year of birth for those babies. To be sure, we check the dataset description from the SSN Office: https://www.ssa.gov/oact/babynames/background.html
 
@@ -105,6 +199,10 @@ with sns.color_palette(sns.color_palette(pink_blue)):
     plt.ylabel('Names Registered that Year')
 ```
 
+
+![png](the_students_of_ds100_3_files/the_students_of_ds100_3_9_0.png)
+
+
 This plot makes us question whether the US had babies in 1880. A sentence from the quote above helps explain:
 
 > Note that many people born before 1937 never applied for a Social Security card, so their names are not included in our data. For others who did apply, our records may not show the place of birth, and again their names are not included in our data.
@@ -121,6 +219,90 @@ babynames['Name'] = babynames['Name'].str.lower()
 babynames
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>mary</td>
+      <td>F</td>
+      <td>9217</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>anna</td>
+      <td>F</td>
+      <td>3860</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>emma</td>
+      <td>F</td>
+      <td>2587</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2081</th>
+      <td>verna</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>2082</th>
+      <td>winnie</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>2083</th>
+      <td>winthrop</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 4 columns</p>
+</div>
+
+
+
 Then, we count up how many male and female babies were born in total for each name:
 
 
@@ -130,6 +312,88 @@ sex_counts = pd.pivot_table(babynames, index='Name', columns='Sex', values='Coun
 sex_counts
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Sex</th>
+      <th>F</th>
+      <th>M</th>
+      <th>All</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>aaban</th>
+      <td>0</td>
+      <td>96</td>
+      <td>96</td>
+    </tr>
+    <tr>
+      <th>aabha</th>
+      <td>35</td>
+      <td>0</td>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>aabid</th>
+      <td>0</td>
+      <td>10</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>zyyon</th>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>zzyzx</th>
+      <td>0</td>
+      <td>5</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>All</th>
+      <td>170639571</td>
+      <td>173894326</td>
+      <td>344533897</td>
+    </tr>
+  </tbody>
+</table>
+<p>96175 rows × 3 columns</p>
+</div>
+
+
+
 To decide whether a name is male or female, we can compute the proportion of times the name was given to a female baby.
 
 
@@ -138,6 +402,97 @@ prop_female = sex_counts['F'] / sex_counts['All']
 sex_counts['prop_female'] = prop_female
 sex_counts
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Sex</th>
+      <th>F</th>
+      <th>M</th>
+      <th>All</th>
+      <th>prop_female</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>aaban</th>
+      <td>0</td>
+      <td>96</td>
+      <td>96</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>aabha</th>
+      <td>35</td>
+      <td>0</td>
+      <td>35</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>aabid</th>
+      <td>0</td>
+      <td>10</td>
+      <td>10</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>zyyon</th>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>zzyzx</th>
+      <td>0</td>
+      <td>5</td>
+      <td>5</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>All</th>
+      <td>170639571</td>
+      <td>173894326</td>
+      <td>344533897</td>
+      <td>0.495277</td>
+    </tr>
+  </tbody>
+</table>
+<p>96175 rows × 4 columns</p>
+</div>
+
+
 
 We can then define a function that looks up the proportion of female names given a name.
 
@@ -152,12 +507,23 @@ def sex_from_name(name):
 sex_from_name('sam')
 ```
 
+
+
+
+    'M'
+
+
+
 Try typing some names in this box to see whether the function outputs what you expect:
 
 
 ```python
 interact(sex_from_name, name='sam');
 ```
+
+
+    A Jupyter Widget
+
 
 We mark each name in our class roster with its most likely sex.
 
@@ -167,12 +533,97 @@ students['sex'] = students['Name'].apply(sex_from_name)
 students
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>keeley</td>
+      <td>Student</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>john</td>
+      <td>Student</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>bryan</td>
+      <td>Student</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>276</th>
+      <td>ernesto</td>
+      <td>Waitlist Student</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>277</th>
+      <td>athan</td>
+      <td>Waitlist Student</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>278</th>
+      <td>michael</td>
+      <td>Waitlist Student</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+<p>279 rows × 3 columns</p>
+</div>
+
+
+
 Now it is easy to estimate how many male and female students we have:
 
 
 ```python
 students['sex'].value_counts()
 ```
+
+
+
+
+    M    144
+    F     92
+    Name: sex, dtype: int64
+
+
 
 ### Inferring Age From Name
 
@@ -194,6 +645,70 @@ avg_years
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>avg_year</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>aaban</th>
+      <td>2012.572917</td>
+    </tr>
+    <tr>
+      <th>aabha</th>
+      <td>2013.714286</td>
+    </tr>
+    <tr>
+      <th>aabid</th>
+      <td>2009.500000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>zyyanna</th>
+      <td>2010.000000</td>
+    </tr>
+    <tr>
+      <th>zyyon</th>
+      <td>2014.000000</td>
+    </tr>
+    <tr>
+      <th>zzyzx</th>
+      <td>2010.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>96174 rows × 1 columns</p>
+</div>
+
+
+
+
 ```python
 def year_from_name(name):
     return (avg_years.loc[name, 'avg_year']
@@ -205,10 +720,98 @@ interact(year_from_name, name='fernando');
 ```
 
 
+    A Jupyter Widget
+
+
+
 ```python
 students['year'] = students['Name'].apply(year_from_name)
 students
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>sex</th>
+      <th>year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>keeley</td>
+      <td>Student</td>
+      <td>F</td>
+      <td>1998.147952</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>john</td>
+      <td>Student</td>
+      <td>M</td>
+      <td>1951.084937</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>bryan</td>
+      <td>Student</td>
+      <td>M</td>
+      <td>1983.565113</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>276</th>
+      <td>ernesto</td>
+      <td>Waitlist Student</td>
+      <td>M</td>
+      <td>1981.439873</td>
+    </tr>
+    <tr>
+      <th>277</th>
+      <td>athan</td>
+      <td>Waitlist Student</td>
+      <td>M</td>
+      <td>2004.397863</td>
+    </tr>
+    <tr>
+      <th>278</th>
+      <td>michael</td>
+      <td>Waitlist Student</td>
+      <td>M</td>
+      <td>1971.179231</td>
+    </tr>
+  </tbody>
+</table>
+<p>279 rows × 4 columns</p>
+</div>
+
+
 
 Then, it is easy to plot the distribution of years:
 
@@ -217,12 +820,23 @@ Then, it is easy to plot the distribution of years:
 sns.distplot(students['year'].dropna());
 ```
 
+
+![png](the_students_of_ds100_3_files/the_students_of_ds100_3_30_0.png)
+
+
 To compute the average year:
 
 
 ```python
 students['year'].mean()
 ```
+
+
+
+
+    1983.846741800525
+
+
 
 Which makes it appear like the average student is 35 years old. This is a course for college undergrads, so we were expecting an average age of around 20. Why might our estimate be so far off?
 
@@ -236,5 +850,9 @@ names = babynames.set_index('Name').sort_values('Year')
 john = names.loc['john']
 john[john['Sex'] == 'M'].plot('Year', 'Count');
 ```
+
+
+![png](the_students_of_ds100_3_files/the_students_of_ds100_3_34_0.png)
+
 
 If we happen to believe that no one in our class is over the age of 40 or under the age of 10 (we might find out by looking at our classroom during lecture) we can incorporate this into our analysis by only examining the data between 1978 and 2008. We will soon discuss data manipulation and you may revisit this analysis to find out if incorporating this prior belief gives a more sensible result.

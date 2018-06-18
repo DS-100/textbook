@@ -35,6 +35,75 @@ baby.head()
 # the .head() method outputs the first five rows of the DataFrame
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>F</td>
+      <td>9217</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>F</td>
+      <td>3860</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>2587</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Elizabeth</td>
+      <td>F</td>
+      <td>2549</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Minnie</td>
+      <td>F</td>
+      <td>2243</td>
+      <td>1884</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ### Breaking the Problem Down
 
 Although there are many ways to see whether prediction is possible, we will use plotting in this section. We can decompose this question into two steps:
@@ -53,6 +122,20 @@ names = baby['Name']
 names.apply(len)
 ```
 
+
+
+
+    0          4
+    1          4
+    2          4
+              ..
+    1891891    5
+    1891892    6
+    1891893    8
+    Name: Name, Length: 1891894, dtype: int64
+
+
+
 To extract the last letter of each name, we can define our own function to pass into `.apply()`:
 
 
@@ -62,6 +145,20 @@ def last_letter(string):
 
 names.apply(last_letter)
 ```
+
+
+
+
+    0          y
+    1          a
+    2          a
+              ..
+    1891891    a
+    1891892    e
+    1891893    p
+    Name: Name, Length: 1891894, dtype: object
+
+
 
 ### String Manipulation
 
@@ -75,12 +172,40 @@ names = baby['Name']
 names.str.len()
 ```
 
+
+
+
+    0          4
+    1          4
+    2          4
+              ..
+    1891891    5
+    1891892    6
+    1891893    8
+    Name: Name, Length: 1891894, dtype: int64
+
+
+
 We can directly slice out the last letter of each name in a similar way.
 
 
 ```python
 names.str[-1]
 ```
+
+
+
+
+    0          y
+    1          a
+    2          a
+              ..
+    1891891    a
+    1891892    e
+    1891893    p
+    Name: Name, Length: 1891894, dtype: object
+
+
 
 We suggest looking at the docs for the full list of string methods ([link](https://pandas.pydata.org/pandas-docs/stable/text.html)).
 
@@ -92,6 +217,98 @@ baby['Last'] = names.str[-1]
 baby
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+      <th>Last</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>F</td>
+      <td>9217</td>
+      <td>1884</td>
+      <td>y</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>F</td>
+      <td>3860</td>
+      <td>1884</td>
+      <td>a</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>2587</td>
+      <td>1884</td>
+      <td>a</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1891891</th>
+      <td>Verna</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+      <td>a</td>
+    </tr>
+    <tr>
+      <th>1891892</th>
+      <td>Winnie</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+      <td>e</td>
+    </tr>
+    <tr>
+      <th>1891893</th>
+      <td>Winthrop</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+      <td>p</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 5 columns</p>
+</div>
+
+
+
 ### Grouping
 
 To compute the sex distribution for each last letter, we need to group by both Last and Sex.
@@ -101,6 +318,86 @@ To compute the sex distribution for each last letter, we need to group by both L
 # Shorthand for baby.groupby(['Last', 'Sex']).agg(np.sum)
 baby.groupby(['Last', 'Sex']).sum()
 ```
+
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+    <tr>
+      <th>Last</th>
+      <th>Sex</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">a</th>
+      <th>F</th>
+      <td>58079486</td>
+      <td>915565667</td>
+    </tr>
+    <tr>
+      <th>M</th>
+      <td>1931630</td>
+      <td>53566324</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <th>F</th>
+      <td>17376</td>
+      <td>1092953</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <th>M</th>
+      <td>18569388</td>
+      <td>114394474</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">z</th>
+      <th>F</th>
+      <td>142023</td>
+      <td>4268028</td>
+    </tr>
+    <tr>
+      <th>M</th>
+      <td>120123</td>
+      <td>9649274</td>
+    </tr>
+  </tbody>
+</table>
+<p>52 rows × 2 columns</p>
+</div>
+
+
 
 Notice that `Year` is also summed up since each non-grouped column is passed into the aggregation function. To avoid this, we can select out the desired columns before calling `.groupby()`.
 
@@ -116,6 +413,77 @@ letter_dist = (
 letter_dist
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Count</th>
+    </tr>
+    <tr>
+      <th>Last</th>
+      <th>Sex</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">a</th>
+      <th>F</th>
+      <td>58079486</td>
+    </tr>
+    <tr>
+      <th>M</th>
+      <td>1931630</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <th>F</th>
+      <td>17376</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <th>M</th>
+      <td>18569388</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">z</th>
+      <th>F</th>
+      <td>142023</td>
+    </tr>
+    <tr>
+      <th>M</th>
+      <td>120123</td>
+    </tr>
+  </tbody>
+</table>
+<p>52 rows × 1 columns</p>
+</div>
+
+
+
 ### Plotting
 
 `pandas` provides built-in plotting functionality for most basic plots, including bar charts, histograms, line charts, and scatterplots. To make a plot from a DataFrame, use the `.plot` attribute:
@@ -125,6 +493,17 @@ letter_dist
 # We use the figsize option to make the plot larger
 letter_dist.plot.barh(figsize=(10, 10))
 ```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1a17af4780>
+
+
+
+
+![png](apply_strings_plotting_files/apply_strings_plotting_20_1.png)
+
 
 Although this plot shows the distribution of letters and sexes, the male and female bars are difficult to tell apart. By looking at the `pandas` docs on plotting ([link](https://pandas.pydata.org/pandas-docs/stable/visualization.html)) we learn that `pandas` plots one group of bars for row column in the DataFrame, showing one differently colored bar for each column. This means that a pivoted version of the `letter_dist` table will have the right format.
 
@@ -137,9 +516,93 @@ letter_pivot
 ```
 
 
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Sex</th>
+      <th>F</th>
+      <th>M</th>
+    </tr>
+    <tr>
+      <th>Last</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>a</th>
+      <td>58079486</td>
+      <td>1931630</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>17376</td>
+      <td>1435939</td>
+    </tr>
+    <tr>
+      <th>c</th>
+      <td>30262</td>
+      <td>1672407</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td>37381</td>
+      <td>644092</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>24877638</td>
+      <td>18569388</td>
+    </tr>
+    <tr>
+      <th>z</th>
+      <td>142023</td>
+      <td>120123</td>
+    </tr>
+  </tbody>
+</table>
+<p>26 rows × 2 columns</p>
+</div>
+
+
+
+
 ```python
 letter_pivot.plot.barh(figsize=(10, 10))
 ```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1a17c36978>
+
+
+
+
+![png](apply_strings_plotting_files/apply_strings_plotting_23_1.png)
+
 
 Notice that `pandas` conveniently generates a legend for us as well. However, this is still difficult to interpret. We plot the counts for each letter and sex which causes some bars to appear very long and others to be almost invisible. We should instead plot the proportion of male and female babies within each last letter.
 
@@ -153,12 +616,114 @@ letter_pivot
 ```
 
 
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Sex</th>
+      <th>F</th>
+      <th>M</th>
+      <th>F prop</th>
+      <th>M prop</th>
+    </tr>
+    <tr>
+      <th>Last</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>a</th>
+      <td>58079486</td>
+      <td>1931630</td>
+      <td>0.967812</td>
+      <td>0.032188</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>17376</td>
+      <td>1435939</td>
+      <td>0.011956</td>
+      <td>0.988044</td>
+    </tr>
+    <tr>
+      <th>c</th>
+      <td>30262</td>
+      <td>1672407</td>
+      <td>0.017773</td>
+      <td>0.982227</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td>37381</td>
+      <td>644092</td>
+      <td>0.054853</td>
+      <td>0.945147</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>24877638</td>
+      <td>18569388</td>
+      <td>0.572597</td>
+      <td>0.427403</td>
+    </tr>
+    <tr>
+      <th>z</th>
+      <td>142023</td>
+      <td>120123</td>
+      <td>0.541771</td>
+      <td>0.458229</td>
+    </tr>
+  </tbody>
+</table>
+<p>26 rows × 4 columns</p>
+</div>
+
+
+
+
 ```python
 (letter_pivot[['F prop', 'M prop']]
  .sort_values('M prop') # Sorting orders the plotted bars
  .plot.barh(figsize=(10, 10))
 )
 ```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1a18194b70>
+
+
+
+
+![png](apply_strings_plotting_files/apply_strings_plotting_26_1.png)
+
 
 ## In Conclusion
 
