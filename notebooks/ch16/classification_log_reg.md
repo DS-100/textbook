@@ -111,12 +111,140 @@ lebron = pd.read_csv('lebron.csv')
 lebron
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>game_date</th>
+      <th>minute</th>
+      <th>opponent</th>
+      <th>action_type</th>
+      <th>shot_type</th>
+      <th>shot_distance</th>
+      <th>shot_made</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20170415</td>
+      <td>10</td>
+      <td>IND</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20170415</td>
+      <td>11</td>
+      <td>IND</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20170415</td>
+      <td>14</td>
+      <td>IND</td>
+      <td>Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>20170612</td>
+      <td>46</td>
+      <td>GSW</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>382</th>
+      <td>20170612</td>
+      <td>47</td>
+      <td>GSW</td>
+      <td>Turnaround Fadeaway shot</td>
+      <td>2PT Field Goal</td>
+      <td>14</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>383</th>
+      <td>20170612</td>
+      <td>48</td>
+      <td>GSW</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>384 rows × 7 columns</p>
+</div>
+
+
+
 We've included a widget below to allow you to pan through the entire DataFrame.
 
 
 ```python
 df_interact(lebron)
 ```
+
+
+<p>Failed to display Jupyter Widget of type <code>interactive</code>.</p>
+<p>
+  If you're reading this message in the Jupyter Notebook or JupyterLab Notebook, it may mean
+  that the widgets JavaScript is still loading. If this message persists, it
+  likely means that the widgets JavaScript library is either not installed or
+  not enabled. See the <a href="https://ipywidgets.readthedocs.io/en/stable/user_install.html">Jupyter
+  Widgets Documentation</a> for setup instructions.
+</p>
+<p>
+  If you're reading this message in another frontend (for example, a static
+  rendering on GitHub or <a href="https://nbviewer.jupyter.org/">NBViewer</a>),
+  it may mean that your frontend doesn't currently support widgets.
+</p>
+
+
+
+    (384 rows, 7 columns) total
+
 
 We start by using using only the shot distance to predict the shot make or miss. `scikit-learn` conveniently provides a logistic regression classifier as the [`sklearn.linear_model.LogisticRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) class. To use the class, we first create our data matrix `X` and vector of observed outcomes `y`.
 
@@ -131,6 +259,19 @@ print('y:')
 print(y)
 ```
 
+    X:
+    [[ 0]
+     [ 0]
+     [ 0]
+     ...
+     [ 1]
+     [14]
+     [ 2]]
+    
+    y:
+    [0 1 1 ... 1 0 1]
+
+
 As is customary, we split our data into a training set and a test set.
 
 
@@ -144,6 +285,10 @@ print(f'Training set size: {len(y_train)}')
 print(f'Test set size: {len(y_test)}')
 ```
 
+    Training set size: 344
+    Test set size: 40
+
+
 `scikit-learn` makes it simple to initialize the classifier and fit it on `X_train` and `y_train`:
 
 
@@ -152,6 +297,16 @@ from sklearn.linear_model import LogisticRegression
 simple_clf = LogisticRegression()
 simple_clf.fit(X_train, y_train)
 ```
+
+
+
+
+    LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+              intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+              penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+              verbose=0, warm_start=False)
+
+
 
 To visualize the classifier's performance, we plot the original points and the classifier's predicted probabilities.
 
@@ -174,6 +329,10 @@ plt.xlabel('Distance from Basket (ft)')
 plt.ylabel('Shot Made');
 ```
 
+
+![png](classification_log_reg_files/classification_log_reg_17_0.png)
+
+
 ## Evaluating the Classifier
 
 One method to evaluate the effectiveness of our classifier is to check its prediction accuracy: what proportion of points does it predict correctly?
@@ -183,6 +342,13 @@ One method to evaluate the effectiveness of our classifier is to check its predi
 simple_clf.score(X_test, y_test)
 ```
 
+
+
+
+    0.6
+
+
+
 Our classifier achieves a rather low accuracy of 0.60 on the test set. If our classifier simply guessed each point at random, we would expect an accuracy of 0.50. In fact, if our classifier simply predicted that every shot LeBron takes will go in, we would also get an accuracy of 0.60:
 
 
@@ -190,6 +356,13 @@ Our classifier achieves a rather low accuracy of 0.60 on the test set. If our cl
 # Calculates the accuracy if we always predict 1
 np.count_nonzero(y_test == 1) / len(y_test)
 ```
+
+
+
+
+    0.6
+
+
 
 For this classifier we only used one out of several possible features. As in multivariable linear regression, we will likely achieve a more accurate classifier by incorporating more features.
 
@@ -211,6 +384,13 @@ y = lebron['shot_made'].as_matrix()
 X.shape
 ```
 
+
+
+
+    (384, 42)
+
+
+
 We will again split the data into a training set and test set:
 
 
@@ -222,6 +402,10 @@ print(f'Training set size: {len(y_train)}')
 print(f'Test set size: {len(y_test)}')
 ```
 
+    Training set size: 344
+    Test set size: 40
+
+
 Finally, we fit our model once more and check its accuracy:
 
 
@@ -230,6 +414,9 @@ clf = LogisticRegression()
 clf.fit(X_train, y_train)
 print(f'Test set accuracy: {clf.score(X_test, y_test)}')
 ```
+
+    Test set accuracy: 0.725
+
 
 This classifier is around 12% more accurate than the classifier that only took the shot distance into account.
 

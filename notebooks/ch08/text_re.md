@@ -41,6 +41,13 @@ match = re.search(phone_re, text)
 match
 ```
 
+
+
+
+    <_sre.SRE_Match object; span=(11, 23), match='382-384-3840'>
+
+
+
 Although the returned match object has a variety of useful properties, we most commonly use `re.search` to test whether a pattern appears in a string.
 
 
@@ -48,6 +55,9 @@ Although the returned match object has a variety of useful properties, we most c
 if re.search(phone_re, text):
     print("Found a match!")
 ```
+
+    Found a match!
+
 
 
 ```python
@@ -71,6 +81,13 @@ To: email2@yahoo.com and email3@gmail.com
 re.findall(gmail_re, text)
 ```
 
+
+
+
+    ['email1@gmail.com', 'email3@gmail.com']
+
+
+
 ## Regex Groups
 
 
@@ -86,6 +103,13 @@ text  = "Sam's number is 382-384-3840 and Mary's is 123-456-7890."
 re.findall(phone_re, text)
 ```
 
+
+
+
+    ['382-384-3840', '123-456-7890']
+
+
+
 To split apart the individual three or four digit components of a phone number, we can wrap each digit group in parentheses.
 
 
@@ -95,6 +119,13 @@ phone_re = r"([0-9]{3})-([0-9]{3})-([0-9]{4})"
 text  = "Sam's number is 382-384-3840 and Mary's is 123-456-7890."
 re.findall(phone_re, text)
 ```
+
+
+
+
+    [('382', '384', '3840'), ('123', '456', '7890')]
+
+
 
 As promised, `re.findall` returns a list of tuples containing the individual components of the matched phone numbers.
 
@@ -110,6 +141,13 @@ messy_dates = '03/12/2018, 03.13.18, 03/14/2018, 03:15:2018'
 regex = r'[/.:]'
 re.sub(regex, '-', messy_dates)
 ```
+
+
+
+
+    '03-12-2018, 03-13-18, 03-14-2018, 03-15-2018'
+
+
 
 ## `re.split`
 
@@ -133,11 +171,33 @@ lines
 ```
 
 
+
+
+    ['PLAYING PILGRIMS============3',
+     'A MERRY CHRISTMAS===========13',
+     'THE LAURENCE BOY============31',
+     'BURDENS=====================55',
+     'BEING NEIGHBORLY============76']
+
+
+
+
 ```python
 # Then, split into chapter title and page number
 split_re = r'=+' # Matches any sequence of = characters
 [re.split(split_re, line) for line in lines]
 ```
+
+
+
+
+    [['PLAYING PILGRIMS', '3'],
+     ['A MERRY CHRISTMAS', '13'],
+     ['THE LAURENCE BOY', '31'],
+     ['BURDENS', '55'],
+     ['BEING NEIGHBORLY', '76']]
+
+
 
 ## Regex and pandas
 
@@ -165,6 +225,57 @@ little = pd.DataFrame({
 little
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentences</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>"Christmas won't be Christmas without any pres...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>"It's so dreadful to be poor!" sighed Meg, loo...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>"I don't think it's fair for some girls to hav...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>"We've got Father and Mother, and each other,"...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>The four young faces on which the firelight sh...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Since spoken dialog lies within double quotation marks, we create a regex that captures a double quotation mark, a sequence of any characters except a double quotation mark, and the closing quotation mark.
 
 
@@ -172,6 +283,18 @@ Since spoken dialog lies within double quotation marks, we create a regex that c
 quote_re = r'"[^"]+"'
 little['sentences'].str.findall(quote_re)
 ```
+
+
+
+
+    0    ["Christmas won't be Christmas without any pre...
+    1                     ["It's so dreadful to be poor!"]
+    2    ["I don't think it's fair for some girls to ha...
+    3     ["We've got Father and Mother, and each other,"]
+    4    ["We haven't got Father, and shall not have hi...
+    Name: sentences, dtype: object
+
+
 
 Since the `Series.str.findall` method returns a list of matches, `pandas` also provides `Series.str.extract` and `Series.str.extractall` method to extract matches into a Series or DataFrame. These methods require the regex to contain at least one regex group.
 
@@ -183,6 +306,18 @@ spoken = little['sentences'].str.extract(quote_re)
 spoken
 ```
 
+
+
+
+    0    Christmas won't be Christmas without any prese...
+    1                         It's so dreadful to be poor!
+    2    I don't think it's fair for some girls to have...
+    3         We've got Father and Mother, and each other,
+    4    We haven't got Father, and shall not have him ...
+    Name: sentences, dtype: object
+
+
+
 We can add this series as a column of the `little` DataFrame:
 
 
@@ -191,6 +326,63 @@ little['dialog'] = spoken
 little
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentences</th>
+      <th>dialog</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>"Christmas won't be Christmas without any pres...</td>
+      <td>Christmas won't be Christmas without any prese...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>"It's so dreadful to be poor!" sighed Meg, loo...</td>
+      <td>It's so dreadful to be poor!</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>"I don't think it's fair for some girls to hav...</td>
+      <td>I don't think it's fair for some girls to have...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>"We've got Father and Mother, and each other,"...</td>
+      <td>We've got Father and Mother, and each other,</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>The four young faces on which the firelight sh...</td>
+      <td>We haven't got Father, and shall not have him ...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 We can confirm that our string manipulation behaves as expected for the last sentence in our DataFrame by printing the original and extracted text:
 
 
@@ -198,10 +390,16 @@ We can confirm that our string manipulation behaves as expected for the last sen
 print(little.loc[4, 'sentences'])
 ```
 
+    The four young faces on which the firelight shone brightened at the cheerful words, but darkened again as Jo said sadly, "We haven't got Father, and shall not have him for a long time."
+
+
 
 ```python
 print(little.loc[4, 'dialog'])
 ```
+
+    We haven't got Father, and shall not have him for a long time.
+
 
 ## Summary
 
