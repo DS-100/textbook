@@ -100,7 +100,7 @@ The following `prices` relation shows the price of certain gadgets at a few reta
     </tr>
 </table>
 
-We can then reference both tables simultaneously to determine how much Sue, Joey, and Alice paid for their respective gadgets (assuming prices at each store stay constant over time). Together, the two tables form a **relational database**, which is a collection of one or more relations.
+We can then reference both tables simultaneously to determine how much Samantha, Timothy, and Jason paid for their respective gadgets (assuming prices at each store stay constant over time). Together, the two tables form a **relational database**, which is a collection of one or more relations.
 The schema of the entire database is the set of schemas of the individual relations in the database.
 
 ## Relational Database Management Systems
