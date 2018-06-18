@@ -94,6 +94,10 @@ plot_cost(pts, (11, 18), mse_cost)
 plot_theta_on_cost(pts, 12, mse_cost)
 ```
 
+
+![png](gradient_descent_define_files/gradient_descent_define_6_0.png)
+
+
 We'd like to choose a new value for $ \theta $ that decreases the cost. To do this, we look at the slope of the cost function at $ \theta = 12 $:
 
 
@@ -103,6 +107,10 @@ pts = np.array([12, 13, 15, 16, 17])
 plot_cost(pts, (11, 18), mse_cost)
 plot_tangent_on_cost(pts, 12, mse_cost)
 ```
+
+
+![png](gradient_descent_define_files/gradient_descent_define_8_0.png)
+
 
 The slope is negative, which means that increasing $ \theta $ will decrease the cost.
 
@@ -115,6 +123,10 @@ pts = np.array([12, 13, 15, 16, 17])
 plot_cost(pts, (11, 18), mse_cost)
 plot_tangent_on_cost(pts, 16.5, mse_cost)
 ```
+
+
+![png](gradient_descent_define_files/gradient_descent_define_10_0.png)
+
 
 When the slope is positive, decreasing $ \theta $ will decrease the cost.
 
@@ -152,6 +164,10 @@ plot_theta_on_cost(pts, 12, mse_cost, c='none',
 plot_theta_on_cost(pts, 17.2, mse_cost)
 ```
 
+
+![png](gradient_descent_define_files/gradient_descent_define_12_0.png)
+
+
 Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta $. Our final update formula is:
 
 $$
@@ -179,6 +195,14 @@ def plot_one_gd_iter(y_vals, theta, cost_fn, grad_cost, alpha=0.3):
 plot_one_gd_iter(pts, 12, mse_cost, grad_mse_cost)
 ```
 
+    old theta: 12
+    new theta: 13.56
+
+
+
+![png](gradient_descent_define_files/gradient_descent_define_15_1.png)
+
+
 Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum cost because the slope is also smaller.
 
 
@@ -187,17 +211,41 @@ Here are the $ \theta $ values for successive iterations of this process. Notice
 plot_one_gd_iter(pts, 13.56, mse_cost, grad_mse_cost)
 ```
 
+    old theta: 13.56
+    new theta: 14.184000000000001
+
+
+
+![png](gradient_descent_define_files/gradient_descent_define_17_1.png)
+
+
 
 ```python
 # HIDDEN
 plot_one_gd_iter(pts, 14.18, mse_cost, grad_mse_cost)
 ```
 
+    old theta: 14.18
+    new theta: 14.432
+
+
+
+![png](gradient_descent_define_files/gradient_descent_define_18_1.png)
+
+
 
 ```python
 # HIDDEN
 plot_one_gd_iter(pts, 14.432, mse_cost, grad_mse_cost)
 ```
+
+    old theta: 14.432
+    new theta: 14.5328
+
+
+
+![png](gradient_descent_define_files/gradient_descent_define_19_1.png)
+
 
 ### Gradient Descent Analysis
 
@@ -269,12 +317,43 @@ print(f'Minimizing theta: {theta}')
 print()
 ```
 
+    theta: 0.00 | cost: 216.60
+    theta: 5.84 | cost: 80.18
+    theta: 9.34 | cost: 31.07
+    theta: 11.45 | cost: 13.39
+    theta: 12.71 | cost: 7.02
+    theta: 13.46 | cost: 4.73
+    theta: 13.92 | cost: 3.90
+    theta: 14.19 | cost: 3.61
+    theta: 14.35 | cost: 3.50
+    theta: 14.45 | cost: 3.46
+    theta: 14.51 | cost: 3.45
+    theta: 14.55 | cost: 3.44
+    theta: 14.57 | cost: 3.44
+    theta: 14.58 | cost: 3.44
+    theta: 14.59 | cost: 3.44
+    theta: 14.59 | cost: 3.44
+    theta: 14.60 | cost: 3.44
+    theta: 14.60 | cost: 3.44
+    Minimizing theta: 14.59851722463264
+    
+    CPU times: user 2.6 ms, sys: 1.6 ms, total: 4.2 ms
+    Wall time: 3.02 ms
+
+
 We can see that gradient quickly finds the same solution as the analytic method:
 
 
 ```python
 np.mean([12, 13, 15, 16, 17])
 ```
+
+
+
+
+    14.6
+
+
 
 ### Minimizing the Huber cost
 
@@ -328,6 +407,12 @@ theta = minimize(huber_cost, grad_huber_cost, tips['pcttip'], progress=False)
 print(f'Minimizing theta: {theta}')
 print()
 ```
+
+    Minimizing theta: 15.506849531471964
+    
+    CPU times: user 207 ms, sys: 6.9 ms, total: 213 ms
+    Wall time: 258 ms
+
 
 ### Summary
 

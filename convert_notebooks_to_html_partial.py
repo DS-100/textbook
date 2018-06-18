@@ -4,6 +4,8 @@ This script takes the .ipynb files in the notebooks/ folder and removes the
 hidden cells as well as the newlines before closing </div> tags so that the
 resulting HTML partial can be embedded in a Gitbook page easily.
 
+It also converts the input notebooks into Markdown for reviewing.
+
 For reference:
 https://nbconvert.readthedocs.org/en/latest/nbconvert_library.html
 http://nbconvert.readthedocs.org/en/latest/nbconvert_library.html#using-different-preprocessors
@@ -18,6 +20,7 @@ import re
 import os
 from textwrap import dedent
 from docopt import docopt
+from subprocess import run
 
 import nbformat
 from nbinteract import InteractExporter
@@ -35,16 +38,18 @@ wrapper = """
 </div>
 """
 
-config = Config(
-    InteractExporter=dict(
-        # Use ExtractOutputPreprocessor to extract the images to separate files
-        preprocessors=['nbconvert.preprocessors.ExtractOutputPreprocessor'],
-        template_file='gitbook',
-        button_at_top=False,
+html_exporter = InteractExporter(
+    config=Config(
+        InteractExporter=dict(
+            # Use ExtractOutputPreprocessor to extract images to separate files
+            preprocessors=[
+                'nbconvert.preprocessors.ExtractOutputPreprocessor'
+            ],
+            template_file='gitbook',
+            button_at_top=False,
+        )
     )
 )
-
-html_exporter = InteractExporter(config=config)
 
 # Output notebook HTML partials into this directory
 NOTEBOOK_HTML_DIR = 'notebooks-html'
@@ -127,7 +132,10 @@ def convert_notebooks_to_html_partial(notebook_paths):
 
         # Write out Markdown placeholder
         with open(os.path.join(chapter, mdfile_name), 'w') as outfile:
-            outfile.write('!INCLUDE "../{}"\n'.format(outfile_path))
+            # Replace backslashes with forward slashes for Windows
+            outfile.write(
+                '!INCLUDE "../{}"\n'.format(outfile_path.replace('\\', '/'))
+            )
 
         print(outfile_path + " written.")
 
@@ -151,6 +159,15 @@ def _preamble_cell(path):
     return nbformat.v4.new_code_cell(source=code)
 
 
+def convert_notebooks_to_markdown(notebook_paths):
+    """
+    Since notebooks are difficult to use for code reviewing, this converts each
+    notebook to Markdown so that reviewers can use the plain text versions of
+    notebooks.
+    """
+    run(['jupyter', 'nbconvert', '--to', 'markdown', *notebook_paths])
+
+
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     notebooks = arguments['NOTEBOOKS'] or glob.glob(
@@ -159,3 +176,4 @@ if __name__ == '__main__':
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)
     convert_notebooks_to_html_partial(notebooks)
+    convert_notebooks_to_markdown(notebooks)
