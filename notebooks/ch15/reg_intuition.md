@@ -131,6 +131,74 @@ The following dataset records the amount of water that flows out of a large dam 
 df
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>water_level_change</th>
+      <th>water_flow</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-15.936758</td>
+      <td>6.042233e+10</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-29.152979</td>
+      <td>3.321490e+10</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>36.189549</td>
+      <td>9.727064e+11</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>7.085480</td>
+      <td>2.363520e+11</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>46.282369</td>
+      <td>1.494256e+12</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>14.612289</td>
+      <td>3.781463e+11</td>
+    </tr>
+  </tbody>
+</table>
+<p>23 rows × 2 columns</p>
+</div>
+
+
+
 Plotting this data shows an upward trend in water flow as the water level becomes more positive.
 
 
@@ -138,6 +206,10 @@ Plotting this data shows an upward trend in water flow as the water level become
 # HIDDEN
 df.plot.scatter(0, 1, s=50);
 ```
+
+
+![png](reg_intuition_files/reg_intuition_9_0.png)
+
 
 To model this pattern, we may use a least squares linear regression model. We show the data and the model's predictions on the plot below.
 
@@ -148,6 +220,10 @@ df.plot.scatter(0, 1, s=50);
 plot_curve(curves[0])
 ```
 
+
+![png](reg_intuition_files/reg_intuition_11_0.png)
+
+
 The visualization shows that this model does not capture the pattern in the data—the model has high bias. As we have previously done, we can attempt to address this issue by adding polynomial features to the data. We add polynomial features of degrees 2, 8, and 12; the chart below shows the training data with each model's predictions.
 
 
@@ -155,6 +231,10 @@ The visualization shows that this model does not capture the pattern in the data
 # HIDDEN
 plot_curves(curves)
 ```
+
+
+![png](reg_intuition_files/reg_intuition_13_0.png)
+
 
 As expected, the degree 12 polynomial matches the training data well but also seems to fit spurious patterns in the data caused by noise. This provides yet another illustration of the bias-variance tradeoff: the linear model has high bias and low variance while the degree 12 polynomial has low bias but high variance.
 

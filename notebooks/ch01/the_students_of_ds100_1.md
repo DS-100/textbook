@@ -61,6 +61,74 @@ students = pd.read_csv('roster.csv')
 students
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Keeley</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>John</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>BRYAN</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>276</th>
+      <td>Ernesto</td>
+      <td>Waitlist Student</td>
+    </tr>
+    <tr>
+      <th>277</th>
+      <td>Athan</td>
+      <td>Waitlist Student</td>
+    </tr>
+    <tr>
+      <th>278</th>
+      <td>Michael</td>
+      <td>Waitlist Student</td>
+    </tr>
+  </tbody>
+</table>
+<p>279 rows × 2 columns</p>
+</div>
+
+
+
 We can quickly see that there are some quirks in the data. For example, one of the student's names is all uppercase letters. In addition, it is not obvious what the Role column is for.
 
 **In Data 100, we will study how to identify anomalies in data and apply corrections.** The differences in capitalization will cause our programs to think that `'BRYAN'` and `'Bryan'` are different names when they are identical for our purposes. Let's convert all names to lower case to avoid this.
@@ -70,5 +138,73 @@ We can quickly see that there are some quirks in the data. For example, one of t
 students['Name'] = students['Name'].str.lower()
 students
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>keeley</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>john</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>bryan</td>
+      <td>Student</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>276</th>
+      <td>ernesto</td>
+      <td>Waitlist Student</td>
+    </tr>
+    <tr>
+      <th>277</th>
+      <td>athan</td>
+      <td>Waitlist Student</td>
+    </tr>
+    <tr>
+      <th>278</th>
+      <td>michael</td>
+      <td>Waitlist Student</td>
+    </tr>
+  </tbody>
+</table>
+<p>279 rows × 2 columns</p>
+</div>
+
+
 
 Now that our data are in a format that's easier for us to work with, let's proceed to exploratory data analysis.
