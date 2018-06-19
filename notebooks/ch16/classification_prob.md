@@ -57,7 +57,7 @@ def jitter_df(df, x_col, y_col):
 
 ## Regression on Probabilities
 
-In a popular sport called basketball, players score by shooting a ball through a hoop. One such player, LeBron James, is widely considered one of the best basketball players ever for his incredible ability to score.
+In basketball, players score by shooting a ball through a hoop. One such player, LeBron James, is widely considered one of the best basketball players ever for his incredible ability to score.
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/LeBron_James_%2831944491583%29.jpg" alt="LeBron James (31944491583).jpg" height="480" width="308">
 
@@ -189,9 +189,9 @@ This dataset contains one row containing the following attributes of every shot 
 
 We would like to use this dataset to predict whether LeBron will make future shots. This is a *classification problem*; we predict a category, not a continuous number as we do in regression.
 
-Nonetheless, we may reframe this classification problem as a type of regression problem by predicting the *probability* that a shot will go in. For example, we expect that the probability that LeBron makes a shot is lower when he is farther away from the basket.
+We may reframe this classification problem as a type of regression problem by predicting the *probability* that a shot will go in. For example, we expect that the probability that LeBron makes a shot is lower when he is farther away from the basket.
 
-We plot the shot attempts below, showing the distance from the basket on the x-axis and whether made the shot on the y-axis. We've jittered the points slightly on the y-axis to mitigate overplotting.
+We plot the shot attempts below, showing the distance from the basket on the x-axis and whether he made the shot on the y-axis. We've jittered the points slightly on the y-axis to mitigate overplotting.
 
 
 ```python
