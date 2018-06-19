@@ -65,26 +65,43 @@ plt.title('PMF of $X$');
 ![png](bias_random_vars_files/bias_random_vars_5_0.png)
 
 
-### Expectation
+### Joint Distributions
 
-We are often interested in the long-run average of a random variable because it gives us a sense of the center of the variable's distribution. We call this long-run average the **expected value**, or **expectation** of a random variable. The expected value of a random variable $ X $ is defined as:
+The notion of PMFs for single random variables extends naturally to joint distributions for multiple random variables; in particular, the *joint distribution* of a set of random variables yields the probability that they simultaneously take on a specific set of values.
 
-$$\mathbb{E}[X] = \sum_{x\in \mathbb{X}} x \cdot \mathbb{P}(X = x)$$
+As an example, let the random variable $ X $ represent the number of heads in 10 coin flips, and let $ Y $ represent the number of tails in the same set of 10 coin flips. We can note that $P(X=0, Y=10) = P(X=10, Y=0) = (0.5)^{10}$. Meanwhile $P(X=6, Y=6) = 0$ since we cannot possibly have 6 heads and 6 tails in 10 coin flips.
 
-For example, if $ X $ represents the roll of a single fair six-sided die, 
+#### Marginal Distributions
+
+Sometimes, we have the joint distribution for two random variables, but we want to find the *marginal distribution* for $X$. In other words, we would like to find the PMF of $X$ given the joint distribution for $X$ and $Y$. To find the probability that $X$ takes on a particular value, we must consider all possible values of $Y$ that can simultaneously happen with $X$ and sum over all of these joint probabilities:
 
 $$
 \begin{aligned}
-\mathbb{E}[X]
-&= 1 \cdot \mathbb{P}(X = 1) + 2 \cdot \mathbb{P}(X = 2) + \ldots + 6 \cdot \mathbb{P}(X = 6) \\
-&= 1 \cdot \frac{1}{6} + 2 \cdot \frac{1}{6} + \ldots + 6 \cdot \frac{1}{6} \\
-&= 3.5
+\sum_{y \in \mathbb{Y}} P(X=x, Y=y) &= P(X=x)
 \end{aligned}
 $$
 
-Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ never takes on the value $ 3.5 $.
+We can prove this identity as follows:
 
-**Example:** Suppose we have a small dataset of four people:
+$$
+\begin{aligned}
+\sum_{y \in \mathbb{Y}} P(X=x, Y=y)	&= \sum_{y \in \mathbb{Y}} P(X=x) \times P(Y=y \; \vert \; X=x)\\
+&= P(X=x) \times \sum_{y \in \mathbb{Y}} P(Y=y \; \vert \; X=x)\\
+&= P(X=x)
+\end{aligned}
+$$
+
+In the last line of this proof, we treated $Y \; \vert \; X = x$ as a random variable with some unknown PMF. This is important since we used the property that the probabilities in a PMF sum to $1$, which means that $\sum_{y\in \mathbb{Y}} \mathbb{P}(Y = y \; \vert \; X = x) = 1$.
+
+#### Independence
+
+Two random variables $X$ and $Y$ are independent if the value of one random variable has no influence on the second. Consider the coin flipping example earlier in the section where $ X $ represents the number of heads in 10 coin flips, and $ Y $ represents the number of tails in the same set of 10 coin flips. In this instance, $ X $ and $ Y $ are not independent; if we know $X = 5$, then we know for certain that $Y = 5$. However if we did not know that $X = 5$, $ Y $ could be anywhere from 0 to 10.
+
+As another example, let $ X $ be the same as before, but $ Y $ now represents the number of tails in a spearate set of 10 coin flips. Since the result of the first 10 coin flips has no effect on the second set of 10 coin flips, we can say that $ X $ and $ Y $ are independent in this example; knowing $X = 5$ tells us nothing about the value of $ Y $.
+
+#### Example: Sampling
+
+Suppose we have a small dataset of four people:
 
 
 ```python
@@ -146,20 +163,9 @@ people
 
 
 
-We pick one person from this dataset uniformly at random. Let $ Y $ be a random variable representing the age of this person. Then:
+Suppose we sample two people from this dataset with replacement. If the random variable $ Z $ represents the difference between the ages of the first and second persons in the sample, what is the PMF of $ Z $?
 
-$$
-\begin{aligned}
-\mathbb{E}[Y]
-&= 50 \cdot \mathbb{P}(Y = 50) + 51 \cdot \mathbb{P}(Y = 51) + 52 \cdot \mathbb{P}(Y = 52) \\
-&= 50 \cdot \frac{2}{4} + 51 \cdot \frac{1}{4} + 52 \cdot \frac{1}{4} \\
-&= 50.75
-\end{aligned}
-$$
-
-**Example:** Suppose we sample two people from this dataset with replacement. If the random variable $ Z $ represents the difference between the ages of the first and second persons in the sample, what is  $ \mathbb{E}[Z] $?
-
-To approach this problem, we define two new random variables. We define $ X $ as the age of the first person and $ Y $ as the age of the second. Then, $ Z = X - Y $. Then, we find the joint probability distribution of $ X $ and $ Y $: the probability of each value that $ X $ and $ Y $ can take on simultaneously. For example, the probability that $ X = 51 $ and $ Y = 50 $ is $ P(X = 51, Y = 50) = \frac{1}{4} \cdot \frac{2}{4} = \frac{2}{16} $. In a similar way, we get:
+To approach this problem, we define two new random variables. We define $ X $ as the age of the first person and $ Y $ as the age of the second. Then, $ Z = X - Y $. Then, we find the joint probability distribution of $ X $ and $ Y $: the probability of each value that $ X $ and $ Y $ can take on simultaneously. In this case, note that $ X $ and $ Y $ are independent and have the same PMF since they represent two independent draws from the same dataset with the first draw having no influence on the second. For example, the probability that $ X = 51 $ and $ Y = 50 $ is $ P(X = 51, Y = 50) = \frac{1}{4} \cdot \frac{2}{4} = \frac{2}{16} $. In a similar way, we get:
 
 <table>
   <tr>
@@ -188,7 +194,79 @@ To approach this problem, we define two new random variables. We define $ X $ as
   </tr>
 </table>
 
-The above table lets us also find the PMF for $ Z $. For example, $ P(Z = 1) = P(X = 51, Y = 50) + P(X = 52, Y = 51) = \frac{3}{16} $. Thus,
+Let us now consider the case in which we sample two people from the same dataset as above but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$. However, now $X$ and $Y$ are not independent; for example, if we know $X = 51$, then $Y \neq 51$. We find the joint distribution of $X$ and $Y$ as follows:
+
+<table>
+  <tr>
+    <th></th>
+    <th>$Y=50$</th>
+    <th>$Y=51$</th>
+    <th>$Y=52$</th>
+  </tr>
+  <tr>
+    <td>$X=50$</td>
+    <td>2/12</td>
+    <td>2/12</td>
+    <td>2/12</td>
+  </tr>
+  <tr>
+    <td>$X=51$</td>
+    <td>2/12</td>
+    <td>0</td>
+    <td>1/12</td>
+  </tr>
+  <tr>
+    <td>$X=52$</td>
+    <td>2/12</td>
+    <td>1/12</td>
+    <td>0</td>
+  </tr>
+</table>
+
+We can now find the marginal distribution of $Y$ from the table:
+
+$$
+P(Y = 50) = P(Y = 50, X = 50) + P(Y = 50, X = 51) + P(Y = 50, X = 52) = \frac{2}{12} + \frac{2}{12} + \frac{2}{12} = \frac{1}{2} \\
+P(Y = 51) = \frac{2}{12} + 0 + \frac{1}{12} = \frac{1}{4} \\
+P(Y = 52) = \frac{2}{12} + \frac{1}{12} + 0 = \frac{1}{4}
+$$
+
+Even though we are sampling without replacement, note that $X$ and $Y$ still have the same distribution!
+
+### Expectation
+
+We are often interested in the long-run average of a random variable because it gives us a sense of the center of the variable's distribution. We call this long-run average the **expected value**, or **expectation** of a random variable. The expected value of a random variable $ X $ is defined as:
+
+$$\mathbb{E}[X] = \sum_{x\in \mathbb{X}} x \cdot \mathbb{P}(X = x)$$
+
+For example, if $ X $ represents the roll of a single fair six-sided die, 
+
+$$
+\begin{aligned}
+\mathbb{E}[X]
+&= 1 \cdot \mathbb{P}(X = 1) + 2 \cdot \mathbb{P}(X = 2) + \ldots + 6 \cdot \mathbb{P}(X = 6) \\
+&= 1 \cdot \frac{1}{6} + 2 \cdot \frac{1}{6} + \ldots + 6 \cdot \frac{1}{6} \\
+&= 3.5
+\end{aligned}
+$$
+
+Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ never takes on the value $ 3.5 $.
+
+**Example:** We pick one person from the dataset in the previous section uniformly at random. Let $ Y $ be a random variable representing the age of this person. Then:
+
+$$
+\begin{aligned}
+\mathbb{E}[Y]
+&= 50 \cdot \mathbb{P}(Y = 50) + 51 \cdot \mathbb{P}(Y = 51) + 52 \cdot \mathbb{P}(Y = 52) \\
+&= 50 \cdot \frac{2}{4} + 51 \cdot \frac{1}{4} + 52 \cdot \frac{1}{4} \\
+&= 50.75
+\end{aligned}
+$$
+
+**Example:** Suppose we sample two people from the dataset with replacement. If the random variable $ Z $ represents the difference between the ages of the first and second persons in the sample, what is  $ \mathbb{E}[Z] $?
+
+
+As in the previous section, we define $X$ as the age of the first person and $Y$ as the age of the second such that $Z = X - Y$. From the joint distribution of $X$ and $Y$ given in the previous section, we can find the PMF for $ Z $. For example, $ P(Z = 1) = P(X = 51, Y = 50) + P(X = 52, Y = 51) = \frac{3}{16} $. Thus,
 
 $$
 \begin{aligned}
@@ -229,36 +307,9 @@ In the previous example, we saw that $ Z = X - Y $. Thus,  $ \mathbb{E}[Z] = \ma
 
 Now we can calculate $ \mathbb{E}[X] $ and  $ \mathbb{E}[Y] $ separately from each other. Since $ \mathbb{E}[X] = \mathbb{E}[Y] = 50.75 $, $ \mathbb{E}[Z] = 50.75 - 50.75 = 0 $.
 
-The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! To highlight an example of this, let us now consider the case in which we sample two people from the same dataset as above but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$. Now $X$ and $Y$ are not independent; for example, if we know $X = 51$, then $Y \neq 51$. We find the joint distribution of $X$ and $Y$ as follows:
+The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! As an example, let us again consider the case in which we sample two people from the same dataset as above but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$ where $X$ and $Y$ are not independent. 
 
-<table>
-  <tr>
-    <th></th>
-    <th>$Y=50$</th>
-    <th>$Y=51$</th>
-    <th>$Y=52$</th>
-  </tr>
-  <tr>
-    <td>$X=50$</td>
-    <td>2/12</td>
-    <td>2/12</td>
-    <td>2/12</td>
-  </tr>
-  <tr>
-    <td>$X=51$</td>
-    <td>2/12</td>
-    <td>0</td>
-    <td>1/12</td>
-  </tr>
-  <tr>
-    <td>$X=52$</td>
-    <td>2/12</td>
-    <td>1/12</td>
-    <td>0</td>
-  </tr>
-</table>
-
-With this, we can find $\mathbb{E}[Z]$ as before:
+From the joint distribution of $X$ and $Y$ given in the previous section, we can find $\mathbb{E}[Z]$:
 
 $$
 \begin{aligned}
@@ -269,15 +320,7 @@ $$
 \end{aligned}
 $$
 
-We can also find the PMF of $Y$ with the table:
-
-$$
-P(Y = 50) = P(Y = 50, X = 50) + P(Y = 50, X = 51) + P(Y = 50, X = 52) = \frac{2}{12} + \frac{2}{12} + \frac{2}{12} = \frac{1}{2} \\
-P(Y = 51) = \frac{2}{12} + 0 + \frac{1}{12} = \frac{1}{4} \\
-P(Y = 52) = \frac{2}{12} + \frac{1}{12} + 0 = \frac{1}{4}
-$$
-
-Thus, we have shown that $Y$ has the same PMF as $X$, which means that they have the same expectation as well. Since the linearity of expectation holds for dependent random variables, we could have simply used this fact to conclude that $\mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] = 50.75 - 50.75 = 0$.
+A simpler way to compute this expectation is to use the linearity of expectation. Even though $X$ and $Y$ dependent, $\mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y]$. Recall from the previous section that $X$ and $Y$ have the same PMF even though we are sampling without replacement, which means that $\mathbb{E}[X] = \mathbb{E}[Y] = 50.75$. Hence as in the first scenario, $\mathbb{E}[Z] = 0$.
 
 Note that the linearity of expectation only holds for linear combinations of random variables. For example, $ \mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y] $ is not a linear combination of $ X $ and $ Y $. In this case, $ \mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y] $ is true in general only for independent random variables.
 
@@ -330,7 +373,7 @@ plt.tight_layout();
 ```
 
 
-![png](bias_random_vars_files/bias_random_vars_15_0.png)
+![png](bias_random_vars_files/bias_random_vars_18_0.png)
 
 
 $ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
@@ -374,7 +417,27 @@ $$
 
 Note that the linearity of expectation holds for any $ X $ and $ Y $ even if they are dependent; $ Var(X + Y) = Var(X) + Var(Y) $ holds only when $ X $ and $ Y $ are independent.
 
-### Generalization
+#### Covariance
+
+The covariance of two random variables $X$ and $Y$ is defined as:
+
+$$
+\begin{aligned}
+Cov(X, Y) &= \mathbb{E}[(X - \mathbb{E}[X])(Y - \mathbb{E}[Y])]
+\end{aligned}
+$$
+
+Again, we can perform some algebraic manipulation to obtain:
+
+$$
+\begin{aligned}
+Cov(X, Y) = \mathbb{E}[XY] - \mathbb{E}[X]\mathbb{E}[Y]
+\end{aligned}
+$$
+
+Note that although the variance of a single random variable must be non-negative, the covariance of two random variables can be negative. In fact, the covariance helps measure the correlation between two random variables; the sign of the covariance helps us determine whether two random variables are positively or negatively correlated. If two random variables $X$ and $Y$ are independent, then $Cov(X, Y) = 0$, and $\mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y]$.
+
+### Example: Bernoulli Random Variables
 
 Suppose we want to use a random variable $X$ to a simulate a biased coin with $P(Heads) = p$. We can say that $X = 1$ if the coin flip is heads, and $X = 0$ if the coin flip is tails. Therefore, $P(X = 1) = p$, and $P(X = 0) = 1 - p$. This type of binary random variable is called a Bernoulli random variable; we can calculate its expected value and variance as follows:
 
@@ -382,19 +445,19 @@ $$\mathbb{E}[X] = 1 \times p + 0 \times (1 - p) = p$$
 
 $$Var(X) = \mathbb{E}[X^2] - \mathbb{E}[X]^2 = 1^2 \times p + 0^2 \times (1 - p) - p^2 = p - p^2 = p(1 - p)$$
 
-#### Sample Means
+### Sample Means
 
-Suppose we flip a coin with some unknown bias $p$ a total of $n$ times and find the proportion of heads that we get. Let us call this proportion $\hat{p}$. If we wanted to estimate $P(Heads)$, we might intuitively believe that $\hat{p}$ is a good guess. Now, we can use our newly gained knowledge of random variables, expectation, and variance to confirm this intuition.
+Suppose we flip a coin with $P(Heads) = p$ a total of $n$ times and find the proportion of heads. Let us call this proportion $\hat{p}$. If we wanted to estimate $P(Heads)$, we might intuitively believe that $\hat{p}$ is a good guess. Now, we can use our newly gained knowledge of random variables, expectation, and variance to confirm this intuition.
 
-Note that $\hat{p}$ itself is a random variable; thus, it must have some underlying distribution that we can find. If we let $X_i$ be a Bernoulli random variable for the $i^{th}$ coin flip (note that the $X_i$'s are independent since they represent independent coin flips), then we can mathematically determine that $\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i$. We can then calculate the expected value, variance, and standard deviation of $\hat{p}$ as follows:
+Note that $\hat{p}$ itself is a random variable; thus, it must have some underlying distribution. If we let $X_i$ be a Bernoulli random variable for the $i^{th}$ coin flip (note that the $X_i$'s are independent since they represent independent coin flips), then we can mathematically determine that $\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i$. We can then calculate the expected value, variance, and standard deviation of $\hat{p}$ as follows:
 
 $$\mathbb{E}[\frac{1}{n} \sum_{i=1}^{n} X_i] = \frac{1}{n} \sum_{i=1}^{n}\mathbb{E}[X_i] = \frac{1}{n} \times np = p$$
 
 $$Var(\frac{1}{n} \sum_{i=1}^{n} X_i) = \frac{1}{n^2} \sum_{i=1}^{n}Var(X_i) = \frac{1}{n^2} \times np(1-p) = \frac{p(1-p)}{n}$$
 
-The expected value of $\hat{p}$, the sample proportion, is the same as $p$, the true proportion! This is why we sometimes call the sample proportion an *unbiased estimator* of the true proportion, although we will leave the formal definiton of bias for the last section of this chapter.
+The expected value of $\hat{p}$, the sample proportion, is the same as $p$, the true proportion! Furthermore, the variance of the sample proportion gives us a measure of how much error we should expect if we use $\hat{p}$ to estimate $p$. As we increase the sample size $n$, the error of our estimator decreases, and $\hat{p}$ converges to $p$. This fact is known as the law of large numbers.
 
-Furthermore, the variance of the sample proportion gives us a measure of how much error we should expect if we use $\hat{p}$ to estimate $p$. As we increase the number of samples $n$, the error of our estimator decreases, and $\hat{p}$ converges to $p$. This fact is known as the law of large numbers.
+Since this sample proportion converges to the true proportion as the sample size becomes large, the sample proportion is considered an *unbiased estimator* for the true proportion. Some estimators are biased—the sample maximum, for example, meaning that the expected value for these estimators is not the true value.
 
 ## Summary
 
