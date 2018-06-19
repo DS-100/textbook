@@ -82,7 +82,7 @@ We use gradient descent as our optimization method. In the definitions above, $ 
 
 ## Real Numbers to Probabilities
 
-Observe that the model $ f_\hat{\theta} (x) = \hat{\theta} \cdot x $ can output any real number $ \mathbb{R} $ since it produces a linear combinations of the values in the vector $ x $ which itself can contain any value from $ \mathbb{R} $.
+Observe that the model $ f_\hat{\theta} (x) = \hat{\theta} \cdot x $ can output any real number $ \mathbb{R} $ since it produces a linear combination of the values in the vector $ x $ which itself can contain any value from $ \mathbb{R} $.
 
 We can easily visualize this when $ x $ is a scalar. If $ \hat \theta = 0.5$, our model becomes $ f_\hat{\theta} (x) = 0.5 x $. Its predictions can take on any value from negative infinity to positive infinity:
 
@@ -101,7 +101,9 @@ plt.title(r'Model predictions for $ \hat{\theta} = 0.5 $');
 ![png](classification_log_model_files/classification_log_model_7_0.png)
 
 
-We want to constrain $ f_\hat{\theta}(x) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\theta}(x) $ to correspond to high probabilities and small values to low probabilities.
+
+For classification tasks, we want to constrain $ f_\hat{\theta}(x) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\theta}(x) $ to correspond to high probabilities and small values to low probabilities.
+
 
 ## The Logistic Function
 
@@ -190,4 +192,4 @@ We see that changing $ \hat{\theta} $ changes the sharpness of the curve; the fu
 
 ## Summary
 
-We introduce the logistic model, a new prediction function that outputs probabilities. To construct the model, we use the output of linear regression into the input of the logistic function.
+We introduce the logistic model, a new prediction function that outputs probabilities. To construct the model, we use the output of linear regression as the input of the logistic function.
