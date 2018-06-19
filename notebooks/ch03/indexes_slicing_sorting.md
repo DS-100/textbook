@@ -37,12 +37,99 @@ baby = pd.read_csv('babynames.csv')
 baby
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>F</td>
+      <td>9217</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>F</td>
+      <td>3860</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>2587</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1891891</th>
+      <td>Verna</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>1891892</th>
+      <td>Winnie</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>1891893</th>
+      <td>Winthrop</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 4 columns</p>
+</div>
+
+
+
 Note that for the code above to work, the `babynames.csv` file must be located in the same directory as this notebook. We can check what files are in the current folder by running `ls` in a notebook cell:
 
 
 ```python
 ls
 ```
+
+    babynames.csv                  indexes_slicing_sorting.ipynb
+
 
 When we use `pandas` to read in data, we get a DataFrame. A DataFrame is a tabular data structure where each column is labeled (in this case 'Name', 'Sex', 'Count', 'Year') and each row is labeled (in this case 0, 1, 2, ..., 1891893). The Table introduced in Data 8, however, only has labeled columns.
 
@@ -73,9 +160,100 @@ baby
 ```
 
 
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>F</td>
+      <td>9217</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>F</td>
+      <td>3860</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>2587</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1891891</th>
+      <td>Verna</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>1891892</th>
+      <td>Winnie</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>1891893</th>
+      <td>Winthrop</td>
+      <td>M</td>
+      <td>5</td>
+      <td>1883</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 4 columns</p>
+</div>
+
+
+
+
 ```python
 baby.loc[1, 'Name'] # Row labeled 1, Column labeled 'Name'
 ```
+
+
+
+
+    'Anna'
+
+
 
 To slice out multiple rows or columns, we can use `:`. Note that `.loc` slicing is inclusive, unlike Python's slicing.
 
@@ -85,12 +263,89 @@ To slice out multiple rows or columns, we can use `:`. Note that `.loc` slicing 
 baby.loc[1:5, 'Name':'Count']
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>F</td>
+      <td>3860</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>2587</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Elizabeth</td>
+      <td>F</td>
+      <td>2549</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Minnie</td>
+      <td>F</td>
+      <td>2243</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Margaret</td>
+      <td>F</td>
+      <td>2142</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 We will often want a single column from a DataFrame:
 
 
 ```python
 baby.loc[:, 'Year']
 ```
+
+
+
+
+    0          1884
+    1          1884
+    2          1884
+               ... 
+    1891891    1883
+    1891892    1883
+    1891893    1883
+    Name: Year, Length: 1891894, dtype: int64
+
+
 
 Note that when we select a single column, we get a `pandas` Series. A Series is like a one-dimensional NumPy array since we can perform arithmetic on all the elements at once.
 
@@ -99,6 +354,20 @@ Note that when we select a single column, we get a `pandas` Series. A Series is 
 baby.loc[:, 'Year'] * 2
 ```
 
+
+
+
+    0          3768
+    1          3768
+    2          3768
+               ... 
+    1891891    3766
+    1891892    3766
+    1891893    3766
+    Name: Year, Length: 1891894, dtype: int64
+
+
+
 To select out specific columns, we can pass a list into the `.loc` slice:
 
 
@@ -106,6 +375,74 @@ To select out specific columns, we can pass a list into the `.loc` slice:
 # This is a DataFrame again
 baby.loc[:, ['Name', 'Year']]
 ```
+
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>1884</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1891891</th>
+      <td>Verna</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>1891892</th>
+      <td>Winnie</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>1891893</th>
+      <td>Winthrop</td>
+      <td>1883</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 2 columns</p>
+</div>
+
+
 
 Selecting columns is common, so there's a shorthand.
 
@@ -116,10 +453,92 @@ baby['Name']
 ```
 
 
+
+
+    0              Mary
+    1              Anna
+    2              Emma
+                 ...   
+    1891891       Verna
+    1891892      Winnie
+    1891893    Winthrop
+    Name: Name, Length: 1891894, dtype: object
+
+
+
+
 ```python
 # Shorthand for baby.loc[:, ['Name', 'Count']]
 baby[['Name', 'Count']]
 ```
+
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Mary</td>
+      <td>9217</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Anna</td>
+      <td>3860</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Emma</td>
+      <td>2587</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1891891</th>
+      <td>Verna</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1891892</th>
+      <td>Winnie</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1891893</th>
+      <td>Winthrop</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+<p>1891894 rows × 2 columns</p>
+</div>
+
+
 
 #### Slicing rows using a predicate
 
@@ -132,10 +551,38 @@ baby['Year']
 ```
 
 
+
+
+    0          1884
+    1          1884
+    2          1884
+               ... 
+    1891891    1883
+    1891892    1883
+    1891893    1883
+    Name: Year, Length: 1891894, dtype: int64
+
+
+
+
 ```python
 # Compare each year with 2016
 baby['Year'] == 2016
 ```
+
+
+
+
+    0          False
+    1          False
+    2          False
+               ...  
+    1891891    False
+    1891892    False
+    1891893    False
+    Name: Year, Length: 1891894, dtype: bool
+
+
 
 Once we have this Series of `True` and `False`, we can pass it into `.loc`.
 
@@ -147,6 +594,90 @@ baby_2016 = baby.loc[baby['Year'] == 2016, :]
 baby_2016
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1850880</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>19414</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1850881</th>
+      <td>Olivia</td>
+      <td>F</td>
+      <td>19246</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1850882</th>
+      <td>Ava</td>
+      <td>F</td>
+      <td>16237</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1883745</th>
+      <td>Zyahir</td>
+      <td>M</td>
+      <td>5</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1883746</th>
+      <td>Zyel</td>
+      <td>M</td>
+      <td>5</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1883747</th>
+      <td>Zylyn</td>
+      <td>M</td>
+      <td>5</td>
+      <td>2016</td>
+    </tr>
+  </tbody>
+</table>
+<p>32868 rows × 4 columns</p>
+</div>
+
+
+
 ### Sorting Rows
 
 The next step is the sort the rows in descending order by 'Count'. We can use the `sort_values()` function.
@@ -157,6 +688,90 @@ sorted_2016 = baby_2016.sort_values('Count', ascending=False)
 sorted_2016
 ```
 
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1850880</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>19414</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1850881</th>
+      <td>Olivia</td>
+      <td>F</td>
+      <td>19246</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1869637</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>19015</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1868752</th>
+      <td>Mikaelyn</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1868751</th>
+      <td>Miette</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1883747</th>
+      <td>Zylyn</td>
+      <td>M</td>
+      <td>5</td>
+      <td>2016</td>
+    </tr>
+  </tbody>
+</table>
+<p>32868 rows × 4 columns</p>
+</div>
+
+
+
 Finally, we will use `.iloc` to slice out the first five rows of the DataFrame. `.iloc` works like `.loc` but takes in numerical indices instead of labels. It does not include the right endpoint in its slices, like Python's list slicing.
 
 
@@ -166,10 +781,86 @@ sorted_2016.iloc[0, 0]
 ```
 
 
+
+
+    'Emma'
+
+
+
+
 ```python
 # Get the first five rows
 sorted_2016.iloc[0:5]
 ```
+
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1850880</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>19414</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1850881</th>
+      <td>Olivia</td>
+      <td>F</td>
+      <td>19246</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1869637</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>19015</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1869638</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>18138</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1850882</th>
+      <td>Ava</td>
+      <td>F</td>
+      <td>16237</td>
+      <td>2016</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ## In Conclusion
 

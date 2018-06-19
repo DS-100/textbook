@@ -398,6 +398,152 @@ FROM names N, colors C
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cat_id</th>
+      <th>name</th>
+      <th>cat_id</th>
+      <th>color</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 This operation is often called a *Cartesian product*: each row in the first table is paired with every row in the second table. Notice that many rows contain cat colors that are not matched properly with their names. The additional `WHERE`  clause in the implicit join filters out rows that do not have matching `cat_id` values.
 
 ```sql
@@ -466,6 +612,57 @@ SELECT name, color, age
 """
 pd.read_sql(sql_expr, sqlite_engine)
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>color</th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Apricot</td>
+      <td>orange</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Boots</td>
+      <td>black</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Cally</td>
+      <td>calico</td>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ## Summary
 

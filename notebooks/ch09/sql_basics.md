@@ -106,12 +106,186 @@ FROM prices
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>Galaxy S9</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+      <td>Surface Pro</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+      <td>Google Pixel 2</td>
+      <td>659.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Later in this section we will compare SQL queries with `pandas` method calls so we've created an identical DataFrame in `pandas`.
 
 
 ```python
 prices
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>Galaxy S9</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+      <td>Surface Pro</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+      <td>Google Pixel 2</td>
+      <td>659.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ## SQL Syntax
 
@@ -150,6 +324,93 @@ FROM prices
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>Galaxy S9</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+      <td>Surface Pro</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+      <td>Google Pixel 2</td>
+      <td>659.00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 `SELECT *` returns every column in the original relation. To display only the retailers that are represented in `prices`, we add the `retailer` column to the `SELECT` statement.
 
 
@@ -160,6 +421,73 @@ FROM prices
 """
 pd.read_sql(sql_expr, sqlite_engine)
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Walmart</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 If we want a list of unique retailers, we can call the `DISTINCT` function to omit repeated values.
 
@@ -172,12 +500,66 @@ FROM prices
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Amazon</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Walmart</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 This would be the functional equivalent of the following `pandas` code:
 
 
 ```python
 prices['retailer'].unique()
 ```
+
+
+
+
+    array(['Best Buy', 'Amazon', 'Target', 'Walmart'], dtype=object)
+
+
 
 Each RDBMS comes with its own set of functions that can be applied to attributes in the `SELECT` list, such as comparison operators, mathematical functions and operators, and string functions and operators. In Data 100 we use PostgreSQL, a mature RDBMS that comes with hundreds of such functions. The complete list is available [here](https://www.postgresql.org/docs/9.2/static/functions.html). Keep in mind that each RDBMS has a different set of functions for use in `SELECT`.
 
@@ -195,6 +577,93 @@ FROM prices
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer_caps</th>
+      <th>product</th>
+      <th>half_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>BEST BUY</td>
+      <td>Galaxy S9</td>
+      <td>359.500</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BEST BUY</td>
+      <td>iPod</td>
+      <td>100.000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>AMAZON</td>
+      <td>iPad</td>
+      <td>225.000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>AMAZON</td>
+      <td>Battery pack</td>
+      <td>12.435</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AMAZON</td>
+      <td>Chromebook</td>
+      <td>124.995</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>TARGET</td>
+      <td>iPod</td>
+      <td>107.500</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>TARGET</td>
+      <td>Surface Pro</td>
+      <td>399.500</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>TARGET</td>
+      <td>Google Pixel 2</td>
+      <td>329.500</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>WALMART</td>
+      <td>Chromebook</td>
+      <td>119.395</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Notice that we can **alias** the columns (assign another name) with `AS` so that the columns appear with this new name in the output table. This does not modify the names of the columns in the source relation.
 
 ### WHERE
@@ -211,6 +680,75 @@ WHERE price < 500
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Amazon</td>
+      <td>iPad</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Walmart</td>
+      <td>Chromebook</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 We can also use the operators `AND`, `OR`, and `NOT` to further constrain our SQL query. To find an item on Amazon without a battery pack under $300, we write:
 
 
@@ -225,6 +763,45 @@ WHERE retailer = 'Amazon'
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 The equivalent operation in `pandas` is:
 
 
@@ -233,6 +810,45 @@ prices[(prices['retailer'] == 'Amazon')
    & ~(prices['product'] == 'Battery pack')
    & (prices['price'] <= 300)]
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>4</th>
+      <td>Amazon</td>
+      <td>Chromebook</td>
+      <td>249.99</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 There's a subtle difference that's worth noting: the index of the Chromebook in the SQL query is 0, whereas the corresponding index in the DataFrame is 4. This is because SQL queries always return a new table with indices counting up from 0, whereas `pandas` subsets a portion of the DataFrame `prices` and returns it with the original indices. We can use [pd.DataFrame.reset_index](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.reset_index.html) to reset the indices in `pandas`.
 
@@ -251,6 +867,41 @@ FROM prices
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>avg_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>395.072222</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Equivalently, in `pandas`:
 
 
@@ -258,6 +909,13 @@ Equivalently, in `pandas`:
 ```python
 prices['price'].mean()
 ```
+
+
+
+
+    395.0722222222222
+
+
 
 A complete list of PostgreSQL aggregate functions can be found [here](https://www.postgresql.org/docs/9.2/static/functions.html). Though we're using PostgreSQL as our primary version of SQL in Data 100, keep in mind that there are many other variations of SQL (MySQL, SQLite, etc.) that use different function names and have different functions available.
 
@@ -281,6 +939,58 @@ GROUP BY retailer
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>max_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Amazon</td>
+      <td>450.00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>719.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target</td>
+      <td>799.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Walmart</td>
+      <td>238.79</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Let's say we have a client with expensive taste and only want to find retailers that sell gadgets over $700. Note that we must use `HAVING` to define predicates on aggregated columns; we can't use `WHERE` to filter an aggregated column. To compute a list of retailers and accompanying prices that satisfy our needs, we run:
 
 
@@ -294,6 +1004,48 @@ HAVING max_price > 700
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>max_price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Best Buy</td>
+      <td>719.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Target</td>
+      <td>799.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 For comparison, we recreate the same table in `pandas`:
 
 
@@ -301,6 +1053,49 @@ For comparison, we recreate the same table in `pandas`:
 max_prices = prices.groupby('retailer').max()
 max_prices.loc[max_prices['price'] > 700, ['price']]
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price</th>
+    </tr>
+    <tr>
+      <th>retailer</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Best Buy</th>
+      <td>719.0</td>
+    </tr>
+    <tr>
+      <th>Target</th>
+      <td>799.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ### ORDER BY and LIMIT
 
@@ -321,6 +1116,57 @@ LIMIT 3
 pd.read_sql(sql_expr, sqlite_engine)
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Note that we didn't have to include the `ASC` keyword since `ORDER BY` returns data in ascending order by default.
 For comparison, in `pandas`:
 
@@ -328,6 +1174,57 @@ For comparison, in `pandas`:
 ```python
 prices.sort_values('price').head(3)
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>retailer</th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3</th>
+      <td>Amazon</td>
+      <td>Battery pack</td>
+      <td>24.87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Best Buy</td>
+      <td>iPod</td>
+      <td>200.00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Target</td>
+      <td>iPod</td>
+      <td>215.00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 (Again, we see that the indices are out of order in the `pandas` DataFrame. As before, `pandas` returns a view on our DataFrame `prices`, whereas SQL is displaying a new table each time that we execute a query.)
 
