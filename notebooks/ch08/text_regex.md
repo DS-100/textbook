@@ -88,9 +88,23 @@ is_phone_number("382-384-3840")
 ```
 
 
+
+
+    True
+
+
+
+
 ```python
 is_phone_number("phone number")
 ```
+
+
+
+
+    False
+
+
 
 The code above is unpleasant and verbose. Rather than manually loop through the characters of the string, we would prefer to specify a pattern and command Python to match the pattern.
 
@@ -106,6 +120,13 @@ def is_phone_number(string):
 
 is_phone_number("382-384-3840")
 ```
+
+
+
+
+    True
+
+
 
 In the code above, we use the regex `[0-9]{3}-[0-9]{3}-[0-9]{4}` to match phone numbers. Although cryptic at a first glance, the syntax of regular expressions is fortunately much simpler to learn than the Python language itself; we introduce nearly all of the syntax in this section alone.
 
@@ -124,6 +145,9 @@ some_string = 'hello \\ world'
 print(some_string)
 ```
 
+    hello \ world
+
+
 Using a raw string removes the need to escape the backslash:
 
 
@@ -132,6 +156,9 @@ Using a raw string removes the need to escape the backslash:
 some_raw_string = r'hello \ world'
 print(some_raw_string)
 ```
+
+    hello \ world
+
 
 Since backslashes appear often in regular expressions, we will use raw strings for all regexes in this section.
 
@@ -156,10 +183,16 @@ regex = r"green"
 show_regex_match("Say! I like green eggs and ham!", regex)
 ```
 
+    Say! I like [1;30;43mgreen[m eggs and ham!
+
+
 
 ```python
 show_regex_match("Say! I like green eggs and ham!", r"a")
 ```
+
+    S[1;30;43ma[my! I like green eggs [1;30;43ma[mnd h[1;30;43ma[mm!
+
 
 In the example above we observe that regular expressions can match patterns that appear anywhere in the input string. In Python, this behavior differs depending on the method used to match the regex—some methods only return a match if the regex appears at the start of the string; some methods return a match anywhere in the string.
 
@@ -172,6 +205,9 @@ Regular expressions are case-sensitive. In the example below, the regex only mat
 show_regex_match("Say! I like green eggs and ham!", r"s")
 ```
 
+    Say! I like green egg[1;30;43ms[m and ham!
+
+
 ### Wildcard Character
 
 Some characters have special meaning in a regular expression. These meta characters allow regexes to match a variety of patterns.
@@ -183,12 +219,18 @@ In a regular expression, the period character `.` matches any character except a
 show_regex_match("Call me at 382-384-3840.", r".all")
 ```
 
+    [1;30;43mCall[m me at 382-384-3840.
+
+
 To match only the literal period character we must escape it with a backslash:
 
 
 ```python
 show_regex_match("Call me at 382-384-3840.", r"\.")
 ```
+
+    Call me at 382-384-3840[1;30;43m.[m
+
 
 By using the period character to mark the parts of a pattern that vary, we construct a regex to match phone numbers. For example, we may take our original phone number `382-384-3840` and replace the numbers with `.`, leaving the dashes as literals. This results in the regex `...-...-....`.
 
@@ -197,12 +239,18 @@ By using the period character to mark the parts of a pattern that vary, we const
 show_regex_match("Call me at 382-384-3840.", "...-...-....")
 ```
 
+    Call me at [1;30;43m382-384-3840[m.
+
+
 Since the period character matches all characters, however, the following input string will produce a spurious match.
 
 
 ```python
 show_regex_match("My truck is not-all-blue.", "...-...-....")
 ```
+
+    My truck is [1;30;43mnot-all-blue[m.
+
 
 ### Character Classes
 
@@ -213,10 +261,16 @@ A **character class** matches a specified set of characters, allowing us to crea
 show_regex_match("I like your gray shirt.", "gr[ae]y")
 ```
 
+    I like your [1;30;43mgray[m shirt.
+
+
 
 ```python
 show_regex_match("I like your grey shirt.", "gr[ae]y")
 ```
+
+    I like your [1;30;43mgrey[m shirt.
+
 
 
 ```python
@@ -224,11 +278,17 @@ show_regex_match("I like your grey shirt.", "gr[ae]y")
 show_regex_match("I like your graey shirt.", "gr[ae]y")
 ```
 
+    I like your graey shirt.
+
+
 
 ```python
 # In this example, repeating the character class will match
 show_regex_match("I like your graey shirt.", "gr[ae][ae]y")
 ```
+
+    I like your [1;30;43mgraey[m shirt.
+
 
 In a character class, the `.` character is treated as a literal, not as a wildcard.
 
@@ -236,6 +296,9 @@ In a character class, the `.` character is treated as a literal, not as a wildca
 ```python
 show_regex_match("I like your grey shirt.", "irt[.]")
 ```
+
+    I like your grey sh[1;30;43mirt.[m
+
 
 There are a few special shorthand notations we can use for commonly used character classes:
 
@@ -250,6 +313,9 @@ Shorthand | Meaning
 show_regex_match("I like your gray shirt.", "y[a-z]y")
 ```
 
+    I like your gray shirt.
+
+
 Character classes allow us to create a more specific regex for phone numbers.
 
 
@@ -260,11 +326,17 @@ phone_regex = r'[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'
 show_regex_match("Call me at 382-384-3840.", phone_regex)
 ```
 
+    Call me at [1;30;43m382-384-3840[m.
+
+
 
 ```python
 # Now we no longer match this string:
 show_regex_match("My truck is not-all-blue.", phone_regex)
 ```
+
+    My truck is not-all-blue.
+
 
 ### Negated Character Classes
 
@@ -274,6 +346,9 @@ A **negated character class** matches any character **except** the characters in
 ```python
 show_regex_match("The car parked in the garage.", r"[^c]ar")
 ```
+
+    The car [1;30;43mpar[mked in the [1;30;43mgar[mage.
+
 
 ### Quantifiers
 
@@ -293,12 +368,18 @@ phone_regex = r'[0-9]{3}-[0-9]{3}-[0-9]{4}'
 show_regex_match("Call me at 382-384-3840.", phone_regex)
 ```
 
+    Call me at [1;30;43m382-384-3840[m.
+
+
 
 ```python
 # No match
 phone_regex = r'[0-9]{3}-[0-9]{3}-[0-9]{4}'
 show_regex_match("Call me at 12-384-3840.", phone_regex)
 ```
+
+    Call me at 12-384-3840.
+
 
 A quantifier always modifies the character or character class to its immediate left. The following table shows the complete syntax for quantifiers.
 
@@ -327,6 +408,9 @@ We use the `*` character instead of `{0,}` in the following examples.
 show_regex_match('He screamed "Aaaah!" as the cart took a plunge.', "Aa*h!")
 ```
 
+    He screamed "[1;30;43mAaaah![m" as the cart took a plunge.
+
+
 
 ```python
 # Lots of a's
@@ -336,11 +420,17 @@ show_regex_match(
 )
 ```
 
+    He screamed "[1;30;43mAaaaaaaaaaaaaaaaaaaah![m" as the cart took a plunge.
+
+
 
 ```python
 # No lowercase a's
 show_regex_match('He screamed "Ah!" as the cart took a plunge.', "Aa*h!")
 ```
+
+    He screamed "[1;30;43mAh![m" as the cart took a plunge.
+
 
 **Quantifiers are greedy**
 
@@ -353,12 +443,18 @@ Quantifiers will always return the longest match possible. This sometimes result
 show_regex_match("Remember the numbers <311> and <911>", "<.+>")
 ```
 
+    Remember the numbers [1;30;43m<311> and <911>[m
+
+
 In many cases, using a more specific character class prevents these false matches:
 
 
 ```python
 show_regex_match("Remember the numbers <311> and <911>", "<[0-9]+>")
 ```
+
+    Remember the numbers [1;30;43m<311>[m and [1;30;43m<911>[m
+
 
 ### Anchoring
 
@@ -369,6 +465,9 @@ Sometimes a pattern should only match at the beginning or end of a string.  The 
 show_regex_match('well, well, well', r"well$")
 ```
 
+    well, well, [1;30;43mwell[m
+
+
 Using both `^` and `$` requires the regex to match the full string.
 
 
@@ -377,11 +476,17 @@ phone_regex = r"^[0-9]{3}-[0-9]{3}-[0-9]{4}$"
 show_regex_match('382-384-3840', phone_regex)
 ```
 
+    [1;30;43m382-384-3840[m
+
+
 
 ```python
 # No match
 show_regex_match('You can call me at 382-384-3840.', phone_regex)
 ```
+
+    You can call me at 382-384-3840.
+
 
 ### Escaping Meta Characters
 
@@ -393,11 +498,17 @@ All regex meta characters have special meaning in a regular expression. To match
 show_regex_match("Call me at [382-384-3840].", "\[")
 ```
 
+    Call me at [1;30;43m[[m382-384-3840].
+
+
 
 ```python
 # `.` is a meta character and requires escaping
 show_regex_match("Call me at [382-384-3840].", "\.")
 ```
+
+    Call me at [382-384-3840][1;30;43m.[m
+
 
 ## Reference Tables
 

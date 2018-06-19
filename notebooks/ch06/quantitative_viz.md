@@ -58,6 +58,13 @@ ti = sns.load_dataset('titanic').dropna().reset_index(drop=True)
 df_interact(ti)
 ```
 
+
+    A Jupyter Widget
+
+
+    (182 rows, 15 columns) total
+
+
 ### Histograms
 
 We can see that the dataset contains one row for every passenger. Each row includes the age of the passenger and the amount the passenger paid for a ticket. Let's visualize the ages using a histogram. We can use seaborn's `distplot` function:
@@ -69,6 +76,10 @@ We can see that the dataset contains one row for every passenger. Each row inclu
 sns.distplot(ti['age']);
 ```
 
+
+![png](quantitative_viz_files/quantitative_viz_8_0.png)
+
+
 By default, seaborn's `distplot` function will output a smoothed curve that roughly fits the distribution. We can also add a rugplot which marks each individual point on the x-axis:
 
 
@@ -76,12 +87,20 @@ By default, seaborn's `distplot` function will output a smoothed curve that roug
 sns.distplot(ti['age'], rug=True);
 ```
 
+
+![png](quantitative_viz_files/quantitative_viz_10_0.png)
+
+
 We can also plot the distribution itself. Adjusting the number of bins shows that there were a number of children on board.
 
 
 ```python
 sns.distplot(ti['age'], kde=False, bins=30);
 ```
+
+
+![png](quantitative_viz_files/quantitative_viz_12_0.png)
+
 
 ### Box plots
 
@@ -92,6 +111,10 @@ Box plots are a convenient way to see where most of the data lie. Typically, we 
 sns.boxplot(x='fare', data=ti);
 ```
 
+
+![png](quantitative_viz_files/quantitative_viz_14_0.png)
+
+
 We typically use the Inter-Quartile Range (IQR) to determine which points are considered outliers for the box plot. The IQR is the difference between the 75th percentile of the data and the 25th percentile.
 
 
@@ -100,6 +123,13 @@ lower, upper = np.percentile(ti['fare'], [25, 75])
 iqr = upper - lower
 iqr
 ```
+
+
+
+
+    60.299999999999997
+
+
 
 Values greater than 1.5 $\times$ IQR above the 75th percentile and less than 1.5 $\times$ IQR below the 25th percentile are considered outliers and we can see them marked indivdiually on the boxplot above:
 
@@ -110,12 +140,23 @@ lower_cutoff = lower - 1.5 * iqr
 upper_cutoff, lower_cutoff
 ```
 
+
+
+
+    (180.44999999999999, -60.749999999999986)
+
+
+
 Although histograms show the entire distribution at once, box plots are often easier to understand when we split the data by different categories. For example, we can make one box plot for each passenger type:
 
 
 ```python
 sns.boxplot(x='fare', y='who', data=ti);
 ```
+
+
+![png](quantitative_viz_files/quantitative_viz_20_0.png)
+
 
 The separate box plots are much easier to understand than the overlaid histogram below which plots the same data:
 
@@ -125,6 +166,10 @@ sns.distplot(ti.loc[ti['who'] == 'woman', 'fare'])
 sns.distplot(ti.loc[ti['who'] == 'man', 'fare'])
 sns.distplot(ti.loc[ti['who'] == 'child', 'fare']);
 ```
+
+
+![png](quantitative_viz_files/quantitative_viz_22_0.png)
+
 
 ### Brief Aside on Using Seaborn
 
@@ -144,6 +189,10 @@ When the column is categorical (the `'who'` column contained `'woman'`, `'man'`,
 sns.boxplot(x='fare', y='who', data=ti);
 ```
 
+
+![png](quantitative_viz_files/quantitative_viz_24_0.png)
+
+
 ### Scatter Plots
 
 Scatter plots are used to compare two quantitative variables. We can compare the `age` and `fare` columns of our Titanic dataset using a scatter plot.
@@ -153,6 +202,10 @@ Scatter plots are used to compare two quantitative variables. We can compare the
 sns.lmplot(x='age', y='fare', data=ti);
 ```
 
+
+![png](quantitative_viz_files/quantitative_viz_26_0.png)
+
+
 By default seaborn will also fit a regression line to our scatterplot and bootstrap the scatterplot to create a 95% confidence interval around the regression line shown as the light blue shading around the line above. In this case, the regression line doesn't seem to fit the scatter plot very well so we can turn off the regression.
 
 
@@ -160,11 +213,19 @@ By default seaborn will also fit a regression line to our scatterplot and bootst
 sns.lmplot(x='age', y='fare', data=ti, fit_reg=False);
 ```
 
+
+![png](quantitative_viz_files/quantitative_viz_28_0.png)
+
+
 We can color the points using a categorical variable. Let's use the `who` column once more:
 
 
 ```python
 sns.lmplot(x='age', y='fare', hue='who', data=ti, fit_reg=False);
 ```
+
+
+![png](quantitative_viz_files/quantitative_viz_30_0.png)
+
 
 From this plot we can see that all passengers below the age of 18 or so were marked as `child`. There doesn't seem to be a noticable split between male and female passenger fares, although the two most expensive tickets were purchased by males.

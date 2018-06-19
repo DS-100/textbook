@@ -89,6 +89,13 @@ response = requests.get(url)
 response
 ```
 
+
+
+
+    <Response [200]>
+
+
+
 ### The Request
 
 Let's take a closer look at the request we made. We can access the original request using `response` object; we display the request's HTTP headers below:
@@ -100,12 +107,25 @@ for key in request.headers: # The headers in the response are stored as a dictio
     print(f'{key}: {request.headers[key]}')
 ```
 
+    User-Agent: python-requests/2.12.4
+    Accept-Encoding: gzip, deflate
+    Accept: */*
+    Connection: keep-alive
+
+
 Every HTTP request has a type. In this case, we used a `GET` request which retrieves information from a server.
 
 
 ```python
 request.method
 ```
+
+
+
+
+    'GET'
+
+
 
 ### The Response
 
@@ -117,6 +137,18 @@ for key in response.headers:
     print(f'{key}: {response.headers[key]}')
 ```
 
+    Connection: keep-alive
+    Server: gunicorn/19.7.1
+    Date: Wed, 25 Apr 2018 18:32:51 GMT
+    Content-Type: text/html; charset=utf-8
+    Content-Length: 3741
+    Access-Control-Allow-Origin: *
+    Access-Control-Allow-Credentials: true
+    X-Powered-By: Flask
+    X-Processed-Time: 0
+    Via: 1.1 vegur
+
+
 An HTTP response contains a status code, a special number that indicates whether the request succeeded or failed. The status code `200` indicates that the request succeeded.
 
 
@@ -124,12 +156,26 @@ An HTTP response contains a status code, a special number that indicates whether
 response.status_code
 ```
 
+
+
+
+    200
+
+
+
 Finally, we display the first 100 characters of the response's content (the entire response content is too long to display nicely here).
 
 
 ```python
 response.text[:100]
 ```
+
+
+
+
+    '<!DOCTYPE html>\n<html>\n  <head>\n  </head>\n  <body>\n      <h1>Herman Melville - Moby-Dick</h1>\n\n     '
+
+
 
 ## Types of Requests
 
@@ -158,6 +204,13 @@ post_response = requests.post("https://httpbin.org/post",
 post_response
 ```
 
+
+
+
+    <Response [200]>
+
+
+
 The server will respond with a status code to indicate whether the `POST` request successfully completed. In addition, the server will usually send a response body to display to the client.
 
 
@@ -166,9 +219,23 @@ post_response.status_code
 ```
 
 
+
+
+    200
+
+
+
+
 ```python
 post_response.text
 ```
+
+
+
+
+    '{\n  "args": {}, \n  "data": "", \n  "files": {}, \n  "form": {\n    "name": "sam"\n  }, \n  "headers": {\n    "Accept": "*/*", \n    "Accept-Encoding": "gzip, deflate", \n    "Connection": "close", \n    "Content-Length": "8", \n    "Content-Type": "application/x-www-form-urlencoded", \n    "Host": "httpbin.org", \n    "User-Agent": "python-requests/2.12.4"\n  }, \n  "json": null, \n  "origin": "136.152.143.72", \n  "url": "https://httpbin.org/post"\n}\n'
+
+
 
 ## Types of Response Status Codes
 
@@ -190,6 +257,9 @@ errorResponse = requests.get(url)
 print(errorResponse)
 ```
 
+    <Response [404]>
+
+
 
 ```python
 # This specific page results in a 500 server error
@@ -197,6 +267,9 @@ url = "https://httpstat.us/500"
 serverResponse = requests.get(url)
 print(serverResponse)
 ```
+
+    <Response [500]>
+
 
 ## Summary
 
