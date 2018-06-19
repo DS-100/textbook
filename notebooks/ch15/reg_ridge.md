@@ -198,6 +198,82 @@ pd.DataFrame(clfs[2].named_steps['poly'].transform(X[:5]),
              columns=[f'deg_{n}_feat' for n in range(8)])
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>deg_0_feat</th>
+      <th>deg_1_feat</th>
+      <th>...</th>
+      <th>deg_6_feat</th>
+      <th>deg_7_feat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-15.94</td>
+      <td>253.98</td>
+      <td>...</td>
+      <td>-261095791.08</td>
+      <td>4161020472.12</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-29.15</td>
+      <td>849.90</td>
+      <td>...</td>
+      <td>-17897014961.65</td>
+      <td>521751305227.70</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>36.19</td>
+      <td>1309.68</td>
+      <td>...</td>
+      <td>81298431147.09</td>
+      <td>2942153527269.12</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>37.49</td>
+      <td>1405.66</td>
+      <td>...</td>
+      <td>104132296999.30</td>
+      <td>3904147586408.71</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-48.06</td>
+      <td>2309.65</td>
+      <td>...</td>
+      <td>-592123531634.12</td>
+      <td>28456763821657.78</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 8 columns</p>
+</div>
+
+
+
 We can see that the degree 7 polynomial features have much larger values than the degree 1 features. This means that a large model weight for the degree 7 features affects the predictions much more than a large model weight for the degree 1 features. If we apply regularization to this data directly, the regularization penalty will disproportionately lower the model weight for the lower degree features. In practice, this often results in high model variance even after applying regularization since the features with large effect on prediction will not be affected.
 
 To combat this, we *normalize* each data column by subtracting the mean and scaling the values in each column to be between -1 and 1. In `scikit-learn`, most regression models allow initializing with `normalize=True` to normalize the data before fitting.
@@ -215,10 +291,82 @@ df
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>water_level_change</th>
+      <th>water_flow</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-15.94</td>
+      <td>60422330445.52</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-29.15</td>
+      <td>33214896575.60</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>36.19</td>
+      <td>972706380901.06</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>7.09</td>
+      <td>236352046523.78</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>46.28</td>
+      <td>1494256381086.73</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>14.61</td>
+      <td>378146284247.97</td>
+    </tr>
+  </tbody>
+</table>
+<p>23 rows × 2 columns</p>
+</div>
+
+
+
+
 ```python
 # HIDDEN
 plot_curves(curves)
 ```
+
+
+![png](reg_ridge_files/reg_ridge_16_0.png)
+
 
 To conduct ridge regression, we first extract the data matrix and the vector of outcomes from the data:
 
@@ -233,6 +381,19 @@ print('y: ')
 print(y)
 ```
 
+    X: 
+    [[-15.94]
+     [-29.15]
+     [ 36.19]
+     ...
+     [  7.09]
+     [ 46.28]
+     [ 14.61]]
+    
+    y: 
+    [6.04e+10 3.32e+10 9.73e+11 ... 2.36e+11 1.49e+12 3.78e+11]
+
+
 Then, we apply a degree 12 polynomial transform to `X`:
 
 
@@ -245,6 +406,13 @@ X_poly_8 = PolynomialFeatures(degree=8, include_bias=False).fit_transform(X)
 print('First two rows of transformed X:')
 print(X_poly_8[0:2])
 ```
+
+    First two rows of transformed X:
+    [[-1.59e+01  2.54e+02 -4.05e+03  6.45e+04 -1.03e+06  1.64e+07 -2.61e+08
+       4.16e+09]
+     [-2.92e+01  8.50e+02 -2.48e+04  7.22e+05 -2.11e+07  6.14e+08 -1.79e+10
+       5.22e+11]]
+
 
 We specify `alpha` values that `scikit-learn` will select from using cross-validation, then use the `RidgeCV` classifier to fit the transformed data.
 
@@ -260,6 +428,13 @@ clf = RidgeCV(alphas=alphas, normalize=True).fit(X_poly_8, y)
 # Display the chosen alpha value:
 clf.alpha_
 ```
+
+
+
+
+    0.1
+
+
 
 Finally, we plot the model predictions for the base degree 8 polynomial classifier next to the regularized degree 8 classifier:
 
@@ -280,6 +455,10 @@ plt.title('Regularized degree 8 polynomial')
 plt.tight_layout()
 ```
 
+
+![png](reg_ridge_files/reg_ridge_24_0.png)
+
+
 We can see that the regularized polynomial is smoother than the base degree 8 polynomial and still captures the major trend in the data.
 
 Comparing the coefficients of the non-regularized and regularized models shows that ridge regression favors placing model weights on the lower degree polynomial terms:
@@ -294,6 +473,85 @@ pd.options.display.max_rows = 20
 display(base.join(ridge))
 pd.options.display.max_rows = 7
 ```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Base</th>
+      <th>Regularized</th>
+    </tr>
+    <tr>
+      <th>degree</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>225782472111.94</td>
+      <td>221063525725.23</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>13115217770.78</td>
+      <td>6846139065.96</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-144725749.98</td>
+      <td>146158037.96</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-10355082.91</td>
+      <td>1930090.04</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>567935.23</td>
+      <td>38240.62</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>9805.14</td>
+      <td>564.21</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-249.64</td>
+      <td>7.25</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-2.09</td>
+      <td>0.18</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.03</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 Repeating the process for degree 12 polynomial features results in a similar result:
 
@@ -316,6 +574,10 @@ plt.ylim(-5e10, 170e10)
 plt.tight_layout()
 ```
 
+
+![png](reg_ridge_files/reg_ridge_28_0.png)
+
+
 Increasing the regularization parameter results in progressively simpler models. The plot below demonstrates the effects of increasing the regularization amount from 0.001 to 100.0.
 
 
@@ -333,6 +595,10 @@ labels = [f'$\\lambda = {alpha}$' for alpha in alphas]
 
 plot_curves(alpha_curves, cols=3, labels=labels)
 ```
+
+
+![png](reg_ridge_files/reg_ridge_30_0.png)
+
 
 As we can see, increasing the regularization parameter increases the bias of our model. If our parameter is too large, the model becomes a constant model because any non-zero model weight is heavily penalized.
 
