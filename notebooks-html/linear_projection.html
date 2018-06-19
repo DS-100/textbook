@@ -1,0 +1,467 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch12/linear_projection.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch12&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">Image</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Least-Squares-Regression-as-a-Projection">Least Squares Regression as a Projection<a class="anchor-link" href="#Least-Squares-Regression-as-a-Projection">&#182;</a></h1></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Recall that we found the optimal coefficients for linear models by optimizing their cost functions with gradient descent.</p>
+<p>We also mentioned that least squares linear regression can be solved analytically. While gradient descent is practical, this geometric perspective will provide a deeper understanding of linear regression.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Case-Study">Case Study<a class="anchor-link" href="#Case-Study">&#182;</a></h2></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A wealthy client has a set of points with a clear linear pattern and asked us to come up with the best linear model for the data and a rigorous argument for how we know that our model is sound.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">data</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-1</td>
+      <td>-2</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1108ccef0&gt;</pre></div></div>
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_7_1.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can assume that when he says he wants the best model, he wants the least error, and that the least squared error is an acceptable measure.</p>
+<p>Recall that linear models follows the form:</p>
+<p>$$
+\begin{aligned}
+f_\hat{\theta} (x_i) 
+&amp;= \hat{\theta_1} x_i + \hat{\theta_0} \\
+\end{aligned}
+$$</p>
+<p>Thus, our goal is to find the $\hat{\theta}$ that results in the line with the least squared error $L(\hat{\theta}, \vec{x}, \vec{y})$:</p>
+<p>$$
+\begin{aligned}
+L(\hat{\theta}, \vec{x}, \vec{y})
+&amp;= \sum_{i = 1}^{n}(y_i - f_\hat{\theta} (x_i))^2\\
+&amp;= \sum_{i = 1}^{n}(y_i - \hat{\theta_1} x_i - \hat{\theta_0})^2\\
+&amp;= \sum_{i = 1}^{n}(y_i - \begin{bmatrix} x_i &amp; 1 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_1} \\
+     \hat{\theta_0}
+\end{bmatrix} ) ^2
+\end{aligned}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's visualize this cost function.</p>
+<p>$$
+\begin{aligned}
+L(\hat{\theta}, \vec{x}, \vec{y})
+&amp;=
+(y_1 - \begin{bmatrix} x_i &amp; 1 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_1} \\
+     \hat{\theta_0}
+\end{bmatrix})^2  \\
+&amp;+
+(y_2 - \begin{bmatrix} x_i &amp; 1 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_1} \\
+     \hat{\theta_0}
+\end{bmatrix})^2 \\
+&amp;+
+(y_3 - \begin{bmatrix} x_i &amp; 1 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_1} \\
+     \hat{\theta_0}
+\end{bmatrix})^2 \\
+\end{aligned}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Recalling the norm for a vector: $$\Vert \vec{v} \Vert = \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}$$</p>
+<p>We can rewrite the loss as a matrix equation:</p>
+<p>$$ 
+\begin{aligned}
+L(\hat{\theta}, \vec{x}, \vec{y})
+&amp;= \left \Vert  \qquad   
+\begin{bmatrix} y_1 \\ y_2 \\ y_3  \end{bmatrix} \quad - \quad 
+\begin{bmatrix} x_1 &amp; 1\\ x_2 &amp; 1 \\ x_3 &amp; 1 \end{bmatrix}
+\begin{bmatrix} \hat{\theta_1} \\ \hat{\theta_0} \end{bmatrix}
+\qquad \right \Vert ^2 \\
+&amp;= \left \Vert  \qquad  
+\vec{y} 
+\quad - \quad 
+X 
+\begin{bmatrix} \hat{\theta_1} \\ \hat{\theta_0} \end{bmatrix}
+\qquad \right \Vert ^2 \\
+\end{aligned}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This gives us a new perspective on what it means to minimize the least squares error.</p>
+<p>$X$ and $\vec{y}$ are fixed, but $\hat{\theta_1}$ and $\hat{\theta_0}$ can take on any value, so there are infinite possible vectors created by matrix multiplying $X$ and $\hat{\theta}$. Thus, we want to choose $\hat{\theta_1}$ and $\hat{\theta_2}$ such that the resulting vector is as close to $\vec{y}$ as possible.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Geometrical-Intuition">Geometrical Intuition<a class="anchor-link" href="#Geometrical-Intuition">&#182;</a></h2><p>Multiplying $X$ and $\hat{\theta}$ represents adding scalar multiples of the columns of $X$: $\vec{x}$ and $\vec{1}$. Here is an intuition:</p>
+<p>We start off with two vectors, $\vec{x}$ and $\vec{1}$.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span> 
+           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_13_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When $\hat{\theta_1} = 0.5$ and $\hat{\theta_0} = 2$, we add half of $x$ with two times the unit vector, resulting in a new vector.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
+           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_15_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When $\hat{\theta_1} = -1$ and $\hat{\theta_0} = 3$, we add $-1$ times $x$ with $3$ times the unit vector, resulting in yet another vector.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> 
+           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_17_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>With $\hat{\theta_1} = -1$ and $\hat{\theta_0} = -2$, we get:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> 
+           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_19_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>With $\hat{\theta_1} = 1$ and $\hat{\theta_0} = -4$, we get:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">8</span><span class="p">],</span> 
+           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_21_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This process can go on and on, showing that when we can add any scalar multiples of vectors, we can span a space. In this case, we would create a plane as you can start to see above. Formally, this illustrates how vectors $\vec{x}$ and $\vec{1}$ span a vector space.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Recall our scatter plot and the fact that $X$ and $\vec{y}$ are defined by the data. Since no line can perfectly fit our points, we know that $\vec{y}$ is not in the plane spanned by $\vec{x}$ and $\vec{1}$. Otherwise, there would exist $\hat{\theta}$ such that $L(\hat{\theta}, \vec{x}, \vec{y})$.</p>
+<p>Visually,</p>
+<p><img src="../../notebooks-images/linear_projection1.png" width="500" /></p>
+<p>Now, we can see that to minimize $ L(\hat{\theta}, \vec{x}, \vec{y}) = \left \Vert  \vec{y} - X \hat{\theta} \right \Vert ^2$, we want $X \hat{\theta}$ to be as close to $\vec{y}$ as possible. So in the infinite set of possibilities expressed by $X \hat{\theta}$, we want to find $\hat{\theta^*}$ such that $\left \Vert  \vec{y} - X \hat{\theta^*} \right \Vert ^2 \leq \left \Vert  \vec{y} - X \hat{\theta} \right \Vert ^2 \quad \forall \hat{\theta}$.</p>
+<p>Mathematically, we are looking for the projection of $\vec{y}$ onto the vector space spanned by the columns of $X$ because the projection $\hat{y}$ has the property of being the closest point in the vector space to the vector $y$.
+<img src="../../notebooks-images/linear_projection2.png" width="500" /></p>
+<p>To see why, consider any other point on the vector space.
+<img src="../../notebooks-images/linear_projection3.png" width="500" /></p>
+<p>In this case, it is easy to see that by the Pythagorean Theorem, any other point on the plane is farther from $\vec{y}$ than $\hat{y}$ is. The longer the distance, the higher the least squared error. Thus, the length of the perpendicular represents the least squared error.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Linear-Algebra">Linear Algebra<a class="anchor-link" href="#Linear-Algebra">&#182;</a></h2><p>Since we've snuck in a lot of linear algebra concepts already, all that's left is solving for the $\hat{\theta}$ that yields our desired $\hat{y}$.</p>
+<p>A couple things to note:</p>
+<p><img src="../../notebooks-images/linear_projection5.png" width="500" /></p>
+<ul>
+<li>$\hat{y} + e = \vec{y}$</li>
+<li>$\vec{e}$ is perpendicular to $\vec{x}$ and $\vec{1}$</li>
+<li>$\hat{y} = X \hat{\theta^*}$ is the vector closest to $y$ in the vector space spanned by $\vec{x}$ and $\vec{1}$</li>
+</ul>
+<p>Thus, we arrive at the equation:</p>
+<p>$$X  \hat{\theta^*} + \vec{e} = \vec{y}$$</p>
+<p>Left-multiplying both sides by $X^T$ (order matters in matrix multiplication):</p>
+<p>$$X^T X  \hat{\theta^*} + X^T \vec{e} = X^T \vec{y}$$</p>
+<p>But since $\vec{e}$ is perpendicular to the columns of $X$, $X^T \vec{e}$ is a column vector of $0$'s. Thus, we arrive at the Normal Equation:</p>
+<p>$$X^T X  \hat{\theta^*} = X^T \vec{y}$$</p>
+<p>From here, we can easily solve for $\hat{\theta^*}$ by left-multiplying both sides by $(X^T X)^{-1}$:</p>
+<p>$$\hat{\theta^*} = (X^T X)^{-1} X^T \vec{y}$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Finishing-up-the-Case-Study">Finishing up the Case Study<a class="anchor-link" href="#Finishing-up-the-Case-Study">&#182;</a></h2></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's return to our case study and apply what we've learned, and explain to our client why our solution is sound.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>$$
+\vec{y} = \begin{bmatrix} 2 \\ 1 \\ -2  \end{bmatrix} \quad X = \begin{bmatrix} 3 &amp; 1\\ 0 &amp; 1 \\ -1 &amp; 1 \end{bmatrix}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>$$
+\begin{align}
+\hat{\theta^*} 
+&amp;= 
+\left(
+\begin{bmatrix} 3 &amp; 0 &amp; -1 \\ 1 &amp; 1 &amp; 1 \end{bmatrix}
+\begin{bmatrix} 3 &amp; 1 \\ 0 &amp; 1 \\ -1 &amp; 1 \end{bmatrix} 
+\right)^{-1}
+\begin{bmatrix} 3 &amp; 0 &amp; -1 \\ 1 &amp; 1 &amp; 1 \end{bmatrix}
+\begin{bmatrix} 2 \\ 1 \\ -2  \end{bmatrix} \\
+&amp;= 
+\left(
+\begin{bmatrix} 10 &amp; 2\\ 2 &amp; 3 \end{bmatrix}
+\right)^{-1}
+\begin{bmatrix} 8 \\ 1 \end{bmatrix} \\
+&amp;=
+\frac{1}{30-4}
+\begin{bmatrix} 3 &amp; -2\\ -2 &amp; 10 \end{bmatrix}
+\begin{bmatrix} 8 \\ 1 \end{bmatrix} \\
+&amp;=
+\frac{1}{26}
+\begin{bmatrix} 22\\ -6 \end{bmatrix}\\
+&amp;=
+\begin{bmatrix} \frac{11}{13}\\ - \frac{3}{13} \end{bmatrix}
+\end{align}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have analytically found that best model for least squares regression is $f_\hat{\theta} (x_i) = \frac{11}{13} x_i - \frac{3}{13}$.</p></div></div></div></div>
