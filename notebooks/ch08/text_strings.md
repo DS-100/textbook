@@ -72,9 +72,113 @@ state
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>De Witt County</td>
+      <td>IL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Lac qui Parle County</td>
+      <td>MN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Lewis and Clark County</td>
+      <td>MT</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>St John the Baptist Parish</td>
+      <td>LA</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
 ```python
 population
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>Population</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>DeWitt</td>
+      <td>16,798</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Lac Qui Parle</td>
+      <td>8,067</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Lewis &amp; Clark</td>
+      <td>55,716</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>St. John the Baptist</td>
+      <td>43,044</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 We would naturally like to join the `state` and `population` tables using the `County` column. Unfortunately, not a single county is spelled the same in the two tables. This example is illustrative of the following common issues in text data:
 
@@ -115,6 +219,13 @@ john2 = population.loc[0, 'County']
 )
 ```
 
+
+
+
+    'stjohnthebaptist'
+
+
+
 Applying the same set of methods to `john2` allows us to verify that the two strings are now identical.
 
 
@@ -129,6 +240,13 @@ Applying the same set of methods to `john2` allows us to verify that the two str
  .replace(' ', '')
 )
 ```
+
+
+
+
+    'stjohnthebaptist'
+
+
 
 Satisfied, we create a method called `clean_county` that normalizes an input county.
 
@@ -154,6 +272,14 @@ We may now verify that the `clean_county` method produces matching counties for 
 )
 ```
 
+
+
+
+    (['dewitt', 'lacquiparle', 'lewisandclark', 'stjohnthebaptist'],
+     ['dewitt', 'lacquiparle', 'lewisandclark', 'stjohnthebaptist'])
+
+
+
 Because each county in both tables has the same transformed representation, we may successfully join the two tables using the transformed county names.
 
 ## String Methods in pandas
@@ -165,12 +291,34 @@ In the code above we used a loop to transform each county name. `pandas` Series 
 state['County']
 ```
 
+
+
+
+    0                De Witt County
+    1          Lac qui Parle County
+    2        Lewis and Clark County
+    3    St John the Baptist Parish
+    Name: County, dtype: object
+
+
+
 The `.str` property on `pandas` Series exposes the same string methods as Python does. Calling a method on the `.str` property calls the method on each item in the series.
 
 
 ```python
 state['County'].str.lower()
 ```
+
+
+
+
+    0                de witt county
+    1          lac qui parle county
+    2        lewis and clark county
+    3    st john the baptist parish
+    Name: County, dtype: object
+
+
 
 This allows us to transform each string in the series without using a loop.
 
@@ -186,6 +334,17 @@ This allows us to transform each string in the series without using a loop.
  .str.replace(' ', '')
 )
 ```
+
+
+
+
+    0              dewitt
+    1         lacquiparle
+    2       lewisandclark
+    3    stjohnthebaptist
+    Name: County, dtype: object
+
+
 
 We save the transformed counties back into their originating tables:
 
@@ -220,9 +379,113 @@ state
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>dewitt</td>
+      <td>IL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>lacquiparle</td>
+      <td>MN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>lewisandclark</td>
+      <td>MT</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>stjohnthebaptist</td>
+      <td>LA</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
 ```python
 population
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>Population</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>dewitt</td>
+      <td>16,798</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>lacquiparle</td>
+      <td>8,067</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>lewisandclark</td>
+      <td>55,716</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>stjohnthebaptist</td>
+      <td>43,044</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 It is simple to join these tables once the counties match.
 
@@ -230,6 +493,63 @@ It is simple to join these tables once the counties match.
 ```python
 state.merge(population, on='County')
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>State</th>
+      <th>Population</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>dewitt</td>
+      <td>IL</td>
+      <td>16,798</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>lacquiparle</td>
+      <td>MN</td>
+      <td>8,067</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>lewisandclark</td>
+      <td>MT</td>
+      <td>55,716</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>stjohnthebaptist</td>
+      <td>LA</td>
+      <td>43,044</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ## Summary
 

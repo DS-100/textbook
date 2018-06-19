@@ -49,9 +49,120 @@ calls.head()
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENO</th>
+      <th>OFFENSE</th>
+      <th>EVENTDT</th>
+      <th>EVENTTM</th>
+      <th>...</th>
+      <th>BLKADDR</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Day</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17091420</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/23/2017 12:00:00 AM</td>
+      <td>06:00</td>
+      <td>...</td>
+      <td>2500 LE CONTE AVE</td>
+      <td>37.876965</td>
+      <td>-122.260544</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>17038302</td>
+      <td>BURGLARY AUTO</td>
+      <td>07/02/2017 12:00:00 AM</td>
+      <td>22:00</td>
+      <td>...</td>
+      <td>BOWDITCH STREET &amp; CHANNING WAY</td>
+      <td>37.867209</td>
+      <td>-122.256554</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>17049346</td>
+      <td>THEFT MISD. (UNDER $950)</td>
+      <td>08/20/2017 12:00:00 AM</td>
+      <td>23:20</td>
+      <td>...</td>
+      <td>2900 CHANNING WAY</td>
+      <td>37.867948</td>
+      <td>-122.250664</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>17091319</td>
+      <td>THEFT MISD. (UNDER $950)</td>
+      <td>07/09/2017 12:00:00 AM</td>
+      <td>04:15</td>
+      <td>...</td>
+      <td>2100 RUSSELL ST</td>
+      <td>37.856719</td>
+      <td>-122.266672</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>17044238</td>
+      <td>DISTURBANCE</td>
+      <td>07/30/2017 12:00:00 AM</td>
+      <td>01:16</td>
+      <td>...</td>
+      <td>TELEGRAPH AVENUE &amp; DURANT AVE</td>
+      <td>37.867816</td>
+      <td>-122.258994</td>
+      <td>Sunday</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 9 columns</p>
+</div>
+
+
+
+
 ```python
 calls['CASENO'].plot.hist(bins=30)
 ```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1a1ebb2898>
+
+
+
+
+![png](eda_faithfulness_files/eda_faithfulness_4_1.png)
+
 
 Notice the unexpected clusters at 17030000 and 17090000. By plotting the distribution of case numbers, we can quickly see anomalies in the data. In this case, we might guess that two different teams of police use different sets of case numbers for their calls.
 

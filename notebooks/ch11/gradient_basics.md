@@ -84,6 +84,10 @@ pts = np.array([12, 13, 15, 16, 17])
 points_and_cost(pts, (11, 18), mse_cost)
 ```
 
+
+![png](gradient_basics_files/gradient_basics_4_0.png)
+
+
 How might we write a program to automatically find the minimizing value of $ \theta $? The simplest method is to compute the cost for many values $ \theta $. Then, we can return the $ \theta $ value that resulted in the least cost.
 
 We define a function called `simple_minimize` that takes in a cost function, an array of data points, and an array of $ \theta $ values to try.
@@ -112,6 +116,13 @@ thetas = np.arange(12, 18, 0.1)
 simple_minimize(mse_cost, dataset, thetas)
 ```
 
+
+
+
+    14.599999999999991
+
+
+
 This is close to the expected value:
 
 
@@ -119,6 +130,13 @@ This is close to the expected value:
 # Compute the minimizing theta using the analytical formula
 np.mean(dataset)
 ```
+
+
+
+
+    14.6
+
+
 
 Now, we can define a function to compute the Huber cost and plot the cost against $ \theta $.
 
@@ -139,12 +157,23 @@ def huber_cost(theta, dataset, alpha = 1):
 points_and_cost(pts, (11, 18), huber_cost)
 ```
 
+
+![png](gradient_basics_files/gradient_basics_13_0.png)
+
+
 Although we can see that the minimizing value of $ \theta $ should be close to 15, we do not have an analytical method of finding $ \theta $ directly for the Huber cost. Instead, we can use our `simple_minimize` function.
 
 
 ```python
 simple_minimize(huber_cost, dataset, thetas)
 ```
+
+
+
+
+    14.999999999999989
+
+
 
 Now, we can return to our original dataset of tip percentages and find the best value for $ \theta $ using the Huber cost.
 
@@ -156,15 +185,119 @@ tips.head()
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+      <th>pcttip</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>16.99</td>
+      <td>1.01</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+      <td>5.944673</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.34</td>
+      <td>1.66</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+      <td>16.054159</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>21.01</td>
+      <td>3.50</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+      <td>16.658734</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>23.68</td>
+      <td>3.31</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+      <td>13.978041</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>24.59</td>
+      <td>3.61</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>4</td>
+      <td>14.680765</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
 ```python
 # HIDDEN
 points_and_cost(tips['pcttip'], (11, 20), huber_cost)
 ```
 
 
+![png](gradient_basics_files/gradient_basics_18_0.png)
+
+
+
 ```python
 simple_minimize(huber_cost, tips['pcttip'], thetas)
 ```
+
+
+
+
+    15.499999999999988
+
+
 
 We can see that using the Huber cost gives us $ \theta = 15.5 $. We can now compare the minimizing $ \theta $ values for MSE cost, mean absolute cost, and Huber cost.
 
@@ -175,12 +308,21 @@ print(f"Mean Absolute cost: theta = {tips['pcttip'].median():.2f}")
 print(f"        Huber cost: theta = 15.50")
 ```
 
+              MSE cost: theta = 16.08
+    Mean Absolute cost: theta = 15.48
+            Huber cost: theta = 15.50
+
+
 We can see that the Huber cost is closer to the mean absolute cost since it is less affected by the outliers on the right side of the tip percentage distribution:
 
 
 ```python
 sns.distplot(tips['pcttip'], bins=50);
 ```
+
+
+![png](gradient_basics_files/gradient_basics_23_0.png)
+
 
 ## Issues with `simple_minimize`
 
