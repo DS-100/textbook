@@ -348,4 +348,4 @@ $$
 \end{align}
 $$
 
-We have analytically found that best model for least squares regression is $f_\hat{\theta} (x_i) = \frac{11}{13} x_i - \frac{3}{13}$.
+We have analytically found that best model for least squares regression is $f_\hat{\theta} (x_i) = \frac{11}{13} x_i - \frac{3}{13}$. We know that our choice of $\hat{\theta}$ is sound by the mathematical property that the projection of $\vec{y}$ onto the span of the columns of $X$ yield the closest point in the vector space to $\vec{y}$. Under linear constraints using the least squares metric, solving for $\hat{\theta}$ by taking the projection guarantees us the optimal solution.
