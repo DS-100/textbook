@@ -58,13 +58,13 @@ L(\hat{\theta}, X, y)
 \end{aligned}
 $$
 
-As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict.
+As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict. $ X_i $is the $i$'th row of $ X $ and $ y_i $ is the $i$'th entry of y.
 
-Observe that our cost function is the average of the loss function values for each row of our data. If we define the loss function:
+Observe that our cost function is the average of the loss function values for each row of our data. If we define the squared loss function:
 
 $$
 \begin{aligned}
-\ell(y, f_\hat{\theta} (x))
+\ell(y_i, f_\hat{\theta} (x))
 &= (y_i - f_\hat{\theta} (x))^2
 \end{aligned}
 $$
@@ -100,7 +100,7 @@ The **risk** for a model $ f_\hat{\theta} $ is the expected value of the loss ab
 
 $$
 \begin{aligned}
-R(f_\hat{\theta}) = \mathbb{E}[ \ell(\gamma, f_\hat{\theta} (z)) ]
+R(f_\hat{\theta}(x)) = \mathbb{E}[ \ell(\gamma, f_\hat{\theta} (z)) ]
 \end{aligned}
 $$
 

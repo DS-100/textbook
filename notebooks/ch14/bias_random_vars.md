@@ -61,6 +61,10 @@ plt.yticks((0, 1/12, 1/6), ('0', r'$\frac{1}{12}$', r'$\frac{1}{6}$'))
 plt.title('PMF of $X$');
 ```
 
+
+![png](bias_random_vars_files/bias_random_vars_5_0.png)
+
+
 ### Expectation
 
 We are often interested in the long-run average of a random variable because it gives us a sense of the center of the variable's distribution. We call this long-run average the **expected value**, or **expectation** of a random variable. The expected value of a random variable $ X $ is defined as:
@@ -89,6 +93,58 @@ data={"Name":["Carol","Bob","John","Dave"], 'Age': [50,52,51,50]}
 people = pd.DataFrame(data)
 people
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Age</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>50</td>
+      <td>Carol</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>52</td>
+      <td>Bob</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51</td>
+      <td>John</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>50</td>
+      <td>Dave</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 We pick one person from this dataset uniformly at random. Let $ Y $ be a random variable representing the age of this person. Then:
 
@@ -222,6 +278,10 @@ plt.yticks(np.arange(0, 1.1, 0.25),
 plt.title('PMF of $Y$')
 plt.tight_layout();
 ```
+
+
+![png](bias_random_vars_files/bias_random_vars_15_0.png)
+
 
 $ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
 

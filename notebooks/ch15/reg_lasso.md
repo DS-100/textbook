@@ -192,6 +192,74 @@ To conduct lasso regression, we make use of `scikit-learn`'s convenient [`LassoC
 df
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>water_level_change</th>
+      <th>water_flow</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-15.94</td>
+      <td>60422330445.52</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-29.15</td>
+      <td>33214896575.60</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>36.19</td>
+      <td>972706380901.06</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>7.09</td>
+      <td>236352046523.78</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>46.28</td>
+      <td>1494256381086.73</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>14.61</td>
+      <td>378146284247.97</td>
+    </tr>
+  </tbody>
+</table>
+<p>23 rows × 2 columns</p>
+</div>
+
+
+
 Since the procedure is almost identical to using the `RidgeCV` classifier from the previous section, we omit the code and instead display the base degree 12 polynomial, ridge regression, and lasso regression model predictions below.
 
 
@@ -219,7 +287,11 @@ plt.ylim(-5e10, 170e10)
 plt.tight_layout()
 ```
 
-We can see that both regularized models have less variance than the base degree 8 polynomial. At a glance, it appears that using $ L_2 $ and $ L_1 $ regularization produces nearly identical models. Comparing the coefficients of ridge and lasso regression, however, reveals the most significant difference between the two types of regularization: the lasso regression model sets a number of model weights to zero.
+
+![png](reg_lasso_files/reg_lasso_12_0.png)
+
+
+We can see that both regularized models have less variance than the base degree 12 polynomial. At a glance, it appears that using $ L_2 $ and $ L_1 $ regularization produces nearly identical models. Comparing the coefficients of ridge and lasso regression, however, reveals the most significant difference between the two types of regularization: the lasso regression model sets a number of model weights to zero.
 
 
 ```python
@@ -233,6 +305,105 @@ display(ridge.join(lasso))
 pd.options.display.max_rows = 7
 pd.set_option('display.float_format', '{:.2f}'.format)
 ```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Ridge</th>
+      <th>Lasso</th>
+    </tr>
+    <tr>
+      <th>degree</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>221303288116.2275085449</td>
+      <td>198212062407.2835693359</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>6953405307.7653837204</td>
+      <td>9655088668.0876655579</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>142621063.9297277331</td>
+      <td>198852674.1646585464</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1893283.0567885502</td>
+      <td>0.0000000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>38202.1520293704</td>
+      <td>34434.3458919188</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>484.4262914111</td>
+      <td>975.6965959434</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>8.1525126516</td>
+      <td>0.0000000000</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.1197232472</td>
+      <td>0.0887942172</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.0012506185</td>
+      <td>0.0000000000</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.0000289599</td>
+      <td>0.0000000000</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>-0.0000000004</td>
+      <td>0.0000000000</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>0.0000000069</td>
+      <td>0.0000000000</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>-0.0000000001</td>
+      <td>-0.0000000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 If you will forgive the verbose output above, you will notice that ridge regression results in non-zero weights for the all polynomial features. Lasso regression, on the other hand, produces weights of zero for seven features.
 
@@ -252,4 +423,4 @@ Lasso regression models tend to take more computation to fit than ridge regressi
 
 ## Summary
 
-Using $ L_1 $ regularization, like $ L_1 $ regularization, allows us to tune model bias and variance by penalizing large model weights. $ L_1 $ regularization for least squares linear regression is also known by the more common name lasso regression. Lasso regression may also be used to perform feature selection since it discards insignificant features.
+Using $ L_1 $ regularization, like $ L_2 $ regularization, allows us to tune model bias and variance by penalizing large model weights. $ L_1 $ regularization for least squares linear regression is also known by the more common name lasso regression. Lasso regression may also be used to perform feature selection since it discards insignificant features.
