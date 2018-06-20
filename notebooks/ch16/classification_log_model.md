@@ -101,9 +101,7 @@ plt.title(r'Model predictions for $ \hat{\theta} = 0.5 $');
 ![png](classification_log_model_files/classification_log_model_7_0.png)
 
 
-
 For classification tasks, we want to constrain $ f_\hat{\theta}(x) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\theta}(x) $ to correspond to high probabilities and small values to low probabilities.
-
 
 ## The Logistic Function
 
