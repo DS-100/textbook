@@ -57,6 +57,10 @@ plt.ylim(0, 0.75)
 None
 ```
 
+
+![png](srs_vs_big_data_files/srs_vs_big_data_5_0.png)
+
+
 We can see that our large dataset is just a bit biased towards the Republican candidate Romney just as the Gallup Poll was in 1948. Still, this dataset could give us accurate predictions. To check, we can simulate taking simple random samples of size 400 from the population and large non-random samples of size 60,000,000. We will compute the proportion of votes for Obama in each sample and plot the distribution of proportions.
 
 
@@ -89,6 +93,10 @@ plt.axvline(x=obama_true, color='r', label='truth')
 plt.legend()
 None
 ```
+
+
+![png](srs_vs_big_data_files/srs_vs_big_data_9_0.png)
+
 
 As you can see, the SRS distribution is spread out but centered around the true population proportion of Obama voters. The distribution created by the large non-random sample, on the other hand, is very narrow but not a single simulated sample produces the true population proportion. If we attempt to create confidence intervals using the non-random sample, none of them will contain the true population proportion. To make matters worse, the confidence interval will be extremely narrow because the sample is so large. We will be very sure of an ultimately incorrect estimation.
 

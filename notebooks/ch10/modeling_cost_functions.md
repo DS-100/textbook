@@ -51,6 +51,10 @@ plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
 
+
+![png](modeling_cost_functions_files/modeling_cost_functions_4_0.png)
+
+
 Since $ \theta = 15 $ falls closer to most of the points, our cost function should output a small value for $ \theta = 15 $ and a larger value for $ \theta = 10 $.
 
 Let's use this intuition to create a cost function.
@@ -108,6 +112,10 @@ try_thetas(thetas=[11, 12, 13, 14, 15, 16],
            y_vals=[14], xlims=(10, 17))
 ```
 
+
+![png](modeling_cost_functions_files/modeling_cost_functions_8_0.png)
+
+
 You can also interactively try different values of $ \theta $ below. You should understand why the cost for $ \theta = 11 $ is many times higher than the cost for $ \theta = 13 $.
 
 
@@ -133,6 +141,10 @@ def mse_interact(theta, y_vals, xlims):
 mse_interact(theta=(11, 16, 0.5), y_vals=[14], xlims=(10, 17))
 ```
 
+
+    A Jupyter Widget
+
+
 As we hoped, our cost is larger as $ \theta $ is further away from our data and is smallest when $ \theta $ falls exactly onto our data point. Let's now see how our mean squared error behaves when we have five points instead of one. Our data this time are: $ \{ 12.1, 12.8, 14.9, 16.3, 17.2 \} $.
 
 
@@ -142,6 +154,10 @@ try_thetas(thetas=[12, 13, 14, 15, 16, 17],
            y_vals=[12.1, 12.8, 14.9, 16.3, 17.2],
            xlims=(11, 18))
 ```
+
+
+![png](modeling_cost_functions_files/modeling_cost_functions_12_0.png)
+
 
 Of the values of $ \theta $ we tried $ \theta = 15 $ has the lowest cost. However, a value of $ \theta $ in between 14 and 15 might have an even lower cost than $ \theta = 15 $. See if you can find a better value of $ \theta $ using the interactive plot below.
 
@@ -155,6 +171,10 @@ mse_interact(theta=(12, 17, 0.2),
              xlims=(11, 18))
 ```
 
+
+    A Jupyter Widget
+
+
 The mean squared error cost function seems to be doing its job by penalizing values of $ \theta $ that are far away from the center of the data. Let's now see what the cost function outputs on the original dataset of tip percents. For reference, the original distribution of tip percents is plotted below:
 
 
@@ -166,6 +186,10 @@ plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
 
+
+![png](modeling_cost_functions_files/modeling_cost_functions_16_0.png)
+
+
 Let's try some values of $ \theta $.
 
 
@@ -176,6 +200,10 @@ try_thetas(thetas=np.arange(13, 17.1, 0.5),
            xlims=(0, 30))
 ```
 
+
+![png](modeling_cost_functions_files/modeling_cost_functions_18_0.png)
+
+
 As before, we've created an interactive widget to test different values of $ \theta $.
 
 
@@ -185,6 +213,10 @@ mse_interact(theta=(13, 17, 0.25),
              y_vals=tips['pcttip'],
              xlims=(0, 30))
 ```
+
+
+    A Jupyter Widget
+
 
 It looks like the best value of $ \theta $ that we've tried so far is 16.00. This is slightly above our original blind guess of 15% tip. It appears that our waiter gets a bit more tip than we originally thought.
 
@@ -224,6 +256,10 @@ try_thetas(thetas=[12, 13, 14, 15, 16, 17],
            xlims=(11, 18))
 ```
 
+
+![png](modeling_cost_functions_files/modeling_cost_functions_24_0.png)
+
+
 In the plots above, we've used integer $ \theta $ values in between 12 and 17. When we change $ \theta $, the cost seems to start high (at 10.92), decrease until $ \theta = 15 $, then increase again. We can see that the cost changes as $ \theta $ changes, so let's make a plot comparing the cost to $ \theta $ for each of the six $ \theta $s we've tried.
 
 
@@ -238,6 +274,10 @@ plt.xlabel(r'$ \theta $ Values')
 plt.ylabel('Cost');
 ```
 
+
+![png](modeling_cost_functions_files/modeling_cost_functions_26_0.png)
+
+
 The scatter plot shows the downward, then upward trend that we noticed before. We can try more values of $ \theta $ to see a complete curve that shows how the cost changes as $ \theta $ changes.
 
 
@@ -251,6 +291,10 @@ plt.title(r'Cost vs. $ \theta $ when $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $')
 plt.xlabel(r'$ \theta $ Values')
 plt.ylabel('Cost');
 ```
+
+
+![png](modeling_cost_functions_files/modeling_cost_functions_28_0.png)
+
 
 The plot above shows that in fact, $ \theta = 15$ was not the best choice; a $ \theta $ of around 14.7 would have gotten a lower cost! We can use calculus to find that minimizing value of $ \theta $ exactly. First, we start with our cost function:
 
@@ -342,6 +386,13 @@ np.mean(tips['pcttip'])
 ```
 
 
+
+
+    16.080258172250463
+
+
+
+
 ```python
 # HIDDEN
 sns.distplot(tips['pcttip'], bins=np.arange(30), rug=True)
@@ -354,6 +405,10 @@ plt.title('Distribution of tip percent')
 plt.xlabel('Percent Tip Amount')
 plt.ylabel('Proportion per Percent');
 ```
+
+
+![png](modeling_cost_functions_files/modeling_cost_functions_34_0.png)
+
 
 ### Summary
 
