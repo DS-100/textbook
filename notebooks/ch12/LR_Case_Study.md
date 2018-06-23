@@ -69,15 +69,15 @@ def minimize(cost_fn, grad_cost_fn, X, y, progress=True):
 
 ## Linear Regression Case Study
 
-In this section, we will perform an end-to-end case study of the application of a linear regression model to a dataset.
+In this section, we perform an end-to-end case study of the application of a linear regression model to a dataset.
 
 The dataset we will be working with is a record of the population and drinking data in various states. The dataset is from this website: http://people.sc.fsu.edu/~jburkardt/datasets/regression/x20.txt, with some properties of the dataset changed for didactical purposes.
 
-Our task in this section: fit a good linear regression model to this dataset in order to predict the cirrhosis death rate.
+Our task: predict the cirrhosis death rate using linear regression.
 
 ## Exploring the Dataset
 
-As in any data science project, we're going to begin by doing some exploratory data analysis.
+As in any data science project, we'll begin with exploratory data analysis.
 
 We'll start by reading in the dataset using `pandas`.
 
@@ -86,7 +86,7 @@ We'll start by reading in the dataset using `pandas`.
 drinking_data = pd.read_csv("drinking.csv")
 ```
 
-It's always a good idea to look at _how much_ data we have by looking at the number of columns and the number of rows in our dataset.
+It's always a good idea to look at _how much_ data we have by looking at the dimensions of the dataset. An example of how this might be useful: if our data has a large number of observations, it would not be a good idea to print out the whole dataframe.
 
 
 ```python
@@ -100,7 +100,7 @@ drinking_data.shape
 
 
 
-We have 46 rows of observations and 6 columns. The dataset is a pretty small one. Let's look at what columns we have available to us.
+The dataset is small, with only 46 rows of observations and 6 columns. Let's look at what columns we have available to us.
 
 
 ```python
@@ -116,7 +116,7 @@ drinking_data.columns.values
 
 
 
-But what do any of these column names mean? Looking at the documentation provided by the source of the dataset, we can create a table describing each column, sometimes referred to as a data dictionary:
+But what do any of these column names mean? Just looking at the column names is not enough because they may be unclear and our assumptions of what they mean can be wrong. Looking at the documentation provided by the source of the dataset, we can create a table describing each column, sometimes referred to as a data dictionary:
 
 | Column        | Description   
 | :------------- |:-------------|
@@ -370,7 +370,7 @@ drinking_data
 
 
 
-Let's deal with that pesky null value. We can use the `dropna` function for this purpose.
+Let's deal with that pesky null value. 
 
 
 ```python
@@ -497,7 +497,7 @@ plt.ylabel("Cirrhosis");
 ![png](LR_Case_Study_files/LR_Case_Study_25_0.png)
 
 
-This looks like a reasonably linear relationship.
+This looks like reasonably linear.
 
 
 ```python
@@ -512,7 +512,7 @@ plt.ylabel("Cirrhosis");
 ![png](LR_Case_Study_files/LR_Case_Study_27_0.png)
 
 
-It looks like we have an outlier for late births values. Late births and cirrhosis seem to have a pretty strong linear relationship, but because this point is not close to the linear trend at all, this outlier would negatively affect our linear regression model. Thus, we should take this row out of our dataset and investigate later whether this was an error in our dataset or an actual recorded value (not in this notebook). 
+It looks like we have an outlier for late births. Late births and cirrhosis seem to have a pretty strong linear relationship, but because this point is not close to the linear trend at all, this outlier would negatively affect our linear regression model. Thus, we should take this row out of our dataset. 
 
 Since we can easily see that this lates births value is less than 10, we can just filter our dataset by selecting only rows where late births is over 10.
 
@@ -697,10 +697,9 @@ def grad_mse_cost(thetas, X, y):
     return -2 / n * (X.T @ y  - X.T @ X @ thetas)
 ```
 
-In order to use the above functions, we need `X`, and `y`. `thetas` is actually set to be an array of all 1's in the body of the `minimize` function. We can get these from our dataframe. Remember that `X` and `y` have to be numpy matrices in order to be able to multiply them with `@` notation.
+In order to use the above functions, we need `X`, and `y`. These can both be obtained from our dataframe. Remember that `X` and `y` have to be numpy matrices in order to be able to multiply them with `@` notation.
 
-`X` consists of all columns of the dataframe except for the target column, `Cirrhosis`. Note that we also need to call `as_matrix()` so that `X` is a matrix.
-
+`X` consists of all columns of the dataframe except for the target column, `Cirrhosis`. 
 
 
 ```python
@@ -783,7 +782,7 @@ plt.ylabel('Error proportion');
 
 Looks like our linear model does pretty well when it predicts something higher than the actual value (it is usually within 25% of the correct value), but our model can do pretty abysmally when it predicts something lower than the actual value (there are a good number of error proportions around and above 30%). 
 
-As we can tell from the residual plot, our model is not excellent. We can hypothesize why our model is not doing well:
+As we can tell from the residual plot, our model is subpar. We can hypothesize why our model is not doing well:
 
 1) We don't have enough data (only 44 rows of observations)
 
