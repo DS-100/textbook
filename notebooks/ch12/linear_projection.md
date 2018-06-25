@@ -20,7 +20,7 @@ We also mentioned that least squares linear regression can be solved analyticall
 
 ## Case Study
 
-We've been tasked with finding a good linear model and a rigorous argument for how we know that our model is sound, using the following data:
+We've been tasked with finding a good linear model for the below data:
 
 | x | y |
 | - |:-|
@@ -40,18 +40,11 @@ data = pd.DataFrame(
     columns=['x', 'y']
 )
 
-sns.regplot(x='x', y='y', data=data, ci=None)
+sns.regplot(x='x', y='y', data=data, ci=None, fit_reg=False);
 ```
 
 
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x1111584e0>
-
-
-
-
-![png](linear_projection_files/linear_projection_6_1.png)
+![png](linear_projection_files/linear_projection_6_0.png)
 
 
 Assume that the best model is one with the least error, and that the least squared error is an acceptable measure.
@@ -80,6 +73,25 @@ L(\hat{\theta}, \vec{x}, \vec{y})
 \end{aligned}
 $$
 
+
+```python
+# HIDDEN
+data = pd.DataFrame(
+    [
+        [3,2],
+        [0,1],
+        [-1,-2]
+    ],
+    columns=['x', 'y']
+)
+
+sns.regplot(x='x', y='y', data=data, ci=None);
+```
+
+
+![png](linear_projection_files/linear_projection_8_0.png)
+
+
 In our data set, n = 3, so let's expand out this equation by breaking up the summation.
 
 $$
@@ -106,15 +118,28 @@ L(\hat{\theta}, \vec{x}, \vec{y})
 \end{aligned}
 $$
 
-Notice that our loss function is a sum of squares. Now, notice that the *L2*-norm for a vector has a similar form: 
+Notice that our loss function is a sum of squares. Also, notice that the *L2*-norm for a vector has a similar form: 
 
 $$\Vert \vec{v} \Vert = \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}$$ 
 
-So if we can express each $y_i - \begin{bmatrix} 1 & x_i \end{bmatrix}
+If we let $y_i - \begin{bmatrix} 1 & x_i \end{bmatrix}
 \begin{bmatrix} 
      \hat{\theta_0} \\
      \hat{\theta_1}
-\end{bmatrix}$ as a vector, we can express our loss as the *L2*-norm, squared:
+\end{bmatrix} = v_i$: 
+$$
+\begin{aligned}
+L(\hat{\theta}, \vec{x}, \vec{y}) 
+&= v_1^2 + v_2^2 + \dots + v_n^2 \\
+&= \Vert \vec{v} \Vert^2
+\end{aligned}
+$$
+
+This means our loss can be expressed as the *L2* norm of some vector $v$, squared. To get the components $v_i$ to equal $y_i - \begin{bmatrix} 1 & x_i \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_0} \\
+     \hat{\theta_1}
+\end{bmatrix} \forall i \in [1,3]$:
 
 $$ 
 \begin{aligned}
@@ -144,18 +169,21 @@ X
 \end{aligned}
 $$
 
+The matrix multiplication $\begin{bmatrix} 1 & x_1 \\ 1 & x_2 \\ 1 & x_3 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_0} \\
+     \hat{\theta_1}
+\end{bmatrix}$ is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$--this perspective shows us that $\hat{y}$ is a linear combination of the features of our data.
+
 This gives us a new perspective on what it means to minimize the least squares error.
 
-
-$X$ and $\vec{y}$ are fixed, but $\hat{\theta_0}$ and $\hat{\theta_1}$ can take on any value, so there are *infinite possible vectors* created by matrix multiplying $X$ and $\hat{\theta}$. To have the smallest loss, we want to choose $\hat{\theta_0}$ and $\hat{\theta_1}$ such that the resulting vector is as close to $\vec{y}$ as possible. This is the same underlying logic as before: find the smallest squared distance; but between two vectors $\vec{y}$ and $\vec{\hat{y}}$, rather than considering the indefinite number of data points. Lastly, notice that the matrix multiplication is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$--this perspective shows us that our $\hat{y}$ is a linear combination of the features of our data. Let's get some geometric intuition on these observations.
-
-
+$X$ and $\vec{y}$ are fixed, but $\hat{\theta_0}$ and $\hat{\theta_1}$ can take on any value, so $\hat{y}$ can take on any of the infinite linear combinations of the columns of $X$. To have the smallest loss, we want to choose $\hat{\theta_0}$ and $\hat{\theta_1}$ such that the resulting vector is as close to $\vec{y}$ as possible.
 
 ## Geometrical Intuition
 
-Multiplying $X$ and $\hat{\theta}$ represents adding scalar multiples of the columns of $X$: $\vec{x}$ and $\vec{1}$, resulting in a linear combination. Here is an intuition:
+Now, let's develop an intuition for what it means for the columns of $X$ to span a vector space, and why it matters that $\hat{y}$ is restricted to this vector space.
 
-Let's take two generic vectors, $\vec{x}$ and $\vec{1}$, colored black. We use red to represent the new vector we are adding, and blue for the older linear combinations.
+Let $\vec{x}$ and $\vec{1}$ by two generic vectors, colored black. As we take linear combinations, we will use red for each new vector.
 
 
 ```python
@@ -169,7 +197,7 @@ plt.show()
 ```
 
 
-![png](linear_projection_files/linear_projection_12_0.png)
+![png](linear_projection_files/linear_projection_13_0.png)
 
 
 When $\hat{\theta_0} = 2$ and $\hat{\theta_1} = 0.5$, we add half of $x$ with two times the unit vector, resulting in a new vector.
@@ -186,7 +214,7 @@ plt.show()
 ```
 
 
-![png](linear_projection_files/linear_projection_14_0.png)
+![png](linear_projection_files/linear_projection_15_0.png)
 
 
 When $\hat{\theta_0} = 3$ and $\hat{\theta_1} = -1$, we add $3$ times the unit vector to $-1$ times $x$, resulting in yet another vector.
@@ -203,7 +231,7 @@ plt.show()
 ```
 
 
-![png](linear_projection_files/linear_projection_16_0.png)
+![png](linear_projection_files/linear_projection_17_0.png)
 
 
 With $\hat{\theta_0} = -2$ and $\hat{\theta_1} = -1$, we get:
@@ -220,7 +248,7 @@ plt.show()
 ```
 
 
-![png](linear_projection_files/linear_projection_18_0.png)
+![png](linear_projection_files/linear_projection_19_0.png)
 
 
 With $\hat{\theta_0} = -4$ and $\hat{\theta_1} = 1$, we get:
@@ -237,31 +265,46 @@ plt.show()
 ```
 
 
-![png](linear_projection_files/linear_projection_20_0.png)
+![png](linear_projection_files/linear_projection_21_0.png)
 
 
-This process can go on and on, showing that when we can use any scalar multiples, we can make an infinite number of linear combinations. However, infinite does not mean any--the linear combinations span a space defined by the original vectors. In this case, we would create a plane as you can start to see above. Formally, this illustrates how vectors $\vec{x}$ and $\vec{1}$ span a vector space.
+This process can go on and on, showing that when we can use any scalar multiples, we can make an infinite number of linear combinations. However, infinite does not mean any--the linear combinations span a space defined by the original vectors. In this case, we would create a plane as you can start to see above. However, if we had more explanatory variables, the columns of $X$ would create higher dimensional vector spaces.
 
-Recall:
-- our scatter plot
-- $X$ and $\vec{y}$ are defined by the data
-- our loss value is the L2 norm of $y-X \hat{\theta}$, squared. 
+Formally, this illustrates how vectors $\vec{x}$ and $\vec{1}$ span a vector space.
 
-By inspection, we see that no line can perfectly fit our points, so we cannot achieve 0 loss. Thus, we know that $\vec{y}$ is not in the plane spanned by $\vec{x}$ and $\vec{1}$.
+Back to linear regression, $\hat{y} = X \hat{\theta}$, and is thus the restricted to the vector space spanned by the columns of X. Let's look at the significance of these facts.
 
-Visually,
+As a reminder, here is our loss function and scatter plot:
+
+$$L(\hat{\theta}, \vec{x}, \vec{y}) \quad = \quad \left \Vert  \quad  
+\vec{y} 
+\quad - \quad 
+X \hat{\theta}
+\quad \right \Vert ^2$$
+
+
+```python
+# HIDDEN
+sns.regplot(x='x', y='y', data=data, ci=None, fit_reg=False);
+```
+
+
+![png](linear_projection_files/linear_projection_24_0.png)
+
+
+By inspection, we see that no line can perfectly fit our points, so we cannot achieve 0 loss. Thus, we know that $\vec{y}$ is not in the plane spanned by $\vec{x}$ and $\vec{1}$, represented as a parallelogram below.
 
 <img src="../../notebooks-images/linear_projection1.png" width="500" />
 
-Since our error is based on distance, we can see that to minimize $ L(\hat{\theta}, \vec{x}, \vec{y}) = \left \Vert  \vec{y} - X \hat{\theta} \right \Vert ^2$, we want $X \hat{\theta}$ to be as close to $\vec{y}$ as possible.
+Since our error is based on distance, we can see that to minimize $ L(\hat{\theta}, \vec{x}, \vec{y}) = \left \Vert  \vec{y} - \hat{y} \right \Vert ^2$, we want $\hat{y}$ to be as close to $\vec{y}$ as possible.
 
-Mathematically, we are looking for the projection of $\vec{y}$ onto the vector space spanned by the columns of $X$ because the projection $\hat{y}$ has the property of being the closest point in the vector space to the vector $y$.
+Mathematically, we are looking for the projection of $\vec{y}$ onto the vector space spanned by the columns of $X$, because $\hat{y}$ must be inside the vector space, and the projection of $\vec{y}$ has the property of being the closest point in the vector space to the vector $y$. Thus, choosing $\hat{\theta}$ such that $X \hat{\theta} = \hat{y} = proj_{spanX} \quad y$ is the best solution.
 <img src="../../notebooks-images/linear_projection2.png" width="500" />
 
 To see why, consider other points on the vector space, in purple.
 <img src="../../notebooks-images/linear_projection3.png" width="500" />
 
-By the Pythagorean Theorem, any other point on the plane is farther from $\vec{y}$ than $\hat{y}$ is. The longer the distance, the higher the least squared error. Thus, the length of the perpendicular represents the least squared error.
+By the Pythagorean Theorem, any other point on the plane is farther from $\vec{y}$ than $\hat{y}$ is. The length of the perpendicular corresponding to $\hat{y}$ represents the least squared error.
 
 ## Linear Algebra
 
@@ -283,7 +326,7 @@ Left-multiplying both sides by $X^T$:
 
 $$X^T X  \hat{\theta^*} + X^T \vec{e} = X^T \vec{y}$$
 
-But since $\vec{e}$ is perpendicular to the columns of $X$, $X^T \vec{e}$ is a column vector of $0$'s. Thus, we arrive at the Normal Equation:
+Since $\vec{e}$ is perpendicular to the columns of $X$, $X^T \vec{e}$ is a column vector of $0$'s. Thus, we arrive at the Normal Equation:
 
 $$X^T X  \hat{\theta^*} = X^T \vec{y}$$
 
@@ -293,7 +336,7 @@ $$\hat{\theta^*} = (X^T X)^{-1} X^T \vec{y}$$
 
 ## Finishing up the Case Study
 
-Let's return to our case study and apply what we've learned, and explain to our client why our solution is sound.
+Let's return to our case study and apply what we've learned, and explain why our solution is sound
 
 $$
 \vec{y} = \begin{bmatrix} 2 \\ 1 \\ -2  \end{bmatrix} \qquad X = \begin{bmatrix} 1 & 3 \\ 1 & 0 \\ 1 & -1 \end{bmatrix}
