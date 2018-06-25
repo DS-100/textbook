@@ -217,23 +217,23 @@ drinking_data.head()
 
 
 
-Although we cannot see any null values from the first 5 rows of the dataset, there may be some present in our dataset that we will need to deal with. We can write code to loop through every column of the dataset and tell us if there are null values present using the pandas `isnull` function.
+Although we cannot see any null values from the first 5 rows of the dataset, there may be some present in our dataset that we will need to deal with. We can write code to tell us if there are null values present using the pandas `isnull` function.
 
 
 ```python
-for cname in drinking_data.columns.values:
-    column = drinking_data[cname] # Get the column corresponding to that column name
-    null_mask = column.isnull() # Get a mask that is True if there is a null value present, False otherwise
-    nulls_series = column[null_mask] # Get only values where the null value was detected
-    if len(nulls_series) > 0: # If a null value was detected
-        print(nulls_series)
+num_nulls = drinking_data.isnull().sum(axis=1) # summing over axis = 1 tells us the number of null values per row
+num_nulls[num_nulls > 0]
 ```
 
-    35   NaN
-    Name: Urban population (percentage), dtype: float64
-    
 
-It appears that there is a null value present in row 35 of our dataset in the `Urban population (percentage)` column. Let's examine that row more closely:
+
+
+    35    1
+    dtype: int64
+
+
+
+It appears that there is a null value present in row 35 of our dataset. Let's examine that row more closely:
 
 
 ```python
@@ -742,21 +742,19 @@ Looks like gradient descent converged to those theta values! Thus, our linear mo
 
 $y = -11.19 + 0.14x_1 + 1.16x_2 + 1.81x_3 - 0.05x_4$
 
-Let's compare this equation that we obtained to the one we would get if we had used `sklearn`'s LinearRegression model instead.
+Let's compare this equation that we obtained to the one we would get if we had used `sklearn`'s LinearRegression model instead. The LinearRegression model automatically includes a column of all 1's in our data, so we can get rid of our column of 1's when we pass `X` into the `fit` function.
 
 
 ```python
 model = LinearRegression()
-model.fit(X, y)
-model.coef_
+model.fit(X[:, 1:], y)
+print("Coefficients", model.coef_)
+print("Intercept", model.intercept_)
 ```
 
-
-
-
-    array([ 0.  ,  0.14,  1.16,  1.81, -0.05])
-
-
+    Coefficients [ 0.14  1.16  1.81 -0.05]
+    Intercept -11.1877734159
+    
 
 The coefficients look pretty similar! Our homemade functions create the same model as an established Python package!
 
