@@ -99,7 +99,7 @@ Simplifiying some more: (Note that $\mathbb{E}[h(z)] = h(z)$ because $h(z)$ is a
 
 $$ =\mathbb{E}[h(z)^2 + 2h(z) \epsilon + \epsilon^2] - (2h(z) + \mathbb{E}[2\epsilon]) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)^2]$$ 
 
-Applyling linearity of expectation again:
+Applying linearity of expectation again:
 
 $$= h(z)^2 + 2h(z)\mathbb{E}[\epsilon] + \mathbb{E}[\epsilon^2] - (2h(z) + 2\mathbb{E}[\epsilon]) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)^2]$$   
 
