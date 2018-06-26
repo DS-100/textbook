@@ -75,7 +75,7 @@ R(f_\hat{\theta}) = (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 + \text{Var}
 \end{aligned}
 $$
 
-The first term in this expression, $ (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 $, is a mathematical expression for the bias of the model. (Technically, this term represents the biased squared, $\text{bias}^2$). The bias is equal to zero if in the long run our choice of model $ f_\hat{\theta}(z) $ predicts the same outcomes produced by the population process $ f_\theta(z) $. The bias is high if our choice of model makes poor predictions of the population process even when we have the entire population as our dataset.
+The first term in this expression, $ (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 $, is a mathematical expression for the bias of the model. (Technically, this term represents the bias squared, $\text{bias}^2$.) The bias is equal to zero if in the long run our choice of model $ f_\hat{\theta}(z) $ predicts the same outcomes produced by the population process $ f_\theta(z) $. The bias is high if our choice of model makes poor predictions of the population process even when we have the entire population as our dataset.
 
 The second term in this expression, $ \text{Var}(f_\hat{\theta}(z)) $, represents the model variance. The variance is low when the model's predictions don't change much when the model is trained on different datasets from the population. The variance is high when the model's predictions change greatly when the model is trained on different datasets from the population.
 
@@ -97,7 +97,7 @@ $$ =\mathbb{E}[(h(z) + \epsilon)^2] - \mathbb{E}[2(h(z) + \epsilon)] \mathbb{E}[
 Simplifiying some more: (Note that $\mathbb{E}[h(z)] = h(z)$ because $h(z)$ is a deterministic function.)   
 
 
-$$ =\mathbb{E}[h(z)^2 -2h(z) \epsilon + \epsilon^2] - (2h(z) + \mathbb{E}[2\epsilon]) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)^2]$$ 
+$$ =\mathbb{E}[h(z)^2 -2h(z) \epsilon + \epsilon^2] - (2h(z) + \mathbb{E}[2\epsilon]) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)^2]$$
 
 $$= h(z)^2 + 2h(z)\mathbb{E}[\epsilon] + \mathbb{E}[\epsilon^2] - (2h(z) + 2\mathbb{E}[\epsilon]) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)^2]$$   
 
@@ -111,7 +111,7 @@ $$ = h(z)^2 + \text{Var}(\epsilon) - 2h(z) \mathbb{E}[f_{\hat{\theta}}(z)] + \ma
 
 Because $ \mathbb{E}[f_{\hat{\theta}}(z)^2] -  \mathbb{E}[f_{\hat{\theta}}(z)]^2 = Var(f_{\hat{\theta}}(z))$:
 
-$$ =  h(z)^2 - 2h(z) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)]^2 + Var(f_{\hat{\theta}}(z)) + \text{Var}(\epsilon)$$ 
+$$ =  h(z)^2 - 2h(z) \mathbb{E}[f_{\hat{\theta}}(z)] + \mathbb{E}[f_{\hat{\theta}}(z)]^2 + Var(f_{\hat{\theta}}(z)) + \text{Var}(\epsilon)$$
 
 
 
@@ -183,6 +183,8 @@ plt.title('One set of observed data');
 
 Suppose we draw many sets of data from the population and fit a simple linear model, to each one. Below, we plot the population data generation scheme in blue and the model predictions in green.
 
+Suppose we draw many sets of data from the population and fit a simple linear model to each one. Below, we plot the population data generation scheme in blue and the model predictions in green.
+
 
 ```python
 # HIDDEN
@@ -226,7 +228,7 @@ The variance of our model is the variation of the model predictions around the l
 plt.figure(figsize=(8, 5))
 for x_start, x_end, y_start, y_end in random_lines:
     plt.plot([x_start, x_end], [y_start, y_end], linewidth=1, c='g', alpha=0.8)
-    
+
 plt.plot([avg_line.x_start, avg_line.x_end],
          [avg_line.y_start, avg_line.y_end],
          linewidth=4, c='r')
@@ -257,15 +259,15 @@ plt.title('Irreducible error');
 
 ## Bias-Variance In Practice
 
-In practice, we do not know the population data generation process and thus are unable to precisely determine a model's bias, variance, or irreducible error. Instead, we use our observed dataset as an approximation to the population. 
+In practice, we do not know the population data generation process and thus are unable to precisely determine a model's bias, variance, or irreducible error. Instead, we use our observed dataset as an approximation to the population.
 
 As we have seen, however, achieving a low training error does not necessarily mean that our model will have a low test error as well. Fundamentally, this occurs because training error reflects the bias of our model but not the variance; the test error reflects both. In order to minimize test error, our model needs to simultaneously achieve low bias and low variance. There is always a always a trade-off between these two values. It is easy to obtain a model with extremely low bias but high variance (by fitting a curve that passes through every training observation), or a model with very low variance but high bias (by fitting a horizontal line to the data). The challenge lies in finding a model for which both the variance and the  bias are low.
 
 Cross-validation provides a more accurate method of estimating our model error using a single observed dataset by separating data used for training from the data used for model selection and final accuracy. Intuitively, the validation or test error checks the model's performance on a previously unseen dataset and thus allows us to estimate both bias and variance. To choose the final model to use, we select the one that has the lowest validation error.
 
-The simplest form of cross-validation is the **holdout method**. This involves splitting the dataset into a training set and validation set. The model is fit on the training set and then is used to predict the unseen values in the validation set. This allows us to judge the generalization error by using an independent sample of data, measuring both the model bias and variance. This method is better than just having a training/test split, and doesn't take any overhead to compute. However, the holdout method is prone to high variance, because the evaluation of the error may depend heavily on which points end up in the training and validation sets. 
+The simplest form of cross-validation is the **holdout method**. This involves splitting the dataset into a training set and validation set. The model is fit on the training set and then is used to predict the unseen values in the validation set. This allows us to judge the generalization error by using an independent sample of data, measuring both the model bias and variance. This method is better than just having a training/test split, and doesn't take any overhead to compute. However, the holdout method is prone to high variance, because the evaluation of the error may depend heavily on which points end up in the training and validation sets.
 
-To tackle this problem, we can run the holdout method multiple times on the same dataset. The dataset is divided into *k* subsets, and the holdout method is repeated k times. Each time, one of the *k* subsets is used as the validation set, and the other *k-1* subsets are combined and used as the training set. The validation error is computed as the average error from all *k* trials. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once, and for training *k-1* times. Typically, a *k* between 5 to 10 is used, but *k* remains an unfixed parameter. The smaller *k* is, the fewer computations one has to do. Also, the error estimate has a lower variance (many validation points), but has a higher bias (fewer training points). Vice versa, with large *k*, there are more computations, and the error estimate will have lower bias, but have higher variance. K-fold cross-validation outputs a prediction error that more accurately reflects the bias and variance of a model. The model bias is the validation error. If this value is low, this means that your model predicts values with low error on average. The model variance can be estimated by taking the standard deviation of the errors in each of the *k* trials. If the value is high, it means that the model's performance varies a lot with the dataset used for training. 
+To tackle this problem, we can run the holdout method multiple times on the same dataset. The dataset is divided into *k* subsets, and the holdout method is repeated k times. Each time, one of the *k* subsets is used as the validation set, and the other *k-1* subsets are combined and used as the training set. The validation error is computed as the average error from all *k* trials. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once, and for training *k-1* times. Typically, a *k* between 5 to 10 is used, but *k* remains an unfixed parameter. The smaller *k* is, the fewer computations one has to do. Also, the error estimate has a lower variance (many validation points), but has a higher bias (fewer training points). Vice versa, with large *k*, there are more computations, and the error estimate will have lower bias, but have higher variance. K-fold cross-validation outputs a prediction error that more accurately reflects the bias and variance of a model. The model bias is the validation error. If this value is low, this means that your model predicts values with low error on average. The model variance can be estimated by taking the standard deviation of the errors in each of the *k* trials. If the value is high, it means that the model's performance varies a lot with the dataset used for training.
 
 
 
@@ -273,15 +275,28 @@ To tackle this problem, we can run the holdout method multiple times on the same
 
 The bias-variance tradeoff allows us to more precisely describe the modeling phenomena that we have seen thus far.
 
-Underfitting is typically caused by too much bias; overfitting is typically caused by too much variance.
+Underfitting is typically caused by too much bias; overfitting is typically caused by too much model variance.
 
-Collecting more data reduces variance. One recent trend is to select a model with low bias and high intrinsic variance (e.g. a neural network) and collect many data points so that the model variance is low enough to make accurate predictions. While effective in practice, collecting enough data for these models tends to require large amounts of time and money.
+Collecting more data reduces variance. For example, the model variance of linear regression goes down by a factor of $ 1
+/n $, where $ n $ is the number of data points. Thus, doubling the dataset size halves the model variance, and collecting many data points will cause the variance to approach 0. One recent trend is to select a model with low bias and high intrinsic variance (e.g. a neural network) and collect many data points so that the model variance is low enough to make accurate predictions. While effective in practice, collecting enough data for these models tends to require large amounts of time and money.
 
 Collecting more data reduces bias if the model can fit the population process exactly. If the model is inherently incapable of modeling the population (as in the example above), even infinite data cannot get rid of model bias.
 
 Adding a useful feature to the data, such as a quadratic feature when the underlying process is quadratic, reduces bias. Adding a useless feature rarely increases bias.
 
-Adding a feature, whether useful or not, typically increases model variance. In order to increase a model's prediction accuracy, a new feature should decrease bias more than it increases variance.
+Adding a feature, whether useful or not, typically increases model variance since each new feature adds a parameter to the model. Generally speaking, models with many parameters have many possible combinations of parameters and therefore have higher variance than models with few parameters. In order to increase a model's prediction accuracy, a new feature should decrease bias more than it increases variance.
+
+Removing features will typically increase bias and can cause underfitting. For example, a simple linear model has higher model bias than the same model with a quadratic feature added to it. If the data were generated from a quadratic phenomenon, the simple linear model underfits the data.
+
+In the plot below, the X-axis measures model complexity and the Y-axis measures magnitude. Notice  how as model complexity increases, model bias strictly decreases and model variance strictly increases. As we choose more complex models, the test error first decreases then increases as the increased model variance outweighs the decreased model bias.
+
+![bias_modeling_bias_var_plot.png](https://raw.githubusercontent.com/DS-100/textbook/master/assets/bias_modeling_bias_var_plot.png)
+
+As the plot shows, a model with high complexity can achieve low training error but can fail to generalize to the test set because of its high model variance. On the other hand, a model with low complexity will have low model variance but can also fail to generalize because of its high model bias. To select a useful model, we must strike a balance between model bias and variance.
+
+As we add more data, we shift the curves on our plot to the right and down, reducing bias and variance:
+
+![bias_modeling_bias_var_shiftt.png](https://raw.githubusercontent.com/DS-100/textbook/master/assets/bias_modeling_bias_var_shift.png)
 
 ## Summary
 
