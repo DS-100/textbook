@@ -75,7 +75,7 @@ R(f_\hat{\theta}) = (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 + \text{Var}
 \end{aligned}
 $$
 
-The first term in this expression, $ (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 $, is a mathematical expression for the bias of the model. (Technically, this term represents the biased squared, $\text{bias}^2$.) The bias is equal to zero if in the long run our choice of model $ f_\hat{\theta}(z) $ predicts the same outcomes produced by the population process $ f_\theta(z) $. The bias is high if our choice of model makes poor predictions of the population process even when we have the entire population as our dataset.
+The first term in this expression, $ (\mathbb{E}[f_\hat{\theta}(z)] - f_\theta(z))^2 $, is a mathematical expression for the bias of the model. (Technically, this term represents the bias squared, $\text{bias}^2$.) The bias is equal to zero if in the long run our choice of model $ f_\hat{\theta}(z) $ predicts the same outcomes produced by the population process $ f_\theta(z) $. The bias is high if our choice of model makes poor predictions of the population process even when we have the entire population as our dataset.
 
 The second term in this expression, $ \text{Var}(f_\hat{\theta}(z)) $, represents the model variance. The variance is low when the model's predictions don't change much when the model is trained on different datasets from the population. The variance is high when the model's predictions change greatly when the model is trained on different datasets from the population.
 
@@ -241,7 +241,7 @@ Adding a feature, whether useful or not, typically increases model variance sinc
 
 Removing features will typically increase bias and can cause underfitting. For example, a simple linear model has higher model bias than the same model with a quadratic feature added to it. If the data were generated from a quadratic phenomenon, the simple linear model underfits the data.
 
-In the plot below, the X-axis measures model complexity and the Y-axis measures magnitude. Notice  how as model complexity increases, model bias strictly decreases and model variance strictly increases. The test error decreases at first, but after the model reaches a certain complexity, starts increasing. 
+In the plot below, the X-axis measures model complexity and the Y-axis measures magnitude. Notice  how as model complexity increases, model bias strictly decreases and model variance strictly increases. As we choose more complex models, the test error first decreases then increases as the increased model variance outweighs the decreased model bias.
 
 ![bias_modeling_bias_var_plot.png](https://raw.githubusercontent.com/DS-100/textbook/master/assets/bias_modeling_bias_var_plot.png)
 
