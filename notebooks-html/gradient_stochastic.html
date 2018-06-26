@@ -1,0 +1,196 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch11/gradient_stochastic.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch11&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
+<span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;total_bill&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">grad_mse_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="A-Brief-Review">A Brief Review<a class="anchor-link" href="#A-Brief-Review">&#182;</a></h2><p>We initially modeled the tips dataset by heuristically calculating the $\hat\theta$ that minimized the MSE cost function, $L(\hat\theta, y) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat\theta)^2$. This involved taking the derivative of the MSE, setting it to zero, and solving for $\hat\theta$. We found that the MSE-minimizing $\hat\theta$ value was simply the mean of the $y$ values in our dataset.</p>
+<p>But for more complicated models and cost functions, there may not be simple algebraic expressions that yield the cost-minimizing $\hat\theta$ values. Our solution was a new method called gradient descent, which iteratively updates $\hat\theta$ until it doesn't change between iterations. To complete an iteration of gradient descent, we calculate the following:</p>
+<p>$$
+\hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \nabla_{\hat\theta} L(\hat\theta, y)
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Limitations-of-Gradient-Descent">Limitations of Gradient Descent<a class="anchor-link" href="#Limitations-of-Gradient-Descent">&#182;</a></h2><p>Often, we calculate $\nabla_{\hat\theta}L(\hat\theta, y)$ using the average gradient of the loss function $l(\hat\theta, y_i)$ across the entire dataset as a single batch. For this reason, this gradient update rule is often referred to as <strong>batch gradient descent</strong>.</p>
+<p>For example, the gradient of the MSE cost first requires us to find the gradient of the squared loss, $\nabla_{\hat\theta} l(\hat\theta, y_i) = -2 (y_i - \hat\theta)$, for each of the $n$ observations in our dataset. We then compute the average of these results. This is shown below:</p>
+<p>$$
+\begin{align}
+\nabla_{\hat\theta} L(\hat\theta, y) &amp;= -\frac{2}{n} \sum_{i=1}^{n}(y_i - \hat\theta) \\
+&amp;= \frac{1}{n} \sum_{i=1}^{n}-2(y_i - \hat\theta) \\
+&amp;= \frac{1}{n} \sum_{i=1}^{n} \nabla_{\hat\theta} l(\hat\theta, y_i)
+\end{align}
+$$</p>
+<p>This process is then repeated at each iteration $t$ of the gradient descent algorithm. For large $n$, this can become a computationally expensive problem to solve.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Stochastic-Gradient-Descent">Stochastic Gradient Descent<a class="anchor-link" href="#Stochastic-Gradient-Descent">&#182;</a></h2><p>To circumvent the difficulty of computing a gradient across the entire training set, <strong>stochastic gradient descent</strong> approximates the overall gradient using a single randomly chosen data point. Since the observation is chosen randomly, we expect that using the gradient at each individual observation will eventually converge the algorithm to the same parameters as batch gradient descent. The general update formula for stochastic gradient descent is below, where $l(\hat\theta, y_i)$ is the loss function for a single data point:</p>
+<p>$$
+\hat\theta_{t+1} = \hat\theta_t - \alpha \nabla_\hat\theta l(\hat\theta, y_i)
+$$</p>
+<p>Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point.</p>
+<p>$$
+\begin{align}
+\nabla_{\hat\theta}L(\hat\theta, y) &amp;\approx \nabla_{\hat\theta} l(\hat\theta, y_i) \\
+&amp;= -2(y_i - \hat\theta)
+\end{align}
+$$</p>
+<p>Stochastic gradient descent relies on the random selection of individual observations. This is statistically founded, since the randomness means that $E[\nabla_{\hat\theta}l(\hat\theta, y_i)] = \nabla_{\hat\theta}L(\hat\theta, y)$. In practice, we choose these random data points by shuffling the training data and iteratively selecting from the shuffled data. An iteration through the shuffled data is called an <strong>epoch</strong>; at the end of every epoch, we re-shuffle the data to ensure that the model sees examples from various classes in an arbitrary order.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Visualizing-Stochastic-Gradient-Descent">Visualizing Stochastic Gradient Descent<a class="anchor-link" href="#Visualizing-Stochastic-Gradient-Descent">&#182;</a></h3><p>Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.</p>
+<p><img src="gd.png" alt="">
+<img src="sgd.png" alt=""></p>
+<p>At each iteration of batch gradient descent, we move in the direction of the true gradient of the cost function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\hat\theta$ parameters eventually converge to the minima of the cost function. Surprisingly, stochastic gradient descent often converges more quickly than batch gradient descent in practice since stochastic gradient descent spends significantly less time updating model parameters.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Defining-a-Function-for-Stochastic-Gradient-Descent">Defining a Function for Stochastic Gradient Descent<a class="anchor-link" href="#Defining-a-Function-for-Stochastic-Gradient-Descent">&#182;</a></h3><p>As we previously did for batch gradient descent, we would like to define a function that computes the stochastic gradient descent of the cost function. It will be similar to our <code>minimize</code> function, but we will need to implement the random selection of one observation at each iteration.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize_sgd</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses stochastic gradient descent to minimize cost_fn.</span>
+<span class="sd">    Returns the minimizing value of theta once theta changes</span>
+<span class="sd">    less than 0.001 between iterations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NUM_OBS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">NUM_OBS</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta:.2f}</span><span class="s1"> | cost: {cost_fn(theta, dataset):.2f}&#39;</span><span class="p">)</span>
+            <span class="n">rand_obs</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">rand_obs</span><span class="p">)</span>
+            <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gradient</span>
+        
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_theta</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">new_theta</span>
+        
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Mini-batch-Gradient-Descent">Mini-batch Gradient Descent<a class="anchor-link" href="#Mini-batch-Gradient-Descent">&#182;</a></h2><p><strong>Mini-batch gradient descent</strong> strikes a balance between batch gradient descent and stochastic gradient descent by increasing the number of observations that we select at each iteration. In mini-batch gradient descent, we take a simple random sample of observations called a mini-batch. We use the average of the gradients of their loss functions to construct an estimate of the true gradient of the cross entropy cost. Since our sample is randomly selected, the expectation of this estimate is equal to the true gradient. This is illustrated in the approximation for the gradient of the cost function, where $\mathcal{B}$ is the mini-batch of data points that we randomly sample from the $n$ observations.</p>
+<p>$$
+\nabla_\hat\theta L(\hat\theta, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\hat\theta}l(\hat\theta, y_i)
+$$</p>
+<p>As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.</p>
+<p>While we have made the distinction between stochastic and mini-batch gradient descent, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size.</p>
+<h3 id="Selecting-the-Mini-Batch-Size">Selecting the Mini-Batch Size<a class="anchor-link" href="#Selecting-the-Mini-Batch-Size">&#182;</a></h3><p>Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations.</p>
+<h3 id="Defining-a-Function-for-Mini-Batch-Gradient-Descent">Defining a Function for Mini-Batch Gradient Descent<a class="anchor-link" href="#Defining-a-Function-for-Mini-Batch-Gradient-Descent">&#182;</a></h3><p>A function for mini-batch gradient descent requires the ability to select a batch size. Below is a function that implements this feature.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize_mini_batch</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">minibatch_size</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses mini-batch gradient descent to minimize cost_fn.</span>
+<span class="sd">    Returns the minimizing value of theta once theta changes</span>
+<span class="sd">    less than 0.001 between iterations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NUM_OBS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">minibatch_size</span> <span class="o">&lt;</span> <span class="n">NUM_OBS</span>
+    
+    <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">NUM_OBS</span><span class="p">,</span> <span class="n">minibatch_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta:.2f}</span><span class="s1"> | cost: {cost_fn(theta, dataset):.2f}&#39;</span><span class="p">)</span>
+            
+            <span class="n">mini_batch</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">minibatch_size</span><span class="p">]</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">mini_batch</span><span class="p">)</span>
+            <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gradient</span>
+            
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_theta</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">new_theta</span>
+            
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We use batch gradient descent to iteratively improve model parameters until the model achieves low cost. Since batch gradient descent is computationally intractable with large datasets, we often use stochastic gradient descent to fit models instead. With a GPU, mini-batch gradient descent can converge more quickly than stochastic gradient descent.</p>
+<p>Although stochastic gradient descent typically takes more individual updates to converge than batch gradient descent, stochastic gradient descent often converges more quickly because it computes updates faster.</p></div></div></div></div>

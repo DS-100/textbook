@@ -11,36 +11,44 @@ import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual
 import nbinteract as nbi
 
+from sklearn.linear_model import SGDClassifier
+from sklearn.datasets import load_iris
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.model_selection import train_test_split
+
 sns.set()
 sns.set_context('talk')
 np.set_printoptions(threshold=20, precision=2, suppress=True)
 pd.options.display.max_rows = 7
 pd.options.display.max_columns = 8
 pd.set_option('precision', 2)
+np.random.seed(42)
 ```
 
-## Limitations of Gradient Descent
+## Gradient Descent in Logistic Regression
 
-We have previously introduced gradient descent as a general-purpose algorithm used to find model parameters $ \hat\theta $ that minimize a specified cost function $ L(\hat\theta, X, y) $. To perform an iteration of gradient descent, we compute:
+Previously, we covered batch gradient descent, an algorithm that iteratively updates $\hat\theta$ to find the cost-minimizing parameters. We also discussed stochastic gradient descent and mini-batch gradient descent, methods that take advantage of statistical theory and parallelized hardware to decrease the time spent training the gradient descent algorithm. In this section, we will apply these concepts specifically to logistic regression and walk through examples using scikit-learn functions.
+
+### Batch Gradient Descent
+
+The general update formula for batch gradient descent is given by:
 
 $$
 \hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \nabla_\hat\theta L(\hat\theta, X, y)
 $$
 
-
-Since $ L(\hat\theta, X, y) $ computes an average cost across an entire dataset, this gradient update equation computes a gradient using the average gradient across the entire dataset as a single batch. For this reason, this gradient update rule is often referred to as **batch gradient descent**.
-
-For example, in logistic regression we use the cross entropy cost as our cost function. We replace  $\nabla_\hat\theta L(\hat\theta, X, y)$ with the gradient of the cross entropy cost, $-\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i$, to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $, this becomes:
+In logistic regression, we use the cross entropy cost as our cost function. $\nabla_\hat\theta L(\hat\theta, X, y)$ is then the gradient of the cross entropy cost, $-\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i$; plugging this in allows us to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $, this becomes:
 
 $$
-\hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right)
+\begin{align}
+\hat\theta_{t+1} &= \hat\theta_t - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right) \\
+&= \hat\theta_t + \alpha \cdot \left(\frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right)
+\end{align}
 $$
 
-To find the gradient of the cross entropy cost, we first compute the gradient of the cross entropy loss, $-(y_i - \sigma_i)X_i$, for all $n$ observations. Then we take the average over all observations to find the gradient of the cross entropy cost. This is then computed at each iteration $t$ of the gradient descent algorithm. For large $n$, this can become a computationally expensive problem to solve.
+### Stochastic Gradient Descent
 
-## Stochastic Gradient Descent
-
-To circumvent the difficulty of computing a gradient across the entire training set, **stochastic gradient descent** approximates the overall gradient using a single randomly chosen data point. Since the observation is chosen randomly, we expect that using the gradient at each individual observation will eventually converge to the same parameters as batch gradient descent. The general update formula for stochastic gradient descent is below, where $l(\hat\theta, X, y)$ is the loss function for a single data point:
+The general update formula is below, where $l(\hat\theta, X, y)$ is the loss function for a single data point:
 
 $$
 \hat\theta_{t+1} = \hat\theta_t - \alpha \nabla_\hat\theta l(\hat\theta, X, y)
@@ -64,36 +72,116 @@ $$
 \end{align}
 $$
 
-In practice, we choose random data points by shuffling the training data and iteratively selecting from the shuffled data. An iteration through the shuffled data is called an **epoch**; at the end of every epoch, we re-shuffle the data to ensure that the model sees examples from various classes in an arbitrary order.
+### Mini-batch Gradient Descent
 
-### Visualizing Stochastic Gradient Descent
-
-Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.
-
-![](gd.png)
-![](sgd.png)
-
-At each iteration of batch gradient descent, we move in the direction of the true gradient of the cost function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\hat\theta$ parameters eventually converge to the minima of the cost function. Surprisingly, stochastic gradient descent often converges more quickly than batch gradient descent in practice since stochastic gradient descent spends significantly less time updating model parameters.
-
-## Mini-batch Gradient Descent
-
-**Mini-batch gradient descent** strikes a balance between batch gradient descent and stochastic gradient descent by increasing the number of observations that we select at each iteration. In mini-batch gradient descent, we take a simple random sample of observations called a mini-batch. We use the average of the gradients of their loss functions to construct an estimate of the true gradient of the cross entropy cost. Since our sample is randomly selected, the expectation of this estimate is equal to the true gradient. This is illustrated in the approximation for the cost function of logistic regression, where $\mathcal{B}$ is the mini-batch of data points that we randomly sample from the $n$ observations.
+Similarly, we can approximate the gradient of the cross entropy cost using a random sample of data points, also known as a mini-batch.
 
 $$
-\nabla_\hat\theta L(\hat\theta, X, y) \approx -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i
+\nabla_\hat\theta L(\hat\theta, X, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\hat\theta}l(\hat\theta, X, y_i)
 $$
 
-As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.
+We substitute this for the gradient of the cross entropy cost, yielding a mini-batch gradient descent update formula specific to logistic regression:
 
-While we have made the distinction between stochastic and mini-batch gradient descent, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size. 
+$$
+\begin{align}
+\hat\theta_{t+1} &= \hat\theta_t - \alpha \cdot -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i \\
+&= \hat\theta_t + \alpha \cdot \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i
+\end{align}
+$$
+
+## Implementation in Scikit-Learn
+
+Scikit-learn has implementations for stochastic gradient descent and mini-batch gradient descent using the [`SGDClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html) class. To gain a better estimate of the speed benefits afforded by stochastic gradient descent and mini-batch gradient descent, we will first manually implement batch gradient descent; then, we will compare the results with stochastic gradient descent and mini-batch gradient descent.
 
 
-### Selecting the Mini-Batch Size
+```python
+lebron = pd.read_csv('lebron.csv')
 
-Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations. 
+columns = ['shot_distance', 'minute', 'action_type', 'shot_type', 'opponent']
+rows = lebron[columns].to_dict(orient='row')
 
-## Summary
+onehot = DictVectorizer(sparse=False).fit(rows)
+X = onehot.transform(rows)
+y = lebron['shot_made'].as_matrix()
 
-We use batch gradient descent to iteratively improve model parameters until the model achieves low cost. Since batch gradient descent is computationally intractable with large datasets, we often use stochastic gradient descent to fit models instead. With a GPU, mini-batch gradient descent can converge more quickly than stochastic gradient descent.
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=20, random_state=42
+)
+```
 
-Although stochastic gradient descent typically takes more individual updates to converge than batch gradient descent, stochastic gradient descent often converges more quickly because it computes updates faster.
+
+```python
+# from sklearn.datasets import load_iris
+
+# iris = load_iris()
+# X = iris['data']
+# y = iris['target'] == 2
+
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X, y, test_size=20, random_state=42
+# )
+```
+
+
+```python
+%%time
+# Stochastic GD
+sgd_clf = SGDClassifier(loss='log', random_state=42)
+sgd_clf.fit(X_train, y_train)
+```
+
+    CPU times: user 0 ns, sys: 15.6 ms, total: 15.6 ms
+    Wall time: 1.77 ms
+
+
+
+```python
+sgd_clf.score(X_test, y_test)
+```
+
+
+
+
+    0.5
+
+
+
+
+```python
+# Mini-batch GD
+
+def iter_minibatches(X, y, minibatch_size):
+    # Provide chunks one by one
+    shuffled_indices = np.random.permutation(len(y))
+    X = X[shuffled_indices]
+    y = y[shuffled_indices]
+    for i in range(0, len(y), minibatch_size):
+        X_b, y_b = X[i:i+minibatch_size], y[i:i+minibatch_size]
+        yield X_b, y_b
+        
+minibatch_generator = iter_minibatches(X_train, y_train, 10)
+```
+
+
+```python
+%%time
+mbgd_clf = SGDClassifier(loss='log', random_state=42)
+for X_b, y_b in minibatch_generator:
+    mbgd_clf.partial_fit(X_b, y_b, classes=np.unique(y))
+```
+
+    CPU times: user 15.6 ms, sys: 0 ns, total: 15.6 ms
+    Wall time: 16.8 ms
+
+
+
+```python
+mbgd_clf.score(X_test, y_test)
+```
+
+
+
+
+    0.5
+
+

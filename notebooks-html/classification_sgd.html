@@ -42,28 +42,34 @@
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
 <span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">SGDClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="k">import</span> <span class="n">DictVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+
 <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Limitations-of-Gradient-Descent">Limitations of Gradient Descent<a class="anchor-link" href="#Limitations-of-Gradient-Descent">&#182;</a></h2><p>We have previously introduced gradient descent as a general-purpose algorithm used to find model parameters $ \hat\theta $ that minimize a specified cost function $ L(\hat\theta, X, y) $. To perform an iteration of gradient descent, we compute:</p>
+<h2 id="Gradient-Descent-in-Logistic-Regression">Gradient Descent in Logistic Regression<a class="anchor-link" href="#Gradient-Descent-in-Logistic-Regression">&#182;</a></h2><p>Previously, we covered batch gradient descent, an algorithm that iteratively updates $\hat\theta$ to find the cost-minimizing parameters. We also discussed stochastic gradient descent and mini-batch gradient descent, methods that take advantage of statistical theory and parallelized hardware to decrease the time spent training the gradient descent algorithm. In this section, we will apply these concepts specifically to logistic regression and walk through examples using scikit-learn functions.</p>
+<h3 id="Batch-Gradient-Descent">Batch Gradient Descent<a class="anchor-link" href="#Batch-Gradient-Descent">&#182;</a></h3><p>The general update formula for batch gradient descent is given by:</p>
 <p>$$
 \hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \nabla_\hat\theta L(\hat\theta, X, y)
 $$</p>
-<p>Since $ L(\hat\theta, X, y) $ computes an average cost across an entire dataset, this gradient update equation computes a gradient using the average gradient across the entire dataset as a single batch. For this reason, this gradient update rule is often referred to as <strong>batch gradient descent</strong>.</p>
-<p>For example, in logistic regression we use the cross entropy cost as our cost function. We replace  $\nabla_\hat\theta L(\hat\theta, X, y)$ with the gradient of the cross entropy cost, $-\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i$, to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $, this becomes:</p>
+<p>In logistic regression, we use the cross entropy cost as our cost function. $\nabla_\hat\theta L(\hat\theta, X, y)$ is then the gradient of the cross entropy cost, $-\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i$; plugging this in allows us to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $, this becomes:</p>
 <p>$$
-\hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right)
+\begin{align}
+\hat\theta_{t+1} &amp;= \hat\theta_t - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right) \\
+&amp;= \hat\theta_t + \alpha \cdot \left(\frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right)
+\end{align}
 $$</p>
-<p>To find the gradient of the cross entropy cost, we first compute the gradient of the cross entropy loss, $-(y_i - \sigma_i)X_i$, for all $n$ observations. Then we take the average over all observations to find the gradient of the cross entropy cost. This is then computed at each iteration $t$ of the gradient descent algorithm. For large $n$, this can become a computationally expensive problem to solve.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Stochastic-Gradient-Descent">Stochastic Gradient Descent<a class="anchor-link" href="#Stochastic-Gradient-Descent">&#182;</a></h2><p>To circumvent the difficulty of computing a gradient across the entire training set, <strong>stochastic gradient descent</strong> approximates the overall gradient using a single randomly chosen data point. Since the observation is chosen randomly, we expect that using the gradient at each individual observation will eventually converge to the same parameters as batch gradient descent. The general update formula for stochastic gradient descent is below, where $l(\hat\theta, X, y)$ is the loss function for a single data point:</p>
+<h3 id="Stochastic-Gradient-Descent">Stochastic Gradient Descent<a class="anchor-link" href="#Stochastic-Gradient-Descent">&#182;</a></h3><p>The general update formula is below, where $l(\hat\theta, X, y)$ is the loss function for a single data point:</p>
 <p>$$
 \hat\theta_{t+1} = \hat\theta_t - \alpha \nabla_\hat\theta l(\hat\theta, X, y)
 $$</p>
@@ -81,21 +87,168 @@ $$</p>
 &amp;= \hat\theta_t + \alpha \cdot (y_i - \sigma_i)X_i
 \end{align}
 $$</p>
-<p>In practice, we choose random data points by shuffling the training data and iteratively selecting from the shuffled data. An iteration through the shuffled data is called an <strong>epoch</strong>; at the end of every epoch, we re-shuffle the data to ensure that the model sees examples from various classes in an arbitrary order.</p>
-<h3 id="Visualizing-Stochastic-Gradient-Descent">Visualizing Stochastic Gradient Descent<a class="anchor-link" href="#Visualizing-Stochastic-Gradient-Descent">&#182;</a></h3><p>Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="gd.png" alt="">
-<img src="sgd.png" alt=""></p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>At each iteration of batch gradient descent, we move in the direction of the true gradient of the cost function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\hat\theta$ parameters eventually converge to the minima of the cost function. Surprisingly, stochastic gradient descent often converges more quickly than batch gradient descent in practice since stochastic gradient descent spends significantly less time updating model parameters.</p>
-<h2 id="Mini-batch-Gradient-Descent">Mini-batch Gradient Descent<a class="anchor-link" href="#Mini-batch-Gradient-Descent">&#182;</a></h2><p><strong>Mini-batch gradient descent</strong> strikes a balance between batch gradient descent and stochastic gradient descent by increasing the number of observations that we select at each iteration. In mini-batch gradient descent, we take a simple random sample of observations called a mini-batch. We use the average of the gradients of their loss functions to construct an estimate of the true gradient of the cross entropy cost. Since our sample is randomly selected, the expectation of this estimate is equal to the true gradient. This is illustrated in the approximation for the cost function of logistic regression, where $\mathcal{B}$ is the mini-batch of data points that we randomly sample from the $n$ observations.</p>
+<h3 id="Mini-batch-Gradient-Descent">Mini-batch Gradient Descent<a class="anchor-link" href="#Mini-batch-Gradient-Descent">&#182;</a></h3><p>Similarly, we can approximate the gradient of the cross entropy cost using a random sample of data points, also known as a mini-batch.</p>
 <p>$$
-\nabla_\hat\theta L(\hat\theta, X, y) \approx -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i
+\nabla_\hat\theta L(\hat\theta, X, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\hat\theta}l(\hat\theta, X, y_i)
 $$</p>
-<p>As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.</p>
-<p>While we have made the distinction between stochastic and mini-batch gradient descent, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size.</p>
-<h3 id="Selecting-the-Mini-Batch-Size">Selecting the Mini-Batch Size<a class="anchor-link" href="#Selecting-the-Mini-Batch-Size">&#182;</a></h3><p>Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations.</p>
-<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We use batch gradient descent to iteratively improve model parameters until the model achieves low cost. Since batch gradient descent is computationally intractable with large datasets, we often use stochastic gradient descent to fit models instead. With a GPU, mini-batch gradient descent can converge more quickly than stochastic gradient descent.</p>
-<p>Although stochastic gradient descent typically takes more individual updates to converge than batch gradient descent, stochastic gradient descent often converges more quickly because it computes updates faster.</p></div></div></div></div>
+<p>We substitute this for the gradient of the cross entropy cost, yielding a mini-batch gradient descent update formula specific to logistic regression:</p>
+<p>$$
+\begin{align}
+\hat\theta_{t+1} &amp;= \hat\theta_t - \alpha \cdot -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i \\
+&amp;= \hat\theta_t + \alpha \cdot \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i
+\end{align}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Implementation-in-Scikit-Learn">Implementation in Scikit-Learn<a class="anchor-link" href="#Implementation-in-Scikit-Learn">&#182;</a></h2><p>Scikit-learn has implementations for stochastic gradient descent and mini-batch gradient descent using the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html"><code>SGDClassifier</code></a> class. To gain a better estimate of the speed benefits afforded by stochastic gradient descent and mini-batch gradient descent, we will first manually implement batch gradient descent; then, we will compare the results with stochastic gradient descent and mini-batch gradient descent.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lebron</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;lebron.csv&#39;</span><span class="p">)</span>
+
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;minute&#39;</span><span class="p">,</span> <span class="s1">&#39;action_type&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_type&#39;</span><span class="p">,</span> <span class="s1">&#39;opponent&#39;</span><span class="p">]</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">lebron</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span>
+
+<span class="n">onehot</span> <span class="o">=</span> <span class="n">DictVectorizer</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">onehot</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">lebron</span><span class="p">[</span><span class="s1">&#39;shot_made&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># from sklearn.datasets import load_iris</span>
+
+<span class="c1"># iris = load_iris()</span>
+<span class="c1"># X = iris[&#39;data&#39;]</span>
+<span class="c1"># y = iris[&#39;target&#39;] == 2</span>
+
+<span class="c1"># X_train, X_test, y_train, y_test = train_test_split(</span>
+<span class="c1">#     X, y, test_size=20, random_state=42</span>
+<span class="c1"># )</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
+# Stochastic GD
+sgd_clf = SGDClassifier(loss=&#39;log&#39;, random_state=42)
+sgd_clf.fit(X_train, y_train)
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 0 ns, sys: 15.6 ms, total: 15.6 ms
+Wall time: 1.77 ms
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sgd_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.5</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Mini-batch GD</span>
+
+<span class="k">def</span> <span class="nf">iter_minibatches</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">minibatch_size</span><span class="p">):</span>
+    <span class="c1"># Provide chunks one by one</span>
+    <span class="n">shuffled_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">shuffled_indices</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">shuffled_indices</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">minibatch_size</span><span class="p">):</span>
+        <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">minibatch_size</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">minibatch_size</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span>
+        
+<span class="n">minibatch_generator</span> <span class="o">=</span> <span class="n">iter_minibatches</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
+mbgd_clf = SGDClassifier(loss=&#39;log&#39;, random_state=42)
+for X_b, y_b in minibatch_generator:
+    mbgd_clf.partial_fit(X_b, y_b, classes=np.unique(y))
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 15.6 ms, sys: 0 ns, total: 15.6 ms
+Wall time: 16.8 ms
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mbgd_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.5</pre></div></div></div></div></div></div>
