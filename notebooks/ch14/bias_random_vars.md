@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Expectation-and-Variance" data-toc-modified-id="Expectation-and-Variance-1">Expectation and Variance</a></span><ul class="toc-item"><li><span><a href="#Random-Variables" data-toc-modified-id="Random-Variables-1.1">Random Variables</a></span><ul class="toc-item"><li><span><a href="#Probability-Mass-Functions" data-toc-modified-id="Probability-Mass-Functions-1.1.1">Probability Mass Functions</a></span></li></ul></li><li><span><a href="#Expectation" data-toc-modified-id="Expectation-1.2">Expectation</a></span><ul class="toc-item"><li><span><a href="#Linearity-of-Expectation" data-toc-modified-id="Linearity-of-Expectation-1.2.1">Linearity of Expectation</a></span></li></ul></li><li><span><a href="#Variance" data-toc-modified-id="Variance-1.3">Variance</a></span></li></ul></li><li><span><a href="#Summary" data-toc-modified-id="Summary-2">Summary</a></span></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Random-Variables" data-toc-modified-id="Random-Variables-1">Random Variables</a></span><ul class="toc-item"><li><span><a href="#Probability-Mass-Functions" data-toc-modified-id="Probability-Mass-Functions-1.1">Probability Mass Functions</a></span></li><li><span><a href="#Joint-Distributions" data-toc-modified-id="Joint-Distributions-1.2">Joint Distributions</a></span><ul class="toc-item"><li><span><a href="#Marginal-Distributions" data-toc-modified-id="Marginal-Distributions-1.2.1">Marginal Distributions</a></span></li><li><span><a href="#Independence" data-toc-modified-id="Independence-1.2.2">Independence</a></span></li></ul></li></ul></li><li><span><a href="#Summary" data-toc-modified-id="Summary-2">Summary</a></span></li></ul></div>
 
 
 ```python
@@ -13,6 +13,7 @@ import seaborn as sns
 import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual
 import nbinteract as nbi
+from scipy import stats
 
 sns.set()
 sns.set_context('talk')
@@ -52,11 +53,18 @@ Suppose we let $ X $ represent the result of one roll from a fair six-sided die.
 
 ```python
 # HIDDEN
-plt.hist(np.arange(1, 7), bins=np.arange(1, 7.1, 1), normed=True, rwidth=0.95)
+xk = np.arange(1, 7)
+pk = (1/6, 1/6, 1/6, 1/6, 1/6, 1/6)
+dice = stats.rv_discrete(name='dice', values=(xk, pk))
+
+fig, ax = plt.subplots(1, 1)
+ax.plot(xk, dice.pmf(xk), 'ro', ms=12, mec='b', color='b')
+ax.vlines(xk, 0, dice.pmf(xk), colors='b', lw=4)
 plt.xlabel('$x$')
 plt.ylabel('$P(X = x)$')
 plt.yticks((0, 1/12, 1/6), ('0', r'$\frac{1}{12}$', r'$\frac{1}{6}$'))
 plt.title('PMF of $X$');
+plt.show()
 ```
 
 
@@ -97,9 +105,7 @@ Two random variables $X$ and $Y$ are independent if the value of one random vari
 
 As another example, let $ X $ be the same as before, but $ Y $ now represents the number of sixes in a set of 10 dice rolls. Since the result of the coin flips has no effect on the dice rolls, we can say that $ X $ and $ Y $ are independent in this example; knowing $X = 5$ tells us nothing about the value of $ Y $.
 
-#### Example: Sampling
-
-Suppose we have a small dataset of four people:
+**Example:** Suppose we have a small dataset of four people:
 
 
 ```python

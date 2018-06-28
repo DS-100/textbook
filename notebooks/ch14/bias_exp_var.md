@@ -1,4 +1,7 @@
 
+<h1>Table of Contents<span class="tocSkip"></span></h1>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Expectation-and-Variance" data-toc-modified-id="Expectation-and-Variance-1">Expectation and Variance</a></span><ul class="toc-item"><li><span><a href="#Expectation" data-toc-modified-id="Expectation-1.1">Expectation</a></span><ul class="toc-item"><li><span><a href="#Linearity-of-Expectation" data-toc-modified-id="Linearity-of-Expectation-1.1.1">Linearity of Expectation</a></span></li></ul></li><li><span><a href="#Variance" data-toc-modified-id="Variance-1.2">Variance</a></span><ul class="toc-item"><li><span><a href="#Covariance" data-toc-modified-id="Covariance-1.2.1">Covariance</a></span></li></ul></li><li><span><a href="#Bernoulli-Random-Variables" data-toc-modified-id="Bernoulli-Random-Variables-1.3">Bernoulli Random Variables</a></span><li><span><a href="#Sample-Means" data-toc-modified-id="Sample-Means-1.4">Sample Means</a></span></ul></li><li><span><a href="#Summary" data-toc-modified-id="Summary-2">Summary</a></span></li></ul></div>
+
 
 ```python
 # HIDDEN
@@ -10,6 +13,7 @@ import seaborn as sns
 import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual
 import nbinteract as nbi
+from scipy import stats
 
 sns.set()
 sns.set_context('talk')
@@ -20,7 +24,7 @@ pd.options.display.max_columns = 8
 
 ## Expectation and Variance
 
-PMFs help describe a random variable's distribution entirely, but sometimes we want a brief summary of this distribution, which we can achieve through the notions of expectation and variance.
+Although a random variable is completely described by its probability mass function (PMF), we often use **expectation** and **variance** to describe the variable's long-run average and spread. These two values have unique mathematical properties that hold particular importance for data science—for example, we can show that an estimation is accurate in the long term by showing that its expected value is equal to the population parameter. We proceed by defining expectation and variance, introducing their most useful mathematical properties, and conclude with a brief application to estimation.
 
 ### Expectation
 
@@ -41,7 +45,69 @@ $$
 
 Notice that the expected value of $ X $ does not have to be a possible value of $ X $; although in this case  $ \mathbb{E}[X] = 3.5 $, $ X $ never takes on the value $ 3.5 $.
 
-**Example:** We pick one person from the dataset in the previous section uniformly at random. Let $ Y $ be a random variable representing the age of this person. Then:
+**Example:** Recall our dataset from the previous section:
+
+
+```python
+# HIDDEN
+data={"Name":["Carol","Bob","John","Dave"], 'Age': [50,52,51,50]}
+people = pd.DataFrame(data)
+people
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Age</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>50</td>
+      <td>Carol</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>52</td>
+      <td>Bob</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>51</td>
+      <td>John</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>50</td>
+      <td>Dave</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+We pick one person from this dataset uniformly at random. Let $ Y $ be a random variable representing the age of this person. Then:
 
 $$
 \begin{aligned}
@@ -139,20 +205,28 @@ Consider the following two random variables $ X $ and $ Y $ with the following p
 ```python
 # HIDDEN
 plt.figure(figsize=(10,5))
-plt.subplot(1, 2, 1)
-plt.hist([-1, 1], bins=np.arange(-2, 4), normed=True, rwidth=0.95)
+xk = (-1, 1)
+pk = (1/2, 1/2)
+x = stats.rv_discrete(name='x', values=(xk, pk))
+ax = plt.subplot(1, 2, 1)
+ax.plot(xk, x.pmf(xk), 'ro', ms=12, mec='b', color='b')
+ax.vlines(xk, 0, x.pmf(xk), colors='b', lw=4)
 plt.xlabel('$x$')
 plt.ylabel('$P(X = x)$')
-plt.xticks(np.arange(-2, 4))
+plt.xticks(np.arange(-2, 3))
 plt.yticks(np.arange(0, 1.1, 0.25),
            (0, r'$\frac{1}{4}$', r'$\frac{1}{2}$', r'$\frac{3}{4}$', r'$1$'))
 plt.ylim(0, 1)
 plt.title('PMF of $X$')
 
-plt.subplot(1, 2, 2)
-plt.hist([-2, -1, 1, 2], bins=np.arange(-2, 4), normed=True, rwidth=0.95)
+xk = (-2, -1, 1, 2)
+pk = (1/4, 1/4, 1/4, 1/4)
+y = stats.rv_discrete(name='y', values=(xk, pk))
+ax = plt.subplot(1, 2, 2)
+ax.plot(xk, y.pmf(xk), 'ro', ms=12, mec='b', color='b')
+ax.vlines(xk, 0, y.pmf(xk), colors='b', lw=4)
 plt.xlabel('$y$')
-plt.xticks(np.arange(-2, 4))
+plt.xticks(np.arange(-2, 3))
 plt.ylabel('$P(Y = y)$')
 plt.ylim(0, 1)
 plt.yticks(np.arange(0, 1.1, 0.25),
@@ -162,7 +236,7 @@ plt.tight_layout();
 ```
 
 
-![png](bias_exp_var_files/bias_exp_var_10_0.png)
+![png](bias_exp_var_files/bias_exp_var_13_0.png)
 
 
 $ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
@@ -226,7 +300,7 @@ $$
 
 Note that although the variance of a single random variable must be non-negative, the covariance of two random variables can be negative. In fact, the covariance helps measure the correlation between two random variables; the sign of the covariance helps us determine whether two random variables are positively or negatively correlated. If two random variables $X$ and $Y$ are independent, then $Cov(X, Y) = 0$, and $\mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y]$.
 
-### Example: Bernoulli Random Variables
+### Bernoulli Random Variables
 
 Suppose we want to use a random variable $X$ to a simulate a biased coin with $P(Heads) = p$. We can say that $X = 1$ if the coin flip is heads, and $X = 0$ if the coin flip is tails. Therefore, $P(X = 1) = p$, and $P(X = 0) = 1 - p$. This type of binary random variable is called a Bernoulli random variable; we can calculate its expected value and variance as follows:
 
