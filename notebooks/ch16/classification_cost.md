@@ -48,65 +48,6 @@ def df_interact(df, nrows=7, ncols=7):
 lebron = pd.read_csv('lebron.csv')
 ```
 
-
-    ---------------------------------------------------------------------------
-
-    FileNotFoundError                         Traceback (most recent call last)
-
-    <ipython-input-7-4d6d8db4ec60> in <module>()
-          1 # HIDDEN
-    ----> 2 lebron = pd.read_csv('lebron.csv')
-    
-
-    /srv/conda/envs/data100/lib/python3.6/site-packages/pandas/io/parsers.py in parser_f(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, squeeze, prefix, mangle_dupe_cols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, escapechar, comment, encoding, dialect, tupleize_cols, error_bad_lines, warn_bad_lines, skipfooter, skip_footer, doublequote, delim_whitespace, as_recarray, compact_ints, use_unsigned, low_memory, buffer_lines, memory_map, float_precision)
-        707                     skip_blank_lines=skip_blank_lines)
-        708 
-    --> 709         return _read(filepath_or_buffer, kwds)
-        710 
-        711     parser_f.__name__ = name
-
-
-    /srv/conda/envs/data100/lib/python3.6/site-packages/pandas/io/parsers.py in _read(filepath_or_buffer, kwds)
-        447 
-        448     # Create the parser.
-    --> 449     parser = TextFileReader(filepath_or_buffer, **kwds)
-        450 
-        451     if chunksize or iterator:
-
-
-    /srv/conda/envs/data100/lib/python3.6/site-packages/pandas/io/parsers.py in __init__(self, f, engine, **kwds)
-        816             self.options['has_index_names'] = kwds['has_index_names']
-        817 
-    --> 818         self._make_engine(self.engine)
-        819 
-        820     def close(self):
-
-
-    /srv/conda/envs/data100/lib/python3.6/site-packages/pandas/io/parsers.py in _make_engine(self, engine)
-       1047     def _make_engine(self, engine='c'):
-       1048         if engine == 'c':
-    -> 1049             self._engine = CParserWrapper(self.f, **self.options)
-       1050         else:
-       1051             if engine == 'python':
-
-
-    /srv/conda/envs/data100/lib/python3.6/site-packages/pandas/io/parsers.py in __init__(self, src, **kwds)
-       1693         kwds['allow_leading_cols'] = self.index_col is not False
-       1694 
-    -> 1695         self._reader = parsers.TextReader(src, **kwds)
-       1696 
-       1697         # XXX
-
-
-    pandas/_libs/parsers.pyx in pandas._libs.parsers.TextReader.__cinit__()
-
-
-    pandas/_libs/parsers.pyx in pandas._libs.parsers.TextReader._setup_parser_source()
-
-
-    FileNotFoundError: File b'lebron.csv' does not exist
-
-
 ## A Cost Function for the Logistic Model
 
 We have defined a regression model for probabilities, the logistic model:
@@ -258,4 +199,4 @@ The surprisingly simple gradient expression allows us to fit a logistic model to
 
 ## Summary
 
-The cost function for logistic models is based on cross-entropy loss. Since it is a convex function, we use gradient descent to fit the model to the cost. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
+Since the cross-entropy loss function is convex, we minimize this loss using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
