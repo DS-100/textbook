@@ -136,19 +136,7 @@ plt.ylabel('Shot Made');
 ```
 
 
-    ---------------------------------------------------------------------------
-
-    NameError                                 Traceback (most recent call last)
-
-    <ipython-input-8-a6554a34533e> in <module>()
-          2 np.random.seed(42)
-          3 sns.lmplot(x='shot_distance', y='shot_made',
-    ----> 4            data=lebron,
-          5            fit_reg=False, ci=False,
-          6            y_jitter=0.1,
-
-
-    NameError: name 'lebron' is not defined
+![png](classification_cost_files/classification_cost_5_0.png)
 
 
 Noticing the large cluster of made shots close to the basket and the smaller cluster of missed shots further from the basket, we expect that a logistic model fitted on this data might look like:
