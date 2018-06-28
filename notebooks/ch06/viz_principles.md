@@ -53,6 +53,10 @@ plt.xticks([2006, 2013])
 plt.legend();
 ```
 
+
+![png](viz_principles_files/viz_principles_5_0.png)
+
+
 We can see that the change in number of Abortions is very small compared to the large drop in the number of Cancer Screenings. Instead of the number of procedures, we might instead be interested in the percent change in number.
 
 
@@ -73,6 +77,10 @@ plt.ylabel('Percent Change')
 plt.ylim(-0.6, 0.6)
 plt.axhline(y=0, c='black');
 ```
+
+
+![png](viz_principles_files/viz_principles_7_0.png)
+
 
 When selecting the x and y-axis limits we prefer to focus on the region with the bulk of the data, especially when working with long-tailed data. Consider the following plot and its zoomed in version to its right:
 
@@ -104,6 +112,10 @@ ax.set_xlabel("Education")
 ax.set_ylabel("Income")
 ax.set_title("2014 Median Weekly Earnings\nFull-Time Workers over 25 years old");
 ```
+
+
+![png](viz_principles_files/viz_principles_11_0.png)
+
 
 The lines connecting the points more clearly shows the relatively large effect of having a BA degree on weekly earnings. Placing the points for males and females directly above each other makes it much easier to see that the wage gap between males and females tends to increase with higher education levels.
 
@@ -169,5 +181,9 @@ ax.set_xlabel(x)
 ax.set_ylabel(y + "Emissions [Million Tons]")
 ax.legend(ncol=2, frameon=True);
 ```
+
+
+![png](viz_principles_files/viz_principles_18_0.png)
+
 
 This plot does not jiggle the baseline so it is much easier to compare emissions between countries. We can also more clearly see which countries increased emissions the most.
