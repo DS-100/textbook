@@ -145,10 +145,6 @@ As expected, the loss for a correct prediction is $ 0 $. You may verify that the
 
 Minimizing the overall cross entropy cost requires the model $ f_\hat{\theta}(x) $ to make the most accurate predictions it can. Conveniently, this cost function is convex, making gradient descent a useful choice for optimization.
 
-**Statistical justification for the cross entropy cost**
-
-The cross entropy cost also has fundamental underpinnings in statistics. Since the logistic regression model predicts probabilities, given a particular logistic model we can ask, "What is the probability that this model produced the set of observed outcomes $ y $?" We might naturally adjust the parameters of our model until the probability of drawing our dataset from the model is as high as possible. Although we will not prove it in this section, this procedure is equivalent to minimizing the cross entropy cost—this is the *maximum likelihood* statistical justification for the cross entropy cost.
-
 ## Gradient of the Cross Entropy Cost
 
 In order to run gradient descent on the cross entropy cost we must calculate the gradient of the cost function. First, we compute the derivative of the sigmoid function since we'll use it in our gradient calculation.
@@ -203,4 +199,4 @@ The surprisingly simple gradient expression allows us to fit a logistic model to
 
 ## Summary
 
-The cross entropy cost that we use to fit the logistic model. Since it is a convex function, we use gradient descent to fit the model to the cost. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
+Since the cross-entropy loss function is convex, we minimize this loss using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
