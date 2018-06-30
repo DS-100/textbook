@@ -85,7 +85,7 @@ L(\hat{\theta}, \vec{y})
 \end{aligned}
 $$
 
-This means our loss can be expressed as the *L2* norm of some vector $v$, squared. We can simply express the components of $v_i$ as equal $y_i - \hat{\theta} \quad \forall i \in [1,n]$ so that in Cartesian notation, 
+This means our loss can be expressed as the *L2*-norm of some vector $v$, squared. We can simply express the components of $v_i$ as equal $y_i - \hat{\theta} \quad \forall i \in [1,n]$ so that in Cartesian notation, 
 
 $$
 \begin{aligned}
@@ -214,7 +214,7 @@ L(\hat{\theta}, \vec{x}, \vec{y})
 \end{aligned}
 $$
 
-As before, our loss can be expressed as the *L2* norm of some vector $v$, squared. With each component $v_i = y_i - \begin{bmatrix} 1 & x_i \end{bmatrix}
+As before, our loss can be expressed as the *L2*-norm of some vector $v$, squared. With each component $v_i = y_i - \begin{bmatrix} 1 & x_i \end{bmatrix}
 \begin{bmatrix} 
      \hat{\theta_0} \\
      \hat{\theta_1}
@@ -243,7 +243,7 @@ X
 &= \left \Vert  \qquad  
 \vec{y} 
 \quad - \quad 
-\vec{\hat{y}}
+\hat{y}
 \qquad \right \Vert ^2 \\
 \end{aligned}
 $$
