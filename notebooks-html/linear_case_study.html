@@ -1,0 +1,1328 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch12/linear_case_study.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch12&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LinearRegression</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def minimize(cost_fn, grad_cost_fn, X, y, alpha=0.2, progress=True):</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    Uses gradient descent to minimize cost_fn. Returns the minimizing value of</span>
+<span class="sd">    theta once theta changes less than 0.001 between iterations.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    theta = np.zeros(X.shape[1])</span>
+<span class="sd">    old_cost = 10000000</span>
+<span class="sd">    while True:</span>
+<span class="sd">        if progress:</span>
+<span class="sd">            print(f&#39;theta: {theta} | cost: {cost_fn(theta, X, y):.2f}&#39;)</span>
+<span class="sd">        gradient = grad_cost_fn(theta, X, y)</span>
+<span class="sd">        new_theta = theta - alpha * gradient</span>
+<span class="sd">        cost = cost_fn(theta, X, y)</span>
+<span class="sd">        if abs(old_cost - cost) &lt; 10:</span>
+<span class="sd">            return new_theta</span>
+<span class="sd">        old_cost = cost</span>
+<span class="sd">        </span>
+<span class="sd">        theta = new_theta</span>
+<span class="sd">        </span>
+<span class="sd">&quot;&quot;&quot;</span>
+        
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span> <span class="k">as</span> <span class="n">sci_min</span>
+
+<span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost_fn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Uses scipy.minimize to minimize cost_fn using a form of gradient descent.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">grad_cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">print_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">iters</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="n">iters</span> <span class="o">%</span> <span class="n">progress</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta}</span><span class="s1"> | cost: {cost_fn(theta, X, y):.2f}&#39;</span><span class="p">)</span>
+        <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+    <span class="n">print_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sci_min</span><span class="p">(</span>
+        <span class="n">objective</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">print_theta</span><span class="p">,</span>
+        <span class="n">tol</span><span class="o">=</span><span class="mf">1e-7</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">x</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Linear-Regression-Case-Study">Linear Regression Case Study<a class="anchor-link" href="#Linear-Regression-Case-Study">&#182;</a></h2><p>In this section, we perform an end-to-end case study of the application of a linear regression model to a dataset. The dataset we will be working with is a record of various attributes, such as length and girth, of donkeys.</p>
+<p>Our task: predict a donkey's weight using linear regression.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Preliminary-Data-Overview">Preliminary Data Overview<a class="anchor-link" href="#Preliminary-Data-Overview">&#182;</a></h2><p>We will begin by reading in the dataset and taking a quick peek at its contents.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;donkeys.csv&quot;</span><span class="p">)</span>
+<span class="n">donkeys</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BCS</th>
+      <th>Age</th>
+      <th>Sex</th>
+      <th>...</th>
+      <th>Height</th>
+      <th>Weight</th>
+      <th>WeightAlt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.0</td>
+      <td>&lt;2</td>
+      <td>stallion</td>
+      <td>...</td>
+      <td>90</td>
+      <td>77</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.5</td>
+      <td>&lt;2</td>
+      <td>stallion</td>
+      <td>...</td>
+      <td>94</td>
+      <td>100</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.5</td>
+      <td>&lt;2</td>
+      <td>stallion</td>
+      <td>...</td>
+      <td>95</td>
+      <td>74</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3.0</td>
+      <td>&lt;2</td>
+      <td>female</td>
+      <td>...</td>
+      <td>96</td>
+      <td>116</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2.5</td>
+      <td>&lt;2</td>
+      <td>female</td>
+      <td>...</td>
+      <td>91</td>
+      <td>91</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 8 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we will look at how large our dataset is.</p>
+<p>It's always a good idea to look at <em>how much</em> data we have by looking at the dimensions of the dataset. An example of how this might be useful: if our data has a large number of observations, it would not be a good idea to print out the whole dataframe.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="o">.</span><span class="n">shape</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(544, 8)</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The dataset is relatively small, with only 544 rows of observations and 8 columns. Let's look at what columns we have available to us.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([&#39;BCS&#39;, &#39;Age&#39;, &#39;Sex&#39;, &#39;Length&#39;, &#39;Girth&#39;, &#39;Height&#39;, &#39;Weight&#39;,
+       &#39;WeightAlt&#39;], dtype=object)</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our analysis can be guided by a good understanding of our data, so we should aim to understand what each of these columns represent. A few of these columns are self-explanatory, but others require a little more explanation:</p>
+<ul>
+<li><code>BCS</code>: Body Condition Score </li>
+<li><code>Girth</code>: the measurement around the middle of the donkey</li>
+<li><code>WeightAlt</code>: 31 donkeys within our data frame were weighed twice in order to check the accuracy of the scale. The second weighing is in <code>WeightAlt</code>.</li>
+</ul></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Data-Cleaning">Data Cleaning<a class="anchor-link" href="#Data-Cleaning">&#182;</a></h2><p>In this section, we will check the data for any abnormalities that we have to deal with.</p>
+<p>By examining <code>WeightAlt</code> more closely, we can make sure that the scale is accurate by taking the difference between the two different weighings and plotting them.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">difference</span> <span class="o">=</span> <span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;WeightAlt&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">difference</span><span class="o">.</span><span class="n">dropna</span><span class="p">());</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_12_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The measurements are all within 1 kg of each other, which seems reasonable.</p>
+<p>Next, we can look for unusual values that might indicate errors or other problems. We can use the quantile function in order to detect anomalous values.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.995</span><span class="p">])</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BCS</th>
+      <th>Length</th>
+      <th>Girth</th>
+      <th>Height</th>
+      <th>Weight</th>
+      <th>WeightAlt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.005</th>
+      <td>1.5</td>
+      <td>71.145</td>
+      <td>90.000</td>
+      <td>89.0</td>
+      <td>71.715</td>
+      <td>98.75</td>
+    </tr>
+    <tr>
+      <th>0.995</th>
+      <td>4.0</td>
+      <td>111.000</td>
+      <td>131.285</td>
+      <td>112.0</td>
+      <td>214.000</td>
+      <td>192.80</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For each of these numerical columns, we can look at which rows fall outside of these quantiles and what values they take on. Consider that we want our model to apply to only healthy and mature donkeys.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="p">[(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)][</span><span class="s1">&#39;BCS&#39;</span><span class="p">]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>291    4.5
+445    1.0
+Name: BCS, dtype: float64</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Considering that <code>BCS</code> is an indication of the health of a donkey, a <code>BCS</code> of 1 represents an extremely emaciated donkey and a <code>BCS</code> of 4.5 an overweight donkey. Thus, it would probably be a good idea to remove these two donkeys.</p>
+<hr></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="p">[(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Length&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">71.145</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Length&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">111</span><span class="p">)][</span><span class="s1">&#39;Length&#39;</span><span class="p">]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>8       46
+22      68
+26      69
+216    112
+Name: Length, dtype: int64</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="p">[(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Girth&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">90</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Girth&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">131.285</span><span class="p">)][</span><span class="s1">&#39;Girth&#39;</span><span class="p">]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>8       66
+239    132
+283    134
+523    134
+Name: Girth, dtype: int64</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="p">[(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Height&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">89</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Height&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">112</span><span class="p">)][</span><span class="s1">&#39;Height&#39;</span><span class="p">]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>8       71
+22      86
+244    113
+523    116
+Name: Height, dtype: int64</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For <code>Girth</code>, <code>Height</code>, and <code>Length</code>, the donkey in row 8 seems to have a much smaller value than the cut-off while the other anomalous donkeys are close to the cut-off and likely do not need to be removed.</p>
+<hr></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys</span><span class="p">[(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">71.715</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">214</span><span class="p">)][</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>8       27
+26      65
+50      71
+291    227
+523    230
+Name: Weight, dtype: int64</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The first 2 and last 2 donkeys in the list are far off from the cut-off and most likely should be removed. The middle donkey can be included.</p>
+<hr>
+<p>Since <code>WeightAlt</code> closely corresponds to <code>Weight</code>, we do not have to check this column for anomalies. Summarizing what we have learned, here is how we want to filter our donkeys:</p>
+<ul>
+<li>Keep donkeys with <code>BCS</code> in the range 1.5 and 4</li>
+<li>Keep donkeys with <code>Weight</code> between 71 and 214  </li>
+</ul></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys_c</span> <span class="o">=</span> <span class="n">donkeys</span><span class="p">[(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span>
+                         <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">71</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">donkeys</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">214</span><span class="p">)]</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Exploring-the-Data-+-Data-Visualization">Exploring the Data + Data Visualization<a class="anchor-link" href="#Exploring-the-Data-+-Data-Visualization">&#182;</a></h2><p>As in any data science project, we will explore our data before attempting to fit a model to it.</p>
+<p>First, we will examine the categorical variables with boxplots.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_26_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It seems like median weight increases with BCS, but not linearly.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">],</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;stallion&#39;</span><span class="p">,</span> <span class="s1">&#39;gelding&#39;</span><span class="p">]);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_28_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It seems like the sex of the donkey doesn't appear to cause much of a difference in weight.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">],</span> 
+            <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;2&#39;</span><span class="p">,</span> <span class="s1">&#39;2-5&#39;</span><span class="p">,</span> <span class="s1">&#39;5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;20&#39;</span><span class="p">]);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_30_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For donkeys over 5, the weight distribution is not too different.</p>
+<p>Now, let's look at the quantitative variables. We can plot each of them against the target variable.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="n">donkeys_c</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_32_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="n">donkeys_c</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_33_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="s1">&#39;Height&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="n">donkeys_c</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_34_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>All three of our quantitative features have a linear relationship with our target variable of <code>Weight</code>, so we will not have to perform any transformations on our input data.</p>
+<p>It is also a good idea to see if our features are linear with each other. We plot two below:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="s1">&#39;Height&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="n">donkeys_c</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_36_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="s1">&#39;Height&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="n">donkeys_c</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_case_study_37_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>From these plots, we can see that our predictor variables also have strong linear relationships with each other. This makes our model harder to interpret, so we should keep this in mind after we create our model.</p>
+<h2 id="Transforming-Variables">Transforming Variables<a class="anchor-link" href="#Transforming-Variables">&#182;</a></h2><p>Next, we transform the categorical variables into dummy variables so that we can include them in the model. Recall from our boxplots that <code>Sex</code> was not a useful variable, so we will drop it. We will also remove the <code>WeightAlt</code> column because we only have its value for 31 donkeys.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys_c</span> <span class="o">=</span> <span class="n">donkeys_c</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span> <span class="s1">&#39;WeightAlt&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">donkeys_c</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">donkeys_c</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">])</span>
+<span class="n">donkeys_c</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Length</th>
+      <th>Girth</th>
+      <th>Height</th>
+      <th>...</th>
+      <th>Age_5-10</th>
+      <th>Age_&lt;2</th>
+      <th>Age_&gt;20</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>78</td>
+      <td>90</td>
+      <td>90</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>91</td>
+      <td>97</td>
+      <td>94</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>74</td>
+      <td>93</td>
+      <td>95</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>87</td>
+      <td>109</td>
+      <td>96</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>79</td>
+      <td>98</td>
+      <td>91</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 16 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since we do not want our matrix to be over-parameterized, we should drop one category from the <code>BCS</code> and <code>Age</code> dummies.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys_c</span> <span class="o">=</span> <span class="n">donkeys_c</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_5-10&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">donkeys_c</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Length</th>
+      <th>Girth</th>
+      <th>Height</th>
+      <th>...</th>
+      <th>Age_2-5</th>
+      <th>Age_&lt;2</th>
+      <th>Age_&gt;20</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>78</td>
+      <td>90</td>
+      <td>90</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>91</td>
+      <td>97</td>
+      <td>94</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>74</td>
+      <td>93</td>
+      <td>95</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>87</td>
+      <td>109</td>
+      <td>96</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>79</td>
+      <td>98</td>
+      <td>91</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 14 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We should also add a column of biases.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys_c</span> <span class="o">=</span> <span class="n">donkeys_c</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">bias</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">donkeys_c</span> <span class="o">=</span> <span class="n">donkeys_c</span><span class="o">.</span><span class="n">reindex_axis</span><span class="p">([</span><span class="s1">&#39;bias&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">donkeys_c</span><span class="o">.</span><span class="n">columns</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">donkeys_c</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>bias</th>
+      <th>Length</th>
+      <th>Girth</th>
+      <th>...</th>
+      <th>Age_2-5</th>
+      <th>Age_&lt;2</th>
+      <th>Age_&gt;20</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>78</td>
+      <td>90</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>91</td>
+      <td>97</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>74</td>
+      <td>93</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>87</td>
+      <td>109</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>79</td>
+      <td>98</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 15 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Linear-Regression-Model">Linear Regression Model<a class="anchor-link" href="#Linear-Regression-Model">&#182;</a></h2><p>We are finally ready to fit our model!</p>
+<p>Our model looks like this:</p>
+<p>$$
+f_\hat{\theta} (x) = \hat{\theta_0} + \hat{\theta_1} (Length) + \hat{\theta_2} (Girth) + \hat{\theta_3} (Height) + ... +  \hat{\theta_{14}} (Age_&gt;20)
+$$</p>
+<p>Remember, the $\hat{\theta_0}$ is accounted for due to the bias column in our dataframe.</p>
+<p>Here are the functions we defined earlier in the multiple linear regression section, which we will use again:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns predictions by a linear model on x_vals.&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">X</span> <span class="o">@</span> <span class="n">thetas</span>
+
+<span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">grad_mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>  <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">@</span> <span class="n">thetas</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to use the above functions, we need <code>X</code>, and <code>y</code>. These can both be obtained from our dataframe. Remember that <code>X</code> and <code>y</code> have to be numpy matrices in order to be able to multiply them with <code>@</code> notation.</p>
+<p><code>X</code> consists of all columns of the dataframe except for the target column, <code>Weight</code>.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">donkeys_c</span>
+     <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Weight&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+     <span class="o">.</span><span class="n">as_matrix</span><span class="p">())</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>y</code> consists of the <code>Weight</code> column of our dataset.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">donkeys_c</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we just need to call the <code>minimize</code> function defined in a previous section.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">mse_cost</span><span class="p">,</span> <span class="n">grad_mse_cost</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>theta: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.] | cost: 23830.83
+theta: [ 0.01  0.53  0.65  0.56  0.    0.    0.    0.    0.    0.    0.    0.    0.
+  0.  ] | cost: 1251.65
+theta: [-0.07  2.    2.34 -2.78 -0.03 -0.1  -0.33  0.17  0.07  0.32  0.06 -0.19
+ -0.31  0.02] | cost: 1038.97
+theta: [-0.25 -0.75  5.1  -3.39 -0.09 -0.29 -1.11  0.55  0.26  0.98  0.2  -0.59
+ -0.97  0.05] | cost: 882.01
+theta: [-0.42 -0.45  4.52 -3.08 -0.14 -0.45 -1.77  0.86  0.43  1.48  0.35 -0.9
+ -1.53  0.08] | cost: 600.47
+theta: [-1.25  0.49  2.84 -2.14 -0.43 -1.34 -4.54  2.36  1.29  3.36  1.13 -2.13
+ -4.34  0.33] | cost: 211.62
+theta: [-2.45  0.98  1.76 -1.4  -0.9  -2.75 -7.44  4.27  2.56  5.01  2.25 -3.41
+ -8.12  0.84] | cost: 141.47
+theta: [ -3.23   0.96   1.61  -1.21  -1.26  -3.77  -8.41   5.27   3.41   5.33
+   2.94  -3.9  -10.27   1.26] | cost: 134.37
+theta: [ -4.99   0.88   1.41  -0.88  -2.12  -6.14  -9.83   7.27   5.38   5.58
+   4.36  -4.81 -14.75   2.19] | cost: 122.79
+theta: [ -8.49   0.72   1.14  -0.38  -3.92 -10.79 -11.17  10.53   9.33   5.38
+   6.78  -6.35 -22.52   3.9 ] | cost: 112.96
+theta: [ -9.6    0.7    1.12  -0.33  -4.59 -12.15 -10.54  10.94  10.62   4.89
+   7.13  -6.68 -23.91   4.22] | cost: 111.01
+theta: [-11.6    0.69   1.14  -0.31  -5.88 -14.29  -8.86  11.05  12.93   3.88
+   7.23  -7.22 -25.14   4.42] | cost: 108.17
+theta: [-13.64   0.7    1.15  -0.32  -7.23 -15.95  -7.4   10.74  15.17   3.04
+   6.9   -7.75 -25.34   4.21] | cost: 106.52
+theta: [-15.46   0.72   1.16  -0.32  -8.43 -16.89  -6.83  10.31  16.99   2.59
+   6.36  -8.18 -24.9    3.7 ] | cost: 105.29
+theta: [-18.63   0.74   1.16  -0.3  -10.47 -17.93  -6.79   9.65  19.88   2.09
+   5.35  -8.81 -23.93   2.63] | cost: 103.38
+theta: [-23.09   0.76   1.14  -0.24 -13.25 -18.7   -7.74   8.99  23.45   1.64
+   4.05  -9.39 -22.63   1.09] | cost: 101.44
+theta: [-25.76   0.75   1.13  -0.2  -14.78 -18.52  -8.85   8.9   24.99   1.5    3.5
+  -9.39 -22.11   0.31] | cost: 100.43
+theta: [-28.32   0.74   1.12  -0.15 -16.1  -17.74  -9.92   9.12  25.75   1.42
+   3.29  -9.03 -21.97  -0.14] | cost: 99.51
+theta: [-31.4    0.73   1.13  -0.11 -17.54 -16.55 -10.56   9.52  26.07   1.35
+   3.27  -8.46 -22.04  -0.34] | cost: 98.51
+theta: [-36.89   0.71   1.15  -0.08 -20.   -14.57 -10.74  10.1   26.35   1.26
+   3.36  -7.66 -22.15  -0.41] | cost: 96.93
+theta: [-46.75   0.71   1.19  -0.03 -24.28 -11.51 -10.02  10.85  26.71   1.19
+   3.5   -6.74 -22.09  -0.33] | cost: 94.60
+theta: [-57.15   0.73   1.23   0.01 -28.56  -8.95  -8.5   11.24  26.92   1.28
+   3.63  -6.46 -21.65  -0.07] | cost: 92.49
+theta: [-65.83   0.75   1.25   0.04 -31.73  -7.59  -6.9   11.17  26.75   1.51
+   3.74  -6.95 -20.85   0.33] | cost: 90.78
+theta: [-72.09   0.77   1.26   0.07 -33.44  -7.41  -5.96  10.78  26.09   1.76
+   3.88  -7.81 -19.89   0.78] | cost: 89.40
+theta: [-79.41   0.79   1.26   0.12 -34.78  -7.87  -5.59  10.15  24.66   1.99
+   4.12  -8.85 -18.58   1.39] | cost: 87.70
+theta: [-90.71   0.8    1.28   0.21 -36.31  -8.87  -5.97   9.3   22.     2.14
+   4.5   -9.77 -16.73   2.23] | cost: 85.30
+theta: [-106.81    0.81    1.3     0.33  -38.15  -10.25   -7.18    8.37   18.09
+    2.1     4.95   -9.88  -14.52    3.16] | cost: 82.31
+theta: [-123.97    0.81    1.35    0.44  -39.8   -11.61   -8.64    7.7    14.11
+    1.94    5.18   -8.67  -12.66    3.73] | cost: 79.49
+theta: [-136.75    0.81    1.4     0.51  -40.61  -12.58   -9.45    7.45   11.53
+    1.88    5.02   -6.62  -11.7     3.66] | cost: 77.46
+theta: [-143.91    0.82    1.43    0.54  -40.45  -13.16   -9.34    7.45   10.56
+    2.07    4.61   -4.78  -11.39    3.16] | cost: 76.16
+theta: [-148.08    0.83    1.45    0.54  -39.59  -13.51   -8.69    7.5    10.46
+    2.47    4.15   -3.59  -11.25    2.55] | cost: 75.24
+theta: [-152.11    0.84    1.46    0.55  -38.09  -13.73   -7.85    7.54   10.65
+    2.99    3.77   -2.97  -10.96    1.94] | cost: 74.35
+theta: [-158.72    0.86    1.48    0.58  -35.41  -13.76   -6.87    7.59   10.94
+    3.62    3.48   -2.67  -10.31    1.24] | cost: 73.09
+theta: [-170.52    0.88    1.5     0.63  -30.71  -13.34   -5.85    7.73   11.36
+    4.21    3.34   -2.65   -9.11    0.43] | cost: 71.11
+theta: [-190.66    0.91    1.56    0.73  -22.83  -11.97   -4.97    8.03   12.03
+    4.47    3.47   -2.85   -7.17   -0.47] | cost: 68.21
+theta: [-210.17    0.93    1.63    0.83  -15.25   -9.94   -4.94    8.35   12.77
+    3.89    3.86   -3.07   -5.53   -0.85] | cost: 65.73
+theta: [-218.49    0.93    1.68    0.86  -11.99   -8.43   -5.55    8.43   13.26
+    2.91    4.1    -3.07   -5.15   -0.54] | cost: 64.59
+theta: [-218.18    0.92    1.69    0.85  -12.03   -7.96   -5.97    8.26   13.44
+    2.35    4.01   -2.94   -5.49   -0.09] | cost: 64.30
+theta: [-217.06    0.92    1.69    0.84  -12.38   -7.85   -6.11    8.01   13.54
+    2.15    3.75   -2.84   -5.83    0.24] | cost: 64.18
+theta: [-216.73    0.92    1.7     0.84  -12.4    -7.77   -6.11    7.64   13.63
+    2.1     3.33   -2.77   -6.12    0.57] | cost: 64.09
+theta: [-217.54    0.93    1.7     0.84  -12.04   -7.71   -6.04    7.4    13.67
+    2.18    3.     -2.79   -6.19    0.72] | cost: 64.06
+theta: [-218.31    0.93    1.7     0.85  -11.75   -7.68   -5.99    7.35   13.65
+    2.25    2.89   -2.85   -6.14    0.72] | cost: 64.05
+theta: [-218.57    0.93    1.7     0.85  -11.66   -7.67   -5.98    7.36   13.63
+    2.27    2.86   -2.89   -6.12    0.69] | cost: 64.05
+theta: [-218.75    0.93    1.69    0.85  -11.61   -7.66   -5.98    7.39   13.58
+    2.26    2.81   -2.94   -6.12    0.65] | cost: 64.04
+theta: [-218.83    0.93    1.69    0.85  -11.58   -7.64   -5.98    7.44   13.52
+    2.21    2.72   -3.02   -6.16    0.57] | cost: 64.04
+theta: [-218.74    0.93    1.69    0.85  -11.62   -7.63   -5.98    7.48   13.46
+    2.13    2.61   -3.08   -6.24    0.5 ] | cost: 64.04
+theta: [-218.58    0.93    1.69    0.85  -11.67   -7.62   -5.98    7.48   13.43
+    2.07    2.55   -3.11   -6.3     0.46] | cost: 64.04
+theta: [-218.51    0.93    1.7     0.85  -11.69   -7.62   -5.97    7.46   13.43
+    2.05    2.55   -3.11   -6.33    0.44] | cost: 64.04
+theta: [-218.49    0.93    1.7     0.85  -11.7    -7.62   -5.96    7.44   13.43
+    2.04    2.55   -3.11   -6.34    0.42] | cost: 64.04
+theta: [-218.51    0.93    1.7     0.85  -11.69   -7.62   -5.96    7.42   13.43
+    2.04    2.56   -3.11   -6.36    0.4 ] | cost: 64.04
+theta: [-218.54    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.42
+    2.04    2.57   -3.12   -6.36    0.39] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+theta: [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+    2.04    2.57   -3.12   -6.36    0.38] | cost: 64.04
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Looks like gradient descent converged to those theta values! Thus, our linear model is:</p>
+<p>$y = -218.56 + 0.93x_1 + ... -6.36x_{13} + 0.38x_{14}$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's compare this equation that we obtained to the one we would get if we had used <code>sklearn</code>'s LinearRegression model instead. The LinearRegression model automatically includes a column of all 1's in our data, so we can get rid of our column of 1's when we pass <code>X</code> into the <code>fit</code> function.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">donkeys_c</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>15</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">14</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Coefficients&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Intercept&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Coefficients [  0.     0.93   1.7    0.85 -11.68  -7.61  -5.96   7.41  13.41   2.04
+   2.57  -3.12  -6.36   0.38]
+Intercept -218.555096944
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The coefficients look pretty similar! Our homemade functions create the same model as an established Python package!</p>
+<p>We successfully fit a linear model to our donkey data! Nice!</p></div></div></div></div>
