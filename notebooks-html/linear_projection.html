@@ -44,11 +44,12 @@
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Least-Squares-Regression-as-a-Projection">Least Squares Regression as a Projection<a class="anchor-link" href="#Least-Squares-Regression-as-a-Projection">&#182;</a></h1></div></div></div>
+<h1 id="Least-Squares---A-geometric-perspective">Least Squares - A geometric perspective<a class="anchor-link" href="#Least-Squares---A-geometric-perspective">&#182;</a></h1></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Recall that we found the optimal coefficients for linear models by optimizing their cost functions with gradient descent.</p>
-<p>We also mentioned that least squares linear regression can be solved analytically. While gradient descent is practical, this geometric perspective will provide a deeper understanding of linear regression.</p></div></div></div>
+<p>We also mentioned that least squares linear regression can be solved analytically. While gradient descent is practical, this geometric perspective will provide a deeper understanding of linear regression.</p>
+<p>A review of vectors and vector spaces is included at the bottom. Please review any vector concepts you are unfamiliar with, especially the $\vec{1}$ vector, vector arithmetic, span of a collection of vectors, and projections.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Case-Study">Case Study<a class="anchor-link" href="#Case-Study">&#182;</a></h2></div></div></div>
@@ -113,15 +114,94 @@
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Assume that the best model is one with the least error, and that the least squared error is an acceptable measure.</p>
-<p>Recall that a simple linear regression model follows the form:</p>
+<p>Assume that the best model is one with the least error, and that the least squares error is an acceptable measure.</p>
+<h3 id="Least-Squares:-Constant-Model">Least Squares: Constant Model<a class="anchor-link" href="#Least-Squares:-Constant-Model">&#182;</a></h3><p>Like we did with the tips dataset, let's start with the constant model: the model that only ever predicts a single number.</p>
+<p>$$ f = \hat{\theta} $$</p>
+<p>Our goal is to find the $\hat{\theta}$ that results in the line that minimizes the least squares loss:</p>
+<p>$$ L(\hat{\theta}, \vec{y}) = \sum_{i = 1}^{n}(y_i - \hat{\theta})^2\\ $$</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#HIDDEN</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.333</span><span class="p">,</span> <span class="mf">0.333</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/linear_projection_9_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice that our loss function is a sum of squares. The <em>L2</em>-norm for a vector is also a sum of squares, but with a square root:</p>
+<p>$$\Vert \vec{v} \Vert = \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If we let $y_i - \hat{\theta} = v_i$:</p>
+<p>$$
+\begin{aligned}
+L(\hat{\theta}, \vec{y}) 
+&amp;= v_1^2 + v_2^2 + \dots + v_n^2 \\
+&amp;= \Vert \vec{v} \Vert^2
+\end{aligned}
+$$</p>
+<p>This means our loss can be expressed as the <em>L2</em> norm of some vector $v$, squared. We can simply express the components of $v_i$ as equal $y_i - \hat{\theta} \quad \forall i \in [1,n]$ so that in Cartesian notation,</p>
+<p>$$
+\begin{aligned}
+\vec{v} \quad &amp;= \quad \begin{bmatrix} y_1 - \hat{\theta} \\ y_2 - \hat{\theta} \\ \vdots \\ y_n - \hat{\theta} \end{bmatrix} \\
+&amp;= \quad \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n  \end{bmatrix} \quad - \quad 
+\begin{bmatrix} \hat{\theta} \\ \hat{\theta} \\ \hat{\theta} \end{bmatrix} \\
+&amp;= \quad \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n  \end{bmatrix} \quad - \quad 
+\begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}
+\hat{\theta}
+\end{aligned}
+$$</p>
+<p>So our loss function can be written as:</p>
+<p>$$ 
+\begin{aligned}
+L(\hat{\theta}, \vec{y})
+\quad &amp;= \quad \left \Vert  \qquad   
+\begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n  \end{bmatrix} \quad - \quad 
+\begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}
+\hat{\theta}
+\qquad \right \Vert ^2 \\
+\quad &amp;= \quad \left \Vert  \qquad  
+\vec{y} 
+\quad - \quad 
+\hat{y}
+\qquad \right \Vert ^2 \\
+\end{aligned}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The expression $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \ \hat{\theta}$  is a scalar multiple of the columns of the $\vec{1}$ vector.</p>
+<p>This gives us a new perspective on what it means to minimize the least squares error.</p>
+<p>$\vec{y}$ and $\vec{1}$ are fixed, but $\hat{\theta}$ can take on any value, so $\hat{y}$ can be any scalar multiple of $\vec{1}$. We want to find $\hat{\theta} \ \vec{1}$ that is closest to $\vec{y}$.</p>
+<p><img src="../../notebooks-images/linear_projection__1dprojection.png" width="300" /></p>
+<p>The projection of $\vec{y}$ onto $\vec{1}$ is guaranteed to be the closest vector (see "Vector Space Review").</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Least-Squares:-Linear-Model">Least Squares: Linear Model<a class="anchor-link" href="#Least-Squares:-Linear-Model">&#182;</a></h3><p>Now, let's do the same for a simple linear regression model:</p>
 <p>$$
 \begin{aligned}
 f_\hat{\theta} (x_i) 
 &amp;= \hat{\theta_0} + \hat{\theta_1} x_i \\
 \end{aligned}
 $$</p>
-<p>Our goal is to find the $\hat{\theta}$ that results in the line with the least squared error $L(\hat{\theta}, \vec{x}, \vec{y})$:</p>
+<p>Our goal is to find the $\hat{\theta}$ that results in the line with the least squared error:</p>
 <p>$$
 \begin{aligned}
 L(\hat{\theta}, \vec{x}, \vec{y})
@@ -165,7 +245,7 @@ $$</p></div></div></div>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_9_0.png"
+<img src="/notebooks-images/linear_projection_14_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -195,25 +275,25 @@ L(\hat{\theta}, \vec{x}, \vec{y})
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Notice that our loss function is a sum of squares. Also, notice that the <em>L2</em>-norm for a vector has a similar form:</p>
+<p>Again, our loss function is a sum of squares and the <em>L2</em>-norm for a vector is the square root of a sum of squares:</p>
 <p>$$\Vert \vec{v} \Vert = \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}$$</p>
 <p>If we let $y_i - \begin{bmatrix} 1 &amp; x_i \end{bmatrix}
 \begin{bmatrix} 
      \hat{\theta_0} \\
      \hat{\theta_1}
-\end{bmatrix} = v_i$: 
-$$
+\end{bmatrix} = v_i$:</p>
+<p>$$
 \begin{aligned}
 L(\hat{\theta}, \vec{x}, \vec{y}) 
 &amp;= v_1^2 + v_2^2 + \dots + v_n^2 \\
 &amp;= \Vert \vec{v} \Vert^2
 \end{aligned}
 $$</p>
-<p>This means our loss can be expressed as the <em>L2</em> norm of some vector $v$, squared. To get the components $v_i$ to equal $y_i - \begin{bmatrix} 1 &amp; x_i \end{bmatrix}
+<p>As before, our loss can be expressed as the <em>L2</em> norm of some vector $v$, squared. With each component $v_i = y_i - \begin{bmatrix} 1 &amp; x_i \end{bmatrix}
 \begin{bmatrix} 
      \hat{\theta_0} \\
      \hat{\theta_1}
-\end{bmatrix} \forall i \in [1,3]$:</p>
+\end{bmatrix} \quad \forall i \in [1,3]$:</p>
 <p>$$ 
 \begin{aligned}
 L(\hat{\theta}, \vec{x}, \vec{y})
@@ -248,174 +328,11 @@ $$</p></div></div></div>
      \hat{\theta_0} \\
      \hat{\theta_1}
 \end{bmatrix}$ is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$--this perspective shows us that $\hat{y}$ is a linear combination of the features of our data.</p>
-<p>This gives us a new perspective on what it means to minimize the least squares error.</p>
+<p>This gives us a new perspective on what it means to minimize the least squares error for a linear model.</p>
 <p>$X$ and $\vec{y}$ are fixed, but $\hat{\theta_0}$ and $\hat{\theta_1}$ can take on any value, so $\hat{y}$ can take on any of the infinite linear combinations of the columns of $X$. To have the smallest loss, we want to choose $\hat{\theta_0}$ and $\hat{\theta_1}$ such that the resulting vector is as close to $\vec{y}$ as possible.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Geometrical-Intuition">Geometrical Intuition<a class="anchor-link" href="#Geometrical-Intuition">&#182;</a></h2><p>Now, let's develop an intuition for what it means for the columns of $X$ to span a vector space, and why it matters that $\hat{y}$ is restricted to this vector space.</p>
-<p>Let $\vec{x}$ and $\vec{1}$ by two generic vectors, colored black. As we take linear combinations, we will use red for each new vector.</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  style="display:none;"
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span> 
-           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_14_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>When $\hat{\theta_0} = 2$ and $\hat{\theta_1} = 0.5$, we add half of $x$ with two times the unit vector, resulting in a new vector.</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  style="display:none;"
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
-           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_16_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>When $\hat{\theta_0} = 3$ and $\hat{\theta_1} = -1$, we add $3$ times the unit vector to $-1$ times $x$, resulting in yet another vector.</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  style="display:none;"
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> 
-           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_18_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>With $\hat{\theta_0} = -2$ and $\hat{\theta_1} = -1$, we get:</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  style="display:none;"
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> 
-           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_20_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>With $\hat{\theta_0} = -4$ and $\hat{\theta_1} = 1$, we get:</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  style="display:none;"
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">8</span><span class="p">],</span> 
-           <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-           <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_22_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>This process can go on and on, showing that when we can use any scalar multiples, we can make an infinite number of linear combinations. However, infinite does not mean any--the linear combinations span a space defined by the original vectors. In this case, we would create a plane as you can start to see above. However, if we had more explanatory variables, the columns of $X$ would create higher dimensional vector spaces.</p>
-<p>Formally, this illustrates how vectors $\vec{x}$ and $\vec{1}$ span a vector space.</p>
-<p>Back to linear regression, $\hat{y} = X \hat{\theta}$, and is thus the restricted to the vector space spanned by the columns of X. Let's look at the significance of these facts.</p></div></div></div>
+<h2 id="Geometrical-Intuition">Geometrical Intuition<a class="anchor-link" href="#Geometrical-Intuition">&#182;</a></h2><p>Now, let's develop an intuition for why it matters that $\hat{y}$ is restricted to the linear combinations of $X$. Although the span of any set of vectors includes an infinite number of linear combinations, infinite does not mean any--the linear combinations are restricted by the basis vectors. In this case, we would create a plane, if we had more explanatory variables, the columns of $X$ can* create higher dimensional vector subspaces of $\mathbb{R}^n$ . This is only the case if the additional columns are not linear combinations of the existing ones (see the section "When Variables are Linearly Dependent").</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As a reminder, here is our loss function and scatter plot:</p>
@@ -446,7 +363,7 @@ X \hat{\theta}
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/linear_projection_25_0.png"
+<img src="/notebooks-images/linear_projection_20_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -517,4 +434,185 @@ $$</p></div></div></div>
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We have analytically found that best model for least squares regression is $f_\hat{\theta} (x_i) = - \frac{3}{13} + \frac{11}{13} x_i$. We know that our choice of $\hat{\theta}$ is sound by the mathematical property that the projection of $\vec{y}$ onto the span of the columns of $X$ yields the closest point in the vector space to $\vec{y}$. Under linear constraints using the least squares metric, solving for $\hat{\theta}$ by taking the projection guarantees us the optimal solution.</p></div></div></div></div>
+<p>We have analytically found that best model for least squares regression is $f_\hat{\theta} (x_i) = - \frac{3}{13} + \frac{11}{13} x_i$. We know that our choice of $\hat{\theta}$ is sound by the mathematical property that the projection of $\vec{y}$ onto the span of the columns of $X$ yields the closest point in the vector space to $\vec{y}$. Under linear constraints using the least squares metric, solving for $\hat{\theta}$ by taking the projection guarantees us the optimal solution.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="When-Variables-are-Linearly-Dependent">When Variables are Linearly Dependent<a class="anchor-link" href="#When-Variables-are-Linearly-Dependent">&#182;</a></h2><p>For every additional variable, we add one column to $X$. The span of the columns of $X$ is the linear combinations of the column vectors, so adding variables only changes the span into a higher dimensional subspaces when the added variable is linearly independent of the existing ones. Otherwise, if a column is linearly dependent, it can be expressed as a linear combination of some other column. Thus, for every linear combination it contributes to, we can replace it with a linear combination of the other columns. So we have not expanded the set of possible vectors spanned by the original columns of $X$.</p>
+<p>Recall that the span of $X$ is important because it is the subspace we want to project $\vec{y}$ onto. If the subspace does not change, then the projection will not change.</p>
+<p>For example, when we introduced $\vec{x}$ when moving from the constant model to linear model, we introduced a independent variable: $\vec{x} = \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix}$ cannot be expressed as a scalar of $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$.</p>
+<p>However, say we instead introduced a new variable $d$ with values:</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th>d</th>
+<th style="text-align:left">y</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-0.5</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td>-0.5</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td>-0.5</td>
+<td style="text-align:left">-2</td>
+</tr>
+</tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then, we would be minimizing the loss function:</p>
+<p>$$ 
+\begin{aligned}
+L(\hat{\theta}, \vec{d}, \vec{y})
+&amp;= \left \Vert  \qquad   
+\begin{bmatrix} y_1 \\ y_2 \\ y_3  \end{bmatrix} \quad - \quad 
+\begin{bmatrix} 1 &amp; d_1 \\ 1 &amp; d_2 \\ 1 &amp; d_3 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_0} \\
+     \hat{\theta_1}
+\end{bmatrix}
+\qquad \right \Vert ^2 \\
+&amp;= \left \Vert  \qquad   
+\begin{bmatrix} y_1 \\ y_2 \\ y_3  \end{bmatrix} \quad - \quad 
+\begin{bmatrix} 1 &amp; -0.5 \\ 1 &amp; -0.5 \\ 1 &amp; -0.5 \end{bmatrix}
+\begin{bmatrix} 
+     \hat{\theta_0} \\
+     \hat{\theta_1}
+\end{bmatrix}
+\qquad \right \Vert ^2 \\
+&amp;= \left \Vert  \qquad  
+\vec{y} 
+\quad - \quad 
+X 
+\begin{bmatrix} 
+     \hat{\theta_0} \\
+     \hat{\theta_1}
+\end{bmatrix}
+\qquad \right \Vert ^2 \\
+&amp;= \left \Vert  \qquad  
+\vec{y} 
+\quad - \quad 
+\vec{\hat{y}}
+\qquad \right \Vert ^2 \\
+\end{aligned}
+$$</p>
+<p>Recall that $\hat{y}$ can take on any of the infinite linear combinations of the columns of $X$. Thus, its possible values are $\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} + \theta_1 \begin{bmatrix} -0.5 \\ -0.5 \\ -0.5 \end{bmatrix}$.</p>
+<p>Since $\vec{d} = \frac{-1}{2} \ \vec{1}$, regardless of $\theta_0$ and $\theta_1$, the possible values can be rewritten as:
+$$\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} - \frac{1}{2} \theta_1 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \quad = \quad (\theta_0 - \frac{1}{2} \theta_1) \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$$</p>
+<p>Just as before, our solution space are the scalar multiples of $\vec{1}$, just like before we introduced the variable $d$.</p>
+<p><img src="../../notebooks-images/linear_projection__dependent_variables.png" width="400" /></p>
+<p>Adding a linearly dependent column to $X$ does not change its spanning column space, and thus will not change the projection and solution to the least squares problem.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Vector-Space-Review">Vector Space Review<a class="anchor-link" href="#Vector-Space-Review">&#182;</a></h2><ul>
+<li>Definition of a vector</li>
+<li>Scaling vectors</li>
+<li>Adding vectors</li>
+<li>Vector notations</li>
+<li><p>The $\vec{1}$ vector</p>
+</li>
+<li><p>Span of a set of vectors</p>
+</li>
+<li>Vector space</li>
+<li>Vector subspace</li>
+</ul>
+<ul>
+<li>Angles between vectors</li>
+<li>Vector length</li>
+<li>Distance between of vectors</li>
+<li>Orthogonal vectors (needs work)</li>
+<li>Orthogonal vector spaces (omitted for now)</li>
+<li>Projections of vectors</li>
+</ul></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Vector-Definition">Vector Definition<a class="anchor-link" href="#Vector-Definition">&#182;</a></h4><p>A vector is defined by a length and a direction.</p>
+<p><img src="../../notebooks-images/vector_space_review__vectors.png" width="500" /></p>
+<p>Notice that $\vec{x}$ and $\vec{y}$ have the same length and direction. They are equal vectors.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Scaling-and-Adding-Vectors">Scaling and Adding Vectors<a class="anchor-link" href="#Scaling-and-Adding-Vectors">&#182;</a></h4><p>To scale a vector is to change it's length.</p>
+<p><img src="../../notebooks-images/vector_space_review__scaling.png" width="500" /></p>
+<p>Notice that $\vec{2x}$ and $\vec{y}$ have the direction but different lengths. They are not equal.</p>
+<p>To add two vectors $\vec{y} + \vec{z}$, take one step according to the length of $\vec{y}$, then immediately take one step according to the length of $\vec{z}$ (or vice versa). This is also known as triangle method, where you place the initial point of a vector on the terminal point of the other.</p>
+<p><img src="../../notebooks-images/vector_space_review__adding.png" width="300" /></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Vector-Notations">Vector Notations<a class="anchor-link" href="#Vector-Notations">&#182;</a></h4><p>Vectors are usually represented as Cartesian Coordinates.</p>
+<p><img src="../../notebooks-images/vector_space_review__notation.png" width="500" /></p>
+<p>$$ \vec{x} = \begin{bmatrix} 1 \\ 4  \end{bmatrix} , \quad 
+   \vec{y} = \begin{bmatrix} 3 \\ 2  \end{bmatrix} , \quad 
+   \vec{z} = \begin{bmatrix} 4 \\ 0  \end{bmatrix}$$</p>
+<p>In this notation, arithmetic operations we saw earlier become quite easy.</p>
+<p>$$ \vec{2x} = \begin{bmatrix} 2 \\ 8  \end{bmatrix} , \quad
+   \vec{-0.5z} = \begin{bmatrix} -2 \\ 0  \end{bmatrix} , \quad
+   \vec{2x + -0.5z} = \begin{bmatrix} 0 \\ 8  \end{bmatrix}
+$$</p>
+<p><img src="../../notebooks-images/vector_space_review__notation_arithmetic.png" width="500" /></p>
+<p>Vectors can be added and scaled element-wise:</p>
+<p>$$a \vec{x} + b \vec{y} = \begin{bmatrix} a \ x_1 &amp; + &amp; b \  y_1 \\
+                                            &amp; \vdots &amp; \\
+                                          a \  x_n &amp; + &amp; b \  y_n
+                          \end{bmatrix}
+$$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="The-$\vec{1}$-Vector">The $\vec{1}$ Vector<a class="anchor-link" href="#The-$\vec{1}$-Vector">&#182;</a></h4><p>In any $d$ dimensional space, $\vec{1}$ is the vector of all $1$'s: 
+$ \begin{bmatrix} 1 \\ \vdots \\ 1  \end{bmatrix}$</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Span">Span<a class="anchor-link" href="#Span">&#182;</a></h4><p>The span of a set of vectors $\{\vec{v_1}, \vec{v_2}, \dots, \vec{v_p}\}$ is the set of all possible linear combinations. For these $p$ vectors:</p>
+<p>$$ \{ c_1 \ \vec{v_1} + c_2 \ \vec{v_2} + \dots + c_p \ \vec{v_p} \ : \ \forall c_i \in F\}$$</p>
+<p>where $F$ is the field of the vector space (out of scope).</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Vector-Spaces">Vector Spaces<a class="anchor-link" href="#Vector-Spaces">&#182;</a></h4><p>A vector space $V$ is the span of a set of vectors $\{\vec{v_1}, \vec{v_2}, \dots, \vec{v_p}\}$, where each $\vec{v_i}$ is a $n \times 1$ dimensional column vector.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Vector-Subspaces">Vector Subspaces<a class="anchor-link" href="#Vector-Subspaces">&#182;</a></h4><p>A subspace $U$ of $V$ is the span of a set of vectors $\{\vec{u_1}, \dots, \vec{u_q}\}$ where each $\vec{u_i} \in V$. This means every vector in $U$ is also in $V$.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Vector-Angles">Vector Angles<a class="anchor-link" href="#Vector-Angles">&#182;</a></h4><p>When you put any two vectors terminal end to terminal end without changing their direction, you can measure the angle between them.</p>
+<p><img src="../../notebooks-images/vector_space_review__angle.png" width="300" /></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Vector-Length">Vector Length<a class="anchor-link" href="#Vector-Length">&#182;</a></h4><p>Intuition in $\mathbb{R}^2$ :</p>
+<p>Recall the triangle method of adding two vectors. If we add two perpendicular vectors $\vec{a} + \vec{b}$ in $\mathbb{R}^2$, then we know that the resulting vector will be the hypotenuse. In this case, we also know that the length of $\vec{a} + \vec{b}$ will follow the Pythagorean Theorem: $\sqrt{a^2 + b^2}$.</p>
+<p><img src="../../notebooks-images/vector_space_review__length.png" width="400" /></p>
+<p>General Formula for  Length of $\vec{v} \in \mathbb{R}^n$ :
+$$\begin{aligned} || \vec{v} || \quad
+&amp;=  \quad \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}  \\
+&amp;= \quad \sqrt{\vec{v} \cdot \vec{v}}
+\end{aligned}
+$$</p>
+<p>Where the final operator is the dot product.</p>
+<p>$$ \begin{aligned}
+\vec{x} \cdot \vec{y} \quad 
+&amp;= \quad x_1 \ y_1 + x_2 \ y_2 + \dots + x_n \ y_n \\
+&amp;= \quad||u|| \ ||v|| \ \cos{\theta}
+\end{aligned}
+$$</p>
+<p>The first expression is known as the algebraic definition of the dot product, and the second is the geometric definition. Note that the dot product is the inner product defined for vectors in $\mathbb{R}^n$.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Distance-Between-Two-Vectors">Distance Between Two Vectors<a class="anchor-link" href="#Distance-Between-Two-Vectors">&#182;</a></h4><p>$$dist(\vec{x},\vec{y}) \quad = \quad || \vec{x} - \vec{y} ||$$</p>
+<p><img src="../../notebooks-images/vector_space_review__distance.png" width="500" /></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Orthogonal-Vectors">Orthogonal Vectors<a class="anchor-link" href="#Orthogonal-Vectors">&#182;</a></h4><p>For two non-zero vectors to be orthogonal, they must satisfy the property that $\vec{x} \cdot \vec{y} = 0$. Since they have non-zero length, the only way for the two vectors to be orthogonal is if $\cos{\theta} = 0$. One satisfying $\theta$ is 90 degrees, our familiar right angle.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Orthogonal-Vector-Spaces">Orthogonal Vector Spaces<a class="anchor-link" href="#Orthogonal-Vector-Spaces">&#182;</a></h4><p>To come.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Projections">Projections<a class="anchor-link" href="#Projections">&#182;</a></h4><p>To project one vector $\vec{x}$ onto another vector $\vec{y}$, we want to find $k \ \vec{y}$ that is closest to $\vec{x}$.</p>
+<p><img src="../../notebooks-images/vector_space_review__projection.png" width="400" /></p>
+<p>By the Pythagorean Theorem, we know that $k$ must be the scalar such that $\vec{x} - k \ \vec{y}$ is perpendicular to $\vec{y}$, so  $k \ \vec{y}$ is the (orthogonal) projection of $\vec{x}$ onto $\vec{y}$.</p>
+<p>Likewise, to project one vector $\vec{x}$ onto any vector space spanned by some set of vectors $\{\vec{v_1}, \vec{v_2}, \dots, \vec{v_p}\}$, we still find the linear combination $k_1 \ \vec{v_1} + k_2 \ \vec{v_2} + \dots + k_p \ \vec{v_p}\}$ that is closest to $\vec{x}$.</p>
+<p><img src="../../notebooks-images/vector_space_review__proj2d.png" width="500" /></p></div></div></div></div>
