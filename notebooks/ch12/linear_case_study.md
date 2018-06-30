@@ -204,7 +204,7 @@ donkeys.columns.values
 
 Our analysis can be guided by a good understanding of our data, so we should aim to understand what each of these columns represent. A few of these columns are self-explanatory, but others require a little more explanation:
 
-- `BCS`: Body Condition Score 
+- `BCS`: Body Condition Score (a physical health rating)
 - `Girth`: the measurement around the middle of the donkey
 - `WeightAlt`: 31 donkeys within our data frame were weighed twice in order to check the accuracy of the scale. The second weighing is in `WeightAlt`.
 
@@ -497,7 +497,7 @@ From these plots, we can see that our predictor variables also have strong linea
 
 ## Transforming Variables
 
-Next, we transform the categorical variables into dummy variables so that we can include them in the model. Recall from our boxplots that `Sex` was not a useful variable, so we will drop it. We will also remove the `WeightAlt` column because we only have its value for 31 donkeys.
+Recall from our boxplots that `Sex` was not a useful variable, so we will drop it. We will also remove the `WeightAlt` column because we only have its value for 31 donkeys. Also, using `get_dummies`, we transform the categorical variables `BCS` and `Age` into dummy variables so that we can include them in the model. 
 
 
 ```python
@@ -690,7 +690,7 @@ donkeys_c.head()
 
 
 
-We should also add a column of biases.
+We should also add a column of biases in order to have a constant term in our model.
 
 
 ```python
@@ -987,15 +987,13 @@ len(donkeys_c.columns.values)
 
 
 ```python
-model = LinearRegression()
+model = LinearRegression(fit_intercept=False) # We already accounted for it with the bias column
 model.fit(X[:, :14], y)
 print("Coefficients", model.coef_)
-print("Intercept", model.intercept_)
 ```
 
-    Coefficients [  0.     0.93   1.7    0.85 -11.68  -7.61  -5.96   7.41  13.41   2.04
-       2.57  -3.12  -6.36   0.38]
-    Intercept -218.555096944
+    Coefficients [-218.56    0.93    1.7     0.85  -11.68   -7.61   -5.96    7.41   13.41
+        2.04    2.57   -3.12   -6.36    0.38]
     
 
 The coefficients look pretty similar! Our homemade functions create the same model as an established Python package!
