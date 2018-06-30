@@ -73,6 +73,6 @@
 * [18. Appendix: Reference Tables](ch18/ref_intro.md)
   * [18.1 pandas](ch18/ref_pandas.md)
   * [18.2 seaborn](ch18/ref_seaborn.md)
-  * [18.3 matplotlib](ch1/ref_matplotlib.md)
+  * [18.3 matplotlib](ch18/ref_matplotlib.md)
   * [18.4 scikit-learn](ch18/ref_sklearn.md)
 * [19. Appendix: Contributors](ch19/contributors.md)
