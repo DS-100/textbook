@@ -32,7 +32,7 @@ We are often interested in the long-run average of a random variable because it 
 
 $$\mathbb{E}[X] = \sum_{x\in \mathbb{X}} x \cdot \mathbb{P}(X = x)$$
 
-For example, if $ X $ represents the roll of a single fair six-sided die, 
+For example, if $ X $ represents the roll of a single fair six-sided die,
 
 $$
 \begin{aligned}
@@ -158,11 +158,11 @@ where $X$ and $Y$ are random variables, and $c$ is a constant.
 
 In words, the expectation of a sum of any two random variables is equal to the sum of the expectations of the variables.
 
-In the previous example, we saw that $ Z = X - Y $. Thus,  $ \mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] $. 
+In the previous example, we saw that $ Z = X - Y $. Thus,  $ \mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] $.
 
 Now we can calculate $ \mathbb{E}[X] $ and  $ \mathbb{E}[Y] $ separately from each other. Since $ \mathbb{E}[X] = \mathbb{E}[Y] = 50.75 $, $ \mathbb{E}[Z] = 50.75 - 50.75 = 0 $.
 
-The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! As an example, let us again consider the case in which we sample two people from the dataset in the previous section but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$ where $X$ and $Y$ are not independent. 
+The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! As an example, let us again consider the case in which we sample two people from the dataset in the previous section but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$ where $X$ and $Y$ are not independent.
 
 From the joint distribution of $X$ and $Y$ given in the previous section, we can find $\mathbb{E}[Z]$:
 
@@ -236,7 +236,7 @@ plt.tight_layout();
 ```
 
 
-![png](bias_exp_var_files/bias_exp_var_13_0.png)
+![png](exp_var_files/exp_var_13_0.png)
 
 
 $ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
