@@ -14,11 +14,9 @@ sns.set_context('talk')
 
 # Least Squares - A geometric perspective
 
-Recall that we found the optimal coefficients for linear models by optimizing their cost functions with gradient descent.
+Recall that we found the optimal coefficients for linear models by optimizing their loss functions with gradient descent. We also mentioned that least squares linear regression can be solved analytically. While gradient descent is practical, this geometric perspective will provide a deeper understanding of linear regression.
 
-We also mentioned that least squares linear regression can be solved analytically. While gradient descent is practical, this geometric perspective will provide a deeper understanding of linear regression.
-
-A review of vectors and vector spaces is included at the bottom. Please review any vector concepts you are unfamiliar with, especially the $\vec{1}$ vector, vector arithmetic, span of a collection of vectors, and projections.
+A review of vectors and vector spaces is included at the bottom. We will assume familiarity with vector arithmetic, the 1-vector, span of a collection of vectors, and projections.
 
 ## Case Study
 
@@ -85,7 +83,7 @@ L(\hat{\theta}, \vec{y})
 \end{aligned}
 $$
 
-This means our loss can be expressed as the *L2*-norm of some vector $v$, squared. We can simply express the components of $v_i$ as equal $y_i - \hat{\theta} \quad \forall i \in [1,n]$ so that in Cartesian notation, 
+This means our loss can be expressed as the *L2*-norm of some vector $v$, squared. We can express $v_i$ as $y_i - \hat{\theta} \quad \forall i \in [1,n]$ so that in Cartesian notation, 
 
 $$
 \begin{aligned}
@@ -116,18 +114,20 @@ L(\hat{\theta}, \vec{y})
 \end{aligned}
 $$
 
-The expression $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \ \hat{\theta}$  is a scalar multiple of the columns of the $\vec{1}$ vector.
+The expression $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \ \hat{\theta}$  is a scalar multiple of the columns of the $\vec{1}$ vector, and is the result of our predictions, denoted $\hat{y}$.
 
 This gives us a new perspective on what it means to minimize the least squares error.
 
-$\vec{y}$ and $\vec{1}$ are fixed, but $\hat{\theta}$ can take on any value, so $\hat{y}$ can be any scalar multiple of $\vec{1}$. We want to find $\hat{\theta} \ \vec{1}$ that is closest to $\vec{y}$.
+$\vec{y}$ and $\vec{1}$ are fixed, but $\hat{\theta}$ can take on any value, so $\hat{y}$ can be any scalar multiple of $\vec{1}$. We want to find $\hat{\theta}$ so that $\hat{\theta} \ \vec{1}$ is closest to $\vec{y}$.
 
 <img src="../../notebooks-images/linear_projection__1dprojection.png" width="300" />
 
 The projection of $\vec{y}$ onto $\vec{1}$ is guaranteed to be the closest vector (see "Vector Space Review").
 
 ### Least Squares: Linear Model
-Now, let's do the same for a simple linear regression model:
+Now, let's look at the simple linear regression model. This is strongly parallel to the constant model derivation, but be mindful of the differences and think about how you might generalize to multiple linear regression.
+
+The simple linear model is:
 
 $$
 \begin{aligned}
@@ -170,7 +170,7 @@ sns.regplot(x='x', y='y', data=data, ci=None);
 ![png](linear_projection_files/linear_projection_13_0.png)
 
 
-In our data set, n = 3, so let's expand out this equation by breaking up the summation.
+To help us visualize the translation of our loss summation into matrix form, let's expand out the loss with $n = 3$.
 
 $$
 \begin{aligned}
@@ -243,7 +243,7 @@ X
 &= \left \Vert  \qquad  
 \vec{y} 
 \quad - \quad 
-\hat{y}
+f_\hat{\theta}
 \qquad \right \Vert ^2 \\
 \end{aligned}
 $$
@@ -252,15 +252,13 @@ The matrix multiplication $\begin{bmatrix} 1 & x_1 \\ 1 & x_2 \\ 1 & x_3 \end{bm
 \begin{bmatrix} 
      \hat{\theta_0} \\
      \hat{\theta_1}
-\end{bmatrix}$ is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$--this perspective shows us that $\hat{y}$ is a linear combination of the features of our data.
+\end{bmatrix}$ is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$—this perspective shows us that $f_\hat{\theta}$ is a linear combination of the features of our data.
 
-This gives us a new perspective on what it means to minimize the least squares error for a linear model.
+$X$ and $\vec{y}$ are fixed, but $\hat{\theta_0}$ and $\hat{\theta_1}$ can take on any value, so $f_\hat{\theta}$ can take on any of the infinite linear combinations of the columns of $X$. To have the smallest loss, we want to choose $\hat{\theta_0}$ and $\hat{\theta_1}$ such that the resulting vector is as close to $\vec{y}$ as possible.
 
-$X$ and $\vec{y}$ are fixed, but $\hat{\theta_0}$ and $\hat{\theta_1}$ can take on any value, so $\hat{y}$ can take on any of the infinite linear combinations of the columns of $X$. To have the smallest loss, we want to choose $\hat{\theta_0}$ and $\hat{\theta_1}$ such that the resulting vector is as close to $\vec{y}$ as possible.
+## Geometric Intuition
 
-## Geometrical Intuition
-
-Now, let's develop an intuition for why it matters that $\hat{y}$ is restricted to the linear combinations of $X$. Although the span of any set of vectors includes an infinite number of linear combinations, infinite does not mean any--the linear combinations are restricted by the basis vectors. In this case, we would create a plane, if we had more explanatory variables, the columns of $X$ can* create higher dimensional vector subspaces of $\mathbb{R}^n$ . This is only the case if the additional columns are not linear combinations of the existing ones (see the section "When Variables are Linearly Dependent").
+Now, let's develop an intuition for why it matters that $\hat{y}$ is restricted to the linear combinations of the columns of $X$. Although the span of any set of vectors includes an infinite number of linear combinations, infinite does not mean any—the linear combinations are restricted by the basis vectors.
 
 As a reminder, here is our loss function and scatter plot:
 
@@ -284,9 +282,9 @@ By inspection, we see that no line can perfectly fit our points, so we cannot ac
 
 <img src="../../notebooks-images/linear_projection1.png" width="500" />
 
-Since our error is based on distance, we can see that to minimize $ L(\hat{\theta}, \vec{x}, \vec{y}) = \left \Vert  \vec{y} - \hat{y} \right \Vert ^2$, we want $\hat{y}$ to be as close to $\vec{y}$ as possible.
+Since our error is based on distance, we can see that to minimize $ L(\hat{\theta}, \vec{x}, \vec{y}) = \left \Vert  \vec{y} - X \hat{\theta} \right \Vert ^2$, we want $X \hat{\theta}$ to be as close to $\vec{y}$ as possible.
 
-Mathematically, we are looking for the projection of $\vec{y}$ onto the vector space spanned by the columns of $X$, because $\hat{y}$ must be inside the vector space, and the projection of $\vec{y}$ has the property of being the closest point in the vector space to the vector $y$. Thus, choosing $\hat{\theta}$ such that $X \hat{\theta} = \hat{y} = proj_{spanX} \quad y$ is the best solution.
+Mathematically, we are looking for the projection of $\vec{y}$ onto the vector space spanned by the columns of $X$, as the projection of any vector is the closest point in $Span(X)$ to that vector. Thus, choosing $\hat{\theta}$ such that $\hat{y} = X \hat{\theta} = $ proj$_{Span(X)} \quad $ $y$ is the best solution.
 <img src="../../notebooks-images/linear_projection2.png" width="500" />
 
 To see why, consider other points on the vector space, in purple.
@@ -324,7 +322,7 @@ $$\hat{\theta^*} = (X^T X)^{-1} X^T \vec{y}$$
 
 ## Finishing up the Case Study
 
-Let's return to our case study and apply what we've learned, and explain why our solution is sound
+Let's return to our case study, apply what we've learned, and explain why our solution is sound.
 
 $$
 \vec{y} = \begin{bmatrix} 2 \\ 1 \\ -2  \end{bmatrix} \qquad X = \begin{bmatrix} 1 & 3 \\ 1 & 0 \\ 1 & -1 \end{bmatrix}
@@ -362,13 +360,15 @@ We have analytically found that best model for least squares regression is $f_\h
 
 ## When Variables are Linearly Dependent
 
-For every additional variable, we add one column to $X$. The span of the columns of $X$ is the linear combinations of the column vectors, so adding variables only changes the span into a higher dimensional subspaces when the added variable is linearly independent of the existing ones. Otherwise, if a column is linearly dependent, it can be expressed as a linear combination of some other column. Thus, for every linear combination it contributes to, we can replace it with a linear combination of the other columns. So we have not expanded the set of possible vectors spanned by the original columns of $X$.
+For every additional variable, we add one column to $X$. The span of the columns of $X$ is the linear combinations of the column vectors, so adding columns only changes the span if it is linearly independent from all existing columns.
+
+When the added column is linearly dependent, it can be expressed as a linear combination of some other columns, and thus will not introduce new any vectors to the subspace.
 
 Recall that the span of $X$ is important because it is the subspace we want to project $\vec{y}$ onto. If the subspace does not change, then the projection will not change.
 
 For example, when we introduced $\vec{x}$ when moving from the constant model to linear model, we introduced a independent variable: $\vec{x} = \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix}$ cannot be expressed as a scalar of $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$.
 
-However, say we instead introduced a new variable $d$ with values:
+Now, let's instead introduce a variable $d$ that is linearly dependent to $\vec{1}$:
 
 | d | y |
 | - | :-|
@@ -397,24 +397,10 @@ L(\hat{\theta}, \vec{d}, \vec{y})
      \hat{\theta_1}
 \end{bmatrix}
 \qquad \right \Vert ^2 \\
-&= \left \Vert  \qquad  
-\vec{y} 
-\quad - \quad 
-X 
-\begin{bmatrix} 
-     \hat{\theta_0} \\
-     \hat{\theta_1}
-\end{bmatrix}
-\qquad \right \Vert ^2 \\
-&= \left \Vert  \qquad  
-\vec{y} 
-\quad - \quad 
-\hat{y}
-\qquad \right \Vert ^2 \\
 \end{aligned}
 $$
 
-Recall that $\hat{y}$ can take on any of the infinite linear combinations of the columns of $X$. Thus, its possible values are $\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} + \theta_1 \begin{bmatrix} -0.5 \\ -0.5 \\ -0.5 \end{bmatrix}$. 
+Our possible solutions follow the form $\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} + \theta_1 \begin{bmatrix} -0.5 \\ -0.5 \\ -0.5 \end{bmatrix}$. 
 
 
 Since $\vec{d} = \frac{-1}{2} \ \vec{1}$, regardless of $\theta_0$ and $\theta_1$, the possible values can be rewritten as:
@@ -425,7 +411,7 @@ Just as before, our solution space are the scalar multiples of $\vec{1}$, just l
 <img src="../../notebooks-images/linear_projection__dependent_variables.png" width="400" />
 
 
-Adding a linearly dependent column to $X$ does not change its spanning column space, and thus will not change the projection and solution to the least squares problem.
+Adding a linearly dependent column to $X$ does not change its span, and thus will not change the projection and solution to the least squares problem.
 
 ## Vector Space Review
 - Definition of a vector
@@ -442,8 +428,7 @@ Adding a linearly dependent column to $X$ does not change its spanning column sp
 - Angles between vectors
 - Vector length
 - Distance between of vectors
-- Orthogonal vectors (needs work)
-- Orthogonal vector spaces (omitted for now)
+- Orthogonal vectors
 - Projections of vectors
 
 #### Vector Definition
@@ -535,7 +520,7 @@ Where the final operator is the dot product.
 $$ \begin{aligned}
 \vec{x} \cdot \vec{y} \quad 
 &= \quad x_1 \ y_1 + x_2 \ y_2 + \dots + x_n \ y_n \\
-&= \quad||u|| \ ||v|| \ \cos{\theta}
+&= \quad||x|| \ ||y|| \ \cos{\theta}
 \end{aligned}
 $$
 
@@ -549,9 +534,6 @@ $$dist(\vec{x},\vec{y}) \quad = \quad || \vec{x} - \vec{y} ||$$
 
 #### Orthogonal Vectors
 For two non-zero vectors to be orthogonal, they must satisfy the property that $\vec{x} \cdot \vec{y} = 0$. Since they have non-zero length, the only way for the two vectors to be orthogonal is if $\cos{\theta} = 0$. One satisfying $\theta$ is 90 degrees, our familiar right angle.
-
-#### Orthogonal Vector Spaces
-To come.
 
 #### Projections
 To project one vector $\vec{x}$ onto another vector $\vec{y}$, we want to find $k \ \vec{y}$ that is closest to $\vec{x}$.
