@@ -409,7 +409,7 @@ X
 &= \left \Vert  \qquad  
 \vec{y} 
 \quad - \quad 
-\vec{\hat{y}}
+\hat{y}
 \qquad \right \Vert ^2 \\
 \end{aligned}
 $$
