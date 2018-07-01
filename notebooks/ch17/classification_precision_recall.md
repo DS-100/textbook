@@ -171,8 +171,8 @@ Using just the occurrence of four words, we have built a model that accurately c
 
 The accuracy we computed is the proportion of predictions that the model correctly classified. The fact that the accuracy is high implies that most of the model's classifications are true positives and true negatives, which occur when the model correctly labels the positive class (spam) and negative class (ham) respectively. On the other hand, there are two types of errors a model can make:
 
-* False positive: a ham email gets flagged as spam and filtered out of the inbox. Generally, a false positive occurs when the model assigns a data point to the positive class (spam) whereas it actually belonged in the negative class (ham).
-* False negative:  a spam email gets mislabelled as ham and ends up in the inbox. Generally, a false negative occurs when the model assigns a data point to the negative class (ham) whereas it actually belonged in the positive class (spam).
+* False positive: the model assigns a data point to the positive class (spam) whereas it actually belonged in the negative class (ham). In our case, a false positive means that a ham email gets flagged as spam and filtered out of the inbox.
+* False negative: the model assigns a data point to the negative class (ham) whereas it actually belonged in the positive class (spam). In our case, a false negative means that a spam email gets mislabelled as ham and ends up in the inbox. 
 
 We can assess the number of errors relative to correct classifications by building a **confusion matrix**, which contains the model predictions on one axis and the actual labels on the other. 
 
@@ -246,7 +246,7 @@ Adding together the number of true positives and false negatives, we know the tr
 What if we used a classifier `ham_only` that simply labeled every email as ham? We can calculate its accuracy by knowing the number of ham emails in the dataset: $$ \text{Accuracy} = \frac{TP + TN}{TP + FP + TN + FN} = \frac{0 + 714}{0 + 0 + 714 + 36} = .95$$
 
 
-This model, which is essentially useless as a classifier, surprisingly achieves a better accuracy than our EDA-driven model. Clearly accuracy alone can be a misleading indicator of model performance. This is especially characteristic of **class-imbalanced datasets**, in which a vast majority of labels belong in one class over the other. In this case, most of our emails are ham. The confusion matrix shows that `words_list_model` had many more false negatives than true positives, which implies that it didn't have enough features to reliably identify spam, but because the dataset is predominantly ham, it had a deceptively high accuracy. Another common example of class imbalance is disease detection when the frequency of the disease in a population is low.
+This model, which is essentially useless as a classifier since it assigns all data to the same class, surprisingly achieves a better accuracy than our EDA-driven model. Clearly accuracy alone can be a misleading indicator of model performance. This is especially characteristic of **class-imbalanced datasets**, in which a vast majority of labels belong in one class over the other. In this case, most of our emails are ham. The confusion matrix shows that `words_list_model` had many more false negatives than true positives, which implies that it didn't have enough features to reliably identify spam, but because the dataset is predominantly ham, it had a deceptively high accuracy. Another common example of class imbalance is disease detection when the frequency of the disease in a population is low.
 
 We now turn to precision and recall, two metrics that are better suited for evaluating class-imbalanced datasets.
 
