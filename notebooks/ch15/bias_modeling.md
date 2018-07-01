@@ -266,10 +266,6 @@ In an ideal world, we would minimize the expected prediction error for our model
 
 As we have seen, however, achieving a low training error does not necessarily mean that our model will have a low test error as well. It is easy to obtain a model with extremely low bias and therefore low training error by fitting a curve that passes through every training observation. However, this model will have high variance which typically leads to high test error. Conversely, a model that predicts a constant has low variance but high bias. Fundamentally, this occurs because training error reflects the bias of our model but not the variance; the test error reflects both. In order to minimize test error, our model needs to simultaneously achieve low bias and low variance. To account for this, we need a way to simulate test error without using the test set. This is generally done using cross validation.
 
-Cross-validation provides a more accurate method of estimating our model error using a single observed dataset by separating data used for training from the data used for model selection and final accuracy. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training, allowing us to estimate both model bias and model variance. Cross validation also allows us to incorporate the fact that the noise in the training set only affects the noise term in the risk, whereas the noise in the training set only affects bias and model variance. To choose the final model to use, we select the one that has the lowest validation error.
-
-
-
 
 ## Takeaways
 
