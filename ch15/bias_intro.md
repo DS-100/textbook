@@ -6,6 +6,6 @@ fits the noise in the data rather than the data's overall pattern.
 
 To understand why this happens, we analyze our models using the tools of
 probability and statistics. These tools allow us to generalize beyond a few
-isolated examples to describe fundamental phenomena in modeling. We
-introduce expectation and variance, then use them to uncover the bias-variance
-tradeoff.
+isolated examples to describe fundamental phenomena in modeling. In
+particular, we will use the tools of expectation and variance from chapter
+12 to uncover the bias-variance tradeoff.
