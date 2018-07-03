@@ -11,10 +11,11 @@ import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual
 import nbinteract as nbi
 
-from sklearn.linear_model import SGDClassifier
-from sklearn.datasets import load_iris
-from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.model_selection import GridSearchCV
 
 sns.set()
 sns.set_context('talk')
@@ -43,7 +44,7 @@ $$
 L(\hat\theta, X, y) = \frac{1}{n} \sum_{i} \left(-y_i \ln \left(f_{\hat\theta} \left(X_i \right) \right) - \left(1 - y_i \right) \ln \left(1 - f_{\hat\theta} \left(X_i \right) \right) \right)
 $$
 
-$\nabla_{\hat\theta} L(\hat\theta, X, y) = -\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i $ is then the gradient of the cross entropy loss; plugging this in allows us to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $, this becomes:
+The gradient of the cross entropy loss is $\nabla_{\hat\theta} L(\hat\theta, X, y) = -\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i $. Plugging this into the update formula allows us to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $:
 
 $$
 \begin{align}
@@ -60,7 +61,7 @@ $$
 
 ### Stochastic Gradient Descent
 
-The general update formula is below, where $l(\hat\theta, X_i, y_i)$ is the loss function for a single data point:
+Stochastic gradient descent approximates the gradient of the loss function across all observations using the gradient of the loss of a single data point.The general update formula is below, where $l(\hat\theta, X_i, y_i)$ is the loss function for a single data point:
 
 $$
 \hat\theta_{t+1} = \hat\theta_t - \alpha \nabla_\hat\theta l(\hat\theta, X_i, y_i)
@@ -86,13 +87,13 @@ $$
 
 ### Mini-batch Gradient Descent
 
-Similarly, we can approximate the gradient of the cross entropy loss using a random sample of data points, also known as a mini-batch.
+Similarly, we can approximate the gradient of the cross entropy loss for all observations using a random sample of data points, known as a mini-batch.
 
 $$
 \nabla_\hat\theta L(\hat\theta, X, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\hat\theta}l(\hat\theta, X_i, y_i)
 $$
 
-We substitute this for the gradient of the cross entropy loss, yielding a mini-batch gradient descent update formula specific to logistic regression:
+We substitute this approximation for the gradient of the cross entropy loss, yielding a mini-batch gradient descent update formula specific to logistic regression:
 
 $$
 \begin{align}
@@ -101,99 +102,74 @@ $$
 \end{align}
 $$
 
-## Implementation in Scikit-Learn
+## Implementation in Scikit-learn
 
-Scikit-learn has implementations for stochastic gradient descent and mini-batch gradient descent using the [`SGDClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html) class. To gain a better estimate of the speed benefits afforded by stochastic gradient descent and mini-batch gradient descent, we will first manually implement batch gradient descent; then, we will compare the results with stochastic gradient descent and mini-batch gradient descent.
+Scikit-learn's [`SGDClassifier`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html) class provides an implementation for stochastic gradient descent, which we can use by specifying `loss=log`. Since scikit-learn does not have a model that implements batch gradient descent, we will compare `SGDClassifier`'s performance against [`LogisticRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) on the `emails` dataset. We omit feature extraction for brevity:
 
 
 ```python
-lebron = pd.read_csv('lebron.csv')
+# HIDDEN
+emails = pd.read_csv('emails_sgd.csv').sample(frac=0.5)
 
-columns = ['shot_distance', 'minute', 'action_type', 'shot_type', 'opponent']
-rows = lebron[columns].to_dict(orient='row')
+X, y = emails['email'], emails['spam']
+X_tr = CountVectorizer().fit_transform(X)
 
-onehot = DictVectorizer(sparse=False).fit(rows)
-X = onehot.transform(rows)
-y = lebron['shot_made'].as_matrix()
+X_train, X_test, y_train, y_test = train_test_split(X_tr, y, random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=20, random_state=42
-)
+y_train = y_train.reset_index(drop=True)
+y_test = y_test.reset_index(drop=True)
 ```
 
 
 ```python
-# from sklearn.datasets import load_iris
-
-# iris = load_iris()
-# X = iris['data']
-# y = iris['target'] == 2
-
-# X_train, X_test, y_train, y_test = train_test_split(
-#     X, y, test_size=20, random_state=42
-# )
+log_reg = LogisticRegression(tol=0.0001, random_state=42)
+stochastic_gd = SGDClassifier(tol=0.0001, loss='log', random_state=42)
 ```
 
 
 ```python
 %%time
-# Stochastic GD
-sgd_clf = SGDClassifier(loss='log', random_state=42)
-sgd_clf.fit(X_train, y_train)
+log_reg.fit(X_train, y_train)
+log_reg_pred = log_reg.predict(X_test)
+print('Logistic Regression')
+print('  Accuracy:  ', accuracy_score(y_test, log_reg_pred))
+print('  Precision: ', precision_score(y_test, log_reg_pred))
+print('  Recall:    ', recall_score(y_test, log_reg_pred))
+print()
 ```
 
-    CPU times: user 0 ns, sys: 15.6 ms, total: 15.6 ms
-    Wall time: 1.77 ms
+    Logistic Regression
+      Accuracy:   0.9913793103448276
+      Precision:  0.974169741697417
+      Recall:     0.9924812030075187
+    
+    CPU times: user 3.2 s, sys: 0 ns, total: 3.2 s
+    Wall time: 3.26 s
 
-
-
-```python
-sgd_clf.score(X_test, y_test)
-```
-
-
-
-
-    0.5
-
-
-
-
-```python
-# Mini-batch GD
-
-def iter_minibatches(X, y, minibatch_size):
-    # Provide chunks one by one
-    shuffled_indices = np.random.permutation(len(y))
-    X = X[shuffled_indices]
-    y = y[shuffled_indices]
-    for i in range(0, len(y), minibatch_size):
-        X_b, y_b = X[i:i+minibatch_size], y[i:i+minibatch_size]
-        yield X_b, y_b
-        
-minibatch_generator = iter_minibatches(X_train, y_train, 10)
-```
 
 
 ```python
 %%time
-mbgd_clf = SGDClassifier(loss='log', random_state=42)
-for X_b, y_b in minibatch_generator:
-    mbgd_clf.partial_fit(X_b, y_b, classes=np.unique(y))
+stochastic_gd.fit(X_train, y_train)
+stochastic_gd_pred = stochastic_gd.predict(X_test)
+print('Stochastic GD')
+print('  Accuracy:  ', accuracy_score(y_test, stochastic_gd_pred))
+print('  Precision: ', precision_score(y_test, stochastic_gd_pred))
+print('  Recall:    ', recall_score(y_test, stochastic_gd_pred))
+print()
 ```
 
-    CPU times: user 15.6 ms, sys: 0 ns, total: 15.6 ms
-    Wall time: 16.8 ms
+    Stochastic GD
+      Accuracy:   0.9808429118773946
+      Precision:  0.9392857142857143
+      Recall:     0.9887218045112782
+    
+    CPU times: user 93.8 ms, sys: 31.2 ms, total: 125 ms
+    Wall time: 119 ms
 
 
+The results above indicate that `SGDClassifier` is able to find a solution in significantly less time than `LogisticRegression`. Although the evaluation metrics are slightly worse on the `SGDClassifier`, we can improve the `SGDClassifier`'s performance by tuning hyperparameters. Furthermore, this discrepancy is a tradeoff that data scientists often encounter in the real world. Depending on the situation, data scientists might place greater value on the lower runtime or on the higher metrics.
 
-```python
-mbgd_clf.score(X_test, y_test)
-```
+## Summary
 
-
-
-
-    0.5
-
-
+Stochastic gradient descent is a method that data scientists use to cut down on computational cost and runtime. We can see the value of stochastic gradient descent in logistic regression, since we would only have to calculate the gradient of the cross entropy loss for one observation at each iteration instead of for every observation in batch gradient descent. From the example using scikit-learn's `SGDClassifier`, we observe that stochastic gradient descent may achieve slightly worse evaluation metrics, but drastically improves runtime. On larger datasets or for more complex models, the difference in runtime might be much larger and thus more valuable.
