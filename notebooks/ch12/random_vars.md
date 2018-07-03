@@ -243,4 +243,4 @@ Even though we are sampling without replacement, note that $X$ and $Y$ still hav
 
 ## Summary
 
-In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence.
+In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence. 
