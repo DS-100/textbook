@@ -58,7 +58,7 @@ L(\hat{\theta}, X, y)
 \end{aligned}
 $$
 
-As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict. $ X_i $is the $i$'th row of $ X $ and $ y_i $ is the $i$'th entry of y.
+As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict. $ X_i $ is the $i$'th row of $ X $ and $ y_i $ is the $i$'th entry of y.
 
 Observe that our cost function is the average of the loss function values for each row of our data. If we define the squared loss function:
 
@@ -122,7 +122,7 @@ $$
 
 To further simplify this expression, we need to know $ P(\gamma, z)  $, the global probability distribution of observing any point in the population. Unfortunately, this is not so easy. Suppose we are trying to predict the tip amount based on the size of the table. What is the probability that a table of three people gives a tip of $14.50? If we knew the distribution of points exactly, we wouldn't have to collect data or fit a model—we would already know the most likely tip amount for any given table.
 
-Although we do not know the exact distribution of the population, we can approximate it using the observed dataset $ X $ and $ y $. If $ X $ and $ y $ are drawn at random from our population, the distribution of points in $ X $ and $ y $ is similar to the population distribution. Thus, we treat $ X $ and $ y $ as our population. Then, the probability that any input-output pair $ X_i $, $ y_i $ appear is $ \frac{1}{n} $ since each pair appears once out of $ n $ points total.
+Although we do not know the exact distribution of the population, we can approximate it using the observed dataset $ X $ and $ y $. If $ X $ and $ y $ are drawn at random from our population, the distribution of points in $ X $ and $ y $ is similar to the population distribution. Thus, we treat $ X $ and $ y $ as our population. Then, the probability that any input-output pair $ X_i $, $ y_i $ appears is $ \frac{1}{n} $ since each pair appears once out of $ n $ points total.
 
 This allows us to calculate the **empirical risk**, an approximation for the true risk:
 

@@ -5,7 +5,7 @@
             Show Widgets
         </button>
         <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch16/classification_cost.ipynb">Open on DataHub</a></div>
-    
+
 
 
 
@@ -209,10 +209,6 @@ $$</p></div></div></div>
 <p>Minimizing the overall cross entropy cost requires the model $ f_\hat{\theta}(x) $ to make the most accurate predictions it can. Conveniently, this cost function is convex, making gradient descent a useful choice for optimization.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Statistical justification for the cross entropy cost</strong></p>
-<p>The cross entropy cost also has fundamental underpinnings in statistics. Since the logistic regression model predicts probabilities, given a particular logistic model we can ask, "What is the probability that this model produced the set of observed outcomes $ y $?" We might naturally adjust the parameters of our model until the probability of drawing our dataset from the model is as high as possible. Although we will not prove it in this section, this procedure is equivalent to minimizing the cross entropy cost—this is the <em>maximum likelihood</em> statistical justification for the cross entropy cost.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Gradient-of-the-Cross-Entropy-Cost">Gradient of the Cross Entropy Cost<a class="anchor-link" href="#Gradient-of-the-Cross-Entropy-Cost">&#182;</a></h2><p>In order to run gradient descent on the cross entropy cost we must calculate the gradient of the cost function. First, we compute the derivative of the sigmoid function since we'll use it in our gradient calculation.</p>
 <p>$$
 \begin{aligned}
@@ -231,38 +227,36 @@ $$</p>
 \nabla_{\hat{\theta}} \sigma_i
 &amp;= \nabla_{\hat{\theta}} \sigma(X_i \cdot \hat \theta) \\
 &amp;= \sigma(X_i \cdot \hat \theta) (1 - \sigma(X_i \cdot \hat \theta))  \nabla_{\hat{\theta}} (X_i \cdot \hat \theta) \\
-&amp;= \sigma_i (1 - \sigma_i) X_i 
+&amp;= \sigma_i (1 - \sigma_i) X_i
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now, we derive the gradient for the cross entropy cost with respect to the model parameters $ \hat{\theta} $. In the derivation below, we let $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $.</p>
 <p>$$
-\begin{aligned}
-L(\hat{\theta}, X, y)
-&amp;= \frac{1}{n} \sum_i \left(- y<em>i \ln (f</em>\hat{\theta}(X_i)) - (1 - y<em>i) \ln (1 - f</em>\hat{\theta}(X_i) \right) \
-&amp;= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma<em>i ) \right) \
-\nabla</em>{\hat{\theta}} L(\hat{\theta}, X, y)
-&amp;= \frac{1}{n} \sum_i \left(</p>
-
-<pre><code>- \frac{y_i}{\sigma_i} \nabla_{\hat{\theta}} \sigma_i
-+ \frac{1 - y_i}{1 - \sigma_i} \nabla_{\hat{\theta}} \sigma_i
-</code></pre>
-<p>\right) \
-&amp;= - \frac{1}{n} \sum_i \left(
-    \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma<em>i}
-\right) \nabla</em>{\hat{\theta}} \sigma_i \
-&amp;= - \frac{1}{n} \sum_i \left(
-    \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-\right) \sigma_i (1 - \sigma_i) X_i \
-&amp;= - \frac{1}{n} \sum_i \left(
-    y_i - \sigma_i
-\right) X_i \
-\end{aligned}
+  \begin{aligned}
+  L(\hat{\theta}, X, y)
+  &amp;= \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) \right) \\
+  &amp;= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
+  \nabla_{\hat{\theta}} L(\hat{\theta}, X, y)
+  &amp;= \frac{1}{n} \sum_i \left(
+      - \frac{y_i}{\sigma_i} \nabla_{\hat{\theta}} \sigma_i
+      + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\hat{\theta}} \sigma_i
+  \right) \\
+  &amp;= - \frac{1}{n} \sum_i \left(
+      \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
+  \right) \nabla_{\hat{\theta}} \sigma_i \\
+  &amp;= - \frac{1}{n} \sum_i \left(
+      \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
+  \right) \sigma_i (1 - \sigma_i) X_i \\
+  &amp;= - \frac{1}{n} \sum_i \left(
+      y_i - \sigma_i
+  \right) X_i \\
+  \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The surprisingly simple gradient expression allows us to fit a logistic model to the cross entropy loss using gradient descent.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>The cross entropy cost that we use to fit the logistic model. Since it is a convex function, we use gradient descent to fit the model to the cost. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.</p></div></div></div></div>
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Since the cross-entropy loss function is convex, we minimize this loss using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.</p></div></div></div></div>
