@@ -1,13 +1,13 @@
 
 ## Cross-Validation
 
-In the previous section, we observe that the we need a way to simulate test error to more accurately manage the bias-variance trade off. Cross-validation provides a method of estimating our model error using a single observed dataset by separating data used for training from the data used for model selection and final accuracy. 
+In the previous chapter, we observed that we needed a more accurate way of simulating the test error to manage the bias-variance trade off. Cross-validation provides a method of estimating our model error using a single observed dataset by separating data used for training from the data used for model selection and final accuracy. 
 
 ## K-Fold Cross-Validation
 
-In Chapter 14.3, we mentioned the method of the **train-validation split**, which can be used to simulate test error through the validation set. However, this method is prone to high variance of the validation error because the evaluation of the error may depend heavily on which points end up in the training and validation sets.
+In Chapter 14.3, we mentioned the method of the **train-validation split** method to simulate test error through the validation set. However, this method is prone to high variance of the validation error because the evaluation of the error may depend heavily on which points end up in the training and validation sets.
 
-To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into *k* equally-sized subsets subsets (*$k$ folds*), and the train-validation split is repeated k times. Each time, one of the *k* folds is used as the validation set, and the reaming *k-1* folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once, and for training *k-1* times.
+To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into *k* equally-sized subsets (*$k$ folds*), and the train-validation split is repeated *k* times. Each time, one of the *k* folds is used as the validation set, and the reaming *k-1* folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once and for training *k-1* times.
 
 The diagram below illustrates the technique when using five folds:
 
@@ -15,13 +15,13 @@ The diagram below illustrates the technique when using five folds:
 
 The biggest advantage of this method is that every data point is used for validation exactly once and for training *k-1* times. Typically, a *k* between 5 to 10 is used, but *k* remains an unfixed parameter. When *k* is small, the error estimate has a lower variance (many validation points) but has a higher bias (fewer training points). Vice versa, with large *k* the error estimate has lower bias but has higher variance. 
 
-$k$-fold cross-validation takes more computation time since we typically have to refit each model from scratch for each fold. However, it computes a more accurate validation error by averaging multiple errors together for each model.
+$k$-fold cross-validation takes more computation time than the train-validation split since we typically have to refit each model from scratch for each fold. However, it computes a more accurate validation error by averaging multiple errors together for each model.
 
 The `scikit-learn` library provides a convenient [`sklearn.model_selection.KFold`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html) class to implement $k$-fold cross-validation.
 
 ## Bias-Variance Tradeoff
 
-K-fold cross-validation helps us manage the bias-variance tradeoff more accurately. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training, allowing us to estimate both model bias and model variance. K-fold cross-validation also allows us to incorporate the fact that the noise in the training set only affects the noise term in the risk, whereas the noise in the training set only affects bias and model variance. To choose the final model to use, we select the one that has the lowest validation error.
+K-fold cross-validation helps us manage the bias-variance tradeoff more accurately. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training; this allows us to estimate both model bias and model variance. K-fold cross-validation also incorporates the fact that the noise in the test set only affects the noise term in the risk equation whereas the noise in the training set only affects bias and model variance in the equation. To choose the final model to use, we select the one that has the lowest validation error.
 
 
 
