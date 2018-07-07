@@ -3,8 +3,7 @@
 
 There are several cases where we would like to perform a permuation test in order to test a hypothesis and learn more about the world. A permutation test is a very useful type of non-parametric test that allows us to make inferences without making statistical assumptions that underly traditional parametric tests.
 
-One insightful example of permutation inference is the reexamination of Student Evaluation of Teaching (SET) data by Boring, Ottoboni, and Stark (2016). In this experiment, 47 students were randomly assigned to one of four sections. In two of the sections, the teaching
-assistants were introduced using their actual names. In the other two sections, the assistants
+One insightful example of permutation inference is the reexamination of Student Evaluation of Teaching (SET) data by Boring, Ottoboni, and Stark (2016). In this experiment, 47 students were randomly assigned to one of four sections. There are two TAs that teach two sections each; one TA is male and other is female. In two of the sections, the teaching assistants were introduced using their actual names. In the other two sections, the assistants
 switched names.
 
 
@@ -13,8 +12,12 @@ switched names.
 ```
 #HIDDEN 
 from IPython.display import Image
-Image('student_setup.png')
+display(Image('student_setup2.png'))
 ```
+
+
+![png](hyp_introduction_part2_files/hyp_introduction_part2_3_0.png)
+
 
  Students never met the teaching assistants face-to-face. Instead, they interacted with the students via an online forum. Homework returns were coordinated so that all students received scores/feedback all at the same time. The 2 TAs also had comparable levels of experience. At the end of the course, students evaluate the TA on promptness in returning assignment.
 The authors wanted to investigate if
@@ -31,22 +34,36 @@ one another.
 The **null hypothesis** of this experiment is that perceived gender has no effect on SETs and any observed difference in ratings is due to chance. In other words, the evaluation of each TA should remain unchanged whether they are percieved as a male or a female.
 This means that each TA really only has one possible rating from each student.
 
-The **test statistic** that we use the the difference in means of perceived male and perceived female ratings for each TA. Intuitively, we expect this to be close to 0 if gender has no effect on ratings.
+The **test statistic** that we use the the difference in means of perceived male and perceived female ratings for each TA. Intuitively, we expect this to be close to 0 if gender has no effect on ratings. We can write this formally:
+
+$\\$
+$$\mu_{perceived female} - \mu_{percieved male}$$
+$\\$
+where,
+
+$\\$
+$$\mu_{perceived female} = \frac {\sum_{i=1}^{n_1} x_{1i} + \sum_{i=1}^{n_3} x_{3i}}{{n_1} + {n_3}} $$
+$\\$
+$$\mu_{perceived male} = \frac {\sum_{i=1}^{n_2} x_{2i} + \sum_{i=1}^{n_4} x_{4i}}{{n_2} + {n_4}}$$
+$\\$
+
+where $n_i$ is the number of students in the ith group and $x_{ij}$ is the rating of the jth student in the ith group. 
 
 In order to determine whether gender has an effect on SET ratings, we will perform a permutation test in order to get the distribution of the test statistic under the null hypothesis. We will follow the following steps:
 
 * Permute the perceived gender labels for students under the same TA. Note that we are shuffling within the left and right halves in the picture above.
 * Compute the difference in average scores for identified-female and identified-male groups. 
 * Repeat many times to create an approximate sampling distribution for the difference in average scores for the 2 groups. 
-* Use the approximate distribution to estimate the chance of observing -0.8 or lower
+* Use the approximate distribution to estimate the chance of seeing a test statistic more extreme than the one observed.
 
 
 It is important to understand why the permutation test is justified in this scenario. Under the null model, each student would have given their TA the same rating regardless of perceived gender. Simple random assignment then implies that for a given TA, all of their ratings had an equal chance of showing up under perceived male or perceived female. Therefore, permuting the gender labels should have no effect on the ratings if the null hypothesis were true. 
 
 ### The Data
 
-We begin with the student and gender data below. These data are collected from 2008 to 2013 and are a census of 23,001 SET from 4,423 (57% women) first-year students in
-1,177 sections at a French university, taught by 379 instructors (34% women). 
+We begin with the student and gender data below. These data are a census of 47 students enrolled in an online course at a U.S. university.
+
+
 
 
 ```
@@ -71,8 +88,8 @@ student_eval.head()
 
 
 
-     <input type="file" id="files-0e4a2696-daff-4678-a8f3-146b2d9c2585" name="files[]" multiple disabled />
-     <output id="result-0e4a2696-daff-4678-a8f3-146b2d9c2585">
+     <input type="file" id="files-832dfd4e-240b-46fc-9b37-ae3937327657" name="files[]" multiple disabled />
+     <output id="result-832dfd4e-240b-46fc-9b37-ae3937327657">
       Upload widget is only available when the cell has been executed in the
       current browser session. Please rerun this cell to enable.
       </output>
@@ -159,6 +176,90 @@ The columns have the following meanings:
 
 **prompt** – rating on promptness of HW on a scale from 1 to 5
 
+
+
+After analyzing and plotting the ratings data from the experiment below,  there appears to be a difference between the groups of students, with perceived female ratings lower than male ratings; however, we need a more formal hypothesis test to see if this difference could simply be due to the random assignment of students.
+
+
+
+
+```
+average_gender_eval = student_eval.loc[:, ["tagender", "taidgender", "prompt"]].groupby(["tagender", "taidgender"]).mean()
+average_gender_eval
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>prompt</th>
+    </tr>
+    <tr>
+      <th>tagender</th>
+      <th>taidgender</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">0</th>
+      <th>0</th>
+      <td>3.750000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.333333</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">1</th>
+      <th>0</th>
+      <td>3.416667</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.363636</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```
+fig, ax = plt.subplots(figsize=(12, 7))
+ind = np.arange(4)
+plt.bar(ind, average_gender_eval["prompt"])
+ax.set_xticks(ind)
+ax.set_xticklabels(['Female (Percieved Female)', 'Female (Percieved Male)', 'Male (Percieved Female)', "Male (Percieved Male)"])
+ax.set_ylabel('Average Rating')
+ax.set_xlabel('Actual/Percieved Gender')
+ax.set_title('Average Rating Per Actual/Percieved Gender')
+plt.show()
+```
+
+
+![png](hyp_introduction_part2_files/hyp_introduction_part2_12_0.png)
+
+
 ### Performing the Experiment
 
 We will compute the observed difference between the average ratings of the identified male and identified female groups:
@@ -178,7 +279,7 @@ observed_difference
 
 
 
-We see that the difference is -0.8. In other words, the average for those identified as female is nearly 1 point lower on a scale from 1 to 5.  Is this a big/significant difference? Or could this have simply happened by chance? We will perform a permutation test to explore these questions.
+We see that the difference is -0.8. In other words, the average for those identified as female is nearly 1 point lower on a scale from 1 to 5.  Given the scale of the ratings, this difference appears to be quite large. By performing a permutation test, we will be able to find the chance of observing a difference this large.
 
 Now, we can permute the perceived gender labels for each TA and calculate the test statistic 1,000 times:
 
@@ -230,18 +331,15 @@ We can now view the approximate sampling distribution of the difference in score
 ```
 differences_df = pd.DataFrame()
 differences_df["gender_differences"] = gender_differences
-differences_df.loc[:, "gender_differences"].hist()
+gender_hist = differences_df.loc[:, "gender_differences"].hist(normed=True)
+gender_hist.set_xlabel("Average Gender Difference (Test Statistic)")
+gender_hist.set_ylabel("Percent per Unit")
+gender_hist.set_title("Distribution of Gender Differences")
+plt.show()
 ```
 
 
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7ff68c5aa310>
-
-
-
-
-![png](hyp_introduction_part2_files/hyp_introduction_part2_16_1.png)
+![png](hyp_introduction_part2_files/hyp_introduction_part2_19_0.png)
 
 
 From our calculation below, 0 of the 1000 simulations had a difference as large as the one observed. Therefore, our p -value is less than the 0.005 threshold.
@@ -264,11 +362,8 @@ empirical_P
 
 Through this permuatation test, we have shown that SET are biased against female instructors by an amount that is large and statistically significant.
 
-Recall that during our permutation test, we did not make any underlying assumptions about the distribution of our data. According to Boring, Ottoboni & Stark 2016, 
+There are other studies that have also tested bias within teaching evaluations. According to Boring, Ottoboni & Stark 2016, there were several other parametric tests conducted that assumed ratings of male and female instructors are independent random samples from normally distributed populations with equal variances; this type of experimental design does not align with the proposed null hypothesis, causing the p-values to be potentially misleading.
 
+In contrast, Boring, Ottoboni & Stark 2016 used permutation tests based on random assignment of students to class sections. Recall that during our permutation test, we did not make any underlying assumptions about the distribution of our data. In this experiment,  we did not assume that students, SET scores, grades, or any other variables comprise random samples from any populations, much less populations with normal distributions.
 
-
-*"Previous analyses of these data relied on parametric tests **based on null hypotheses that do not match the experimental design**. For example, the tests assumed that SET of male and female instructors are independent random samples from normally distributed populations with equal variances and possibly different means. **As a result, the p-values reported in those studies are for unrealistic null hypotheses and might be misleading. ** *
-
-*In contrast, **we use permutation tests** based on the as-if random (French natural experiment) or truly random (US experiment) assignment of students to class sections, **with no counterfactual assumption that the students, SET scores, grades, or any other variables comprise random samples from any populations, much less populations with normal distributions.**" *
-
+When testing a hypothesis, it is very important to carefully choose your experiment design and null hypothesis in order to obtain reliable results.
