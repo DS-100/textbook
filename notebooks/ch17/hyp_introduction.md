@@ -28,8 +28,8 @@ baby.head()
 
 
 
-     <input type="file" id="files-861e986f-3698-4b12-8b15-9efa8c968343" name="files[]" multiple disabled />
-     <output id="result-861e986f-3698-4b12-8b15-9efa8c968343">
+     <input type="file" id="files-080b9d41-878d-465d-8c8e-f3eb8b981dbc" name="files[]" multiple disabled />
+     <output id="result-080b9d41-878d-465d-8c8e-f3eb8b981dbc">
       Upload widget is only available when the cell has been executed in the
       current browser session. Please rerun this cell to enable.
       </output>
@@ -113,8 +113,11 @@ The null hypothesis emphasizes that if the data look different from what the nul
 
 
 ```
-smokers_hist = baby[baby["Maternal Smoker"] == True].loc[:, "Birth Weight"].hist(label = )
-non_smokers_hist = baby[baby["Maternal Smoker"] == False].loc[:, "Birth Weight"].hist()
+smokers_hist = baby[baby["Maternal Smoker"] == True].loc[:, "Birth Weight"].hist(normed=True, label = "Maternal Smoker")
+non_smokers_hist = baby[baby["Maternal Smoker"] == False].loc[:, "Birth Weight"].hist(normed=True, label = "Not Maternal Smoker")
+smokers_hist.set_xlabel("Baby Birth Weights")
+smokers_hist.set_ylabel("Proportion per Unit")
+smokers_hist.set_title("Distribution of Birth Weights")
 plt.legend()
 plt.show()
 ```
@@ -123,12 +126,20 @@ plt.show()
 ![png](hyp_introduction_files/hyp_introduction_3_0.png)
 
 
+The weights of the babies of the mothers who smoked seem lower, on average than the weights of the babies of the non-smokers. Could this difference reflect just chance variation or a difference in the distributions in the larger population? We can try to answer this question using a hypothesis test.
+
 The basis of hypothesis testing is that we assume a particular model for generating the data; then, we ask ourselves, what is the chance we would see an outcome as extreme as the one that we observed? Intuitively, if the chance of seeing the outcome we observed is very small, then the model that we assumed may not be the appropriate model. 
 
-In particular, we assume that the **null model** is true, which is the probability model if the null hypothesis is true. In other words, we assume that the null hypothesis is true and focus on what the value of the statistic would be under under the null hypothesis.
+In particular, we assume that the **null model** is true, which is the probability model if the null hypothesis is true. In other words, we assume that the null hypothesis is true and focus on what the value of the statistic would be under under the null hypothesis. This chance model says that there is no underlying difference; the distributions in the samples are different just due to chance.
+
+**Test Statistic**
 
 In our example, we would assume that maternal smoking has no effect on baby weight (where any observed difference is due to chance). In order to choose between our hypotheses, we will use the difference between the two group means as our **test statistic**.
-Note: we will use "average weight of the smoking group  −  average weight of the non-smoking group", so that small values (that is, large negative values) of this statistic will favor the alternative hypothesis. Let's calculate the observed value of test statistic:
+Formally, our test statistic is
+
+$$\mu_{smoking} - \mu_{non-smoking}$$
+
+so that small values (that is, large negative values) of this statistic will favor the alternative hypothesis. Let's calculate the observed value of test statistic:
 
 
 
@@ -146,12 +157,14 @@ observed_difference
 
 
 
-If there were really no difference between the two distributions in the underlying population, then we should be able to shuffle all the birth weights randomly among the mothers. This is called random permutation. This method allows us to simulate the test statistic under the null hypothesis as demonstrated below.
+If there were really no difference between the two distributions in the underlying population, then whether each mother was a maternal smoker or not should not affect the average birth weight. In other words, the label True or False with respect to maternal smoking should make no difference to the average.
+
+Therefore, in order to simulate the test statistic under the null hypothesis, we can shuffle all the birth weights randomly among the mothers. This is called random permutation. Let's use this technique below on our data.
 
 
 ```
 n = len(baby) #Total number of babies
-shuffled_weights = baby["Birth Weight"].sample(n, replace = True)
+shuffled_weights = baby["Birth Weight"].sample(n, replace = False)
 baby["Shuffled Birth Weight"] = np.array(shuffled_weights)
 baby.head()
 ```
@@ -187,31 +200,31 @@ baby.head()
       <th>0</th>
       <td>120</td>
       <td>False</td>
-      <td>131</td>
+      <td>144</td>
     </tr>
     <tr>
       <th>1</th>
       <td>113</td>
       <td>False</td>
-      <td>129</td>
+      <td>154</td>
     </tr>
     <tr>
       <th>2</th>
       <td>128</td>
       <td>True</td>
-      <td>117</td>
+      <td>131</td>
     </tr>
     <tr>
       <th>3</th>
       <td>108</td>
       <td>True</td>
-      <td>117</td>
+      <td>125</td>
     </tr>
     <tr>
       <th>4</th>
       <td>136</td>
       <td>False</td>
-      <td>101</td>
+      <td>108</td>
     </tr>
   </tbody>
 </table>
@@ -240,17 +253,18 @@ for i in np.arange(repetitions):
 
 
 ```
-#TODO: label axis
 differences_df = pd.DataFrame()
 differences_df["differences"] = differences
-differences_df.hist()
+diff_hist = differences_df.loc[:, "differences"].hist(normed = True)
+diff_hist.set_xlabel("Birth Weight Difference")
+diff_hist.set_ylabel("Proportion per Unit")
+diff_hist.set_title("Distribution of Birth Weight Differences")
 ```
 
 
 
 
-    array([[<matplotlib.axes._subplots.AxesSubplot object at 0x7f7327e85590>]],
-          dtype=object)
+    Text(0.5,1,u'Distribution of Birth Weight Differences')
 
 
 
@@ -297,7 +311,7 @@ The bootstrap is a simple process:
 
 
 
-![alt text](https://www.inferentialthinking.com/v/fa17/notebooks-images/Bootstrap_25_0.png)
+![alt text](https://ds8.gitbooks.io/textbook/content/notebooks-images/Bootstrap_25_0.png)
 
 Going back to our example, we may want to build a confidence interval for the difference in average birthweight of the babies of smoking mothers and babies of non-smoking mothers. 
 We act as if the data on mothers who did not smoke is a representation of the population of nonsmoking mothers. Similarly, we act as if the data for smoking mothers is a representation of the population of smoking mothers. Therefore, we treat our original samples as the bootstrap populations. To perform the bootstrap procedure, we do the following:
@@ -331,14 +345,16 @@ mean_differences = smoking_means - non_smoking_means
 
 mean_differences_df = pd.DataFrame()
 mean_differences_df["differences"] = np.array(mean_differences)
-mean_differences_df.hist()
+mean_diff = mean_differences_df.loc[:, "differences"].hist()
+mean_diff.set_xlabel("Birth Weight Difference")
+mean_diff.set_ylabel("Proportion per Unit")
+mean_diff.set_title("Distribution of Birth Weight Differences")
 ```
 
 
 
 
-    array([[<matplotlib.axes._subplots.AxesSubplot object at 0x7f470d3cdad0>]],
-          dtype=object)
+    Text(0.5,1,u'Distribution of Birth Weight Differences')
 
 
 
