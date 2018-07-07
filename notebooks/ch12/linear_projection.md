@@ -58,6 +58,8 @@ Our goal is to find the $\hat{\theta}$ that results in the line that minimizes t
 
 $$ L(\hat{\theta}, \vec{y}) = \sum_{i = 1}^{n}(y_i - \hat{\theta})^2\\ $$
 
+Recall that for the constant model, the minimizing $\theta$ for the MSE cost is $\bar{y}$, the average of the $y$ values.
+
 
 ```python
 #HIDDEN
@@ -124,7 +126,7 @@ $\vec{y}$ and $\vec{1}$ are fixed, but $\hat{\theta}$ can take on any value, so 
 
 The projection of $\vec{y}$ onto $\vec{1}$ is guaranteed to be the closest vector (see "Vector Space Review").
 
-### Least Squares: Linear Model
+### Least Squares: Simple Linear Model
 Now, let's look at the simple linear regression model. This is strongly parallel to the constant model derivation, but be mindful of the differences and think about how you might generalize to multiple linear regression.
 
 The simple linear model is:
@@ -252,7 +254,7 @@ The matrix multiplication $\begin{bmatrix} 1 & x_1 \\ 1 & x_2 \\ 1 & x_3 \end{bm
 \begin{bmatrix} 
      \hat{\theta_0} \\
      \hat{\theta_1}
-\end{bmatrix}$ is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$—this perspective shows us that $f_\hat{\theta}$ is a linear combination of the features of our data.
+\end{bmatrix}$ is a linear combination of the columns of $X$: each $\hat{\theta_i}$ only ever multiplies with one column of $X$—this perspective shows us that $f_\hat{\theta}$ is a linear combination of the features of our data. In summary, simple linear regression fits $f_\hat{\theta}$ to $\vec{1}$ and $\vec{x}$.
 
 $X$ and $\vec{y}$ are fixed, but $\hat{\theta_0}$ and $\hat{\theta_1}$ can take on any value, so $f_\hat{\theta}$ can take on any of the infinite linear combinations of the columns of $X$. To have the smallest loss, we want to choose $\hat{\theta_0}$ and $\hat{\theta_1}$ such that the resulting vector is as close to $\vec{y}$ as possible.
 
@@ -366,52 +368,79 @@ When the added column is linearly dependent, it can be expressed as a linear com
 
 Recall that the span of $X$ is important because it is the subspace we want to project $\vec{y}$ onto. If the subspace does not change, then the projection will not change.
 
-For example, when we introduced $\vec{x}$ when moving from the constant model to linear model, we introduced a independent variable: $\vec{x} = \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix}$ cannot be expressed as a scalar of $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$.
+For example, when we introduced $\vec{x}$ to the constant model to get the simple linear model, we introduced a independent variable. $\vec{x} = \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix}$ cannot be expressed as a scalar of $\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$. Thus, we moved from finding the projection of $\vec{y}$ onto a line:
 
-Now, let's instead introduce a variable $d$ that is linearly dependent to $\vec{1}$:
+<img src="../../notebooks-images/linear_projection__1dprojection.png" width="250" />
 
-| d | y |
-| - | :-|
-| -0.5 | 2 |
-| -0.5 | 1 |
-| -0.5 | -2 |
+to finding the projection of $\vec{y}$ onto a plane:
 
-Then, we would be minimizing the loss function:
+<img src="../../notebooks-images/linear_projection1.png" width="500" />
+
+
+Now, lets introduce another variable, $\vec{z}$:
+
+| x | z |  y |
+| - |:-| - |
+| 3 | 4 | 2 |
+| 0 | 1 | 1 |
+| -1 | 0 | -2 |
+
+But since $\vec{z} = \vec{1} + \vec{x}$, $\vec{z}$ is linearly dependent on the existing columns and therefore does not change $Span(X)$. In fact, $\vec{z}$ lies in the original $Span(X)$:
+
+<img src="../../notebooks-images/linear_projection__dependent_variablesz.png" width="500" />
+
+Notice that $\vec{z} = \vec{1} + \vec{x}$. Since $\vec{z}$ is a linear combination of $\vec{1}$ and $\vec{x}$, it lies in the original $Span(X)$. Furthermore, we can say that the original $Span(X)$ is the same as the new $Span(X)$. Thus, the projection of $\vec{y}$ onto the subspace spanned by $\vec{1}$, $\vec{x}$, and $\vec{z}$ would be the same as the projection of $\vec{y}$ onto the subspace spanned by $\vec{1}$ and $\vec{x}$.
+
+We can also observe this from minimizing the loss function:
 
 $$ 
 \begin{aligned}
 L(\hat{\theta}, \vec{d}, \vec{y})
 &= \left \Vert  \qquad   
 \begin{bmatrix} y_1 \\ y_2 \\ y_3  \end{bmatrix} \quad - \quad 
-\begin{bmatrix} 1 & d_1 \\ 1 & d_2 \\ 1 & d_3 \end{bmatrix}
+\begin{bmatrix} 1 & x_1 & z_1 \\ 1 & x_2 & z_2\\ 1 & x_3 & z_3\end{bmatrix}
 \begin{bmatrix} 
      \hat{\theta_0} \\
-     \hat{\theta_1}
+     \hat{\theta_1} \\
+     \hat{\theta_2}
 \end{bmatrix}
 \qquad \right \Vert ^2 \\
 &= \left \Vert  \qquad   
 \begin{bmatrix} y_1 \\ y_2 \\ y_3  \end{bmatrix} \quad - \quad 
-\begin{bmatrix} 1 & -0.5 \\ 1 & -0.5 \\ 1 & -0.5 \end{bmatrix}
+\begin{bmatrix} 1 & 3 & 4\\ 1 & 0 & 1\\ 1 & -1 & 0\end{bmatrix}
 \begin{bmatrix} 
      \hat{\theta_0} \\
-     \hat{\theta_1}
+     \hat{\theta_1} \\
+     \hat{\theta_2}
 \end{bmatrix}
 \qquad \right \Vert ^2 \\
 \end{aligned}
 $$
 
-Our possible solutions follow the form $\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} + \theta_1 \begin{bmatrix} -0.5 \\ -0.5 \\ -0.5 \end{bmatrix}$. 
+
+Our possible solutions follow the form $\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} + \theta_1 \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix} + \theta_2 \begin{bmatrix} 4 \\ 1 \\ 0 \end{bmatrix}$.
 
 
-Since $\vec{d} = \frac{-1}{2} \ \vec{1}$, regardless of $\theta_0$ and $\theta_1$, the possible values can be rewritten as:
-$$\theta_0 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} - \frac{1}{2} \theta_1 \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \quad = \quad (\theta_0 - \frac{1}{2} \theta_1) \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$$
+Since $\vec{z} = \vec{1} + \vec{x}$, regardless of $\theta_0$, $\theta_1$, and $\theta_2$, the possible values can be rewritten as:
+$$ (\theta_0 + \theta_2) \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} + (\theta_1 + \theta_2) \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix}$$
 
-Just as before, our solution space are the scalar multiples of $\vec{1}$, just like before we introduced the variable $d$. 
+So adding $\vec{z}$ does not change the problem at all. The only difference is, we can express this projection in multiple ways. Recall that we found the projection of $\vec{y}$ onto the plane spanned by $\vec{1}$ and $\vec{x}$ to be:
 
-<img src="../../notebooks-images/linear_projection__dependent_variables.png" width="400" />
+$$ \begin{bmatrix} \vec{1} & \vec{x} \end{bmatrix}  \begin{bmatrix} - \frac{3}{13} \\ \frac{11}{13} \end{bmatrix} = - \frac{3}{13} \vec{1} + \frac{11}{13} \vec{x}$$
 
+However, with the introduction of $\vec{z}$, we have more ways to express this same projection vector. 
 
-Adding a linearly dependent column to $X$ does not change its span, and thus will not change the projection and solution to the least squares problem.
+Since $\vec{1} = \vec{z} - \vec{x}$, $\hat{y}$ can also be expressed as:
+
+$$ - \frac{3}{13} (\vec{z} - \vec{x}) + \frac{11}{13} \vec{x} = - \frac{3}{13} \vec{z} + \frac{14}{13} \vec{x} $$
+
+Since $\vec{x} = \vec{z} + \vec{1}$, $\hat{y}$ can also be expressed as:
+
+$$ - \frac{3}{13} \vec{1} + \frac{11}{13} (\vec{z} + \vec{1}) = \frac{8}{13} \vec{1} + \frac{11}{13} \vec{z} $$
+
+But all three expressions represent the same projection.
+
+In conclusion, adding a linearly dependent column to $X$ does not change $Span(X)$, and thus will not change the projection and solution to the least squares problem.
 
 ## Vector Space Review
 - Definition of a vector
