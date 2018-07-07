@@ -17,25 +17,25 @@
 ### Definition of a vector
 A vector is defined by a length and a direction.
 
-<img src="../../notebooks-images/vector_space_review__vectors.png" width="500" />
+<img src="../notebooks-images/vector_space_review__vectors.png" width="500" />
 
 Notice that $\vec{x}$ and $\vec{y}$ have the same length and direction. They are equal vectors.
 
 ### Scaling and adding vectors
 To scale a vector is to change it's length.
 
-<img src="../../notebooks-images/vector_space_review__scaling.png" width="500" />
+<img src="../notebooks-images/vector_space_review__scaling.png" width="500" />
 
 Notice that $\vec{2x}$ and $\vec{y}$ have the direction but different lengths. They are not equal.
 
 To add two vectors $\vec{y} + \vec{z}$, take one step according to the length of $\vec{y}$, then immediately take one step according to the length of $\vec{z}$ (or vice versa). This is also known as triangle method, where you place the initial point of a vector on the terminal point of the other.
 
-<img src="../../notebooks-images/vector_space_review__adding.png" width="300" />
+<img src="../notebooks-images/vector_space_review__adding.png" width="300" />
 
 ### Vector notations
 Vectors are usually represented as Cartesian Coordinates.
 
-<img src="../../notebooks-images/vector_space_review__notation.png" width="500" />
+<img src="../notebooks-images/vector_space_review__notation.png" width="500" />
 
 $$ \vec{x} = \begin{bmatrix} 1 \\ 4  \end{bmatrix} , \quad 
    \vec{y} = \begin{bmatrix} 3 \\ 2  \end{bmatrix} , \quad 
@@ -48,7 +48,7 @@ $$ \vec{2x} = \begin{bmatrix} 2 \\ 8  \end{bmatrix} , \quad
    \vec{2x + -0.5z} = \begin{bmatrix} 0 \\ 8  \end{bmatrix}
 $$
 
-<img src="../../notebooks-images/vector_space_review__notation_arithmetic.png" width="500" />
+<img src="../notebooks-images/vector_space_review__notation_arithmetic.png" width="500" />
 
 
 Vectors can be added and scaled element-wise:
@@ -79,7 +79,7 @@ A subspace $U$ of $V$ is the span of a set of vectors $\{\vec{u_1}, \dots, \vec{
 ### Angles between vectors
 When you put any two vectors terminal end to terminal end without changing their direction, you can measure the angle between them.
 
-<img src="../../notebooks-images/vector_space_review__angle.png" width="300" />
+<img src="../notebooks-images/vector_space_review__angle.png" width="300" />
 
 
 ### Vector lengths
@@ -88,7 +88,7 @@ Intuition in $\mathbb{R}^2$ :
 
 Recall the triangle method of adding two vectors. If we add two perpendicular vectors $\vec{a} + \vec{b}$ in $\mathbb{R}^2$, then we know that the resulting vector will be the hypotenuse. In this case, we also know that the length of $\vec{a} + \vec{b}$ will follow the Pythagorean Theorem: $\sqrt{a^2 + b^2}$.
 
-<img src="../../notebooks-images/vector_space_review__length.png" width="400" />
+<img src="../notebooks-images/vector_space_review__length.png" width="400" />
 
 
 General Formula for  Length of $\vec{v} \in \mathbb{R}^n$ :
@@ -112,7 +112,7 @@ The first expression is known as the algebraic definition of the dot product, an
 ### Distance between two vectors
 $$dist(\vec{x},\vec{y}) \quad = \quad || \vec{x} - \vec{y} ||$$
 
-<img src="../../notebooks-images/vector_space_review__distance.png" width="500" />
+<img src="../notebooks-images/vector_space_review__distance.png" width="500" />
 
 
 ### Orthogonal vectors
@@ -121,11 +121,11 @@ For two non-zero vectors to be orthogonal, they must satisfy the property that $
 ### Projections
 To project one vector $\vec{x}$ onto another vector $\vec{y}$, we want to find $k \ \vec{y}$ that is closest to $\vec{x}$.
 
-<img src="../../notebooks-images/vector_space_review__projection.png" width="400" />
+<img src="../notebooks-images/vector_space_review__projection.png" width="400" />
 
 
 By the Pythagorean Theorem, we know that $k$ must be the scalar such that $\vec{x} - k \ \vec{y}$ is perpendicular to $\vec{y}$, so  $k \ \vec{y}$ is the (orthogonal) projection of $\vec{x}$ onto $\vec{y}$.
 
 Likewise, to project one vector $\vec{x}$ onto any vector space spanned by some set of vectors $\{\vec{v_1}, \vec{v_2}, \dots, \vec{v_p}\}$, we still find the linear combination $k_1 \ \vec{v_1} + k_2 \ \vec{v_2} + \dots + k_p \ \vec{v_p}\}$ that is closest to $\vec{x}$.
 
-<img src="../../notebooks-images/vector_space_review__proj2d.png" width="500" />
+<img src="../notebooks-images/vector_space_review__proj2d.png" width="500" />
