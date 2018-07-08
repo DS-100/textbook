@@ -78,7 +78,7 @@ We can measure *coverage error* by calculating the difference between our measur
 
 ### Repair Times
 
-Blah blah stuff about repair times and stuff. Here we plot the data. (need Deb for more background)
+The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have repair times for one class of repairs at one time period. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
 
 
 ```python
