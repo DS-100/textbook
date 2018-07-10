@@ -81,8 +81,32 @@
 <h2 id="Cross-Validation">Cross-Validation<a class="anchor-link" href="#Cross-Validation">&#182;</a></h2><p>In the previous chapter, we observed that we needed a more accurate way of simulating the test error to manage the bias-variance trade off. Cross-validation provides a method of estimating our model error using a single observed dataset by separating data used for training from the data used for model selection and final accuracy.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Train-Validation-Test-Split">Train-Validation-Test Split<a class="anchor-link" href="#Train-Validation-Test-Split">&#182;</a></h2><p>One way to accomplish this is to split the original dataset into three disjoint subsets:</p>
+<ul>
+<li>Training set: The data used to fit the model.</li>
+<li>Validation set: The data used to select features.</li>
+<li>Test set: The data used to report the model's final accuracy.</li>
+</ul>
+<p>After splitting, we select a set of features and a model based on the following procedure:</p>
+<ol>
+<li>For each potential set of features, fit a model using the training set. The error of a model on the training set is its <em>training error</em>.</li>
+<li>Check the error of each model on the validation set: its <em>validation error</em>. Select the model that achieves the lowest validation error. This is the final choice of features and model.</li>
+<li>Calculate the <em>test error</em>, error of the final model on the test set. This is the final reported accuracy of the model. We are forbidden from adjusting the features or model to decrease test error; doing so effectively converts the test set into a validation set. Instead, we must collect a new test set after making further changes to the features or the model.</li>
+</ol>
+<p>This process allows us to more accurately determine the model to use than using the training error alone.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Size of the train-validation-test split</strong></p>
+<p>The train-validation-test split commonly uses 70% of the data as the training set, 15% as the validation set, and the remaining 15% as the test set. Increasing the size of the training set helps model accuracy but causes more variation in the validation and test error.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-Error-and-Test-Error">Training Error and Test Error<a class="anchor-link" href="#Training-Error-and-Test-Error">&#182;</a></h2><p>A model is of little use to us if it fails to generalize to unseen data from the population. The test error provides an accurate representation of the model's performance on new data since we do not use the test set to train the model or select features.</p>
+<p>In general, the training error decreases as we add complexity to our model with additional features or more complex prediction mechanisms. The test error, on the other hand, decreases up to a certain amount of complexity then increases again as the model overfits the training set.</p>
+<p><img src="https://raw.githubusercontent.com/DS-100/textbook/master/assets/feature_train_test_error.png" alt="feature_train_test_error.png"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="K-Fold-Cross-Validation">K-Fold Cross-Validation<a class="anchor-link" href="#K-Fold-Cross-Validation">&#182;</a></h2><p>In Chapter 14.3, we mentioned the method of the <strong>train-validation split</strong> method to simulate test error through the validation set. However, with this method the validation error may be prone to high variance because the evaluation of the error may depend heavily on which points end up in the training and validation sets.</p>
-<p>To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into <em>k</em> equally-sized subsets (<em>$k$ folds</em>), and the train-validation split is repeated <em>k</em> times. Each time, one of the <em>k</em> folds is used as the validation set, and the reaming <em>k-1</em> folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called <strong>k-fold cross-validation</strong>. The biggest advantage of this method is that every data point is used for validation exactly once and for training <em>k-1</em> times.</p>
+<p>To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into <em>k</em> equally-sized subsets (<em>$k$ folds</em>), and the train-validation split is repeated <em>k</em> times. Each time, one of the <em>k</em> folds is used as the validation set, and the remaining <em>k-1</em> folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called <strong>k-fold cross-validation</strong>. The biggest advantage of this method is that every data point is used for validation exactly once and for training <em>k-1</em> times.</p>
 <p>The diagram below illustrates the technique when using five folds:</p>
 <p><img src="https://github.com/DS-100/textbook/blob/master/assets/feature_5_fold_cv.jpg?raw=true" alt="feature_5_fold_cv.jpg"></p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
@@ -92,7 +116,7 @@
 <p>The <code>scikit-learn</code> library provides a convenient <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html"><code>sklearn.model_selection.KFold</code></a> class to implement $k$-fold cross-validation.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Bias-Variance-Tradeoff">Bias-Variance Tradeoff<a class="anchor-link" href="#Bias-Variance-Tradeoff">&#182;</a></h2><p>K-fold cross-validation helps us manage the bias-variance tradeoff more accurately. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training; this allows us to estimate both model bias and model variance. K-fold cross-validation also incorporates the fact that the noise in the test set only affects the noise term in the risk equation whereas the noise in the training set only affects bias and model variance in the equation. To choose the final model to use, we select the one that has the lowest validation error.</p></div></div></div>
+<h2 id="Bias-Variance-Tradeoff">Bias-Variance Tradeoff<a class="anchor-link" href="#Bias-Variance-Tradeoff">&#182;</a></h2><p>K-fold cross-validation helps us manage the bias-variance tradeoff more accurately. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training; this allows us to estimate both model bias and model variance. K-fold cross-validation also incorporates the fact that the noise in the test set only affects the noise term in the bias-variance decomposition whereas the noise in the training set affects both bias and model variance To choose the final model to use, we select the one that has the lowest validation error.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Example:-Model-Selection-for-Ice-Cream-Ratings">Example: Model Selection for Ice Cream Ratings<a class="anchor-link" href="#Example:-Model-Selection-for-Ice-Cream-Ratings">&#182;</a></h2><p>We will use the complete model selection process, including cross-validation, to select a model that predicts ice cream ratings from ice cream sweetness. The complete ice cream dataset and a scatter plot of the overall rating versus ice cream sweetness are shown below.</p></div></div></div>
@@ -233,7 +257,7 @@
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/bias_cv_10_0.png"
+<img src="/notebooks-images/bias_cv_13_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -299,11 +323,11 @@
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/bias_cv_13_0.png"
+<img src="/notebooks-images/bias_cv_16_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Instead of the above method, we first partition our data into a training dataset, validation dataset, and test dataset using <code>scikit-learn</code>'s <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html"><code>sklearn.model_selection.train_test_split</code></a> method to perform a 70/30% train-test split.</p></div></div></div>
+<p>Instead of the above method, we first partition our data into training, validation, and test datasetsusing <code>scikit-learn</code>'s <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html"><code>sklearn.model_selection.train_test_split</code></a> method to perform a 70/30% train-test split.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -337,7 +361,7 @@
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We now fit polynomial regression models using the training set <code>X_train</code> and <code>y_train</code>, one for each polynomial degree from 1 to 10.</p></div></div></div>
+<p>We now fit polynomial regression models using the training set, one for each polynomial degree from 1 to 10.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -567,19 +591,20 @@
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/bias_cv_23_0.png"
+<img src="/notebooks-images/bias_cv_26_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Examining the validation errors reveals the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and fit it on the all of the training data at once. Then, we compute its error on the test set.</p></div></div></div>
+<p>Examining the validation errors reveals that the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and fit it on the all of the training data at once. Then, we compute its error on the test set.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell"
-  
+  style="display:none;"
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">best_trans</span> <span class="o">=</span> <span class="n">transformers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">best_trans</span> <span class="o">=</span> <span class="n">transformers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">best_model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_train</span><span class="p">)</span>
 
 <span class="n">training_error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">best_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">y_train</span><span class="p">)</span>
@@ -600,15 +625,24 @@
 
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Degree 2 polynomial
-  Training error: 0.04427
-Validation error: 0.04673
-      Test error: 0.04745
-</pre></div></div></div></div></div>
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-intense-fg ansi-bold">&lt;ipython-input-1-3c5419014a84&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-intense-fg ansi-bold">()</span>
+<span class="ansi-green-fg">      1</span> <span class="ansi-red-intense-fg ansi-bold"># HIDDEN</span>
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 2</span><span class="ansi-yellow-intense-fg ansi-bold"> </span>best_trans <span class="ansi-yellow-intense-fg ansi-bold">=</span> transformers<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span>
+<span class="ansi-green-fg">      3</span> best_model <span class="ansi-yellow-intense-fg ansi-bold">=</span> LinearRegression<span class="ansi-yellow-intense-fg ansi-bold">(</span>fit_intercept<span class="ansi-yellow-intense-fg ansi-bold">=</span><span class="ansi-green-intense-fg ansi-bold">False</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>fit<span class="ansi-yellow-intense-fg ansi-bold">(</span>X_train_polys<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> y_train<span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-fg">      4</span> 
+<span class="ansi-green-fg">      5</span> training_error <span class="ansi-yellow-intense-fg ansi-bold">=</span> mse_cost<span class="ansi-yellow-intense-fg ansi-bold">(</span>best_model<span class="ansi-yellow-intense-fg ansi-bold">.</span>predict<span class="ansi-yellow-intense-fg ansi-bold">(</span>X_train_polys<span class="ansi-yellow-intense-fg ansi-bold">[</span><span class="ansi-cyan-intense-fg ansi-bold">1</span><span class="ansi-yellow-intense-fg ansi-bold">]</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> y_train<span class="ansi-yellow-intense-fg ansi-bold">)</span>
+
+<span class="ansi-red-intense-fg ansi-bold">NameError</span>: name &#39;transformers&#39; is not defined</pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For future reference, Scikit-learn has <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html"><code>cross_val_predict</code></a> to automatically perform cross-validation, so you don't have to break the data into training and validation sets yourself. Also, note that the test error is higher than the validation error which is higher than the training error.</p></div></div></div>
+<p>For future reference, <code>scikit-learn</code> has a <a href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html"><code>cross_val_predict</code></a> to automatically perform cross-validation, so we don't have to break the data into training and validation sets yourself.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Also, note that the test error is higher than the validation error which is higher than the training error.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We use the widely useful cross-validation technique to manage the bias-variance tradeoff. After computing a train-validation-test split on the original dataset, we use the following procedure to train and choose a model.</p>

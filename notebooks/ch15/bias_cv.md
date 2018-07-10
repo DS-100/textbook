@@ -46,11 +46,39 @@ def df_interact(df, nrows=7, ncols=7):
 
 In the previous chapter, we observed that we needed a more accurate way of simulating the test error to manage the bias-variance trade off. Cross-validation provides a method of estimating our model error using a single observed dataset by separating data used for training from the data used for model selection and final accuracy. 
 
+## Train-Validation-Test Split
+
+One way to accomplish this is to split the original dataset into three disjoint subsets:
+
+* Training set: The data used to fit the model.
+* Validation set: The data used to select features.
+* Test set: The data used to report the model's final accuracy.
+
+After splitting, we select a set of features and a model based on the following procedure:
+
+1. For each potential set of features, fit a model using the training set. The error of a model on the training set is its *training error*.
+1. Check the error of each model on the validation set: its *validation error*. Select the model that achieves the lowest validation error. This is the final choice of features and model.
+1. Calculate the *test error*, error of the final model on the test set. This is the final reported accuracy of the model. We are forbidden from adjusting the features or model to decrease test error; doing so effectively converts the test set into a validation set. Instead, we must collect a new test set after making further changes to the features or the model.
+
+This process allows us to more accurately determine the model to use than using the training error alone.
+
+**Size of the train-validation-test split**
+
+The train-validation-test split commonly uses 70% of the data as the training set, 15% as the validation set, and the remaining 15% as the test set. Increasing the size of the training set helps model accuracy but causes more variation in the validation and test error.
+
+## Training Error and Test Error
+
+A model is of little use to us if it fails to generalize to unseen data from the population. The test error provides an accurate representation of the model's performance on new data since we do not use the test set to train the model or select features.
+
+In general, the training error decreases as we add complexity to our model with additional features or more complex prediction mechanisms. The test error, on the other hand, decreases up to a certain amount of complexity then increases again as the model overfits the training set.
+
+![feature_train_test_error.png](https://raw.githubusercontent.com/DS-100/textbook/master/assets/feature_train_test_error.png)
+
 ## K-Fold Cross-Validation
 
 In Chapter 14.3, we mentioned the method of the **train-validation split** method to simulate test error through the validation set. However, with this method the validation error may be prone to high variance because the evaluation of the error may depend heavily on which points end up in the training and validation sets.
 
-To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into *k* equally-sized subsets (*$k$ folds*), and the train-validation split is repeated *k* times. Each time, one of the *k* folds is used as the validation set, and the reaming *k-1* folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once and for training *k-1* times.
+To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into *k* equally-sized subsets (*$k$ folds*), and the train-validation split is repeated *k* times. Each time, one of the *k* folds is used as the validation set, and the remaining *k-1* folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once and for training *k-1* times.
 
 The diagram below illustrates the technique when using five folds:
 
@@ -64,7 +92,7 @@ The `scikit-learn` library provides a convenient [`sklearn.model_selection.KFold
 
 ## Bias-Variance Tradeoff
 
-K-fold cross-validation helps us manage the bias-variance tradeoff more accurately. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training; this allows us to estimate both model bias and model variance. K-fold cross-validation also incorporates the fact that the noise in the test set only affects the noise term in the risk equation whereas the noise in the training set only affects bias and model variance in the equation. To choose the final model to use, we select the one that has the lowest validation error.
+K-fold cross-validation helps us manage the bias-variance tradeoff more accurately. Intuitively, the validation error estimates test error by checking the model's performance on a dataset not used for training; this allows us to estimate both model bias and model variance. K-fold cross-validation also incorporates the fact that the noise in the test set only affects the noise term in the bias-variance decomposition whereas the noise in the training set affects both bias and model variance To choose the final model to use, we select the one that has the lowest validation error.
 
 
 
@@ -181,7 +209,7 @@ plt.ylabel('Rating');
 ```
 
 
-![png](bias_cv_files/bias_cv_9_0.png)
+![png](bias_cv_files/bias_cv_12_0.png)
 
 
 Using degree 10 polynomial features on the dataset below results in a perfectly accurate model for the 10 datapoints. Unfortunately, this model fails to generalize to previously-unseen data from the population.
@@ -228,10 +256,10 @@ plt.ylim(3, 7);
 ```
 
 
-![png](bias_cv_files/bias_cv_12_0.png)
+![png](bias_cv_files/bias_cv_15_0.png)
 
 
-Instead of the above method, we first partition our data into a training dataset, validation dataset, and test dataset using `scikit-learn`'s [`sklearn.model_selection.train_test_split`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) method to perform a 70/30% train-test split.
+Instead of the above method, we first partition our data into training, validation, and test datasetsusing `scikit-learn`'s [`sklearn.model_selection.train_test_split`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) method to perform a 70/30% train-test split.
 
 
 ```python
@@ -251,7 +279,7 @@ print(f'      Test set size: {len(X_test)}')
           Test set size: 92
     
 
-We now fit polynomial regression models using the training set `X_train` and `y_train`, one for each polynomial degree from 1 to 10.
+We now fit polynomial regression models using the training set, one for each polynomial degree from 1 to 10.
 
 
 ```python
@@ -434,13 +462,14 @@ plt.tight_layout();
 ```
 
 
-![png](bias_cv_files/bias_cv_22_0.png)
+![png](bias_cv_files/bias_cv_25_0.png)
 
 
-Examining the validation errors reveals the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and fit it on the all of the training data at once. Then, we compute its error on the test set.
+Examining the validation errors reveals that the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and fit it on the all of the training data at once. Then, we compute its error on the test set.
 
 
 ```python
+# HIDDEN
 best_trans = transformers[1]
 best_model = LinearRegression(fit_intercept=False).fit(X_train_polys[1], y_train)
 
@@ -454,13 +483,25 @@ print(f'Validation error: {validation_error:0.5f}')
 print(f'      Test error: {test_error:0.5f}')
 ```
 
-    Degree 2 polynomial
-      Training error: 0.04427
-    Validation error: 0.04673
-          Test error: 0.04745
+
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    <ipython-input-1-3c5419014a84> in <module>()
+          1 # HIDDEN
+    ----> 2 best_trans = transformers[1]
+          3 best_model = LinearRegression(fit_intercept=False).fit(X_train_polys[1], y_train)
+          4 
+          5 training_error = mse_cost(best_model.predict(X_train_polys[1]), y_train)
     
 
-For future reference, Scikit-learn has [`cross_val_predict`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html) to automatically perform cross-validation, so you don't have to break the data into training and validation sets yourself. Also, note that the test error is higher than the validation error which is higher than the training error. 
+    NameError: name 'transformers' is not defined
+
+
+For future reference, `scikit-learn` has a [`cross_val_predict`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html) to automatically perform cross-validation, so we don't have to break the data into training and validation sets yourself. 
+
+Also, note that the test error is higher than the validation error which is higher than the training error. 
 
 ## Summary
 
