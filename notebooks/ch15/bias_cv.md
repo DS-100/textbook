@@ -76,7 +76,7 @@ In general, the training error decreases as we add complexity to our model with 
 
 ## K-Fold Cross-Validation
 
-In Chapter 14.3, we mentioned the method of the **train-validation split** method to simulate test error through the validation set. However, with this method the validation error may be prone to high variance because the evaluation of the error may depend heavily on which points end up in the training and validation sets.
+The **train-validation split** method is a good method to simulate test error through the validation set. However, with this method the validation error may be prone to high variance because the evaluation of the error may depend heavily on which points end up in the training and validation sets.
 
 To tackle this problem, we can run the train-validation split multiple times on the same dataset. The dataset is divided into *k* equally-sized subsets (*$k$ folds*), and the train-validation split is repeated *k* times. Each time, one of the *k* folds is used as the validation set, and the remaining *k-1* folds are used as the training set. We report the model's final validation error as the average of the $ k $ validation errors from each trial. This method is called **k-fold cross-validation**. The biggest advantage of this method is that every data point is used for validation exactly once and for training *k-1* times.
 
@@ -109,10 +109,6 @@ X = transformer.fit_transform(ice[['sweetness']])
 clf = LinearRegression(fit_intercept=False).fit(X, ice[['overall']])
 xs = np.linspace(3.5, 12.5, 300).reshape(-1, 1)
 rating_pred = clf.predict(transformer.transform(xs))
-
-#ice.plot.scatter('sweetness', 'overall')
-#plt.plot(xs, rating_pred)
-#plt.title('Degree 2 polynomial fit');
 
 temp = pd.DataFrame(xs, columns = ['sweetness'])
 temp['overall'] = rating_pred
@@ -212,7 +208,7 @@ plt.ylabel('Rating');
 ![png](bias_cv_files/bias_cv_12_0.png)
 
 
-Using degree 10 polynomial features on the dataset below results in a perfectly accurate model for the 10 datapoints. Unfortunately, this model fails to generalize to previously-unseen data from the population.
+Using degree 10 polynomial features on 9 random points from the dataset result in a perfectly accurate model for those data points. Unfortunately, this model fails to generalize to previously unseen data from the population.
 
 
 ```python
@@ -268,7 +264,7 @@ from sklearn.model_selection import train_test_split
 test_size = 92
 
 X_train, X_test, y_train, y_test = train_test_split(
-    ice[['sweetness']], ice['overall'], test_size=test_size)
+    ice[['sweetness']], ice['overall'], test_size=test_size, random_state=0)
 
 
 print(f'  Training set size: {len(X_train)}')
@@ -299,13 +295,13 @@ X_train_polys[4]
 
 
 
-    array([[     1.  ,     11.46,    131.33,   1505.06,  17247.99, 197661.96],
-           [     1.  ,      8.  ,     64.  ,    512.  ,   4096.  ,  32768.  ],
-           [     1.  ,      4.71,     22.18,    104.49,    492.13,   2317.95],
+    array([[     1.  ,      8.8 ,     77.44,    681.47,   5996.95,  52773.19],
+           [     1.  ,     10.74,    115.35,   1238.83,  13305.07, 142896.44],
+           [     1.  ,      9.98,     99.6 ,    994.01,   9920.24,  99003.99],
            ...,
-           [     1.  ,      6.88,     47.33,    325.66,   2240.55,  15414.95],
-           [     1.  ,      4.63,     21.44,     99.25,    459.54,   2127.67],
-           [     1.  ,      6.74,     45.43,    306.18,   2063.67,  13909.11]])
+           [     1.  ,      6.79,     46.1 ,    313.05,   2125.59,  14432.74],
+           [     1.  ,      5.13,     26.32,    135.01,    692.58,   3552.93],
+           [     1.  ,      8.66,     75.  ,    649.46,   5624.34,  48706.78]])
 
 
 
@@ -393,43 +389,43 @@ pd.options.display.max_rows = 7
   <tbody>
     <tr>
       <th>1</th>
-      <td>0.332086</td>
+      <td>0.324820</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.046725</td>
+      <td>0.045060</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.047069</td>
+      <td>0.045418</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.048161</td>
+      <td>0.045282</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>0.048352</td>
+      <td>0.046272</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>0.048653</td>
+      <td>0.046715</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>0.048578</td>
+      <td>0.047140</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>0.048877</td>
+      <td>0.047540</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>0.051174</td>
+      <td>0.048055</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>0.050455</td>
+      <td>0.047805</td>
     </tr>
   </tbody>
 </table>
@@ -453,7 +449,7 @@ plt.ylabel('Validation Error');
 plt.subplot(122)
 plt.plot(cv_df.index, cv_df['Validation Error'])
 plt.scatter(cv_df.index, cv_df['Validation Error'])
-plt.ylim(0.046225, 0.05)
+plt.ylim(0.044925, 0.05)
 plt.title('Zoomed In')
 plt.xlabel('Polynomial Degree')
 plt.ylabel('Validation Error')
@@ -483,25 +479,15 @@ print(f'Validation error: {validation_error:0.5f}')
 print(f'      Test error: {test_error:0.5f}')
 ```
 
-
-    ---------------------------------------------------------------------------
-
-    NameError                                 Traceback (most recent call last)
-
-    <ipython-input-1-3c5419014a84> in <module>()
-          1 # HIDDEN
-    ----> 2 best_trans = transformers[1]
-          3 best_model = LinearRegression(fit_intercept=False).fit(X_train_polys[1], y_train)
-          4 
-          5 training_error = mse_cost(best_model.predict(X_train_polys[1]), y_train)
+    Degree 2 polynomial
+      Training error: 0.04409
+    Validation error: 0.04506
+          Test error: 0.04698
     
-
-    NameError: name 'transformers' is not defined
-
 
 For future reference, `scikit-learn` has a [`cross_val_predict`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html) to automatically perform cross-validation, so we don't have to break the data into training and validation sets yourself. 
 
-Also, note that the test error is higher than the validation error which is higher than the training error. 
+Also, note that the test error is higher than the validation error which is higher than the training error. The training error should be the lowest because the model is fit on the training data. Fitting the model minimizes the mean squared error for that dataset. The validation error and the test error are usually higher than the training error because the error is computed on an unknown dataset that the model hasn't seen.
 
 ## Summary
 
