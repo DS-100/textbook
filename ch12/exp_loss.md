@@ -42,7 +42,7 @@ As is the case with the tips dataset, we often do not have access to the populat
 Unfortunately, we cannot find $ P(X = x) $, the probability that a specific tip percentage appears in the population, because we do not have access to the population data. Thus, we must use our sample data to approximate the population distribution so that we can estimate the expected loss. If $ n $ is our sample size, then the probability that a particular point appears in our sample is $ \frac{1}{n}$. We can now estimate the expected squared loss as follows:
 
 \\[
-\mathbb{E}[(X - c)^2] \approx \frac{1}{n} \sum_{i=1}^n (x_i - c)^2
+\mathbb{E}[(X - \theta)^2] \approx \frac{1}{n} \sum_{i=1}^n (x_i - \theta)^2
 \\]
 
 This is the same expression as the MSE loss function from the previous chapters; hence, the MSE for a simple random sample provides us with a good estimate of the expected squared loss for the population.
