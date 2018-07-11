@@ -59,20 +59,25 @@ The **bootstrap** is a process we learned about in Data 8 that we can use for es
 - Using this sample, we *resample with replacement* to form new samples of the same size.
 - We do this many times, taking the desired statistic of each resample (e.g. we take the median of each resample).
 
-Here, we end up with many test statistics from individual resamples, from which we can form a distribution. In Data 8, we were taught to form a confidence interval by taking the 2.5th percentile and the 97.5th percentile. This method of bootstrapping to create a confidence interval is called the **percentile bootstrap.** Generally speaking, this confidence interval will have a 95% chance of containing the actual population statistic. It is important to note, however, that this will NOT always be the case. 
+Here, we end up with many test statistics from individual resamples, from which we can form a distribution. In Data 8, we were taught to form a 95% confidence interval by taking the 2.5th percentile and the 97.5th percentile of the bootstrap statistics. This method of bootstrapping to create a confidence interval is called the **percentile bootstrap.** 95% confidence implies that if we take a new sample from the population and construct a confidence interval, the confidence interval will contain the population parameter with probability 0.95. However, it is important to note that confidence intervals created from real data can only approximate 95% confidence. The percentile bootstrap in particular has lower confidence than desired at small sample sizes.
 
-Below, we've taken a population and created one thousand bootstrap *confidence intervals* for the population mean for different sample sizes. The y-axis represents the fraction of the one thousand confidence intervals that contained the real population mean. Notice that at sample sizes below 20, fewer than 90% of the confidence intervals actually contain the population mean.
+Below, we've taken a population and created one thousand bootstrap 95% confidence intervals for the population mean for different sample sizes. The y-axis represents the fraction of the one thousand confidence intervals that contained the real population mean. Notice that at sample sizes below 20, fewer than 90% of the confidence intervals actually contain the population mean.
 
 
 ```python
 # Since this plot needs a bunch of prior code to run, I suggest
 # saving this plot as a .png and then just including the picture without the
 # code in the final notebook
-# trials['percentile'].plot()
-# plt.axhline(0.95, c='red', linestyle='--', label='95% coverage');
+trials['percentile'].plot()
+plt.axhline(0.95, c='red', linestyle='--', label='95% coverage')
+plt.xlabel('Sample Size')
+plt.ylabel('Coverage')
+plt.title('Coverage vs. Sample Size for Percentile Bootstrap');
 ```
 
-<img src="trials.png">
+
+![png](hyp_studentized_files/hyp_studentized_6_0.png)
+
 
 We can measure *coverage error* by calculating the difference between our measured confidence here and our desired 95% confidence. We can see that the coverage error for percentile bootstrap is very high at small sample sizes. In this chapter, we will introduce a new bootstrap method, called the **studentized bootstrap** method, that has a lower coverage error but requires more computation.
 
@@ -82,11 +87,14 @@ The New York Public Utilities Commission monitors the response time for repairin
 
 
 ```python
-plt.hist(times, bins=20);
+plt.hist(times, bins=20)
+plt.xlabel('Repair Time')
+plt.ylabel('Count')
+plt.title('Distribution of Repair Times');
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_10_0.png)
+![png](hyp_studentized_files/hyp_studentized_9_0.png)
 
 
 Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about 354.
@@ -129,10 +137,20 @@ pop_sampling_dist = np.array(
 )
 
 plt.hist(pop_sampling_dist, bins=30);
+plt.xlabel('Average Repair Time')
+plt.ylabel('Count')
+plt.title('Distribution of Sample Means ($\hat{\theta}$)');
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_17_0.png)
+
+
+    <matplotlib.text.Text at 0x115446ef0>
+
+
+
+
+![png](hyp_studentized_files/hyp_studentized_16_1.png)
 
 
 We can see that the center of this distribution is ~350, and that it is skewed right because of the skewed distribution of the original data. 
@@ -166,11 +184,21 @@ np.random.seed(0)
 
 sample = take_sample()
 
-plt.hist(bootstrap_stats(sample), bins=30);
+plt.hist(bootstrap_stats(sample), bins=30)
+plt.xlabel('Average Repair Time')
+plt.ylabel('Count')
+plt.title('Distribution of Bootstrap Sample Means ($\tilde{\theta}$)');
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_21_0.png)
+
+
+    <matplotlib.text.Text at 0x1152cd208>
+
+
+
+
+![png](hyp_studentized_files/hyp_studentized_20_1.png)
 
 
 As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the distribution of $\hat\theta$, likely because our original sample did not look like the population. As a result, our confidence intervals perform rather poorly. Below we can see a side-by-side comparison of the two distributions:
@@ -179,14 +207,16 @@ As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the
 ```python
 plt.figure(figsize=(10, 4))
 plt.subplot(121)
-plt.hist(pop_sampling_dist, bins=30);
+plt.hist(pop_sampling_dist, bins=30, range=(0, 1000))
+plt.ylim((0,150))
 
 plt.subplot(122)
-plt.hist(bootstrap_stats(sample), bins=30);
+plt.hist(bootstrap_stats(sample), bins=30, range=(0, 1000))
+plt.ylim((0,150));
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_23_0.png)
+![png](hyp_studentized_files/hyp_studentized_22_0.png)
 
 
 ### The Studentized Bootstrap Procedure
@@ -269,10 +299,13 @@ To assess the tradeoffs of studentized and percentile bootstrap, let's compare t
 
 ```python
 plt.hist(times, bins=20);
+plt.xlabel('Repair Time')
+plt.ylabel('Count')
+plt.title('Distribution of Repair Times');
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_35_0.png)
+![png](hyp_studentized_files/hyp_studentized_34_0.png)
 
 
 We will take many samples from the population, compute a percentile confidence interval and a studentized confidence interval for each sample, and then compute the coverage for each. We will repeat this for varying sample sizes to see how the coverage of each method changes with sample size.
@@ -401,11 +434,14 @@ trials = run_trials(np.arange(4, 101, 2))
 ```python
 trials.plot()
 plt.axhline(0.95, c='red', linestyle='--', label='95% coverage')
-plt.legend();
+plt.legend()
+plt.xlabel('Sample Size')
+plt.ylabel('Coverage')
+plt.title('Coverage vs. Sample Size for Studentized and Percentile Bootstraps');
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_47_0.png)
+![png](hyp_studentized_files/hyp_studentized_46_0.png)
 
 
 As we can see, the studentized bootstrap has a much better coverage at smaller sample sizes.
