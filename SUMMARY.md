@@ -1,11 +1,14 @@
 # Table of Contents
 
+* [About This Book](about_this_book.md)
+
+<!-- begin_numbering -->
+
 * [1. The Data Science Lifecycle](ch01/the_data_science_lifecycle.md)
-  * [1.1 About This Book](ch01/about_this_book.md)
-  * [1.2 The Students of Data 100](ch01/the_students_of_ds100_1.md)
-  * [1.3 Exploring the Data](ch01/the_students_of_ds100_2.md)
-  * [1.4 What's in a Name?](ch01/the_students_of_ds100_3.md)
-* [2. Data Generation](ch02/data_generation.md)
+  * [1.1 The Students of Data 100](ch01/the_students_of_ds100_1.md)
+  * [1.2 Exploring the Data](ch01/the_students_of_ds100_2.md)
+  * [1.3 What's in a Name?](ch01/the_students_of_ds100_3.md)
+* [2. Data Design](ch02/data_design.md)
   * [2.1 Dewey Defeats Truman](ch02/dewey_truman.md)
   * [2.2 Probability Sampling](ch02/probability_sampling.md)
   * [2.3 SRS vs. "Big Data"](ch02/srs_vs_big_data.md)
@@ -72,9 +75,13 @@
   * [17.3 Logistic Cost](ch17/classification_cost.md)
   * [17.4 Using Logistic Regression](ch17/classification_log_reg.md)
   * [17.5 Fitting a Logistic Model](ch17/classification_sgd.md)
-* [18. Appendix: Reference Tables](ch18/ref_intro.md)
-  * [18.1 pandas](ch18/ref_pandas.md)
-  * [18.2 seaborn](ch18/ref_seaborn.md)
-  * [18.3 matplotlib](ch18/ref_matplotlib.md)
-  * [18.4 scikit-learn](ch18/ref_sklearn.md)
-* [19. Appendix: Contributors](ch19/contributors.md)
+* [18. Statistical Inference](ch18/hyp_intro.md)
+
+<!-- end_numbering -->
+
+* [Appendix: Reference Tables](ch19/ref_intro.md)
+  * [pandas](ch19/ref_pandas.md)
+  * [seaborn](ch19/ref_seaborn.md)
+  * [matplotlib](ch19/ref_matplotlib.md)
+  * [scikit-learn](ch19/ref_sklearn.md)
+* [Appendix: Contributors](ch20/contributors.md)
