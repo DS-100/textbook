@@ -59,6 +59,7 @@
   * [13.2 Fitting the Model](ch13/linear_grad.md)
   * [13.3 Multiple Linear Regression](ch13/linear_multiple.md)
   * [13.4 Least Squares - A Geometric Perspective](ch13/linear_projection.md)
+  * [13.5 Linear Regression Case Study](ch13/linear_case_study.md)
 * [14. Feature Engineering](ch14/feature_engineering.md)
   * [14.1 One-Hot Encoding](ch14/feature_one_hot.md)
   * [14.2 Polynomial Regression](ch14/feature_polynomial.md)
