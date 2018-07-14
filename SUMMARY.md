@@ -80,9 +80,10 @@
 
 <!-- end_numbering -->
 
-* [Appendix: Reference Tables](ch19/ref_intro.md)
-  * [pandas](ch19/ref_pandas.md)
-  * [seaborn](ch19/ref_seaborn.md)
-  * [matplotlib](ch19/ref_matplotlib.md)
-  * [scikit-learn](ch19/ref_sklearn.md)
-* [Appendix: Contributors](ch20/contributors.md)
+* [Appendix: Vector Space Review](ch19/vector_space_review.md)
+* [Appendix: Reference Tables](ch20/ref_intro.md)
+  * [pandas](ch20/ref_pandas.md)
+  * [seaborn](ch20/ref_seaborn.md)
+  * [matplotlib](ch20/ref_matplotlib.md)
+  * [scikit-learn](ch20/ref_sklearn.md)
+* [Appendix: Contributors](ch21/contributors.md)
