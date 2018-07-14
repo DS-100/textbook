@@ -2,6 +2,8 @@
 
 * [About This Book](about_this_book.md)
 
+<!-- begin_numbering -->
+
 * [1. The Data Science Lifecycle](ch01/the_data_science_lifecycle.md)
   * [1.1 The Students of Data 100](ch01/the_students_of_ds100_1.md)
   * [1.2 Exploring the Data](ch01/the_students_of_ds100_2.md)
@@ -72,9 +74,12 @@
   * [17.3 Logistic Cost](ch17/classification_cost.md)
   * [17.4 Using Logistic Regression](ch17/classification_log_reg.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
-* [19. Appendix: Reference Tables](ch19/ref_intro.md)
-  * [19.1 pandas](ch19/ref_pandas.md)
-  * [19.2 seaborn](ch19/ref_seaborn.md)
-  * [19.3 matplotlib](ch19/ref_matplotlib.md)
-  * [19.4 scikit-learn](ch19/ref_sklearn.md)
-* [20. Appendix: Contributors](ch20/contributors.md)
+
+<!-- end_numbering -->
+
+* [Appendix: Reference Tables](ch19/ref_intro.md)
+  * [pandas](ch19/ref_pandas.md)
+  * [seaborn](ch19/ref_seaborn.md)
+  * [matplotlib](ch19/ref_matplotlib.md)
+  * [scikit-learn](ch19/ref_sklearn.md)
+* [Appendix: Contributors](ch20/contributors.md)
