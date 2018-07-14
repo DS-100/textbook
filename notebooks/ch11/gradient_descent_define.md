@@ -84,18 +84,21 @@ As with cost functions, we will discuss the intuition for gradient descent first
 
 Since the `minimize` function isn't given values of $ \theta $ to try, we start by picking a $ \theta $ anywhere we'd like. Then, we can iteratively improve the estimate of $ \theta $. To improve an estimate of $ \theta $, we look at the slope of the cost function at that choice of $ \theta $.
 
-For example, suppose we are using MSE cost for the simple dataset $ y = [ 12, 13, 15, 16, 17 ] $ and our current choice of $ \theta $ is 12.
+For example, suppose we are using MSE cost for the simple dataset $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.
 
 
 ```python
 # HIDDEN
-pts = np.array([12, 13, 15, 16, 17])
+pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
 plot_cost(pts, (11, 18), mse_cost)
 plot_theta_on_cost(pts, 12, mse_cost)
 ```
 
+    No handles with labels found to put in legend.
 
-![png](gradient_descent_define_files/gradient_descent_define_6_0.png)
+
+
+![png](gradient_descent_define_files/gradient_descent_define_6_1.png)
 
 
 We'd like to choose a new value for $ \theta $ that decreases the cost. To do this, we look at the slope of the cost function at $ \theta = 12 $:
@@ -103,13 +106,16 @@ We'd like to choose a new value for $ \theta $ that decreases the cost. To do th
 
 ```python
 # HIDDEN
-pts = np.array([12, 13, 15, 16, 17])
+pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
 plot_cost(pts, (11, 18), mse_cost)
 plot_tangent_on_cost(pts, 12, mse_cost)
 ```
 
+    No handles with labels found to put in legend.
 
-![png](gradient_descent_define_files/gradient_descent_define_8_0.png)
+
+
+![png](gradient_descent_define_files/gradient_descent_define_8_1.png)
 
 
 The slope is negative, which means that increasing $ \theta $ will decrease the cost.
@@ -119,13 +125,16 @@ If $ \theta = 16.5 $ on the other hand, the slope of the cost function is positi
 
 ```python
 # HIDDEN
-pts = np.array([12, 13, 15, 16, 17])
+pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
 plot_cost(pts, (11, 18), mse_cost)
 plot_tangent_on_cost(pts, 16.5, mse_cost)
 ```
 
+    No handles with labels found to put in legend.
 
-![png](gradient_descent_define_files/gradient_descent_define_10_0.png)
+
+
+![png](gradient_descent_define_files/gradient_descent_define_10_1.png)
 
 
 When the slope is positive, decreasing $ \theta $ will decrease the cost.
@@ -157,15 +166,18 @@ We've plotted the old value of $ \theta $ as a green outlined circle and the new
 
 ```python
 # HIDDEN
-pts = np.array([12, 13, 15, 16, 17])
+pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
 plot_cost(pts, (11, 18), mse_cost)
 plot_theta_on_cost(pts, 12, mse_cost, c='none',
                    edgecolor=sns.xkcd_rgb['green'], linewidth=2)
 plot_theta_on_cost(pts, 17.2, mse_cost)
 ```
 
+    No handles with labels found to put in legend.
 
-![png](gradient_descent_define_files/gradient_descent_define_12_0.png)
+
+
+![png](gradient_descent_define_files/gradient_descent_define_12_1.png)
 
 
 Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta $. Our final update formula is:
@@ -195,12 +207,15 @@ def plot_one_gd_iter(y_vals, theta, cost_fn, grad_cost, alpha=0.3):
 plot_one_gd_iter(pts, 12, mse_cost, grad_mse_cost)
 ```
 
+    No handles with labels found to put in legend.
+
+
     old theta: 12
-    new theta: 13.56
+    new theta: 13.596
 
 
 
-![png](gradient_descent_define_files/gradient_descent_define_15_1.png)
+![png](gradient_descent_define_files/gradient_descent_define_15_2.png)
 
 
 Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum cost because the slope is also smaller.
@@ -208,43 +223,52 @@ Here are the $ \theta $ values for successive iterations of this process. Notice
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 13.56, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 13.60, mse_cost, grad_mse_cost)
 ```
 
-    old theta: 13.56
-    new theta: 14.184000000000001
+    No handles with labels found to put in legend.
+
+
+    old theta: 13.6
+    new theta: 14.236
 
 
 
-![png](gradient_descent_define_files/gradient_descent_define_17_1.png)
+![png](gradient_descent_define_files/gradient_descent_define_17_2.png)
 
 
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 14.18, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 14.24, mse_cost, grad_mse_cost)
 ```
 
-    old theta: 14.18
-    new theta: 14.432
+    No handles with labels found to put in legend.
+
+
+    old theta: 14.24
+    new theta: 14.492
 
 
 
-![png](gradient_descent_define_files/gradient_descent_define_18_1.png)
+![png](gradient_descent_define_files/gradient_descent_define_18_2.png)
 
 
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 14.432, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 14.49, mse_cost, grad_mse_cost)
 ```
 
-    old theta: 14.432
-    new theta: 14.5328
+    No handles with labels found to put in legend.
+
+
+    old theta: 14.49
+    new theta: 14.592
 
 
 
-![png](gradient_descent_define_files/gradient_descent_define_19_1.png)
+![png](gradient_descent_define_files/gradient_descent_define_19_2.png)
 
 
 ### Gradient Descent Analysis
@@ -307,51 +331,51 @@ def grad_mse_cost(theta, y_vals):
     return -2 * np.mean(y_vals - theta)
 ```
 
-Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ y = [ 12, 13, 15, 16, 17 ] $.
+Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ y = [12.1, 12.8, 14.9, 16.3, 17.2] $.
 
 
 ```python
 %%time
-theta = minimize(mse_cost, grad_mse_cost, np.array([12, 13, 15, 16, 17]))
+theta = minimize(mse_cost, grad_mse_cost, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
 print(f'Minimizing theta: {theta}')
 print()
 ```
 
-    theta: 0.00 | cost: 216.60
-    theta: 5.84 | cost: 80.18
-    theta: 9.34 | cost: 31.07
-    theta: 11.45 | cost: 13.39
-    theta: 12.71 | cost: 7.02
-    theta: 13.46 | cost: 4.73
-    theta: 13.92 | cost: 3.90
-    theta: 14.19 | cost: 3.61
-    theta: 14.35 | cost: 3.50
-    theta: 14.45 | cost: 3.46
-    theta: 14.51 | cost: 3.45
-    theta: 14.55 | cost: 3.44
-    theta: 14.57 | cost: 3.44
-    theta: 14.58 | cost: 3.44
-    theta: 14.59 | cost: 3.44
-    theta: 14.59 | cost: 3.44
-    theta: 14.60 | cost: 3.44
-    theta: 14.60 | cost: 3.44
-    Minimizing theta: 14.59851722463264
+    theta: 0.00 | cost: 218.76
+    theta: 5.86 | cost: 81.21
+    theta: 9.38 | cost: 31.70
+    theta: 11.49 | cost: 13.87
+    theta: 12.76 | cost: 7.45
+    theta: 13.52 | cost: 5.14
+    theta: 13.98 | cost: 4.31
+    theta: 14.25 | cost: 4.01
+    theta: 14.41 | cost: 3.90
+    theta: 14.51 | cost: 3.86
+    theta: 14.57 | cost: 3.85
+    theta: 14.61 | cost: 3.85
+    theta: 14.63 | cost: 3.84
+    theta: 14.64 | cost: 3.84
+    theta: 14.65 | cost: 3.84
+    theta: 14.65 | cost: 3.84
+    theta: 14.66 | cost: 3.84
+    theta: 14.66 | cost: 3.84
+    Minimizing theta: 14.658511131035242
     
-    CPU times: user 2.6 ms, sys: 1.6 ms, total: 4.2 ms
-    Wall time: 3.02 ms
+    CPU times: user 0 ns, sys: 0 ns, total: 0 ns
+    Wall time: 1.74 ms
 
 
 We can see that gradient quickly finds the same solution as the analytic method:
 
 
 ```python
-np.mean([12, 13, 15, 16, 17])
+np.mean([12.1, 12.8, 14.9, 16.3, 17.2])
 ```
 
 
 
 
-    14.6
+    14.66
 
 
 
@@ -410,8 +434,8 @@ print()
 
     Minimizing theta: 15.506849531471964
     
-    CPU times: user 207 ms, sys: 6.9 ms, total: 213 ms
-    Wall time: 258 ms
+    CPU times: user 78.1 ms, sys: 15.6 ms, total: 93.8 ms
+    Wall time: 134 ms
 
 
 ### Summary

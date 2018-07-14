@@ -12,26 +12,38 @@ For example, given this `SUMMARY.md` file:
 
 ```
 # Table of Contents
+
 * [Read Me](/README.md)
+
+<!-- begin_numbering -->
 * [Introduction](/introduction/README.md)
   * [Motivation](/introduction/Motivation.md)
   * [Getting Started](/introduction/Getting_Started.md)
 * [Tutorial](/tutorial/README.md)
   * [Simple Widgets](/tutorial/Simple_Widgets.md)
   * [Interact](/tutorial/Interact.md)
+<!-- end_numbering -->
+
+* [Appendix](/appendix.md)
 ```
 
 This script will generate:
 
 ```
 # Table of Contents
-* [1. Read Me](/README.md)
-* [2. Introduction](/introduction/README.md)
-  * [2.1 Motivation](/introduction/Motivation.md)
-  * [2.2 Getting Started](/introduction/Getting_Started.md)
-* [3. Tutorial](/tutorial/README.md)
-  * [3.1 Simple Widgets](/tutorial/Simple_Widgets.md)
-  * [3.2 Interact](/tutorial/Interact.md)
+
+* [Read Me](/README.md)
+
+<!-- begin_numbering -->
+* [1. Introduction](/introduction/README.md)
+  * [1.1 Motivation](/introduction/Motivation.md)
+  * [1.2 Getting Started](/introduction/Getting_Started.md)
+* [2. Tutorial](/tutorial/README.md)
+  * [2.1 Simple Widgets](/tutorial/Simple_Widgets.md)
+  * [2.2 Interact](/tutorial/Interact.md)
+<!-- end_numbering -->
+
+* [Appendix](/appendix.md)
 ```
 
 To re-number sections, we can just swap sections in the SUMMARY.md:
@@ -47,7 +59,7 @@ To re-number sections, we can just swap sections in the SUMMARY.md:
   * [2.2 Getting Started](/introduction/Getting_Started.md)
 ```
 
-And the script will produce:
+And the script will regenerate the correct section numbers:
 
 ```
 # Table of Contents
@@ -75,6 +87,10 @@ LINK_RE = re.compile(r'^\s*(\*|-|\+)')
 # Regex to match previously labeled sections
 LABEL_RE = re.compile(r'^[0-9\. ]+')
 
+# Markers to begin and end section numbering
+BEGIN = '<!-- begin_numbering -->'
+END = '<!-- end_numbering -->'
+
 
 def main():
     lines = read_summary()
@@ -83,7 +99,7 @@ def main():
     print('Successfully labeled SUMMARY.md')
 
 
-def add_section_labels(lines, section=(0, 0, 0)):
+def add_section_labels(lines, section=(0, 0, 0), should_label=False):
     """
     Recursively adds the section label to each line. Removes previous labels
     before adding label to avoid duplication.
@@ -94,10 +110,17 @@ def add_section_labels(lines, section=(0, 0, 0)):
     line, *rest = lines
     part, subpart, subsubpart = section
 
-    if not is_link(line):
-        return [line, *add_section_labels(rest, section)]
+    # Read section markers
+    if is_begin(line):
+        return [line, *add_section_labels(rest, section, should_label=True)]
+    if is_end(line):
+        return [line, *add_section_labels(rest, section, should_label=False)]
 
-    # Unfinished chapters aren't linked in the sidebar
+    if not should_label or not is_link(line):
+        # Skip this line
+        return [line, *add_section_labels(rest, section, should_label)]
+
+    # Unfinished chapters aren't linked in the sidebar but we label them anyway
     if '[' not in line:
         before, after = line.split(' ', maxsplit=1)
         bracket = ' '
@@ -114,17 +137,22 @@ def add_section_labels(lines, section=(0, 0, 0)):
             f'{before}{bracket}{part}.{subpart}.{subsubpart + 1} {after}'
         )
         return [
-            labeled_line,
-            *add_section_labels(rest, (part, subpart, subsubpart + 1))
+            labeled_line, *add_section_labels(
+                rest, (part, subpart, subsubpart + 1), should_label
+            )
         ]
     elif is_subpart(line):
         labeled_line = f'{before}{bracket}{part}.{subpart + 1} {after}'
         return [
-            labeled_line, *add_section_labels(rest, (part, subpart + 1, 0))
+            labeled_line,
+            *add_section_labels(rest, (part, subpart + 1, 0), should_label)
         ]
     else:
         labeled_line = f'{before}{bracket}{part + 1}. {after}'
-        return [labeled_line, *add_section_labels(rest, (part + 1, 0, 0))]
+        return [
+            labeled_line,
+            *add_section_labels(rest, (part + 1, 0, 0), should_label)
+        ]
 
 
 def read_summary():
@@ -149,9 +177,18 @@ def is_subsubpart(line: str):
     return line.startswith(INDENT * 2)
 
 
+def is_begin(line: str):
+    return line == BEGIN
+
+
+def is_end(line: str):
+    return line == END
+
+
 def test():
     test1 = [
         '# Table of Contents',
+        '<!-- begin_numbering -->',
         '* [Read Me](/README.md)',
         '* [Introduction](/introduction/README.md)',
         '  * [Motivation](/introduction/Motivation.md)',
@@ -163,6 +200,7 @@ def test():
 
     res1 = [
         '# Table of Contents',
+        '<!-- begin_numbering -->',
         '* [1. Read Me](/README.md)',
         '* [2. Introduction](/introduction/README.md)',
         '  * [2.1 Motivation](/introduction/Motivation.md)',
@@ -174,6 +212,7 @@ def test():
 
     test2 = [
         '# Table of Contents',
+        '<!-- begin_numbering -->',
         '* [1. Read Me](/README.md)',
         '* [3. Tutorial](/tutorial/README.md)',
         '  * [3.1 Simple Widgets](/tutorial/Simple_Widgets.md)',
@@ -185,6 +224,7 @@ def test():
 
     res2 = [
         '# Table of Contents',
+        '<!-- begin_numbering -->',
         '* [1. Read Me](/README.md)',
         '* [2. Tutorial](/tutorial/README.md)',
         '  * [2.1 Simple Widgets](/tutorial/Simple_Widgets.md)',
@@ -196,6 +236,7 @@ def test():
 
     test3 = [
         '# Table of Contents',
+        '<!-- begin_numbering -->',
         '* [1. Read Me](/README.md)',
         '* [Read Me 2](/README.md)',
         '* Unfinished chapter',
@@ -203,17 +244,42 @@ def test():
 
     res3 = [
         '# Table of Contents',
+        '<!-- begin_numbering -->',
         '* [1. Read Me](/README.md)',
         '* [2. Read Me 2](/README.md)',
         '* 3. Unfinished chapter',
     ]
 
+    test4 = [
+        '# Table of Contents',
+        '* [Should not number me](foo.md)',
+        '<!-- begin_numbering -->',
+        '* [1. Read Me](/README.md)',
+        '* [Read Me 2](/README.md)',
+        '* Unfinished chapter',
+        '<!-- end_numbering -->',
+        '* [Appendix](appendix.md)',
+    ]
+
+    res4 = [
+        '# Table of Contents',
+        '* [Should not number me](foo.md)',
+        '<!-- begin_numbering -->',
+        '* [1. Read Me](/README.md)',
+        '* [2. Read Me 2](/README.md)',
+        '* 3. Unfinished chapter',
+        '<!-- end_numbering -->',
+        '* [Appendix](appendix.md)',
+    ]
+
     assert add_section_labels(test1) == res1
     assert add_section_labels(test2) == res2
     assert add_section_labels(test3) == res3
-
+    assert add_section_labels(test4) == res4
     print('Tests pass')
 
 
 if __name__ == '__main__':
+    # To run tests, uncomment this line and comment the main() line
+    # test()
     main()
