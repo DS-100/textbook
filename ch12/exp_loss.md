@@ -49,4 +49,4 @@ This is the same expression as the MSE loss function from the previous chapters;
 
 # Summary
 
-In this section, we introduced the expected loss as an example of a loss function that helps us generalize from a sample to the population. Often we only have access to data from a sample, so using loss functions such as the MSE gives us a good approximation of the expected loss for the population.
+In this section, we introduced the expected loss as an example of a loss function that helps us generalize from a sample to the population. Often, we only have access to data from a sample, so using loss functions such as the MSE gives us a good approximation of the expected loss for the population.
