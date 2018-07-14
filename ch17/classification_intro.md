@@ -1,4 +1,4 @@
-## Classification
+# Classification
 
 Thus far we have studied models for regression, the process of making
 continuous, numerical estimations based on data. We now turn our attention to
