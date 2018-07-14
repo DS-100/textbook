@@ -38,7 +38,7 @@ To add two vectors $\vec{y} + \vec{z}$, take one step according to the length of
 ### Vector notations
 Vectors are usually represented as Cartesian Coordinates.
 
-<img src="../../notebooks-images/vector_space_review__notation.png" width="500" />
+<img src="../../notebooks-images/vector_space_review__notation.png" width="400" />
 
 $$ \vec{x} = \begin{bmatrix} 1 \\ 4  \end{bmatrix} , \quad 
    \vec{y} = \begin{bmatrix} 3 \\ 2  \end{bmatrix} , \quad 
@@ -51,7 +51,7 @@ $$ \vec{2x} = \begin{bmatrix} 2 \\ 8  \end{bmatrix} , \quad
    \vec{2x + -0.5z} = \begin{bmatrix} 0 \\ 8  \end{bmatrix}
 $$
 
-<img src="../../notebooks-images/vector_space_review__notation_arithmetic.png" width="500" />
+<img src="../../notebooks-images/vector_space_review__notation_arithmetic.png" width="400" />
 
 
 Vectors can be added and scaled element-wise:
