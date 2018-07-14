@@ -56,7 +56,7 @@ plt.ylabel('Proportion per Percent');
 
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_4_1.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_4_1.png)
 
 
 Since $ \hat{\theta_0} = 15 $ falls closer to most of the points, our loss function should output a small value for $ \hat{\theta_0} = 15 $ and a larger value for $ \hat{\theta_0} = 10 $.
@@ -117,7 +117,7 @@ try_thetas(thetas=[11, 12, 13, 14, 15, 16],
 ```
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_8_0.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_8_0.png)
 
 
 You can also interactively try different values of $ \hat{\theta_0} $ below. You should understand why the loss for $ \hat{\theta_0} = 11 $ is many times higher than the loss for $ \hat{\theta_0} = 13 $.
@@ -173,7 +173,7 @@ try_thetas(thetas=[12, 13, 14, 15, 16, 17],
 ```
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_12_0.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_12_0.png)
 
 
 Of the values of $ \hat{\theta_0} $ we tried $ \hat{\theta_0} = 15 $ has the lowest loss. However, a value of $ \hat{\theta_0} $ in between 14 and 15 might have an even lower loss than $ \hat{\theta_0} = 15 $. See if you can find a better value of $ \hat{\theta_0} $ using the interactive plot below.
@@ -221,7 +221,7 @@ plt.ylabel('Proportion per Percent');
 
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_16_1.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_16_1.png)
 
 
 Let's try some values of $ \hat{\theta_0} $.
@@ -235,7 +235,7 @@ try_thetas(thetas=np.arange(13, 17.1, 0.5),
 ```
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_18_0.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_18_0.png)
 
 
 As before, we've created an interactive widget to test different values of $ \hat{\theta_0} $.
@@ -304,7 +304,7 @@ try_thetas(thetas=[12, 13, 14, 15, 16, 17],
 ```
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_24_0.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_24_0.png)
 
 
 In the plots above, we've used integer $ \hat{\theta_0} $ values in between 12 and 17. When we change $ \hat{\theta_0} $, the loss seems to start high (at 10.92), decrease until $ \hat{\theta_0} = 15 $, then increase again. We can see that the loss changes as $ \hat{\theta_0} $ changes, so let's make a plot comparing the loss to $ \hat{\theta_0} $ for each of the six $ \hat{\theta_0} $s we've tried.
@@ -322,7 +322,7 @@ plt.ylabel('Loss');
 ```
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_26_0.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_26_0.png)
 
 
 The scatter plot shows the downward, then upward trend that we noticed before. We can try more values of $ \hat{\theta_0} $ to see a complete curve that shows how the loss changes as $ \hat{\theta_0} $ changes.
@@ -340,7 +340,7 @@ plt.ylabel('Loss');
 ```
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_28_0.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_28_0.png)
 
 
 The plot above shows that in fact, $ \hat{\theta_0} = 15$ was not the best choice; a $ \hat{\theta_0} $ of around 14.7 would have gotten a lower loss! We can use calculus to find that minimizing value of $ \hat{\theta_0} $ exactly. First, we start with our loss function:
@@ -458,7 +458,7 @@ plt.ylabel('Proportion per Percent');
 
 
 
-![png](modeling_cost_functions_files/modeling_cost_functions_34_1.png)
+![png](modeling_loss_functions_files/modeling_loss_functions_34_1.png)
 
 
 ### Summary
