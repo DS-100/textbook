@@ -71,7 +71,7 @@
   * [17.2 Logistic Model](ch17/classification_log_model.md)
   * [17.3 Logistic Cost](ch17/classification_cost.md)
   * [17.4 Using Logistic Regression](ch17/classification_log_reg.md)
-  * [17.5 Gradient Descent](ch17/classification_sgd.md)
+  * [17.5 Fitting a Logistic Model](ch17/classification_sgd.md)
 * [18. Appendix: Reference Tables](ch18/ref_intro.md)
   * [18.1 pandas](ch18/ref_pandas.md)
   * [18.2 seaborn](ch18/ref_seaborn.md)
