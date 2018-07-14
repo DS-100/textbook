@@ -50,6 +50,7 @@
   * [11.1 Basic Numerical Optimization](ch11/gradient_basics.md)
   * [11.2 Defining Gradient Descent](ch11/gradient_descent_define.md)
   * [11.3 Convexity](ch11/gradient_convexity.md)
+  * [11.4 Stochastic Gradient Descent](ch11/gradient_stochastic.md)
 * [12. Probability and Generalization](ch12/prob_and_gen.md)
   * [12.1 Random Variables](ch12/random_vars.md)
   * [12.2 Expectation and Variance](ch12/exp_var.md)
@@ -73,6 +74,7 @@
   * [17.2 Logistic Model](ch17/classification_log_model.md)
   * [17.3 Logistic Cost](ch17/classification_cost.md)
   * [17.4 Using Logistic Regression](ch17/classification_log_reg.md)
+  * [17.5 Fitting a Logistic Model](ch17/classification_sgd.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
 
 <!-- end_numbering -->
