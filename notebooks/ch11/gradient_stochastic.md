@@ -77,8 +77,8 @@ Stochastic gradient descent relies on the random selection of individual observa
 
 Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.
 
-![](gd.png)
-![](sgd.png)
+![](https://github.com/DS-100/textbook/tree/master/assets/gd.png)
+![](https://github.com/DS-100/textbook/tree/master/assets/sgd.png)
 
 At each iteration of batch gradient descent, we move in the direction of the true gradient of the loss function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\hat\theta$ parameters eventually converge to the minima of the loss function. Although stochastic gradient descent typically takes more iterations to converge than batch gradient descent, it often converges more quickly because it spends significantly less time computing the update at each iteration.
 
@@ -88,7 +88,7 @@ As we previously did for batch gradient descent, we define a function that compu
 
 
 ```python
-def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
+def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2):
     """
     Uses stochastic gradient descent to minimize loss_fn.
     Returns the minimizing value of theta once theta changes
@@ -99,13 +99,11 @@ def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
     np.random.shuffle(dataset)
     while True:
         for i in range(0, NUM_OBS, 1):
-            if progress:
-                print(f'theta: {theta:.2f} | loss: {loss_fn(theta, dataset):.2f}')
             rand_obs = dataset[i]
             gradient = grad_loss_fn(theta, rand_obs)
             new_theta = theta - alpha * gradient
         
-            if abs(new_theta - theta) < 0.1:
+            if abs(new_theta - theta) < 0.001:
                 return new_theta
         
             theta = new_theta
@@ -135,7 +133,7 @@ A function for mini-batch gradient descent requires the ability to select a batc
 
 
 ```python
-def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.2, progress=True):
+def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.2):
     """
     Uses mini-batch gradient descent to minimize loss_fn.
     Returns the minimizing value of theta once theta changes
@@ -148,14 +146,11 @@ def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.
     np.random.shuffle(dataset)
     while True:
         for i in range(0, NUM_OBS, minibatch_size):
-            if progress:
-                print(f'theta: {theta:.2f} | loss: {loss_fn(theta, dataset):.2f}')
-            
             mini_batch = dataset[i:i+minibatch_size]
             gradient = grad_loss_fn(theta, mini_batch)
             new_theta = theta - alpha * gradient
             
-            if abs(new_theta - theta) < 0.1:
+            if abs(new_theta - theta) < 0.001:
                 return new_theta
             
             theta = new_theta
