@@ -317,7 +317,7 @@ We now turn to sensitivity and specificity, two metrics that are better suited f
 
 $$ \text{Sensitivity} = \frac{TP}{TP + FN} $$
 
-From our discussion of confusion matrices, you should recognize the expression $TP + FN$ as the sum of the entries in the first row. Building confusion matrices allows us to easily compare the sensitivities of our models:
+From our discussion of confusion matrices, you should recognize the expression $TP + FN$ as the sum of the entries in the first row, which is equal to the actual number of data points belonging to the positive class in the dataset. Using confusion matrices allows us to easily compare the sensitivities of our models:
 
 * `ham_only`: $\frac{0}{0 + 42} = 0$
 * `spam_only`: $\frac{42}{42 + 0} = 1$
@@ -331,13 +331,13 @@ Since `ham_only` has no true positives, it has the worst possible sensitivity va
 
 $$ \text{Precision} = \frac{TN}{TN + FP} $$ 
 
-We can use values from the confusion matrices to compare the specificities of our models:
+The expression $TN + FP$ is equal to the actual number of data points belonging to the negative class in the dataset. Again the confusion matrices help to compare the specificities of our models:
 
 * `ham_only`: $\frac{758}{758 + 0} = 1$
 * `spam_only`: $\frac{0}{0 + 758} = 0$
 * `words_list_model`: $\frac{752}{752 + 6} \approx .992$
 
-As with sensitivity, the worst and best specificities are 0 and 1 respectively. Notice that `ham_only` has the best specificity and worst sensitivity, while `spam_only` has the worst specificity and best sensitivity. Since these models only predict one label, they will misclassify all instances of the other label, which is reflected in the extreme sensitivity and specificity values. This contrast is not nearly as pronounced for `words_list_model`. 
+As with sensitivity, the worst and best specificities are 0 and 1 respectively. Notice that `ham_only` has the best specificity and worst sensitivity, while `spam_only` has the worst specificity and best sensitivity. Since these models only predict one label, they will misclassify all instances of the other label, which is reflected in the extreme sensitivity and specificity values. The disparity is much smaller for `words_list_model`. 
 
 Although sensitivity and specificity seem to describe different characteristics of a classifier, we draw an important connection between these two metrics using the classification threshold.
 
@@ -345,9 +345,9 @@ Although sensitivity and specificity seem to describe different characteristics 
 
 The **classification threshold** is a value that determines what class a data point is assigned to; points that fall on opposite sides of the threshold are labeled with different classes. Recall that logistic regression outputs a probability that the data point belongs to the positive class. If this probability is greater than the threshold, the data point is labeled with the positive class, and if it is below the threshold, the data point is labeled with the negative class. For our case, let $f_{\hat{\theta}}$ be the logistic model and $c$ the threshold. If $f_{\hat{\theta}}(x) > c$, $x$ is labeled spam; if $f_{\hat{\theta}}(x) < c$, $x$ is labeled ham. Scikit-learn breaks ties by defaulting to the negative class, so if $f_{\hat{\theta}}(x) = c$, $x$ is labeled ham.
 
-We can assess our model's performance with a threshold $c$ by creating a confusion matrix using $c$. The `words_list_model` confusion matrix displayed earlier in the section uses scikit learn's default threshold $c = .50$. 
+We can assess our model's performance with classification threshold $c$ by creating a confusion matrix. The `words_list_model` confusion matrix displayed earlier in the section uses scikit learn's default threshold $c = .50$. 
 
-Raising the threshold to $c = .80$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than or equal to .80, results in the following confusion matrix:
+Raising the threshold to $c = .70$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than .70, results in the following confusion matrix:
 
 
 ```python
@@ -375,7 +375,7 @@ $$
 
 Compared to the default, a higher threshold of $c = .70$ increases specificity but decreases sensitivity.
 
-Lowering the threshold to $c = .30$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than or equal to .30, results in the following confusion matrix:
+Lowering the threshold to $c = .30$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than .30, results in the following confusion matrix:
 
 
 ```python
