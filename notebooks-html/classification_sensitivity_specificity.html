@@ -55,15 +55,17 @@
 <div class="input">
 
 <div class="inner_cell"
-  
+  style="display:none;"
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="k">import</span> <span class="n">DictVectorizer</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="k">import</span> <span class="n">DictVectorizer</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LogisticRegression</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">confusion_matrix</span>
 
-<span class="n">emails</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;selected_emails.csv&#39;</span><span class="p">)</span>
+<span class="n">emails</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;selected_emails.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -72,7 +74,7 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#HIDDEN (from proj 2, simply for the purpose of generating the feature matrix X for the model training)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#HIDDEN</span>
 
 <span class="k">def</span> <span class="nf">words_in_texts</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
@@ -91,10 +93,10 @@
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Evaluating-Classification-Models">Evaluating Classification Models<a class="anchor-link" href="#Evaluating-Classification-Models">&#182;</a></h2><p>Although we used the classification accuracy to evaluate our logistic model in previous sections, using the accuracy alone has some serious flaws that we explore in this section. To address these issues, we introduce a more useful metric to evaluate classifier performance: the <strong>area under curve</strong> metric.</p></div></div></div>
+<h2 id="Evaluating-Logistic-Models">Evaluating Logistic Models<a class="anchor-link" href="#Evaluating-Logistic-Models">&#182;</a></h2><p>Although we used the classification accuracy to evaluate our logistic model in previous sections, using the accuracy alone has some serious flaws that we explore in this section. To address these issues, we introduce a more useful metric to evaluate classifier performance: the <strong>Area Under Curve (AUC)</strong> metric.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Suppose we have a dataset of 1000 emails that are labeled as spam or ham and our goal is to build a classifier that distinguishes future spam emails from ham emails. The data is contained in the <code>emails</code> DataFrame displayed below:</p></div></div></div>
+<p>Suppose we have a dataset of 1000 emails that are labeled as spam or ham (not spam) and our goal is to build a classifier that distinguishes future spam emails from ham emails. The data is contained in the <code>emails</code> DataFrame displayed below:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -133,27 +135,23 @@
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Unnamed: 0</th>
-      <th>email</th>
+      <th>body</th>
       <th>spam</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
       <td>\n Hi Folks,\n \n I've been trying to set a bu...</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
       <td>Hah.  I guess she doesn't want everyone to kno...</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
       <td>This article from NYTimes.com \n has been sent...</td>
       <td>0</td>
     </tr>
@@ -161,39 +159,35 @@
       <th>...</th>
       <td>...</td>
       <td>...</td>
-      <td>...</td>
     </tr>
     <tr>
       <th>997</th>
-      <td>997</td>
       <td>&lt;html&gt;\n &lt;head&gt;\n     &lt;meta http-equiv="Conten...</td>
       <td>1</td>
     </tr>
     <tr>
       <th>998</th>
-      <td>998</td>
       <td>&lt;html&gt;\n &lt;head&gt;\n &lt;/head&gt;\n &lt;body&gt;\n \n &lt;cente...</td>
       <td>1</td>
     </tr>
     <tr>
       <th>999</th>
-      <td>999</td>
       <td>\n &lt;html&gt;\n \n &lt;head&gt;\n &lt;meta http-equiv=3D"Co...</td>
       <td>1</td>
     </tr>
   </tbody>
 </table>
-<p>1000 rows × 3 columns</p></div></div></div></div></div></div>
+<p>1000 rows × 2 columns</p></div></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Each row contains the body of an email and a <code>spam</code> column, which is <code>0</code> if the email is ham or <code>1</code> if it is spam.</p></div></div></div>
+<p>Each row contains the body of an email in the <code>body</code> column and a spam indicator in the <code>spam</code> column, which is <code>0</code> if the email is ham or <code>1</code> if it is spam.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's compare the performance of three different classifiers:</p>
 <ul>
-<li><code>ham_only</code>: predicts 'ham' for every email.</li>
-<li><code>spam_only</code>: predicts 'spam' for every email.</li>
-<li><code>words_list_model</code>: predicts 'ham' or 'spam' based on the presence of certain words in the body of an email. </li>
+<li><code>ham_only</code>: labels every email as ham.</li>
+<li><code>spam_only</code>: labels every email as spam.</li>
+<li><code>words_list_model</code>: predicts 'ham' or 'spam' based on the presence of certain words in the body of an email.</li>
 </ul>
 <p>Suppose we have a list of words <code>words_list</code> that we believe are common in spam emails: "please", "click", "money", "business", and "remove". We construct <code>words_list_model</code> using the following procedure: transform each email into a feature vector by setting the vector's $i$th entry to 1 if the $i$th word in <code>words_list</code> is contained in the email body and 0 if it isn't. For example, using our five chosen words and the email body "please remove by tomorrow", the feature vector would be $[1, 0, 0, 0, 1]$. This procedure generates the <code>1000 X 5</code> feature matrix $X$.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
@@ -210,7 +204,7 @@
 
 <span class="n">words_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;please&#39;</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;money&#39;</span><span class="p">,</span> <span class="s1">&#39;business&#39;</span><span class="p">,</span> <span class="s1">&#39;remove&#39;</span><span class="p">]</span>
 
-<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">words_in_texts</span><span class="p">(</span><span class="n">words_list</span><span class="p">,</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">words_in_texts</span><span class="p">(</span><span class="n">words_list</span><span class="p">,</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;spam&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
 
 <span class="c1"># Train-test split</span>
@@ -239,9 +233,9 @@
 <span class="c1"># Our selected words</span>
 <span class="n">words_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;please&#39;</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;money&#39;</span><span class="p">,</span> <span class="s1">&#39;business&#39;</span><span class="p">]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;words_list_model test set accuracy: {np.round(accuracy_score(y_prediction_words_list, y_test), 3)}&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ham_only test set accuracy: {np.round(accuracy_score(y_prediction_ham_only, y_test), 3)}&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;spam_only test set accuracy: {np.round(accuracy_score(y_prediction_spam_only, y_test), 3)}&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;words_list_model test set accuracy: {np.round(accuracy_score(y_prediction_words_list, y_test), 3)}&#39;</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -253,9 +247,9 @@
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>words_list_model test set accuracy: 0.96
-ham_only test set accuracy: 0.96
+<pre>ham_only test set accuracy: 0.96
 spam_only test set accuracy: 0.04
+words_list_model test set accuracy: 0.96
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -263,16 +257,16 @@ spam_only test set accuracy: 0.04
 <p>As the accuracies above show, model accuracy alone can be a misleading indicator of model performance. We can understand the model's predictions in greater depth using a <strong>confusion matrix</strong>. A confusion matrix for a binary classifier is a two-by-two heatmap that contains the model predictions on one axis and the actual labels on the other.</p>
 <p>Each entry in a confusion matrix represents a possible outcome of the classifier. If a spam email is input to the classifier, there are two possible outcomes:</p>
 <ul>
-<li><strong>True Positive</strong> (top left entry): the model correctly labels a data point with the positive class (spam).</li>
-<li><strong>False Negative</strong> (top right entry): the model labels a data point with the negative class (ham) but it truly belongs in the positive class (spam). In our case, a false negative means that a spam email gets mislabelled as ham and ends up in the inbox.</li>
+<li><strong>True Positive</strong> (top left entry): the model correctly labels it with the positive class (spam).</li>
+<li><strong>False Negative</strong> (top right entry): the model mislabels it with the negative class (ham), but it truly belongs in the positive class (spam). In our case, a false negative means that a spam email gets mislabelled as ham and ends up in the inbox.</li>
 </ul>
 <p>Similarly, if a ham email is input to the classifier, there are two possible outcomes.</p>
 <ul>
-<li><strong>False Positive</strong> (bottom left entry): the model labels a data point with the positive class (spam) but it truly belongs in the negative class (ham). In our case, a false positive means that a ham email gets flagged as spam and filtered out of the inbox.</li>
-<li><strong>True Negative</strong> (bottom right entry): the model correctly labels a data point with the negative class (ham).</li>
+<li><strong>False Positive</strong> (bottom left entry): the model mislabels it with the positive class (spam), but it truly belongs in the negative class (ham). In our case, a false positive means that a ham email gets flagged as spam and filtered out of the inbox.</li>
+<li><strong>True Negative</strong> (bottom right entry): the model correctly labels it with the negative class (ham).</li>
 </ul>
-<p>The relative cost of false positives and false negatives depends on the situation. For email classification, false positives result in important emails being filtered out, so they are worse than false negatives, in which a spam email winds up in the inbox. In medical settings, however, false negatives in a diagnostic test can be much more consequential than false positives.</p>
-<p>We will use scikit-learn's <a href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix">confusion matrix function</a> to construct confusion matrices for the three models on the training data set.</p></div></div></div>
+<p>The costs of false positives and false negatives depend on the situation. For email classification, false positives result in important emails being filtered out, so they are worse than false negatives, in which a spam email winds up in the inbox. In medical settings, however, false negatives in a diagnostic test can be much more consequential than false positives.</p>
+<p>We will use scikit-learn's <a href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix">confusion matrix function</a> to construct confusion matrices for the three models on the training data set. The <code>ham_only</code> confusion matrix is shown below:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -357,12 +351,12 @@ spam_only test set accuracy: 0.04
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The row totals indicate how many emails in the training dataset are in each respective class:</p>
+<p>Summing the quantities in a row indicates how many emails in the training dataset belong to the corresponding class:</p>
 <ul>
 <li>True label = spam (first row): the sum of true positives (0) and false negatives (42) reveals there are 42 spam emails in the training dataset.</li>
 <li>True label = ham (second row): the sum of false positives (0) and true negatives (758) reveals there are 758 ham emails in the training dataset.</li>
 </ul>
-<p>The column totals indicate how many emails the classifier predicted in each respective class:</p>
+<p>Summing the quantities in a column indicates how many emails the classifier predicted in the corresponding class:</p>
 <ul>
 <li>Predicted label = spam (first column): the sum of true positives (0) and false positives (0) reveals <code>ham_only</code> predicted there are 0 spam emails in the training dataset.</li>
 <li>Predicted label = ham (second column): the sum of false negatives (42) and true negatives (758) reveals <code>ham_only</code> predicted there are 800 ham emails in the training dataset.</li>
@@ -397,7 +391,7 @@ spam_only test set accuracy: 0.04
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>At the other extreme, <code>spam_only</code> predicts the training dataset has no ham emails, which the confusion matrix indicates is far from the truth with 758 false positives.</p>
-<p>Our main interest is in the confusion matrix for <code>words_list_model</code>:</p></div></div></div>
+<p>Our main interest is the confusion matrix for <code>words_list_model</code>:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -427,8 +421,8 @@ spam_only test set accuracy: 0.04
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The row totals match those of the <code>ham_only</code> and <code>spam_only</code> confusion matrices as expected since the true labels in the training dataset are unaltered for all models.</p>
-<p>Of the 42 spam emails, <code>words_list_model</code> correctly classifies 18 of them, which is a poor performance. Its high accuracy is buoyed by the large number of true negatives, but this is insufficent because it does not reliably filter out spam emails.</p>
-<p>This emails dataset is an example of a <strong>class-imbalanced dataset</strong>, in which a vast majority of labels are in one class over the other. In this case, most of our emails are ham. Another common example of class imbalance is disease detection when the frequency of the disease in a population is low. A medical test that always concludes a patient doesn't have the disease will have a high accuracy, but its inability to identify individuals with the disease renders it useless.</p>
+<p>Of the 42 spam emails, <code>words_list_model</code> correctly classifies 18 of them, which is a poor performance. Its high accuracy is buoyed by the large number of true negatives, but this is insufficient because it does not serve its purpose of reliably filtering out spam emails.</p>
+<p>This emails dataset is an example of a <strong>class-imbalanced dataset</strong>, in which a vast majority of labels belong to one class over the other. In this case, most of our emails are ham. Another common example of class imbalance is disease detection when the frequency of the disease in a population is low. A medical test that always concludes a patient doesn't have the disease will have a high accuracy because most patients truly won't have the disease, but its inability to identify individuals with the disease renders it useless.</p>
 <p>We now turn to sensitivity and specificity, two metrics that are better suited for evaluating class-imbalanced datasets.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
