@@ -329,7 +329,7 @@ Since `ham_only` has no true positives, it has the worst possible sensitivity va
 
 **Specificity** (also called **true negative rate**) measures the proportion of data belonging to the negative class that the classifier correctly labels.
 
-$$ \text{Precision} = \frac{TN}{TN + FP} $$ 
+$$ \text{Specificity} = \frac{TN}{TN + FP} $$ 
 
 The expression $TN + FP$ is equal to the actual number of data points belonging to the negative class in the dataset. Again the confusion matrices help to compare the specificities of our models:
 
@@ -398,13 +398,17 @@ $$ \text{Sensitivity } (c = .30) = \frac{24}{42} \approx .571 \\
 \text{Specificity } (c = .30) = \frac{738}{758} \approx .974
 $$
 
-Compared to the default, a lower threshold of $c = .70$ increases sensitivity but decreases specificity.
+Compared to the default, a lower threshold of $c = .30$ increases sensitivity but decreases specificity.
 
-Although we strive to maximize both sensitivity and specificity, we can see from the confusion matrices created with varying classification thresholds that there is a tradeoff. Increasing sensitivity leads to a decrease in specificity and vice versa. We adjust a model's sensitivity and specificity by changing the classification threshold.
+We adjust a model's sensitivity and specificity by changing the classification threshold. Although we strive to maximize both sensitivity and specificity, we can see from the confusion matrices created with varying classification thresholds that there is a tradeoff. Increasing sensitivity leads to a decrease in specificity and vice versa.
 
 ### ROC Curves
 
-Each classification threshold value $c$ is associated with a different (sensitivity, specificity) pair. We can calculate all sensitivity and specificity values for the thresholds between 0 and 1 and plot them. A **ROC (Receiver Operating Characteristic) curve** is a slight modification of this idea; instead of plotting (sensitivity, specificity) it plots (sensitivity, 1 - specificity) pairs, where 1 - specificity is defined as the false positive rate. A point on the ROC curve represents the sensitivity and false positive rate associated with a specific threshold value. 
+We can calculate sensitivity and specificity values for all classification thresholds between 0 and 1 and plot them. Each threshold value $c$ is associated with a (sensitivity, specificity) pair. A **ROC (Receiver Operating Characteristic) curve** is a slight modification of this idea; instead of plotting (sensitivity, specificity) it plots (sensitivity, 1 - specificity) pairs, where 1 - specificity is defined as the false positive rate.
+
+$$ \text{False Positive Rate: } 1 - \frac{TN}{TN + FP} = \frac{TN + FP - TN}{TN + FP} = \frac{FP}{TN + FP} $$
+
+A point on the ROC curve represents the sensitivity and false positive rate associated with a specific threshold value. 
 
 The ROC curve for `words_list_model` is calculated below using scikit-learn's [ROC curve function](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html):
 
@@ -438,7 +442,7 @@ plt.title('words_list_model ROC Curve')
 ![png](classification_sensitivity_specificity_files/classification_sensitivity_specificity_28_1.png)
 
 
-Notice that as we move from left to right across the curve, sensitivity increases and the specificity decreases. Generally, the best classification threshold corresponds to high sensitivity and specificity (low false positive rate), so points in the northwest corner of the plot are preferable. 
+Notice that as we move from left to right across the curve, sensitivity increases and the specificity decreases. Generally, the best classification threshold corresponds to high sensitivity and specificity (low false positive rate), so points in or close to the northwest corner of the plot are preferable. 
 
 Let's examine the four corners of the plot:
 * (0, 0): Sensitivity $= 0$, so the model has no true positives, but specificity $=1$, which means that all data points in the negative class are correctly labeled. (0,0) maps to the classification threshold $c = 1.0$, which has the same effect as `ham_only` since no email can have a probability greater than $1.0$.
