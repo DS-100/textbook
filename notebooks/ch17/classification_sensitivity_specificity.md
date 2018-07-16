@@ -343,11 +343,11 @@ Although sensitivity and specificity seem to describe different characteristics 
 
 ### Classification Threshold
 
-The **classification threshold** is a value that determines what class a data point is assigned to; points that fall on opposite sides of the threshold are labeled with different classes. Recall that logistic regression outputs a probability that the data point belongs to the positive class. If this probability is greater than the threshold, the data point is labeled with the positive class, and if it is below the threshold, the data point is labeled with the negative class. For our case, let $f_{\hat{\theta}}$ be the logistic model and $c$ the threshold. If $f_{\hat{\theta}}(x) > c$, $x$ is labeled spam; if $f_{\hat{\theta}}(x) < c$, $x$ is labeled ham. Scikit-learn breaks ties by defaulting to the negative class, so if $f_{\hat{\theta}}(x) = c$, $x$ is labeled ham.
+The **classification threshold** is a value that determines what class a data point is assigned to; points that fall on opposite sides of the threshold are labeled with different classes. Recall that logistic regression outputs a probability that the data point belongs to the positive class. If this probability is greater than the threshold, the data point is labeled with the positive class, and if it is below the threshold, the data point is labeled with the negative class. For our case, let $f_{\hat{\theta}}$ be the logistic model and $C$ the threshold. If $f_{\hat{\theta}}(x) > C$, $x$ is labeled spam; if $f_{\hat{\theta}}(x) < C$, $x$ is labeled ham. Scikit-learn breaks ties by defaulting to the negative class, so if $f_{\hat{\theta}}(x) = C$, $x$ is labeled ham.
 
-We can assess our model's performance with classification threshold $c$ by creating a confusion matrix. The `words_list_model` confusion matrix displayed earlier in the section uses scikit learn's default threshold $c = .50$. 
+We can assess our model's performance with classification threshold $C$ by creating a confusion matrix. The `words_list_model` confusion matrix displayed earlier in the section uses scikit learn's default threshold $C = .50$. 
 
-Raising the threshold to $c = .70$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than .70, results in the following confusion matrix:
+Raising the threshold to $C = .70$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than .70, results in the following confusion matrix:
 
 
 ```python
@@ -360,22 +360,22 @@ words_list_predictions = [1 if pred >= .70 else 0 for pred in words_list_predict
 high_classification_threshold = confusion_matrix(y_train, words_list_predictions, labels=[1, 0])
 
 plot_confusion_matrix(high_classification_threshold, classes=class_names,
-                      title='words_list_model Confusion Matrix $c = .70$')
+                      title='words_list_model Confusion Matrix $C = .70$')
 ```
 
 
 ![png](classification_sensitivity_specificity_files/classification_sensitivity_specificity_22_0.png)
 
 
-By raising the bar for classifying an email as spam, 13 spam emails that were correctly classified with $c = .50$ are now mislabeled. 
+By raising the bar for classifying an email as spam, 13 spam emails that were correctly classified with $C = .50$ are now mislabeled. 
 
-$$ \text{Sensitivity } (c = .70) = \frac{5}{42} \approx .119 \\
-\text{Specificity } (c = .70) = \frac{757}{758} \approx .999
+$$ \text{Sensitivity } (C = .70) = \frac{5}{42} \approx .119 \\
+\text{Specificity } (C = .70) = \frac{757}{758} \approx .999
 $$
 
-Compared to the default, a higher threshold of $c = .70$ increases specificity but decreases sensitivity.
+Compared to the default, a higher threshold of $C = .70$ increases specificity but decreases sensitivity.
 
-Lowering the threshold to $c = .30$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than .30, results in the following confusion matrix:
+Lowering the threshold to $C = .30$, meaning we label an email $x$ as spam if the probability $f_{\hat{\theta}}(x)$ is greater than .30, results in the following confusion matrix:
 
 
 ```python
@@ -385,28 +385,28 @@ words_list_predictions = [1 if pred >= .30 else 0 for pred in words_list_predict
 low_classification_threshold = confusion_matrix(y_train, words_list_predictions, labels=[1, 0])
 
 plot_confusion_matrix(low_classification_threshold, classes=class_names,
-                      title='words_list_model Confusion Matrix $c = .30$')
+                      title='words_list_model Confusion Matrix $C = .30$')
 ```
 
 
 ![png](classification_sensitivity_specificity_files/classification_sensitivity_specificity_24_0.png)
 
 
-By lowering the bar for classifying an email as spam, 6 spam emails that were mislabeled with $c = .50$ are now correct. However, there are more false positives.
+By lowering the bar for classifying an email as spam, 6 spam emails that were mislabeled with $C = .50$ are now correct. However, there are more false positives.
 
-$$ \text{Sensitivity } (c = .30) = \frac{24}{42} \approx .571 \\
-\text{Specificity } (c = .30) = \frac{738}{758} \approx .974
+$$ \text{Sensitivity } (C = .30) = \frac{24}{42} \approx .571 \\
+\text{Specificity } (C = .30) = \frac{738}{758} \approx .974
 $$
 
-Compared to the default, a lower threshold of $c = .30$ increases sensitivity but decreases specificity.
+Compared to the default, a lower threshold of $C = .30$ increases sensitivity but decreases specificity.
 
 We adjust a model's sensitivity and specificity by changing the classification threshold. Although we strive to maximize both sensitivity and specificity, we can see from the confusion matrices created with varying classification thresholds that there is a tradeoff. Increasing sensitivity leads to a decrease in specificity and vice versa.
 
 ### ROC Curves
 
-We can calculate sensitivity and specificity values for all classification thresholds between 0 and 1 and plot them. Each threshold value $c$ is associated with a (sensitivity, specificity) pair. A **ROC (Receiver Operating Characteristic) curve** is a slight modification of this idea; instead of plotting (sensitivity, specificity) it plots (sensitivity, 1 - specificity) pairs, where 1 - specificity is defined as the false positive rate.
+We can calculate sensitivity and specificity values for all classification thresholds between 0 and 1 and plot them. Each threshold value $C$ is associated with a (sensitivity, specificity) pair. A **ROC (Receiver Operating Characteristic) curve** is a slight modification of this idea; instead of plotting (sensitivity, specificity) it plots (sensitivity, 1 - specificity) pairs, where 1 - specificity is defined as the false positive rate.
 
-$$ \text{False Positive Rate: } 1 - \frac{TN}{TN + FP} = \frac{TN + FP - TN}{TN + FP} = \frac{FP}{TN + FP} $$
+$$ \text{False Positive Rate } = 1 - \frac{TN}{TN + FP} = \frac{TN + FP - TN}{TN + FP} = \frac{FP}{TN + FP} $$
 
 A point on the ROC curve represents the sensitivity and false positive rate associated with a specific threshold value. 
 
@@ -442,19 +442,20 @@ plt.title('words_list_model ROC Curve')
 ![png](classification_sensitivity_specificity_files/classification_sensitivity_specificity_28_1.png)
 
 
-Notice that as we move from left to right across the curve, sensitivity increases and the specificity decreases. Generally, the best classification threshold corresponds to high sensitivity and specificity (low false positive rate), so points in or close to the northwest corner of the plot are preferable. 
+Notice that as we move from left to right across the curve, sensitivity increases and the specificity decreases. Generally, the best classification threshold corresponds to high sensitivity and specificity (low false positive rate), so points in or around the northwest corner of the plot are preferable. 
 
 Let's examine the four corners of the plot:
-* (0, 0): Sensitivity $= 0$, so the model has no true positives, but specificity $=1$, which means that all data points in the negative class are correctly labeled. (0,0) maps to the classification threshold $c = 1.0$, which has the same effect as `ham_only` since no email can have a probability greater than $1.0$.
-* (1, 1): Sensitivity $= 1$, so all data points in the positive class are correctly labeled, but specificity $=0$, which means that there are no true negatives. (1,1) maps to the classification threshold $c = 0.0$, which has the same effect as `spam_only` since no email can have a probability lower than $0.0$.
-* (0, 1): Both sensitivity $= 1$ and specificity $=1$, which means there are no false positives or false negatives. A model with an ROC curve containing (0, 1) has a $c$ value at which it is a perfect classifier!
-* (1, 0): Both sensitivity $= 0$ and specificity $=0$, which means there are no true positives or true negatives. A model with an ROC curve containing (1, 0) has a $c$ value at which it predicts the wrong class for every data point!
+* (0, 0): Specificity $=1$, which means all data points in the negative class are correctly labeled, but sensitivity $= 0$, so the model has no true positives. (0,0) maps to the classification threshold $C = 1.0$, which has the same effect as `ham_only` since no email can have a probability greater than $1.0$.
+* (1, 1): Specificity $=0$, which means the model has no true negatives, but sensitivity $= 1$, so all data points in the positive class are correctly labeled. (1,1) maps to the classification threshold $C = 0.0$, which has the same effect as `spam_only` since no email can have a probability lower than $0.0$.
+* (0, 1): Both specificity $=1$ and sensitivity $= 1$, which means there are no false positives or false negatives. A model with an ROC curve containing (0, 1) has a $C$ value at which it is a perfect classifier!
+* (1, 0): Both specificity $=0$ and sensitivity $= 0$, which means there are no true positives or true negatives. A model with an ROC curve containing (1, 0) has a $C$ value at which it predicts the wrong class for every data point!
 
 A classifier that randomly predicts classes has a diagonal ROC curve containing all points where sensitivity and the false positive rate are equal:
 
 
 ```python
 # HIDDEN
+
 plt.step(np.arange(0, 1, 0.001), np.arange(0, 1, 0.001), color='b', alpha=0.2,
          where='post')
 plt.xlabel('False Positive Rate (1 - Specificity)')
@@ -473,13 +474,13 @@ plt.title('Random Classifier ROC Curve')
 ![png](classification_sensitivity_specificity_files/classification_sensitivity_specificity_30_1.png)
 
 
-Intuitively, a random classifier that outputs probability $p$ on input $x$ will result in either a true positive or false positive with chance $p$, so sensitivity and the false positive rate are equal. 
+Intuitively, a random classifier that predicts probability $p$ for input $x$ will result in either a true positive or false positive with chance $p$, so sensitivity and the false positive rate are equal. 
 
 We want our classifier's ROC curve to be high above the random model diagnoal line, which brings us to the AUC metric.
 
 ### AUC
 
-The **Area Under the Curve (AUC)** is the area under the ROC curve and serves as a single number performance summary of the classifier. The AUC for `words_list_model` is shaded below and calculating using scikit-learn's [AUC function](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score):
+The **Area Under Curve (AUC)** is the area under the ROC curve and serves as a single number performance summary of the classifier. The AUC for `words_list_model` is shaded below and calculating using scikit-learn's [AUC function](http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score):
 
 
 ```python
@@ -518,9 +519,9 @@ roc_auc_score(y_train, words_list_model_probabilities)
 
 
 
-AUC is interpreted as the probability that the classifier will assign a higher probability to a randomly chosen positive data instance than a randomly chosen negative data instance. A perfect AUC value of 1 corresponds to a perfect classifier (the ROC curve would contain (0, 1). The fact that `words_list_model` has an AUC of .906 means that roughly 91% of the time it is more likely to classify a spam email as spam than a ham email as spam.
+AUC is interpreted as the probability that the classifier will assign a higher probability to a randomly chosen data point truly belonging to the positive class than a randomly chosen data point truly belonging to the negative class. A perfect AUC value of 1 corresponds to a perfect classifier (the ROC curve would contain (0, 1). The fact that `words_list_model` has an AUC of .906 means that roughly 90.6% of the time it is more likely to classify a spam email as spam than a ham email as spam.
 
-By inspection, the AUC of the random classifier is 0.5. An effective model will have an AUC much higher than 0.5, which `words_list_model` has achieved. If a model's AUC is less than 0.5, it is performing worse than random predictions.
+By inspection, the AUC of the random classifier is 0.5, though this can vary slightly due to the randomness. An effective model will have an AUC much higher than 0.5, which `words_list_model` achieves. If a model's AUC is less than 0.5, it performs worse than random predictions.
 
 ### Summary
 
