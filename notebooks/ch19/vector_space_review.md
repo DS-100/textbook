@@ -91,7 +91,7 @@ Intuition in $\mathbb{R}^2$ :
 
 Recall the triangle method of adding two vectors. If we add two perpendicular vectors $\vec{a} + \vec{b}$ in $\mathbb{R}^2$, then we know that the resulting vector will be the hypotenuse. In this case, we also know that the length of $\vec{a} + \vec{b}$ will follow the Pythagorean Theorem: $\sqrt{a^2 + b^2}$.
 
-<img src="../../notebooks-images/vector_space_review__length.png" width="400" />
+<img src="../../notebooks-images/vector_space_review__length.png" width="450" />
 
 
 General Formula for  Length of $\vec{v} \in \mathbb{R}^n$ :
