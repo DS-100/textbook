@@ -77,8 +77,8 @@ Stochastic gradient descent relies on the random selection of individual observa
 
 Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.
 
-![](gd.png)
-![](sgd.png)
+![](https://raw.githubusercontent.com/DS-100/textbook/master/assets/gd.png)
+![](https://raw.githubusercontent.com/DS-100/textbook/master/assets/sgd.png)
 
 At each iteration of batch gradient descent, we move in the direction of the true gradient of the loss function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\hat\theta$ parameters eventually converge to the minima of the loss function. Although stochastic gradient descent typically takes more iterations to converge than batch gradient descent, it often converges more quickly because it spends significantly less time computing the update at each iteration.
 

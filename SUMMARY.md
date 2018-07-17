@@ -73,6 +73,7 @@
   * [17.2 Logistic Model](ch17/classification_log_model.md)
   * [17.3 Logistic Cost](ch17/classification_cost.md)
   * [17.4 Using Logistic Regression](ch17/classification_log_reg.md)
+  * [17.8 Multiclass Classification](ch17/classification_multiclass.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
 
 <!-- end_numbering -->
