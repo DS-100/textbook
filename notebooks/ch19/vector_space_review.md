@@ -38,7 +38,7 @@ To add two vectors $\vec{y} + \vec{z}$, take one step according to the length of
 ### Vector notations
 Vectors are usually represented as Cartesian Coordinates.
 
-<img src="../../notebooks-images/vector_space_review__notation.png" width="500" />
+<img src="../../notebooks-images/vector_space_review__notation.png" width="400" />
 
 $$ \vec{x} = \begin{bmatrix} 1 \\ 4  \end{bmatrix} , \quad 
    \vec{y} = \begin{bmatrix} 3 \\ 2  \end{bmatrix} , \quad 
@@ -51,7 +51,7 @@ $$ \vec{2x} = \begin{bmatrix} 2 \\ 8  \end{bmatrix} , \quad
    \vec{2x + -0.5z} = \begin{bmatrix} 0 \\ 8  \end{bmatrix}
 $$
 
-<img src="../../notebooks-images/vector_space_review__notation_arithmetic.png" width="500" />
+<img src="../../notebooks-images/vector_space_review__notation_arithmetic.png" width="400" />
 
 
 Vectors can be added and scaled element-wise:
@@ -91,7 +91,7 @@ Intuition in $\mathbb{R}^2$ :
 
 Recall the triangle method of adding two vectors. If we add two perpendicular vectors $\vec{a} + \vec{b}$ in $\mathbb{R}^2$, then we know that the resulting vector will be the hypotenuse. In this case, we also know that the length of $\vec{a} + \vec{b}$ will follow the Pythagorean Theorem: $\sqrt{a^2 + b^2}$.
 
-<img src="../../notebooks-images/vector_space_review__length.png" width="400" />
+<img src="../../notebooks-images/vector_space_review__length.png" width="450" />
 
 
 General Formula for  Length of $\vec{v} \in \mathbb{R}^n$ :
