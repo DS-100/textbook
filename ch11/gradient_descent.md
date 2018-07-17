@@ -7,7 +7,7 @@ vary by table. Then, we decided to use the mean squared error loss function and
 found the model that minimized the loss function.
 
 We also found that there are simple expressions that minimize the MSE and the
-mean absolute loss functions: the mean and the median. However, as our models
+mean absolute error loss functions: the mean and the median. However, as our models
 and loss functions become more complicated we will no longer be able to find
 useful algebraic expressions for the models that minimize the loss. For
 example, the Huber loss has useful properties but is difficult to differentiate
