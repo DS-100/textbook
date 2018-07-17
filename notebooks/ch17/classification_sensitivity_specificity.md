@@ -36,7 +36,7 @@ emails=pd.read_csv('selected_emails.csv', index_col=0)
 
 
 ```python
-#HIDDEN
+# HIDDEN
 
 def words_in_texts(words, texts):
     '''
@@ -169,7 +169,6 @@ y_prediction_spam_only = np.ones(len(y_test))
 
 
 ```python
-# This cell will be visible
 from sklearn.metrics import accuracy_score
 
 # Our selected words
@@ -248,12 +247,9 @@ words_list_model_y_pred = words_list_model.predict(X_train)
 
 
 ```python
-# This cell will be visible
-
 from sklearn.metrics import confusion_matrix
 
 class_names = ['Spam', 'Ham']
-
 
 ham_only_cnf_matrix = confusion_matrix(y_train, ham_only_y_pred, labels=[1, 0])
 
