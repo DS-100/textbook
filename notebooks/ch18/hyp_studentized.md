@@ -87,10 +87,11 @@ The New York Public Utilities Commission monitors the response time for repairin
 
 
 ```python
-plt.hist(times, bins=20)
+plt.hist(times, bins=20, normed=True)
 plt.xlabel('Repair Time')
-plt.ylabel('Count')
+plt.ylabel('Proportion per Second')
 plt.title('Distribution of Repair Times');
+# insert change here
 ```
 
 
@@ -114,7 +115,7 @@ theta
 
 
 
-    353.71148132542334
+    356.51072447202199
 
 
 
@@ -136,21 +137,14 @@ pop_sampling_dist = np.array(
     [stat(take_sample()) for _ in range(samples_from_pop)]
 )
 
-plt.hist(pop_sampling_dist, bins=30);
+plt.hist(pop_sampling_dist, bins=30, normed=True);
 plt.xlabel('Average Repair Time')
-plt.ylabel('Count')
-plt.title('Distribution of Sample Means ($\hat{\theta}$)');
+plt.ylabel('Proportion per Second')
+plt.title(r'Distribution of Sample Means ($\hat{\theta}$)');
 ```
 
 
-
-
-    <matplotlib.text.Text at 0x115446ef0>
-
-
-
-
-![png](hyp_studentized_files/hyp_studentized_16_1.png)
+![png](hyp_studentized_files/hyp_studentized_16_0.png)
 
 
 We can see that the center of this distribution is ~350, and that it is skewed right because of the skewed distribution of the original data. 
@@ -184,21 +178,14 @@ np.random.seed(0)
 
 sample = take_sample()
 
-plt.hist(bootstrap_stats(sample), bins=30)
+plt.hist(bootstrap_stats(sample), bins=30, normed=True)
 plt.xlabel('Average Repair Time')
-plt.ylabel('Count')
-plt.title('Distribution of Bootstrap Sample Means ($\tilde{\theta}$)');
+plt.ylabel('Proportion per Second')
+plt.title(r'Distribution of Bootstrap Sample Means ($\tilde{\theta}$)');
 ```
 
 
-
-
-    <matplotlib.text.Text at 0x1152cd208>
-
-
-
-
-![png](hyp_studentized_files/hyp_studentized_20_1.png)
+![png](hyp_studentized_files/hyp_studentized_20_0.png)
 
 
 As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the distribution of $\hat\theta$, likely because our original sample did not look like the population. As a result, our confidence intervals perform rather poorly. Below we can see a side-by-side comparison of the two distributions:
@@ -207,12 +194,12 @@ As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the
 ```python
 plt.figure(figsize=(10, 4))
 plt.subplot(121)
-plt.hist(pop_sampling_dist, bins=30, range=(0, 1000))
-plt.ylim((0,150))
+plt.hist(pop_sampling_dist, bins=30, range=(0, 1000), normed=True)
+plt.ylim((0,0.01))
 
 plt.subplot(122)
-plt.hist(bootstrap_stats(sample), bins=30, range=(0, 1000))
-plt.ylim((0,150));
+plt.hist(bootstrap_stats(sample), bins=30, range=(0, 1000), normed=True)
+plt.ylim((0,0.01));
 ```
 
 
@@ -298,9 +285,9 @@ To assess the tradeoffs of studentized and percentile bootstrap, let's compare t
 
 
 ```python
-plt.hist(times, bins=20);
+plt.hist(times, bins=20, normed=True);
 plt.xlabel('Repair Time')
-plt.ylabel('Count')
+plt.ylabel('Proportion per Second')
 plt.title('Distribution of Repair Times');
 ```
 
@@ -329,7 +316,7 @@ percentile_ci(sample)
 
 
 
-    array([ 239.85,  756.91])
+    array([ 328.63,  559.89])
 
 
 
@@ -381,7 +368,7 @@ studentized_ci(sample)
 
 
 
-    (245.85339212384062, 1746.4309329397261)
+    (293.35805475520726, 573.73264989051734)
 
 
 
@@ -426,8 +413,8 @@ trials = run_trials(np.arange(4, 101, 2))
     /Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: divide by zero encountered in true_divide
 
 
-    CPU times: user 1min 53s, sys: 1.02 s, total: 1min 54s
-    Wall time: 1min 57s
+    CPU times: user 1min 54s, sys: 1.22 s, total: 1min 55s
+    Wall time: 1min 59s
 
 
 
