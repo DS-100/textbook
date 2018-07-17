@@ -22,31 +22,31 @@ pd.set_option('precision', 2)
 
 ## A Brief Review
 
-We initially fit our model to the tips dataset by finding the $\hat\theta$ that minimized the MSE loss function, $L(\hat\theta, y) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat\theta)^2$. To calculate the minimizing value of $\theta$, we took the derivative of the MSE, set it equal to zero, and solved for $\hat\theta$. We found that the optimal $\hat\theta$ value was simply the mean of the $y$ values in our dataset.
+We initially fit our model to the tips dataset by finding the $\hat\theta_0$ that minimized the MSE loss function, $L(\hat\theta_0, y) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat\theta_0)^2$. To calculate the minimizing value of $\hat{\theta_0}$, we took the derivative of the MSE, set it equal to zero, and solved for $\hat\theta_0$. We found that the optimal $\hat\theta_0$ value was simply the mean of the $y$ values in our dataset.
 
-However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\hat\theta$ values. Instead, we use the gradient descent algorithm to iteratively improve $\hat\theta$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:
+However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\hat\theta_0$ values. Instead, we use the gradient descent algorithm to iteratively improve $\hat\theta_0$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:
 
 $$
-\hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \nabla_{\hat\theta} L(\hat\theta, y)
+\hat{\theta}_{t+1} = \hat\theta_t - \alpha \cdot \nabla_{\theta} L(\hat\theta, y)
 $$
 
 In this equation:
-- $\hat\theta_{t}$ is our current estimate of $\theta$ at the $t$th iteration
+- $\hat\theta_{t}$ is our current estimate of $\theta_0$ at the $t$th iteration
 - $\alpha$ is the learning rate
 - $\nabla_{\hat\theta} L(\hat\theta, y)$ is the gradient of the loss function
-- We compute the next estimate $\hat\theta_{t+1}$ by subtracting the product of $\alpha$ and $\nabla_{\hat\theta} L(\hat\theta, y)$ computed at $\hat\theta_{t}$
+- We compute the next estimate $\hat\theta_{t+1}$ by subtracting the product of $\alpha$ and $\nabla_{\theta} L(\hat\theta, y)$ computed at $\hat\theta_{t}$
 
 ## Limitations of Gradient Descent
 
-In the expression above, we calculate $\nabla_{\hat\theta}L(\hat\theta, y)$ using the average gradient of the loss function $l(\hat\theta, y_i)$ across the entire dataset as a single batch. For this reason, this gradient update rule is often referred to as **batch gradient descent**.
+In the expression above, we calculate $\nabla_{\theta}L(\hat{\theta_0}, y)$ using the average gradient of the loss function $l(\hat{\theta_0}, y_i)$ across the entire dataset as a single batch. For this reason, this gradient update rule is often referred to as **batch gradient descent**.
 
-For example, the gradient of the MSE loss first requires us to find the gradient of the squared loss, $\nabla_{\hat\theta} l(\hat\theta, y_i) = -2 (y_i - \hat\theta)$, for each of the $n$ observations in our dataset. The final gradient loss is the average of the individual gradients as the derivation below shows:
+For example, the gradient of the MSE loss first requires us to find the gradient of the squared loss, $\nabla_{\theta} l(\hat{\theta_0}, y_i) = -2 (y_i - \hat{\theta_0})$, for each of the $n$ observations in our dataset. The final gradient loss is the average of the individual gradients as the derivation below shows:
 
 $$
 \begin{align}
-\nabla_{\hat\theta} L(\hat\theta, y) &= -\frac{2}{n} \sum_{i=1}^{n}(y_i - \hat\theta) \\
-&= \frac{1}{n} \sum_{i=1}^{n}-2(y_i - \hat\theta) \\
-&= \frac{1}{n} \sum_{i=1}^{n} \nabla_{\hat\theta} l(\hat\theta, y_i)
+\nabla_{\theta} L(\hat{\theta_0}, y) &= -\frac{2}{n} \sum_{i=1}^{n}(y_i - \hat{\theta_0}) \\
+&= \frac{1}{n} \sum_{i=1}^{n}-2(y_i - \hat{\theta_0}) \\
+&= \frac{1}{n} \sum_{i=1}^{n} \nabla_{\theta} l(\hat{\theta_0}, y_i)
 \end{align}
 $$
 
@@ -117,7 +117,7 @@ def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
 **Mini-batch gradient descent** strikes a balance between batch gradient descent and stochastic gradient descent by increasing the number of observations that we select at each iteration. In mini-batch gradient descent, we take a simple random sample of observations called a mini-batch. We use the average of the gradients of their loss functions to construct an estimate of the true gradient of the cross entropy loss. Since our sample is randomly selected, the expectation of this estimate is equal to the true gradient. This is illustrated in the approximation for the gradient of the loss function, where $\mathcal{B}$ is the mini-batch of data points that we randomly sample from the $n$ observations.
 
 $$
-\nabla_\hat\theta L(\hat\theta, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\hat\theta}l(\hat\theta, y_i)
+\nabla_\theta L(\hat{\theta_0}, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\theta}l(\hat{\theta_0}, y_i)
 $$
 
 As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.
