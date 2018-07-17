@@ -143,11 +143,11 @@ lr_circle.fit(shapes[['$x_1$', '$x_2$']], shapes['$y$'] == 'circle')
 proba_circle = lr_circle.predict_proba([[3.2, 2.5]])[0][1]
 ```
 
-triangle | square   | circle
----      | ---      | ---
-0.145748 | 0.285079 | 0.497612
+`lr_triangle` | `lr_square`   | `lr_circle`
+---           | ---           | ---
+0.145748      |      0.285079 | 0.497612
 
-Since the positive class probability of `circle` is the greatest of the three, our multiclass classifier predicts that the observation is a `circle`.
+Since the positive class probability of `lr_circle` is the greatest of the three, our multiclass classifier predicts that the observation is a circle.
 
 ## Case Study: Iris dataset
 
@@ -162,7 +162,7 @@ There are four features available in the dataset:
 - Petal length (cm)
 - Petal width (cm)
 
-![](https://github.com/DS-100/textbook/tree/master/assets/petal_sepal.png)
+![](https://raw.githubusercontent.com/DS-100/textbook/master/assets/petal_sepal.png)
 
 We will create a multiclass classifier that predicts the type of Iris plant based on the four features above. First, we read in the data:
 
@@ -322,7 +322,7 @@ Likewise in the real world, misclassifications can be common if two classes bear
 
 Another type of classification problem is **multilabel classification**, in which each observation can have multiple labels. An example would be a document classification system: a document can have positive or negative sentiment, religious or nonreligious content, and liberal or conservative leaning. Multilabel problems can also be multiclass; we may want our document classification system to distinguish between a list of genres, or identify the language that the document is written in. 
 
-Because each set of labels in a multilabel classification is mutually exclusive, we may perform multilabel classification by simply training a separate classifier on each set of labels. To label a new point, we combine each classifier's predictions.
+We may perform multilabel classification by simply training a separate classifier on each set of labels. To label a new point, we combine each classifier's predictions.
 
 ## Summary
 
