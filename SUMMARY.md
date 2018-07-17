@@ -80,6 +80,7 @@
   * [17.5 Justifying Cross-Entropy Loss](ch17/classification_cost_justification.md)
   * [17.6 Fitting a Logistic Model](ch17/classification_sgd.md)
   * [17.7 Evaluating Logistic Models](ch17/classification_sensitivity_specificity.md)
+  * [17.8 Multiclass Classification](ch17/classification_multiclass.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
 
 <!-- end_numbering -->
