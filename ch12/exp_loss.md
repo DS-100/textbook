@@ -1,5 +1,5 @@
 ## Expected Loss
-Let us return to our discussion of the constant model with the tip percentage dataset in the previous chapters. Suppose we only have data from a simple random sample of tips for all waiters at a particular restaurant in a 3-month period, and we want to predict a single tip percentage for all tips from this restaurant. To generalize a model on our 3-month sample to a model on the entire tip history of the restaurant, we must assume that tipping at this restaurant is the same year-round. Since we only have access to data from the sample, we can find the model that empirically minimizes the loss for the sample data with the mean absolute, mean squared, and Huber loss functions. However, if we want to generalize our model, we would need another loss function that does not specifically depend on which data points appear in our sample. The *expected loss* is an example of such a loss function that allows us to analyze the relationship between our sample and the population.
+Let us return to our discussion of the constant model with the example of tip percentages from the previous chapters. Suppose we only have data from a simple random sample of tips for all waiters at a particular restaurant in a 3-month period, and we want to predict a single tip percentage for all tips from this restaurant. To generalize a model on our 3-month sample to a model on the entire tip history of the restaurant, we must assume that tipping at this restaurant is the same year-round. Since we only have access to data from the sample, we can find the model that empirically minimizes the loss for the sample data with the mean absolute, mean squared, and Huber loss functions. However, if we want to generalize our model, we would need another loss function that does not specifically depend on which data points appear in our sample. The *expected loss* is an example of such a loss function that allows us to analyze the relationship between our sample and the population.
 
 ## Definition
 We define the population as all tip percentages that have ever been observed at a restaurant, and we define the random variable $ X $ as the percentage tipped for a table in the population. As before, we use the constant $ \theta $ to represent our model for the universal tip percentage. Using the quadratic loss as an example, we obtain the following loss function for the expected squared loss:
@@ -17,8 +17,7 @@ f(\theta) &=  \mathbb{E}[(X - \theta)^2] \\\\
 &= \mathbb{E}[(X - \mathbb{E}[X])^2] + 2(\mathbb{E}[X] - \theta)\mathbb{E}[X - \mathbb{E}[X]] + (\mathbb{E}[X]- \theta)^2 \\\\
 \end{aligned} \\]
 
-The second term in this expression simplifies to $ 2(\mathbb{E}[X] - \theta)(\mathbb{E}[X] - \mathbb{E}[X]) $, which further simplifies to $ 0 $.
-Thus, we are left with:
+The second term in this expression simplifies to $ 2(\mathbb{E}[X] - \theta)(\mathbb{E}[X] - \mathbb{E}[X]) $, which is simply $ 0 $. Thus, we are left with:
 
 \\[ f(\theta) = \mathbb{E}[(X - \mathbb{E}[X])^2] + (\mathbb{E}[X]- \theta)^2 \\]
 
@@ -44,4 +43,4 @@ If we have data from a sample, we can always minimize the mean squared loss of a
 
 ## Summary
 
-In this section, we introduced the expected loss as an example of a loss function that helps us generalize from a sample to the population. Often, we only have access to data from a sample, so using loss functions such as the MSE gives us a good approximation of the expected loss for the population.
+In this section, we introduced the expected loss as an example of a loss function that helps us generalize from a sample to the population. Often, we only have access to data from a large random sample, so using loss functions such as the MSE gives us a good approximation of the expected loss for the population.
