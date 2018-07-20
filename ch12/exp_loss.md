@@ -1,13 +1,13 @@
 ## Expected Loss
-Let us return to our discussion of the constant model with the tip percentage dataset in the previous chapters. Recall that we wanted to predict a single tip percentage for all tables using a simple random sample of tips for a particular waiter. Since we only had access to data from this particular sample, we found the model that empirically minimized the loss for data in the sample with the mean absolute, mean squared, and Huber loss functions. However, if we wanted to generalize from the tips sample to the entire population, we would need another loss function that does not specifically depend on which data points appear in our sample. The *expected loss* is an example of such a loss function that allows us to analyze the relationship between our sample and the population.
+Let us return to our discussion of the constant model with the tip percentage dataset in the previous chapters. Suppose we only have data from a simple random sample of tips for all waiters at a particular restaurant in a 3-month period, and we want to predict a single tip percentage for this restaurant. To generalize a model on our 3-month sample to a model on the entire history of the restaurant, we must assume that tipping at this restaurant is the same year-round. Since we only have access to data from the sample, we can find the model that empirically minimizes the loss for the sample data with the mean absolute, mean squared, and Huber loss functions. However, if we want to generalize our model, we would need another loss function that does not specifically depend on which data points appear in our sample. The *expected loss* is an example of such a loss function that allows us to analyze the relationship between our sample and the population.
 
 ## Definition
-We define the random variable $ X $ as the percentage tipped for a particular table in the population. As before, we use the constant $ \theta $ to represent our model for the universal tip percentage. Using the quadratic loss as an example, we obtain the following loss function:
+We define the population as all tip percentages that have ever been observed at the restaurant, and we define the random variable $ X $ as the percentage tipped for a table in the population. As before, we use the constant $ \theta $ to represent our model for the universal tip percentage. Using the quadratic loss as an example, we obtain the following loss function:
 
 \\[ f(\theta) =  \mathbb{E}[(X - \theta)^2] \\]
 
 ## Minimizing the Expected Squared Loss
-Note that the expected squared loss is a function of $ \theta $ since $ \theta $ is a model parameter that we get to choose. After some simplification with the linearity of expectation, we can use calculus to find the value of $ \theta $ that minimizes the expected squared loss.
+Note that the expected squared loss is a function of $ \theta $ since $ \theta $ is a model parameter that we get to choose. We can rewrite $X - \theta$ as $X - \mathbb{E}[X] + \mathbb{E}[X]$ and simplify using the linearity of expectation to find the value of $ \theta $ that minimizes the expected squared loss.
 
 \\[ \begin{aligned}
 f(\theta) &=  \mathbb{E}[(X - \theta)^2] \\\\
