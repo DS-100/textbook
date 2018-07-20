@@ -34,7 +34,7 @@ Ideally, we would like to set $ \theta = \mathbb{E}[X] $, but we must be able to
 
 \\[ \mathbb{E}[X] = \sum_{x \in \mathbb{X}} x \cdot P(X = x) \\]
 
-Unfortunately, we cannot find $ P(X = x) $, the probability that a specific tip percentage appears in the population, because we do not have access to data from the population. Since a simple random sample from the population will resemble the population, we can pretend that our sample is the population; this allows us to estimate $ \mathbb{E}[X] $ with the mean of our sample, which we will assume has size $ n $.
+Unfortunately, we cannot find $ P(X = x) $, the probability that a specific tip percentage appears in the population, because we do not have access to data from the population. Since the empirical distribution of a simple random sample from the population will resemble the distribution of the population, we can pretend that our sample is the population. This allows us to estimate $ \mathbb{E}[X] $ with the mean of our sample since each point appears in our sample with probability $ \frac{1}{n} $ if our sample has size $ n $.
 
 \\[
 \mathbb{E}[X] \approx \frac{1}{n} \sum_{i=1}^n x_i
