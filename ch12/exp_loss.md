@@ -1,34 +1,28 @@
 ## Expected Loss
-Let us return to our discussion of the constant model with the tip percentage dataset in the previous chapters. Suppose we only have data from a simple random sample of tips for all waiters at a particular restaurant in a 3-month period, and we want to predict a single tip percentage for this restaurant. To generalize a model on our 3-month sample to a model on the entire history of the restaurant, we must assume that tipping at this restaurant is the same year-round. Since we only have access to data from the sample, we can find the model that empirically minimizes the loss for the sample data with the mean absolute, mean squared, and Huber loss functions. However, if we want to generalize our model, we would need another loss function that does not specifically depend on which data points appear in our sample. The *expected loss* is an example of such a loss function that allows us to analyze the relationship between our sample and the population.
+Let us return to our discussion of the constant model with the tip percentage dataset in the previous chapters. Suppose we only have data from a simple random sample of tips for all waiters at a particular restaurant in a 3-month period, and we want to predict a single tip percentage for all tips from this restaurant. To generalize a model on our 3-month sample to a model on the entire tip history of the restaurant, we must assume that tipping at this restaurant is the same year-round. Since we only have access to data from the sample, we can find the model that empirically minimizes the loss for the sample data with the mean absolute, mean squared, and Huber loss functions. However, if we want to generalize our model, we would need another loss function that does not specifically depend on which data points appear in our sample. The *expected loss* is an example of such a loss function that allows us to analyze the relationship between our sample and the population.
 
 ## Definition
-We define the population as all tip percentages that have ever been observed at the restaurant, and we define the random variable $ X $ as the percentage tipped for a table in the population. As before, we use the constant $ \theta $ to represent our model for the universal tip percentage. Using the quadratic loss as an example, we obtain the following loss function:
+We define the population as all tip percentages that have ever been observed at a restaurant, and we define the random variable $ X $ as the percentage tipped for a table in the population. As before, we use the constant $ \theta $ to represent our model for the universal tip percentage. Using the quadratic loss as an example, we obtain the following loss function for the expected squared loss:
 
 \\[ f(\theta) =  \mathbb{E}[(X - \theta)^2] \\]
 
 ## Minimizing the Expected Squared Loss
-Note that the expected squared loss is a function of $ \theta $ since $ \theta $ is a model parameter that we get to choose. We can rewrite $X - \theta$ as $X - \mathbb{E}[X] + \mathbb{E}[X]$ and simplify using the linearity of expectation to find the value of $ \theta $ that minimizes the expected squared loss.
+Note that the expected squared loss is a function of $ \theta $ since $ \theta $ is a model parameter that we get to choose. We can rewrite $X - \theta$ as $X - \mathbb{E}[X] + \mathbb{E}[X] - \theta$ and simplify using the linearity of expectation to find the value of $ \theta $ that minimizes the expected squared loss.
 
 \\[ \begin{aligned}
 f(\theta) &=  \mathbb{E}[(X - \theta)^2] \\\\
-&= \mathbb{E}[X^2 - 2\theta X + \theta^2] \\\\
-&= \mathbb{E}[X^2] - \mathbb{E}[2\theta X] + \mathbb{E}[\theta^2] \\\\
-&= \mathbb{E}[X^2] - 2\theta \mathbb{E}[X] + \theta^2 \\\\
+&= \mathbb{E}[(X - \mathbb{E}[X] + \mathbb{E}[X] - \theta)^2] \\\\
+&= \mathbb{E}[(X - \mathbb{E}[X])^2 + 2(X - \mathbb{E}[X])(\mathbb{E}[X] - \theta) + (\mathbb{E}[X]- \theta)^2] \\\\
+&= \mathbb{E}[(X - \mathbb{E}[X])^2] + \mathbb{E}[2(X - \mathbb{E}[X])(\mathbb{E}[X] - \theta)] + \mathbb{E}[(\mathbb{E}[X]- \theta)^2] \\\\
+&= \mathbb{E}[(X - \mathbb{E}[X])^2] + 2(\mathbb{E}[X] - \theta)\mathbb{E}[X - \mathbb{E}[X]] + (\mathbb{E}[X]- \theta)^2 \\\\
 \end{aligned} \\]
 
-To find the value of $ \theta $ that minimizes this function, we take the derivative of the final expression with respect to $ \theta $.
+The second term in this expression simplifies to $ 2(\mathbb{E}[X] - \theta)(\mathbb{E}[X] - \mathbb{E}[X]) $, which further simplifies to $ 0 $.
+Thus, we are left with:
 
-\\[ \frac{\partial}{\partial \theta}f(\theta) = -2\mathbb{E}[X] + 2\theta \\]
+\\[ f(\theta) = \mathbb{E}[(X - \mathbb{E}[X])^2] + (\mathbb{E}[X]- \theta)^2 \\]
 
-Now, we can find the value of $ \theta $ where the derivative is zero.
-
-\\[ \begin{aligned}
--2\mathbb{E}[X] + 2\theta &= 0 \\\\
-2\theta &= 2\mathbb{E}[X] \\\\
-\theta &= \mathbb{E}[X] \\\\
-\end{aligned} \\]
-
-Thus, $ \theta = \mathbb{E}[X] $ minimizes the expected squared loss. If we plug in this value back into the original loss function, we get:
+Note that the first term of the expression does not depend on $\theta$, so we only need to find the value of $\theta$ that minimizes the second term to minimize the entire expression. Since the second term is a quadratic, we know that $ \theta = \mathbb{E}[X] $ minimizes the term and hence the entire expression. If we plug in this value back into the original loss function, we get:
 
 \\[ f(\mathbb{E}[X]) = \mathbb{E}[(X - \mathbb{E}[X])^2] \\]
 
