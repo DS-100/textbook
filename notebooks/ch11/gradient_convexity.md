@@ -52,12 +52,12 @@ def plot_loss(y_vals, xlim, loss_fn):
     plt.plot(thetas, losses, zorder=1)
     plt.xlim(*xlim)
     plt.title(loss_fn.__name__)
-    plt.xlabel(r'$ \hat{\theta_0} $')
+    plt.xlabel(r'$ \theta $')
     plt.ylabel('Loss')
     
 def plot_theta_on_loss(y_vals, theta, loss_fn, **kwargs):
     loss = loss_fn(theta, y_vals)
-    default_args = dict(label=r'$ \hat{\theta_0} $', zorder=2,
+    default_args = dict(label=r'$ \theta $', zorder=2,
                         s=200, c=sns.xkcd_rgb['green'])
     plt.scatter([theta], [loss], **{**default_args, **kwargs})
     
@@ -72,14 +72,14 @@ def plot_connected_thetas(y_vals, theta_1, theta_2, loss_fn, **kwargs):
 
 ```python
 # HIDDEN
-def plot_one_gd_iter(y_vals, theta_hat, loss_fn, grad_loss, alpha=2.5):
-    new_theta_hat = theta_hat - alpha * grad_loss(theta_hat, y_vals)
+def plot_one_gd_iter(y_vals, theta, loss_fn, grad_loss, alpha=2.5):
+    new_theta = theta - alpha * grad_loss(theta, y_vals)
     plot_loss(pts, (-23, 25), loss_fn)
-    plot_theta_on_loss(pts, theta_hat, loss_fn, c='none',
+    plot_theta_on_loss(pts, theta, loss_fn, c='none',
                        edgecolor=sns.xkcd_rgb['green'], linewidth=2)
-    plot_theta_on_loss(pts, new_theta_hat, loss_fn)
-    print(f'old theta_hat: {theta_hat}')
-    print(f'new theta_hat: {new_theta_hat[0]}')
+    plot_theta_on_loss(pts, new_theta, loss_fn)
+    print(f'old theta: {theta}')
+    print(f'new theta: {new_theta[0]}')
 ```
 
 ## Convexity
@@ -88,7 +88,7 @@ Gradient descent provides a general method for minimizing a function. As we obse
 
 ## Gradient Descent Finds Local Minima
 
-Unfortunately, gradient descent does not always find the globally minimizing $ \hat{\theta_0} $. Consider the following gradient descent run using an initial $ \hat{\theta_0} = -21 $ on the loss function below.
+Unfortunately, gradient descent does not always find the globally minimizing $ \theta $. Consider the following gradient descent run using an initial $ \theta = -21 $ on the loss function below.
 
 
 ```python
@@ -108,8 +108,8 @@ plot_theta_on_loss(pts, -21, quartic_loss)
 plot_one_gd_iter(pts, -21, quartic_loss, grad_quartic_loss)
 ```
 
-    old theta_hat: -21
-    new theta_hat: -9.944999999999999
+    old theta: -21
+    new theta: -9.944999999999999
     
 
 
@@ -122,8 +122,8 @@ plot_one_gd_iter(pts, -21, quartic_loss, grad_quartic_loss)
 plot_one_gd_iter(pts, -9.9, quartic_loss, grad_quartic_loss)
 ```
 
-    old theta_hat: -9.9
-    new theta_hat: -12.641412
+    old theta: -9.9
+    new theta: -12.641412
     
 
 
@@ -136,8 +136,8 @@ plot_one_gd_iter(pts, -9.9, quartic_loss, grad_quartic_loss)
 plot_one_gd_iter(pts, -12.6, quartic_loss, grad_quartic_loss)
 ```
 
-    old theta_hat: -12.6
-    new theta_hat: -14.162808
+    old theta: -12.6
+    new theta: -14.162808
     
 
 
@@ -150,15 +150,15 @@ plot_one_gd_iter(pts, -12.6, quartic_loss, grad_quartic_loss)
 plot_one_gd_iter(pts, -14.2, quartic_loss, grad_quartic_loss)
 ```
 
-    old theta_hat: -14.2
-    new theta_hat: -14.497463999999999
+    old theta: -14.2
+    new theta: -14.497463999999999
     
 
 
 ![png](gradient_convexity_files/gradient_convexity_10_1.png)
 
 
-On this loss function and $ \hat{\theta_0} $ value, gradient descent converges to $ \hat{\theta_0} = -14.5 $, producing a loss of roughly 8. However, the global minimum for this loss function is $ \hat{\theta_0} = 18 $, corresponding to a loss of nearly zero. From this example, we observe that gradient descent finds a *local minimum* which may not necessarily have the same loss as the *global minimum*.
+On this loss function and $ \theta $ value, gradient descent converges to $ \theta = -14.5 $, producing a loss of roughly 8. However, the global minimum for this loss function is $ \theta = 18 $, corresponding to a loss of nearly zero. From this example, we observe that gradient descent finds a *local minimum* which may not necessarily have the same loss as the *global minimum*.
 
 Luckily, a number of useful loss functions have identical local and global minima. Consider the familiar mean squared error loss function, for example:
 
@@ -173,7 +173,7 @@ plot_loss(pts, (-5, 5), mse)
 ![png](gradient_convexity_files/gradient_convexity_12_0.png)
 
 
-Running gradient descent on this loss function with an appropriate learning rate will always find the globally optimal $ \hat{\theta_0} $ since the sole local minimum is also the global minimum.
+Running gradient descent on this loss function with an appropriate learning rate will always find the globally optimal $ \theta $ since the sole local minimum is also the global minimum.
 
 The mean absolute error sometimes has multiple local minima. However, all the local minima produce the globally lowest loss possible.
 
@@ -188,13 +188,13 @@ plot_loss(pts, (-5, 5), abs_loss)
 ![png](gradient_convexity_files/gradient_convexity_14_0.png)
 
 
-On this loss function, gradient descent will converge to one of the local minima in the range $ [-1, 1] $. Since all of these local minima have the lowest loss possible for this function, gradient descent will still return an optimal choice of $ \hat{\theta_0} $.
+On this loss function, gradient descent will converge to one of the local minima in the range $ [-1, 1] $. Since all of these local minima have the lowest loss possible for this function, gradient descent will still return an optimal choice of $ \theta $.
 
 ## Definition of Convexity
 
 For some functions, any local minimum is also a global minimum. This set of functions are called **convex functions** since they curve upward. For a constant model, the MSE, MAE, and Huber loss are all convex.
 
-With an appropriate learning rate, gradient descent finds the globally optimal $\hat{\theta_0}$ for convex loss functions. Because of this useful property, we prefer to fit our models using convex loss functions unless we have a good reason not to.
+With an appropriate learning rate, gradient descent finds the globally optimal $\theta$ for convex loss functions. Because of this useful property, we prefer to fit our models using convex loss functions unless we have a good reason not to.
 
 Formally, a function $f$ is convex if and only if it satisfies the following inequality for all possible function inputs $a$ and $b$, for all $t \in [0, 1]$:
 
