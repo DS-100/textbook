@@ -44,13 +44,13 @@ def plot_loss(y_vals, xlim, loss_fn):
     plt.plot(thetas, losses, zorder=1)
     plt.xlim(*xlim)
     plt.title(loss_fn.__name__)
-    plt.xlabel(r'$ \hat{\theta_0} $')
+    plt.xlabel(r'$ \theta $')
     plt.ylabel('Loss')
     plt.legend()
     
 def plot_theta_on_loss(y_vals, theta, loss_fn, **kwargs):
     loss = loss_fn(theta, y_vals)
-    default_args = dict(label=r'$ \hat{\theta_0} $', zorder=2,
+    default_args = dict(label=r'$ \theta $', zorder=2,
                         s=200, c=sns.xkcd_rgb['green'])
     plt.scatter([theta], [loss], **{**default_args, **kwargs})
 
@@ -64,10 +64,10 @@ def plot_tangent_on_loss(y_vals, theta, loss_fn, eps=1e-6):
 
 ## Gradient Descent
 
-We are interested in creating a function that can minimize a loss function without forcing the user to predetermine which values of $ \hat{\theta_0} $ to try. In other words, while the `simple_minimize` function has the following signature:
+We are interested in creating a function that can minimize a loss function without forcing the user to predetermine which values of $\theta$ to try. In other words, while the `simple_minimize` function has the following signature:
 
 ```python
-simple_minimize(lost_fn, dataset, thetas)
+simple_minimize(loss_fn, dataset, thetas)
 ```
 
 We would like a function that has the following signature:
@@ -76,15 +76,15 @@ We would like a function that has the following signature:
 minimize(loss_fn, dataset)
 ```
 
-This function needs to automatically find the minimizing $ \hat{\theta_0} $ value no matter how small or large it is. We will use a technique called gradient descent to implement this new `minimize` function.
+This function needs to automatically find the minimizing $\theta$ value no matter how small or large it is. We will use a technique called gradient descent to implement this new `minimize` function.
 
 ### Intuition
 
 As with loss functions, we will discuss the intuition for gradient descent first, then formalize our understanding with mathematics.
 
-Since the `minimize` function is not given values of $ \hat{\theta_0} $ to try, we start by picking a $ \hat{\theta_0} $ anywhere we'd like. Then, we can iteratively improve the estimate of $ \hat{\theta_0} $. To improve an estimate of $ \hat{\theta_0}$, we look at the slope of the loss function at that choice of $ \hat{\theta_0} $.
+Since the `minimize` function is not given values of $\theta$ to try, we start by picking a $\theta$ anywhere we'd like. Then, we can iteratively improve the estimate of $\theta$. To improve an estimate of $\theta$, we look at the slope of the loss function at that choice of $ \theta $.
 
-For example, suppose we are using MSE for the simple dataset $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \hat{\theta_0} $ is 12.
+For example, suppose we are using MSE for the simple dataset $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.
 
 
 ```python
@@ -98,7 +98,7 @@ plot_theta_on_loss(pts, 12, mse)
 ![png](gradient_descent_define_files/gradient_descent_define_6_0.png)
 
 
-We'd like to choose a new value for $ \hat{\theta_0} $ that decreases the loss. To do this, we look at the slope of the loss function at $\hat{\theta_0}= 12 $:
+We'd like to choose a new value for $\theta$ that decreases the loss. To do this, we look at the slope of the loss function at $\theta= 12 $:
 
 
 ```python
@@ -112,9 +112,9 @@ plot_tangent_on_loss(pts, 12, mse)
 ![png](gradient_descent_define_files/gradient_descent_define_8_0.png)
 
 
-The slope is negative, which means that increasing $\hat{\theta_0}$ will decrease the loss.
+The slope is negative, which means that increasing $\theta$ will decrease the loss.
 
-If $ \hat{\theta_0} = 16.5 $ on the other hand, the slope of the loss function is positive:
+If $\theta = 16.5 $ on the other hand, the slope of the loss function is positive:
 
 
 ```python
@@ -128,31 +128,31 @@ plot_tangent_on_loss(pts, 16.5, mse)
 ![png](gradient_descent_define_files/gradient_descent_define_10_0.png)
 
 
-When the slope is positive, decreasing $ \hat{\theta_0} $ will decrease the loss.
+When the slope is positive, decreasing $ \theta $ will decrease the loss.
 
-The slope of the tangent line tells us which direction to move $ \hat{\theta_0} $ in order to decrease the loss. If the slope is negative, we want $ \hat{\theta_0} $ to move in the positive direction. If the slope is positive, $\hat{\theta_0} $ should move in the negative direction. Mathematically, we write:
+The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the loss. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $\theta $ should move in the negative direction. Mathematically, we write:
 
 $$
-\hat{\theta_{t+1}} = \hat{\theta_t} - \frac{\partial}{\partial \theta} L(\hat{\theta_t}, y)
+\theta^{t+1} = \theta^t - \frac{\partial}{\partial \theta} L(\theta^t, y)
 $$
 
-Where $ \hat{\theta_t} $ is the current estimate and $ \hat{\theta_{t+1}} $ is the next estimate.
+Where $ \theta^t $ is the current estimate and $ \theta^{t+1} $ is the next estimate.
 
 For the MSE, we have:
 
 $$
 \begin{aligned}
 L(\hat{\theta_0}, y)
-&= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \hat{\theta_0})^2\\
-\frac{\partial}{\partial \hat{\theta}} L(\hat{\theta_0}, y)
-&= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \hat{\theta_0}) \\
-&= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \hat{\theta_0}) \\
+&= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\frac{\partial}{\partial \hat{\theta}} L(\theta, y)
+&= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
+&= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
 \end{aligned}
 $$
 
-When $ \hat{\theta_t} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \hat{\theta_0}) = -5.2 $. Thus, $ \hat{\theta_{t+1}} = 12 - (-5.2) = 17.2 $.
+When $ \theta^t = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta^{t+1} = 12 - (-5.2) = 17.2 $.
 
-We've plotted the old value of $ \hat{\theta_0} $ as a green outlined circle and the new value as a filled in circle on the loss curve below.
+We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the loss curve below.
 
 
 ```python
@@ -168,13 +168,13 @@ plot_theta_on_loss(pts, 17.2, mse)
 ![png](gradient_descent_define_files/gradient_descent_define_12_0.png)
 
 
-Although $ \hat{\theta_0} $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \hat{\theta_0}$. Our final update formula is:
+Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta$. Our final update formula is:
 
 $$
-\hat{\theta_{t+1}} = \hat{\theta_t} - \alpha \cdot \frac{\partial}{\partial \theta} L(\hat{\theta_t}, y)
+\theta^{t+1} = \theta^t - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^t, y)
 $$
 
-Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $ this is the new $ \hat{\theta_{t+1}} $:
+Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $ this is the new $ \theta^{t+1} $:
 
 
 ```python
@@ -185,8 +185,8 @@ def plot_one_gd_iter(y_vals, theta, loss_fn, grad_loss, alpha=0.3):
     plot_theta_on_loss(pts, theta, loss_fn, c='none',
                        edgecolor=sns.xkcd_rgb['green'], linewidth=2)
     plot_theta_on_loss(pts, new_theta, loss_fn)
-    print(f'old theta_hat: {theta}')
-    print(f'new theta_hat: {new_theta}')
+    print(f'old theta: {theta}')
+    print(f'new theta: {new_theta}')
 ```
 
 
@@ -195,15 +195,15 @@ def plot_one_gd_iter(y_vals, theta, loss_fn, grad_loss, alpha=0.3):
 plot_one_gd_iter(pts, 12, mse, grad_mse)
 ```
 
-    old theta_hat: 12
-    new theta_hat: 13.596
+    old theta: 12
+    new theta: 13.596
     
 
 
 ![png](gradient_descent_define_files/gradient_descent_define_15_1.png)
 
 
-Here are the $ \hat{\theta_0} $ values for successive iterations of this process. Notice that $ \hat{\theta_0} $ changes more slowly as it gets closer to the minimum loss because the slope is also smaller.
+Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum loss because the slope is also smaller.
 
 
 ```python
@@ -211,8 +211,8 @@ Here are the $ \hat{\theta_0} $ values for successive iterations of this process
 plot_one_gd_iter(pts, 13.60, mse, grad_mse)
 ```
 
-    old theta_hat: 13.6
-    new theta_hat: 14.236
+    old theta: 13.6
+    new theta: 14.236
     
 
 
@@ -225,8 +225,8 @@ plot_one_gd_iter(pts, 13.60, mse, grad_mse)
 plot_one_gd_iter(pts, 14.24, mse, grad_mse)
 ```
 
-    old theta_hat: 14.24
-    new theta_hat: 14.492
+    old theta: 14.24
+    new theta: 14.492
     
 
 
@@ -239,8 +239,8 @@ plot_one_gd_iter(pts, 14.24, mse, grad_mse)
 plot_one_gd_iter(pts, 14.49, mse, grad_mse)
 ```
 
-    old theta_hat: 14.49
-    new theta_hat: 14.592
+    old theta: 14.49
+    new theta: 14.592
     
 
 
@@ -251,24 +251,24 @@ plot_one_gd_iter(pts, 14.49, mse, grad_mse)
 
 We now have the full algorithm for gradient descent:
 
-1. Choose a starting value of $ \hat{\theta_0} $ (0 is a common choice).
-2. Compute $ \hat{\theta_0} - \alpha \cdot \frac{\partial}{\partial \theta} L(\hat{\theta_0}, y) $ and store this as the new value of $ \theta $.
-3. Repeat until $ \hat{\theta_0} $ doesn't change between iterations.
+1. Choose a starting value of $ \theta $ (0 is a common choice).
+2. Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, y) $ and store this as the new value of $ \theta $.
+3. Repeat until $ \theta $ doesn't change between iterations.
 
 You will more commonly see the gradient $ \nabla_\theta $ in place of the partial derivative $ \frac{\partial}{\partial \theta} $. The two notations are essentially equivalent, but since the gradient notation is more common we will use it in the gradient update formula from now on:
 
 $$
-\hat{\theta_{t+1}} = \hat{\theta_t} - \alpha \cdot \nabla_\theta L(\hat{\theta_t}, y)
+\theta^{t+1} = \theta^t - \alpha \cdot \nabla_\theta L(\theta^t, y)
 $$
 
 To review notation:
 
-- $ \hat{\theta_t} $ is the current choice of $ \hat{\theta_0} $.
-- $ \hat{\theta_{t+1}} $ is the next choice of $ \hat{\theta_0} $.
-- $ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha_t $ to mark that $ \alpha $ varies over time $ t $.
-- $ \nabla_\theta L(\hat{\theta_0}, y) $ is the partial derivative / gradient of the loss function at $ \hat{\theta_0} $.
+- $ \theta^t $ is the current choice of $ \theta $.
+- $ \theta_{t+1} $ is the next choice of $ \theta $.
+- $ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha^t $ to mark that $ \alpha $ varies over time $ t $.
+- $ \nabla_\theta L(\theta, y) $ is the partial derivative / gradient of the loss function at $ \theta $.
 
-You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\hat{\theta_0}, y) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \hat{\theta_0} $ and dividing by the distance between $ \hat{\theta_0} $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
+You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\theta, y) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
 
 The gradient algorithm is simple yet powerful since we can use it for many types of models and many types of loss functions. It is the computational tool of choice for fitting many important models, including linear regression on large datasets and neural networks.
 
@@ -283,17 +283,17 @@ def minimize(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
     Uses gradient descent to minimize loss_fn. Returns the minimizing value of
     theta_hat once theta_hat changes less than 0.001 between iterations.
     '''
-    theta_hat = 0
+    theta = 0
     while True:
         if progress:
-            print(f'theta: {theta_hat:.2f} | loss: {loss_fn(theta_hat, dataset):.2f}')
-        gradient = grad_loss_fn(theta_hat, dataset)
-        new_theta_hat = theta_hat - alpha * gradient
+            print(f'theta: {theta:.2f} | loss: {loss_fn(theta, dataset):.2f}')
+        gradient = grad_loss_fn(theta, dataset)
+        new_theta = theta - alpha * gradient
         
-        if abs(new_theta_hat - theta_hat) < 0.001:
-            return new_theta_hat
+        if abs(new_theta - theta) < 0.001:
+            return new_theta
         
-        theta_hat = new_theta_hat
+        theta = new_theta
 ```
 
 Then we can define functions to compute our MSE and its gradient:
@@ -307,13 +307,13 @@ def grad_mse(theta, y_vals):
     return -2 * np.mean(y_vals - theta)
 ```
 
-Finally, we can use the `minimize` function to compute the minimizing value of $ \hat{\theta_0} $ for $ y = [12.1, 12.8, 14.9, 16.3, 17.2] $.
+Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ y = [12.1, 12.8, 14.9, 16.3, 17.2] $.
 
 
 ```python
 %%time
-theta_hat = minimize(mse, grad_mse, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
-print(f'Minimizing theta_hat: {theta_hat}')
+theta = minimize(mse, grad_mse, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
+print(f'Minimizing theta: {theta}')
 print()
 ```
 
@@ -335,9 +335,9 @@ print()
     theta: 14.65 | loss: 3.84
     theta: 14.66 | loss: 3.84
     theta: 14.66 | loss: 3.84
-    Minimizing theta_hat: 14.658511131035242
+    Minimizing theta: 14.658511131035242
     
-    Wall time: 2 ms
+    Wall time: 1.99 ms
     
 
 We can see that gradient quickly finds the same solution as the analytic method:
@@ -361,18 +361,18 @@ Now, we can apply gradient descent to minimize the Huber loss on our dataset of 
 The Huber loss is:
 
 $$
-L_\delta(\hat{\theta_0}, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
-    \frac{1}{2}(y_i - \hat{\theta_0})^2 &  | y_i - \hat{\theta_0} | \le \delta \\
-     \delta (|y_i - \hat{\theta_0}| - \frac{1}{2} \delta ) & \text{otherwise}
+L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    \frac{1}{2}(y_i - \theta)^2 &  | y_i - \theta | \le \delta \\
+     \delta (|y_i - \theta| - \frac{1}{2} \delta ) & \text{otherwise}
 \end{cases}
 $$
 
 The gradient of the Huber loss is:
 
 $$
-\nabla_{\theta} L_\delta(\hat{\theta_0}, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
-    -(y_i - \hat{\theta_0}) &  | y_i - \hat{\theta_0} | \le \delta \\
-    - \delta \cdot \text{sign} (y_i - \hat{\theta_0}) & \text{otherwise}
+\nabla_{\theta} L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    -(y_i - \theta) &  | y_i - \theta | \le \delta \\
+    - \delta \cdot \text{sign} (y_i - \theta) & \text{otherwise}
 \end{cases}
 $$
 
@@ -402,16 +402,16 @@ Let's minimize the Huber loss on the tips dataset:
 
 ```python
 %%time
-theta_hat = minimize(huber_loss, grad_huber_loss, tips['pcttip'], progress=False)
-print(f'Minimizing theta_hat: {theta_hat}')
+theta = minimize(huber_loss, grad_huber_loss, tips['pcttip'], progress=False)
+print(f'Minimizing theta: {theta}')
 print()
 ```
 
-    Minimizing theta_hat: 15.506849531471964
+    Minimizing theta: 15.506849531471964
     
-    Wall time: 100 ms
+    Wall time: 210 ms
     
 
 ### Summary
 
-Gradient descent gives us a generic way to minimize a loss function when we cannot solve for the minimizing value of $ \hat{\theta_0} $ analytically. As our models and loss functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.
+Gradient descent gives us a generic way to minimize a loss function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and loss functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.

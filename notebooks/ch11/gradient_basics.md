@@ -42,7 +42,7 @@ def points_and_loss(y_vals, xlim, loss_fn):
     plt.plot(thetas, losses)
     plt.xlim(*xlim)
     plt.title(loss_fn.__name__)
-    plt.xlabel(r'$ \hat{\theta_0} $')
+    plt.xlabel(r'$ \theta $')
     plt.ylabel('Loss')
     plt.legend()
 ```
@@ -52,30 +52,30 @@ def points_and_loss(y_vals, xlim, loss_fn):
 Let us return to our constant model:
 
 $$
-\hat{\theta_0} = C
+\theta = C
 $$
 
 We will use the mean squared error loss function:
 
 $$
 \begin{aligned}
-L(\hat{\theta_0}, y)
-&= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \hat{\theta_0})^2\\
+L(\theta, y)
+&= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
 \end{aligned}
 $$
 
-For simplicity, we will use the dataset $ y = [ 12, 13, 15, 16, 17 ] $. We know from our analytical approach in a previous chapter that the minimizing $ \hat{\theta_0} $ for the MSE is $ \text{mean}(y) = 14.6 $. Let's see whether we can find the same value by writing a program.
+For simplicity, we will use the dataset $ y = [ 12, 13, 15, 16, 17 ] $. We know from our analytical approach in a previous chapter that the minimizing $ \theta $ for the MSE is $ \text{mean}(y) = 14.6 $. Let's see whether we can find the same value by writing a program.
 
-If we write the program well, we will be able to use the same program on any loss function in order to find the minimizing value of $ \hat{\theta_0} $, including the mathematically complicated Huber loss:
+If we write the program well, we will be able to use the same program on any loss function in order to find the minimizing value of $ \theta $, including the mathematically complicated Huber loss:
 
 $$
-L_\alpha(\hat{\theta_0}, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
-    \frac{1}{2}(y_i - \hat{\theta_0})^2 &  | y_i - \hat{\theta_0} | \le \alpha \\
-    \alpha ( |y_i - \hat{\theta_0}| - \frac{1}{2}\alpha ) & \text{otherwise}
+L_\alpha(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    \frac{1}{2}(y_i - \theta)^2 &  | y_i - \theta | \le \alpha \\
+    \alpha ( |y_i - \theta| - \frac{1}{2}\alpha ) & \text{otherwise}
 \end{cases}
 $$
 
-First, we create a rug plot of the data points. To the right of the rug plot we plot the MSE for different values of $ \hat{\theta_0} $.
+First, we create a rug plot of the data points. To the right of the rug plot we plot the MSE for different values of $ \theta $.
 
 
 ```python
@@ -88,9 +88,9 @@ points_and_loss(pts, (11, 18), mse)
 ![png](gradient_basics_files/gradient_basics_4_0.png)
 
 
-How might we write a program to automatically find the minimizing value of $ \hat{\theta_0} $? The simplest method is to compute the loss for many values $ \hat{\theta_0} $. Then, we can return the $ \hat{\theta_0} $ value that resulted in the least loss.
+How might we write a program to automatically find the minimizing value of $ \theta $? The simplest method is to compute the loss for many values $ \theta $. Then, we can return the $ \theta $ value that resulted in the least loss.
 
-We define a function called `simple_minimize` that takes in a loss function, an array of data points, and an array of $\hat{\theta_0}$ values to try.
+We define a function called `simple_minimize` that takes in a loss function, an array of data points, and an array of $\theta$ values to try.
 
 
 ```python
@@ -138,7 +138,7 @@ np.mean(dataset)
 
 
 
-Now, we can define a function to compute the Huber loss and plot the loss against $ \hat{\theta_0} $.
+Now, we can define a function to compute the Huber loss and plot the loss against $\theta $.
 
 
 ```python
@@ -161,7 +161,7 @@ points_and_loss(pts, (11, 18), huber_loss)
 ![png](gradient_basics_files/gradient_basics_13_0.png)
 
 
-Although we can see that the minimizing value of $ \hat{\theta_0} $ should be close to 15, we do not have an analytical method of finding $ \hat{\theta_0} $ directly for the Huber loss. Instead, we can use our `simple_minimize` function.
+Although we can see that the minimizing value of $ \theta $ should be close to 15, we do not have an analytical method of finding $ \theta $ directly for the Huber loss. Instead, we can use our `simple_minimize` function.
 
 
 ```python
@@ -175,7 +175,7 @@ simple_minimize(huber_loss, dataset, thetas)
 
 
 
-Now, we can return to our original dataset of tip percentages and find the best value for $ \hat{\theta_0} $ using the Huber loss.
+Now, we can return to our original dataset of tip percentages and find the best value for $ \theta $ using the Huber loss.
 
 
 ```python
@@ -299,7 +299,7 @@ simple_minimize(huber_loss, tips['pcttip'], thetas)
 
 
 
-We can see that using the Huber loss gives us $ \hat{\theta_0} = 15.5 $. We can now compare the minimizing $\hat{\theta_0} $ values for MSE, MAE, and Huber loss.
+We can see that using the Huber loss gives us $ \hat{\theta} = 15.5 $. We can now compare the minimizing $\hat{\theta} $ values for MSE, MAE, and Huber loss.
 
 
 ```python
@@ -326,7 +326,7 @@ sns.distplot(tips['pcttip'], bins=50);
 
 ## Issues with `simple_minimize`
 
-Although `simple_minimize` allows us to minimize loss functions, it has some flaws that make it unsuitable for general purpose use. Its primary issue is that it only works with predetermined values of $ \hat{\theta_0} $ to test. For example, in this code snippet we used above, we had to manually define $ \hat{\theta_0} $ values in between 12 and 18.
+Although `simple_minimize` allows us to minimize loss functions, it has some flaws that make it unsuitable for general purpose use. Its primary issue is that it only works with predetermined values of $ \theta $ to test. For example, in this code snippet we used above, we had to manually define $ \theta $ values in between 12 and 18.
 
 ```python
 dataset = np.array([12, 13, 15, 16, 17])
@@ -335,6 +335,6 @@ thetas = np.arange(12, 18, 0.1)
 simple_minimize(mse, dataset, thetas)
 ```
 
-How did we know to examine the range between 12 and 18? We had to inspect the plot of the loss function manually and see that there was a minima in that range. This process becomes impractical as we add extra complexity to our models. In addition, we manually specified a step size of 0.1 in the code above. However, if the optimal value of $ \hat{\theta_0} $ were 12.043, our `simple_minimize` function would round to 12.00, the nearest multiple of 0.1. 
+How did we know to examine the range between 12 and 18? We had to inspect the plot of the loss function manually and see that there was a minima in that range. This process becomes impractical as we add extra complexity to our models. In addition, we manually specified a step size of 0.1 in the code above. However, if the optimal value of $ \theta $ were 12.043, our `simple_minimize` function would round to 12.00, the nearest multiple of 0.1. 
 
 We can solve both of these issues at once by using a method called *gradient descent*.
