@@ -61,7 +61,7 @@ In basketball, players score by shooting a ball through a hoop. One such player,
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/LeBron_James_%2831944491583%29.jpg" alt="LeBron James (31944491583).jpg" height="480" width="308">
 
-LeBron plays in the National Basketball Association (NBA), the United States's premier basketball league. We've collected a dataset of all of LeBron's attempts in the 2017 NBA Playoff Games using the NBA statistics website (https://stats.nba.com/). 
+LeBron plays in the National Basketball Association (NBA), the United States's premier basketball league. We've collected a dataset of all of LeBron's attempts in 2017 NBA playoff games using the NBA statistics website (https://stats.nba.com/). 
 
 
 ```python
@@ -177,21 +177,21 @@ lebron
 
 
 
-This dataset contains one row containing the following attributes of every shot LeBron attempted:
+Each row of this dataset contains the following attributes of a shot LeBron attempted:
 
-- `game_date`: The date of the game played.
+- `game_date`: The date of the game.
 - `minute`: The minute that the shot was attempted (each NBA game is 48 minutes long).
 - `opponent`: The team abbreviation of LeBron's opponent.
 - `action_type`: The type of action leading up to the shot.
 - `shot_type'`: The type of shot (either a 2 point shot or 3 point shot).
-- `shot_distance`: The distance from the basket when shot was attempted.
+- `shot_distance`: LeBron's distance from the basket when the shot was attempted (ft).
 - `shot_made`: `0` if the shot missed, `1` if the shot went in.
 
 We would like to use this dataset to predict whether LeBron will make future shots. This is a *classification problem*; we predict a category, not a continuous number as we do in regression.
 
 We may reframe this classification problem as a type of regression problem by predicting the *probability* that a shot will go in. For example, we expect that the probability that LeBron makes a shot is lower when he is farther away from the basket.
 
-We plot the shot attempts below, showing the distance from the basket on the x-axis and whether he made the shot on the y-axis. We've jittered the points slightly on the y-axis to mitigate overplotting.
+We plot the shot attempts below, showing the distance from the basket on the x-axis and whether he made the shot on the y-axis. Jittering the points slightly on the y-axis mitigates overplotting.
 
 
 ```python
@@ -201,7 +201,7 @@ sns.lmplot(x='shot_distance', y='shot_made',
            data=jitter_df(lebron, 'shot_distance', 'shot_made'),
            fit_reg=False,
            scatter_kws={'alpha': 0.3})
-plt.title('LeBron shot make vs. shot distance');
+plt.title('LeBron Shot Make vs. Shot Distance');
 ```
 
 
@@ -218,16 +218,16 @@ sns.lmplot(x='shot_distance', y='shot_made',
            data=jitter_df(lebron, 'shot_distance', 'shot_made'),
            ci=None,
            scatter_kws={'alpha': 0.4})
-plt.title('Simple linear regression');
+plt.title('Simple Linear Regression');
 ```
 
 
 ![png](classification_prob_files/classification_prob_11_0.png)
 
 
-This regression predicts a continuous value. To perform classification, however, we need to convert this value into a category: a shot make or a miss. We can accomplish this by setting a cutoff. If the regression predicts a value greater than 0.5, we predict that the shot will make. Otherwise, we predict that the shot will miss.
+Linear regression predicts a continuous value. To perform classification, however, we need to convert this value into a category: a shot make or miss. We can accomplish this by setting a cutoff, or **classification threshold**. If the regression predicts a value greater than 0.5, we predict that the shot will make. Otherwise, we predict that the shot will miss.
 
-We draw the cutoff below as a green dashed line. According to this cutoff, our model predicts that LeBron will make a shot if he is closer than 15 feet away from the basket.
+We draw the cutoff below as a green dashed line. According to this cutoff, our model predicts that LeBron will make a shot if he is within 15 feet of the basket.
 
 
 ```python
@@ -238,17 +238,17 @@ sns.lmplot(x='shot_distance', y='shot_made',
            ci=None,
            scatter_kws={'alpha': 0.4})
 plt.axhline(y=0.5, linestyle='--', c='g')
-plt.title('Cutoff for classification');
+plt.title('Cutoff for Classification');
 ```
 
 
 ![png](classification_prob_files/classification_prob_13_0.png)
 
 
-In the steps above, we attempt to perform a regression to predict the probability that a shot will go in. If our regression produces a probability, setting a cutoff of 0.5 means that we predict that a shot will go in when our model thinks the shot going in is more likely than the shot missing.
+In the steps above, we attempt to perform a regression to predict the probability that a shot will go in. If our regression produces a probability, setting a cutoff of 0.5 means that we predict that a shot will go in when our model thinks the shot going in is more likely than the shot missing. We will revisit the topic of classification thresholds later in the chapter.
 
 ## Issues with Linear Regression for Probabilities
 
-Unfortunately, our linear model's predictions cannot be interpreted as probabilities. Valid probabilities must lie between zero and one; our linear model violates this condition. For example, the probability that LeBron makes a shot when he is 100 feet away from the basket should be close to zero. In this case, however, our model will predict a negative value.
+Unfortunately, our linear model's predictions cannot be interpreted as probabilities. Valid probabilities must lie between zero and one, but our linear model violates this condition. For example, the probability that LeBron makes a shot when he is 100 feet away from the basket should be close to zero. In this case, however, our model will predict a negative value.
 
-If we alter our regression model so that its predictions may be interpreted as probabilities, we have no qualms about using its predictions for classification. We accomplish this with a new prediction function and a new cost function. The resulting model is called a **logistic regression** model.
+If we alter our regression model so that its predictions may be interpreted as probabilities, we will have no qualms about using its predictions for classification. We accomplish this with a new prediction function and a new loss function. The resulting model is called a **logistic model**.
