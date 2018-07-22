@@ -39,4 +39,13 @@ In some cases, the first event happening does not impact the probability of the 
 In other cases, the first event happening does impact the probability of the second event happening. We call these **dependent events**. For example, let's say we had a bag of 10 marbles, 5 blue marbles and 5 red marbles. Consider the event of picking two marbles out of the bag, without replacement. This means we are picking the first marble, leaving it out of the bag, then picking the second. What is the probability that both marbles are blue? Half the marbles are blue at first, so the probability of the first marble being blue is $ \frac{5}{10} $. However, the probability of getting a blue marble changed, because the number of blue marbles and the total number of marbles both decreased by 1. The second time, there is only a $ \frac{4}{9} $ chance of picking a blue marble. Therefore, the probability that both marbles are blue is $ \frac{5}{10} * \frac{4}{9} = \frac{2}{9} $.
 
 ## General Multiplication Rule and Conditional Probability
-$ P(A \text{ and } B) = P(A) * P(B|A) $
+In the previous example, we implicitly used the tools of **conditional probability** to calculate the probability of occurrence of two dependent events. Formally, the conditional probability of an event $A$ given an event $B$ is:
+
+\\[ P(A \; \vert \; B) = \frac{P(A \cap B)}{P(B)} \\]
+
+A closer look into this definition indicates that if we know that event $B$ occurred, we must restrict our sample space from $\Omega$ to the outcomes in $B$ since outcomes outside of $B$ cannot possibly occur. Thus, to calculate the conditional probability of $A$ given $B$, we only need to consider the probability of the outcomes in $A \cap B$ and scale appropriately by $P(B)$.
+
+Going back to the picking marbles without replacement example, we define $A$ as the event that the first marble is blue and $B$ as the event that the second marble is blue. Then, $P(A) = \frac{5}{10}$, and $P(B \; \vert \; A) = \frac{4}{9}$. With the definition of conditional probability, we conclude that $P(A \cap B) = P(A) \* P(B \; \vert \; A) = \frac{5}{10} \* \frac{4}{9} = \frac{2}{9}$.
+
+With conditional probability, we can develop a more formal intuition of independent events. We saw earlier that two events are independent if and only if
+$P(A) \* P(B) = P(A \cap B)$. Equivalently, some algebraic manipulation with the definition of conditional probability yields that $P(A \; \vert \; B) = P(A)$ and $P(B \; \vert \; A) = P(A)$, which indicates that the one event's occurrence has no effect on the other event's occurrence.
