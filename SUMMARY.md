@@ -54,7 +54,7 @@
 * [12. Probability and Generalization](ch12/prob_and_gen.md)
   * [12.1 Random Variables](ch12/random_vars.md)
   * [12.2 Expectation and Variance](ch12/exp_var.md)
-  * [12.3 Expected Loss](ch12/exp_loss.md)
+  * [12.3 Expected Loss](ch12/prob_exp_loss.md)
 * [13. Linear Regression](ch13/linear_models.md)
   * [13.1 Defining a Simple Linear Model](ch13/linear_tips.md)
   * [13.2 Fitting the Model](ch13/linear_grad.md)
