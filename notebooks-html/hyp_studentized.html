@@ -4,7 +4,7 @@
         <button class="interact-button js-nbinteract-widget">
             Show Widgets
         </button>
-        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch18/hyp_studentized.ipynb">Open on DataHub</a></div>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch17/hyp_studentized.ipynb">Open on DataHub</a></div>
     
 
 
@@ -23,12 +23,12 @@
 
 <span class="c1"># Set directory for data loading to work properly</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch18&#39;</span><span class="p">))</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch17&#39;</span><span class="p">))</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
-<div class="toc"><ul class="toc-item"><li><span><a href="#The-Studentized-Bootstrap" data-toc-modified-id="The-Studentized-Bootstrap-1">The Studentized Bootstrap</a></span><ul class="toc-item"><li><span><a href="#Repair-Times" data-toc-modified-id="Repair-Times-1.1">Repair Times</a></span></li><li><span><a href="#Comparing-Distributions-of-the-Statistic" data-toc-modified-id="Comparing-Distributions-of-the-Statistic-1.2">Comparing Distributions of the Statistic</a></span></li><li><span><a href="#The-Studentized-Bootstrap-Procedure" data-toc-modified-id="The-Studentized-Bootstrap-Procedure-1.3">The Studentized Bootstrap Procedure</a></span></li><li><span><a href="#Computing-the-Standard-Error-of-the-Resample-Statistic" data-toc-modified-id="Computing-the-Standard-Error-of-the-Resample-Statistic-1.4">Computing the Standard Error of the Resample Statistic</a></span></li><li><span><a href="#Comparison-of-Studentized-Bootstrap-with-Percentile-Bootstrap" data-toc-modified-id="Comparison-of-Studentized-Bootstrap-with-Percentile-Bootstrap-1.5">Comparison of Studentized Bootstrap with Percentile Bootstrap</a></span></li></ul></li><li><span><a href="#Summary" data-toc-modified-id="Summary-2">Summary</a></span></li></ul></div></div></div></div>
+<div class="toc"><ul class="toc-item"></ul></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -77,31 +77,9 @@
                  <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div></div></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Generate a bunch of random points. To change the dataset, just</span>
-<span class="c1"># change this line and rerun notebook</span>
-<span class="n">times</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">13825</span><span class="p">)</span> <span class="o">+</span>
-         <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">13825</span><span class="p">)))</span>
-</pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="The-Studentized-Bootstrap">The Studentized Bootstrap<a class="anchor-link" href="#The-Studentized-Bootstrap">&#182;</a></h2></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The <strong>bootstrap</strong> is a process we learned about in Data 8 that we can use for estimating a population statistic using only one sample. The general procedure for bootstrapping is as follows:</p>
-<ul>
-<li>Draw a sizable sample from the population.</li>
-<li>Using this sample, we <em>resample with replacement</em> to form new samples of the same size.</li>
-<li>We do this many times, taking the desired statistic of each resample (e.g. we take the median of each resample).</li>
-</ul>
-<p>Here, we end up with many test statistics from individual resamples, from which we can form a distribution. In Data 8, we were taught to form a 95% confidence interval by taking the 2.5th percentile and the 97.5th percentile of the bootstrap statistics. This method of bootstrapping to create a confidence interval is called the <strong>percentile bootstrap.</strong> 95% confidence implies that if we take a new sample from the population and construct a confidence interval, the confidence interval will contain the population parameter with probability 0.95. However, it is important to note that confidence intervals created from real data can only approximate 95% confidence. The percentile bootstrap in particular has lower confidence than desired at small sample sizes.</p>
-<p>Below, we've taken a population and created one thousand bootstrap 95% confidence intervals for the population mean for different sample sizes. The y-axis represents the fraction of the one thousand confidence intervals that contained the real population mean. Notice that at sample sizes below 20, fewer than 90% of the confidence intervals actually contain the population mean.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -109,14 +87,17 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Since this plot needs a bunch of prior code to run, I suggest</span>
-<span class="c1"># saving this plot as a .png and then just including the picture without the</span>
-<span class="c1"># code in the final notebook</span>
-<span class="n">trials</span><span class="p">[</span><span class="s1">&#39;percentile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95</span><span class="si">% c</span><span class="s1">overage&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Sample Size&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Coverage&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Coverage vs. Sample Size for Percentile Bootstrap&#39;</span><span class="p">);</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">13825</span><span class="p">)</span> <span class="o">+</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">13825</span><span class="p">)))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -125,19 +106,16 @@
 
 <div class="output_area">
 
-
+    
 
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_7_0.png"
+<img src="/notebooks-images/hyp_studentized_6_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can measure <em>coverage error</em> by calculating the difference between our measured confidence here and our desired 95% confidence. We can see that the coverage error for percentile bootstrap is very high at small sample sizes. In this chapter, we will introduce a new bootstrap method, called the <strong>studentized bootstrap</strong> method, that has a lower coverage error but requires more computation.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Repair-Times">Repair Times<a class="anchor-link" href="#Repair-Times">&#182;</a></h3><p>The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have repair times for one class of repairs at one time period. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.</p></div></div></div>
+<p><strong>Population parameter</strong></p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -145,37 +123,7 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Repair Time&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of Repair Times&#39;</span><span class="p">);</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_10_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about 354.</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -194,15 +142,15 @@
 
 <div class="output_area">
 
-
+    
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>353.71148132542334</pre></div></div></div></div></div>
+<pre>354.88514345436835</pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now we need to define a method that will return a list of indices so we can resample from the original sample without replacement.</p></div></div></div>
+<p><strong>Sampling distribution using samples from population</strong></p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -210,12 +158,11 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">take_sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">samples_from_pop</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="k">def</span> <span class="nf">take_sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>In real life, we won't be able to draw many samples from the population (we use bootstrap to be able to use just one sample). But for demonstration purposes, we have access to the entire population, so we will take 1000 samples of size 10 and plot the distribution of the sample means.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -223,16 +170,19 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">samples_from_pop</span> <span class="o">=</span> <span class="mi">1000</span>
-
-<span class="n">pop_sampling_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pop_sampling_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
     <span class="p">[</span><span class="n">stat</span><span class="p">(</span><span class="n">take_sample</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples_from_pop</span><span class="p">)]</span>
 <span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">pop_sampling_dist</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">);</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Average Repair Time&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of Sample Means ($\hat{</span><span class="se">\t</span><span class="s1">heta}$)&#39;</span><span class="p">);</span>
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">pop_sampling_dist</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -241,31 +191,42 @@
 
 <div class="output_area">
 
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x115446ef0&gt;</pre></div></div>
-
-<div class="output_area">
-
-
+    
 
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_17_1.png"
+<img src="/notebooks-images/hyp_studentized_13_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see that the center of this distribution is ~350, and that it is skewed right because of the skewed distribution of the original data.</p></div></div></div>
+<p><strong> Distribution of $ \hat{\theta} - \theta $</strong></p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">pop_sampling_dist</span> <span class="o">-</span> <span class="n">theta</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/hyp_studentized_15_0.png"
+></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Comparing-Distributions-of-the-Statistic">Comparing Distributions of the Statistic<a class="anchor-link" href="#Comparing-Distributions-of-the-Statistic">&#182;</a></h3><p>Now we can look at how a single bootstrap distribution can stack up against a distribution sampled from the population.</p>
-<p>Generally, we are aiming to estimate $\theta$, our population parameter (in this case, the average repair time of the population, which we found to be ~354). Each individual sample can be used to calculate an estimated statistic, $\hat\theta$ (in this case, the average repair time of a single sample). The plot above shows what we call an <em>empirical distribution</em> of $\hat\theta$, which is calculated of many estimated statistics from many samples from the population. For the bootstrap, however, we want the statistic of the resample of the original sample, which is called $\tilde\theta$.</p>
-<p>In order for the bootstrap to work, we want our original sample to look similar to the population, so that resamples also look similar to the population. If our original sample <em>does</em> look like the population, then the distribution of average repair times calculated from the resamples will look similar to the empirical distribution of samples directly from the population.</p>
-<p>Let's take a look at how an individual bootstrap distribution will look. We can define methods to take samples of size 10 without replacement and bootstrap it 1000 times to get our distribution.</p></div></div></div>
+<p><strong>Bootstrap sampling distribution</strong></p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -274,8 +235,15 @@
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">bootstrap_reps</span> <span class="o">=</span> <span class="mi">1000</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-<span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">):</span>
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">):</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">reps</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">reps</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
 
@@ -283,6 +251,9 @@
     <span class="n">resamples</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">stat</span><span class="p">(</span><span class="n">resamples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong> Distribution of $ \tilde{\theta} - \hat{\theta}$</strong></p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -294,10 +265,7 @@
 
 <span class="n">sample</span> <span class="o">=</span> <span class="n">take_sample</span><span class="p">()</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bootstrap_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Average Repair Time&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of Bootstrap Sample Means ($</span><span class="se">\t</span><span class="s1">ilde{</span><span class="se">\t</span><span class="s1">heta}$)&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bootstrap_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">-</span> <span class="n">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -306,25 +274,16 @@
 
 <div class="output_area">
 
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x1152cd208&gt;</pre></div></div>
-
-<div class="output_area">
-
-
+    
 
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_21_1.png"
+<img src="/notebooks-images/hyp_studentized_20_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As you can see, our distribution of $\tilde\theta$ doesn't look <em>quite</em> like the distribution of $\hat\theta$, likely because our original sample did not look like the population. As a result, our confidence intervals perform rather poorly. Below we can see a side-by-side comparison of the two distributions:</p></div></div></div>
+<p><strong>Distribution of $ (\hat{\theta} - \theta) / SE(\hat \theta) $ vs. $ (\tilde{\theta} - \hat \theta) / SE(\tilde \theta) $ </strong></p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -332,14 +291,15 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">pop_sampling_dist</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">150</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">((</span><span class="n">pop_sampling_dist</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">pop_sampling_dist</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
 
+<span class="n">tilde_thetas</span> <span class="o">=</span> <span class="n">bootstrap_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bootstrap_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">150</span><span class="p">));</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">((</span><span class="n">tilde_thetas</span> <span class="o">-</span> <span class="n">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">tilde_thetas</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -348,88 +308,16 @@
 
 <div class="output_area">
 
-
+    
 
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_23_0.png"
+<img src="/notebooks-images/hyp_studentized_22_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="The-Studentized-Bootstrap-Procedure">The Studentized Bootstrap Procedure<a class="anchor-link" href="#The-Studentized-Bootstrap-Procedure">&#182;</a></h3><p>As we saw, the main issue with percentile bootstrap procedure is that it takes a larger sample size to really reach the desired 95% confidence. With the studentized bootstrap procedure, we can do a little more calculation to get better coverage at smaller sample sizes.</p>
-<p>The idea behind the studentized bootstrap procedure is to normalize the distribution of the test statistic $\tilde\theta$ to be centered at 0 and have a standard deviation of 1. This will correct for the spread difference and skew of the original distribution. In order to do all of this, we need to do some derivation first.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>In the percentile bootstrap procedure, we generate many values of $\tilde\theta$, and then we take the 2.5th and 97.5th percentiles for our confidence interval. For short, we refer to these percentiles as $q_{2.5}$ and $q_{97.5}$. Note that both of these values come from the bootstrap statistics.</p>
-<p>With this procedure, we hope that the probability that the actual population statistic lies between our confidence intervals is about 95%. In other words, we hope for the following equality:</p>
-<p>$$
-\begin{aligned}
-0.95 &amp;= {\cal P}\left(q_{2.5} \leq \theta \leq q_{97.5}\right)
-\end{aligned}
-$$</p>
-<p>We make two approximations during this procedure: since we assume our random sample looks like the population, we approximate $\theta$ with $\hat\theta$; since we assume a random resample looks like the original sample, we approximate $\hat\theta$ with $\tilde\theta$. Since the second approximation relies on the first one, they both introduce error in the confidence interval generation, which creates the coverage error we saw in the plot.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We aim to reduce this error by normalizing our statistic. Instead of using our calculated value of $\tilde\theta$ directly, we use:</p>
-<p>$$
-\begin{aligned}
-\frac
-    {\tilde{\theta} - {\hat{\theta}}}
-    {SE({\tilde{\theta}})}
-\end{aligned}
-$$</p>
-<p>This will normalize the resample statistic by the sample statistic, and then divide by the standard deviation of the resample statistic (this standard deviation is also called the standard error, or SE).</p>
-<p>This whole normalized statistic is called the Student's t-statistic, so we call this bootstrap method the <strong>studentized bootstrap</strong> or the <strong>bootstrap-t</strong> method.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>As usual, we compute this statistic for many resamples, and then take the 2.5th and 97.5th percentiles — $ q_{2.5} $ and $ q_{97.5} $. As such, we hope that the normalized population parameter lies between these percentiles:</p>
-<p>$$
-\begin{aligned}
-0.95 &amp;= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
-\end{aligned}
-$$</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can now solve the inequality for $\theta$:</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>$$
-\begin{aligned}
-0.95 &amp;= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
- &amp;= {\cal P}\left(q_{2.5}SE({\hat{\theta}}) \leq {\hat{\theta} - \theta} \leq q_{97.5}SE({\hat{\theta}})\right) \\
- &amp;= {\cal P}\left(\hat{\theta} - q_{97.5}SE({\hat{\theta}}) \leq {\theta} \leq \hat{\theta} - q_{2.5}SE({\hat{\theta}})\right) 
-\end{aligned}
-$$</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>This means we can construct our confidence interval using just $\hat\theta$ (the test statistic on the original sample), $q_{2.5}$ and $q_{97.5}$ (the percentiles of the normalized statistic computed with the resamples), and $SE(\hat\theta)$ (the standard deviation of the sample test statistic). This last value is estimated by using the standard deviation of the resample test statistics.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Thus, to compute a studentized bootstrap CI, we perform the following procedure:</p>
-<ol>
-<li>Compute $ \hat{\theta} $, the test statistic on the sample.</li>
-<li>Bootstrap the sample a large number of times.</li>
-<li>For each bootstrap resample:<ol>
-<li>Compute $ \tilde \theta $, the test statistic on the resample.</li>
-<li>Compute $ SE({\tilde{\theta}}) $.</li>
-<li>Compute $ q =  \frac{\tilde{\theta} - {\hat{\theta}}}{SE({\tilde{\theta}})} $.</li>
-</ol>
-</li>
-<li>Estimate $ SE(\hat \theta) $ using the standard deviation of the $ \tilde \theta $ values.</li>
-<li>Calculate the confidence intervals thusly: $ \left[ \hat{\theta} - q_{97.5}SE({\hat{\theta}}), \hat{\theta} - q_{2.5}SE({\hat{\theta}}) \right]$.</li>
-</ol></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Computing-the-Standard-Error-of-the-Resample-Statistic">Computing the Standard Error of the Resample Statistic<a class="anchor-link" href="#Computing-the-Standard-Error-of-the-Resample-Statistic">&#182;</a></h3><p>It is important to note that $SE(\hat\theta)$, the standard error of the resample test statistic, is not always easy to compute and is dependent on the test statistic. For the sample mean, $SE(\tilde\theta)=\frac{\tilde\sigma}{\sqrt{n}}$, the standard deviation of the resample values divided by the square root of the sample size.</p>
-<p>Also remember that we have to use the resample values to compute $ SE(\tilde \theta) $; we use the sample values to compute $ SE(\hat \theta) $.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>If our test statistic, however, does not have an analytic expression (like the one we have for the sample mean), then we need to do a second-level bootstrap. For each resample, we bootstrap it again, and compute the test statistic on each second-level resample (the resampled resample), and compute the standard deviation using these second-level statistics. Typically, we do around 50 second-level resamples.</p>
-<p>This greatly increases computation time for the studentized bootstrap procedure. If we do 50 second-level resamples, the entire procedure will take 50 times as long as if we just had an analytic expression for $SE(\tilde\theta)$.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Comparison-of-Studentized-Bootstrap-with-Percentile-Bootstrap">Comparison of Studentized Bootstrap with Percentile Bootstrap<a class="anchor-link" href="#Comparison-of-Studentized-Bootstrap-with-Percentile-Bootstrap">&#182;</a></h3><p>To assess the tradeoffs of studentized and percentile bootstrap, let's compare the coverage of the two methods using the repair times dataset.</p></div></div></div>
+<p><strong>Percentile bootstrap coverage</strong></p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -437,31 +325,9 @@ $$</p></div></div></div>
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Repair Time&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of Repair Times&#39;</span><span class="p">);</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_35_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We will take many samples from the population, compute a percentile confidence interval and a studentized confidence interval for each sample, and then compute the coverage for each. We will repeat this for varying sample sizes to see how the coverage of each method changes with sample size.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can use <code>np.percentile</code> to compute the percentile confidence interval below:</p></div></div></div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">confidence</span> <span class="o">=</span> <span class="mi">95</span>
+<span class="n">percentiles</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">]</span>
+</pre></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -471,7 +337,7 @@ $$</p></div></div></div>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">percentile_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">bootstrap_reps</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="n">stat</span><span class="p">):</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">bootstrap_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">,</span> <span class="n">stat</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -480,9 +346,11 @@ $$</p></div></div></div>
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">sample</span> <span class="o">=</span> <span class="n">take_sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">percentile_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
+
+np.random.seed(0)
+samples = [take_sample() for _ in range(samples_from_pop)]
+percentile_cis = [percentile_ci(sample) for sample in t(samples)]
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -491,82 +359,20 @@ $$</p></div></div></div>
 
 <div class="output_area">
 
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([ 239.85,  756.91])</pre></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>To do the studentized bootstrap, we need a lot more code:</p></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">studentized_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">bootstrap_reps</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="n">stat</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Computes studentized test statistics for the provided sample.</span>
-<span class="sd">    </span>
-<span class="sd">    Returns the studentized test statistics and the SD of the</span>
-<span class="sd">    resample test statistics.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="c1"># Bootstrap the sample and compute \tilde \theta values</span>
-    <span class="n">resamples</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">)</span>
-    <span class="n">resample_stats</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">resamples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">resample_sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">resample_stats</span><span class="p">)</span>
     
-    <span class="c1"># Compute SE of \tilde \theta.</span>
-    <span class="c1"># Since we&#39;re estimating the sample mean, we can use the formula.</span>
-    <span class="c1"># Without the formula, we would have to do a second level bootstrap here.</span>
-    <span class="n">resample_std_errs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">resamples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span>
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 1000/1000 [00:00&lt;00:00, 2051.78it/s]
+</pre></div></div>
+
+<div class="output_area">
+
     
-    <span class="c1"># Compute studentized test statistics (q values)</span>
-    <span class="n">sample_stat</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-    <span class="n">t_statistics</span> <span class="o">=</span> <span class="p">(</span><span class="n">resample_stats</span> <span class="o">-</span> <span class="n">sample_stat</span><span class="p">)</span> <span class="o">/</span> <span class="n">resample_std_errs</span>
-    <span class="k">return</span> <span class="n">t_statistics</span><span class="p">,</span> <span class="n">resample_sd</span>
- 
-<span class="k">def</span> <span class="nf">studentized_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">bootstrap_reps</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="n">stat</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Computes 95% studentized bootstrap CI</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">t_statistics</span><span class="p">,</span> <span class="n">resample_sd</span> <span class="o">=</span> <span class="n">studentized_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">,</span> <span class="n">stat</span><span class="p">)</span>
-    <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">t_statistics</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
-    
-    <span class="n">sample_stat</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">sample_stat</span> <span class="o">-</span> <span class="n">resample_sd</span> <span class="o">*</span> <span class="n">upper</span><span class="p">,</span>
-            <span class="n">sample_stat</span> <span class="o">-</span> <span class="n">resample_sd</span> <span class="o">*</span> <span class="n">lower</span><span class="p">)</span>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 805 ms, sys: 32.8 ms, total: 838 ms
+Wall time: 901 ms
 </pre></div></div></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">sample</span> <span class="o">=</span> <span class="n">take_sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">studentized_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>(245.85339212384062, 1746.4309329397261)</pre></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Now that everything is written out, we can compare the coverages of the two methods as the sample size increases from 4 to 100.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -587,12 +393,128 @@ $$</p></div></div></div>
   
 >
     <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">coverage</span><span class="p">(</span><span class="n">percentile_cis</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.861</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Studentized bootstrap coverage</strong></p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inner_bootstrap_reps</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="n">test</span> <span class="o">=</span> <span class="kc">None</span>
+ 
+<span class="k">def</span> <span class="nf">studentized_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">bootstrap_reps</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="n">stat</span><span class="p">):</span>
+    <span class="n">resamples</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">reps</span><span class="p">)</span>
+    <span class="n">resample_stats</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">resamples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">resample_sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">resample_stats</span><span class="p">)</span>
+    
+    <span class="n">resample_std_errs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">resamples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span>
+    
+    <span class="n">sample_stat</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">t_statistics</span> <span class="o">=</span> <span class="p">(</span><span class="n">resample_stats</span> <span class="o">-</span> <span class="n">sample_stat</span><span class="p">)</span> <span class="o">/</span> <span class="n">resample_std_errs</span>
+    
+    <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">t_statistics</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sample_stat</span> <span class="o">-</span> <span class="n">resample_sd</span> <span class="o">*</span> <span class="n">upper</span><span class="p">,</span>
+            <span class="n">sample_stat</span> <span class="o">-</span> <span class="n">resample_sd</span> <span class="o">*</span> <span class="n">lower</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
+
+np.random.seed(0)
+samples = [take_sample() for _ in range(samples_from_pop)]
+studentized_cis = [studentized_ci(sample) for sample in t(samples)]
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 1000/1000 [00:00&lt;00:00, 1484.56it/s]</pre></div></div>
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 999 ms, sys: 12.5 ms, total: 1.01 s
+Wall time: 1.01 s
+</pre></div></div>
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">coverage</span><span class="p">(</span><span class="n">studentized_cis</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.938</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Increasing the sample size</strong></p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">run_trials</span><span class="p">(</span><span class="n">sample_sizes</span><span class="p">):</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">percentile_coverages</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">studentized_coverages</span> <span class="o">=</span> <span class="p">[]</span>
     
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sample_sizes</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">t</span><span class="p">(</span><span class="n">sample_sizes</span><span class="p">):</span>
         <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">take_sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples_from_pop</span><span class="p">)]</span>
         <span class="n">percentile_cis</span> <span class="o">=</span> <span class="p">[</span><span class="n">percentile_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">]</span>
         <span class="n">studentized_cis</span> <span class="o">=</span> <span class="p">[</span><span class="n">studentized_ci</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">]</span>
@@ -613,7 +535,7 @@ $$</p></div></div></div>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
 
-trials = run_trials(np.arange(4, 101, 2))
+trials = run_trials(np.arange(10, 201, 5))
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -622,20 +544,108 @@ trials = run_trials(np.arange(4, 101, 2))
 
 <div class="output_area">
 
-
+    
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>/Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: divide by zero encountered in true_divide
+<pre>100%|██████████| 39/39 [03:58&lt;00:00,  6.12s/it]</pre></div></div>
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 3min 33s, sys: 21.6 s, total: 3min 54s
+Wall time: 3min 58s
 </pre></div></div>
 
 <div class="output_area">
 
+    
 
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>CPU times: user 1min 53s, sys: 1.02 s, total: 1min 54s
-Wall time: 1min 57s
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>
 </pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">trials</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>percentile</th>
+      <th>studentized</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10</th>
+      <td>0.861</td>
+      <td>0.938</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>0.898</td>
+      <td>0.936</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>0.888</td>
+      <td>0.932</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>190</th>
+      <td>0.925</td>
+      <td>0.933</td>
+    </tr>
+    <tr>
+      <th>195</th>
+      <td>0.951</td>
+      <td>0.955</td>
+    </tr>
+    <tr>
+      <th>200</th>
+      <td>0.950</td>
+      <td>0.947</td>
+    </tr>
+  </tbody>
+</table>
+<p>39 rows × 2 columns</p></div></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -645,10 +655,7 @@ Wall time: 1min 57s
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">trials</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95</span><span class="si">% c</span><span class="s1">overage&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Sample Size&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Coverage&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Coverage vs. Sample Size for Studentized and Percentile Bootstraps&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -657,16 +664,10 @@ Wall time: 1min 57s
 
 <div class="output_area">
 
-
+    
 
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/hyp_studentized_47_0.png"
-></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>As we can see, the studentized bootstrap has a much better coverage at smaller sample sizes.</p></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>The studentized bootstrap for the most part is better than the percentile bootstrap, especially if we only have a small sample to start with. We generally want to use this method when the sample size is small or when the original data is skewed. The main drawback is its computation time, which is further magnified if $SE(\tilde\theta)$ is not easy to compute.</p></div></div></div></div>
+<img src="/notebooks-images/hyp_studentized_37_0.png"
+></div></div></div></div></div></div>
