@@ -133,16 +133,16 @@ When the slope is positive, decreasing $ \theta $ will decrease the loss.
 The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the loss. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $\theta $ should move in the negative direction. Mathematically, we write:
 
 $$
-\theta^{t+1} = \theta^t - \frac{\partial}{\partial \theta} L(\theta^t, y)
+\theta^{(t+1)} = \theta^{(t)} - \frac{\partial}{\partial \theta} L(\theta^{(t)}, y)
 $$
 
-Where $ \theta^t $ is the current estimate and $ \theta^{t+1} $ is the next estimate.
+Where $ \theta^{(t)} $ is the current estimate and $ \theta^{(t+1)} $ is the next estimate.
 
 For the MSE, we have:
 
 $$
 \begin{aligned}
-L(\hat{\theta_0}, y)
+L(\theta, y)
 &= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
 \frac{\partial}{\partial \hat{\theta}} L(\theta, y)
 &= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
@@ -150,7 +150,7 @@ L(\hat{\theta_0}, y)
 \end{aligned}
 $$
 
-When $ \theta^t = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta^{t+1} = 12 - (-5.2) = 17.2 $.
+When $ \theta^{(t)} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta^{(t+1)} = 12 - (-5.2) = 17.2 $.
 
 We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the loss curve below.
 
@@ -171,10 +171,10 @@ plot_theta_on_loss(pts, 17.2, mse)
 Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta$. Our final update formula is:
 
 $$
-\theta^{t+1} = \theta^t - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^t, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^{(t)}, y)
 $$
-
-Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $ this is the new $ \theta^{t+1} $:
+|
+Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:
 
 
 ```python
@@ -258,15 +258,15 @@ We now have the full algorithm for gradient descent:
 You will more commonly see the gradient $ \nabla_\theta $ in place of the partial derivative $ \frac{\partial}{\partial \theta} $. The two notations are essentially equivalent, but since the gradient notation is more common we will use it in the gradient update formula from now on:
 
 $$
-\theta^{t+1} = \theta^t - \alpha \cdot \nabla_\theta L(\theta^t, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_\theta L(\theta^{(t)}, y)
 $$
 
 To review notation:
 
-- $ \theta^t $ is the current choice of $ \theta $.
-- $ \theta_{t+1} $ is the next choice of $ \theta $.
+- $ \theta^{(t)} $ is the current estimate of $ \theta^* $ at the $t$th iteration.
+- $ \theta^{(t+1)} $ is the next choice of $ \theta $.
 - $ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha^t $ to mark that $ \alpha $ varies over time $ t $.
-- $ \nabla_\theta L(\theta, y) $ is the partial derivative / gradient of the loss function at $ \theta $.
+- $ \nabla_\theta L(\theta^{(t)}, y) $ is the partial derivative / gradient of the loss function with respect to $ \theta $ at time $t$.
 
 You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\theta, y) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
 

@@ -27,14 +27,14 @@ We initially fit our model to the tips dataset by finding the $\theta$ that mini
 However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\theta$ values. Instead, we use the gradient descent algorithm to iteratively improve $\theta$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:
 
 $$
-{\theta}^{t+1} = \theta^t - \alpha \cdot \nabla_{\theta} L(\theta^t, y)
+{\theta}^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_{\theta} L(\theta^{(t)}, y)
 $$
 
 In this equation:
-- $\theta^{t}$ is our current estimate of $\theta^*$ at the $t$th iteration
+- $\theta^{(t)}$ is our current estimate of $\theta^*$ at the $t$th iteration
 - $\alpha$ is the learning rate
 - $\nabla_{\theta} L(\theta, y)$ is the gradient of the loss function
-- We compute the next estimate $\theta^{t+1}$ by subtracting the product of $\alpha$ and $\nabla_{\theta} L(\theta, y)$ computed at $\theta^{t}$
+- We compute the next estimate $\theta^{(t+1)}$ by subtracting the product of $\alpha$ and $\nabla_{\theta} L(\theta, y)$ computed at $\theta^{(t)}$
 
 ## Limitations of Gradient Descent
 
@@ -59,7 +59,7 @@ Thus, for each iteration of batch gradient descent, we must compute the loss on 
 To circumvent the difficulty of computing a gradient across the entire training set, **stochastic gradient descent** approximates the overall gradient using a single randomly chosen data point. Since the observation is chosen randomly, we expect that using the gradient at each individual observation will eventually converge the algorithm to the same parameters as batch gradient descent. The modified update formula for stochastic gradient descent is presented below, where $l(\theta, y_i)$ is the loss function for a single data point.
 
 $$
-\theta^{t+1} = \theta^t - \alpha \nabla_\theta l(\theta^t, y_i)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \nabla_\theta l(\theta^{(t)}, y_i)
 $$
 
 Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point. 
