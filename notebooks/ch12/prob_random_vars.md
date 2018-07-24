@@ -68,7 +68,7 @@ plt.show()
 ```
 
 
-![png](random_vars_files/random_vars_5_0.png)
+![png](prob_random_vars_files/prob_random_vars_5_0.png)
 
 
 ### Joint Distributions
