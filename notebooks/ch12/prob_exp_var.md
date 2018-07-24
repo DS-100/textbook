@@ -236,7 +236,7 @@ plt.tight_layout();
 ```
 
 
-![png](exp_var_files/exp_var_13_0.png)
+![png](prob_exp_var_files/prob_exp_var_13_0.png)
 
 
 $ X $ takes on values -1 and 1 with probability $ \frac{1}{2} $ each. $ Y $ takes on values -2, -1, 1, and 2 with probability $ \frac{1}{4} $ each. We find that $ \mathbb{E}[X] = \mathbb{E}[Y] = 0 $. Since $ Y $'s distribution has a higher spread than $ X $'s, we expect that $ Var(Y) $ is larger than $ Var(X) $.
