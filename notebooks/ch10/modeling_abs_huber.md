@@ -328,15 +328,11 @@ def points_and_loss(y_vals, xlim, loss_fn=abs_loss):
     plt.xlim(*xlim)
     plt.xlabel(r'$ \theta $')
     plt.ylabel('Loss')
-    plt.legend()
 points_and_loss(np.array([10, 11, 12, 14, 15]), (9, 16))
 ```
 
-    No handles with labels found to put in legend.
 
-
-
-![png](modeling_abs_huber_files/modeling_abs_huber_26_1.png)
+![png](modeling_abs_huber_files/modeling_abs_huber_26_0.png)
 
 
 However, when we have an even number of points, the loss is minimized when $ \theta $ is any value in between the two central points.
@@ -347,11 +343,8 @@ However, when we have an even number of points, the loss is minimized when $ \th
 points_and_loss(np.array([10, 11, 14, 15]), (9, 16))
 ```
 
-    No handles with labels found to put in legend.
 
-
-
-![png](modeling_abs_huber_files/modeling_abs_huber_28_1.png)
+![png](modeling_abs_huber_files/modeling_abs_huber_28_0.png)
 
 
 This is not the case when we use the MSE:
@@ -362,11 +355,8 @@ This is not the case when we use the MSE:
 points_and_loss(np.array([10, 11, 14, 15]), (9, 16), mse_loss)
 ```
 
-    No handles with labels found to put in legend.
 
-
-
-![png](modeling_abs_huber_files/modeling_abs_huber_30_1.png)
+![png](modeling_abs_huber_files/modeling_abs_huber_30_0.png)
 
 
 ### MSE and MAE Comparison
