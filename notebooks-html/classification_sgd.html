@@ -58,55 +58,55 @@
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Fitting-a-Logistic-Model">Fitting a Logistic Model<a class="anchor-link" href="#Fitting-a-Logistic-Model">&#182;</a></h2><p>Previously, we covered batch gradient descent, an algorithm that iteratively updates $\hat\theta$ to find the loss-minimizing parameters. We also discussed stochastic gradient descent and mini-batch gradient descent, methods that take advantage of statistical theory and parallelized hardware to decrease the time spent training the gradient descent algorithm. In this section, we will apply these concepts to logistic regression and walk through examples using scikit-learn functions.</p>
+<h2 id="Fitting-a-Logistic-Model">Fitting a Logistic Model<a class="anchor-link" href="#Fitting-a-Logistic-Model">&#182;</a></h2><p>Previously, we covered batch gradient descent, an algorithm that iteratively updates $\boldsymbol{\theta}$ to find the loss-minimizing parameters $\boldsymbol{\hat\theta}$. We also discussed stochastic gradient descent and mini-batch gradient descent, methods that take advantage of statistical theory and parallelized hardware to decrease the time spent training the gradient descent algorithm. In this section, we will apply these concepts to logistic regression and walk through examples using scikit-learn functions.</p>
 <h3 id="Batch-Gradient-Descent">Batch Gradient Descent<a class="anchor-link" href="#Batch-Gradient-Descent">&#182;</a></h3><p>The general update formula for batch gradient descent is given by:</p>
 <p>$$
-\hat\theta_{t+1} = \hat\theta_t - \alpha \cdot \nabla_\hat\theta L(\hat\theta, X, y)
+\boldsymbol{\theta^{(t+1)}} = \boldsymbol{\theta^{(t)}} - \alpha \cdot \nabla_\boldsymbol{\theta} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})
 $$</p>
 <p>In logistic regression, we use the cross entropy loss as our loss function:</p>
 <p>$$
-L(\hat\theta, X, y) = \frac{1}{n} \sum_{i} \left(-y_i \ln \left(f_{\hat\theta} \left(X_i \right) \right) - \left(1 - y_i \right) \ln \left(1 - f_{\hat\theta} \left(X_i \right) \right) \right)
+L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y}) = \frac{1}{n} \sum_{i=1}^{n} \left(-\boldsymbol{y}_i \ln \left(f_{\boldsymbol{\theta}} \left(\boldsymbol{X}_i \right) \right) - \left(1 - \boldsymbol{y}_i \right) \ln \left(1 - f_{\boldsymbol{\theta}} \left(\boldsymbol{X}_i \right) \right) \right)
 $$</p>
-<p>The gradient of the cross entropy loss is $\nabla_{\hat\theta} L(\hat\theta, X, y) = -\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)X_i $. Plugging this into the update formula allows us to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\hat\theta(X_i) = \sigma(X_i \cdot \hat \theta) $:</p>
+<p>The gradient of the cross entropy loss is $\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y}) = -\frac{1}{n}\sum_{i=1}^n(\boldsymbol{y}_i - \sigma_i)\boldsymbol{X}_i $. Plugging this into the update formula allows us to find the gradient descent algorithm specific to logistic regression. Letting $ \sigma_i = f_\boldsymbol{\theta}(\boldsymbol{X}_i) = \sigma(\boldsymbol{X}_i \cdot \boldsymbol{\theta}) $:</p>
 <p>$$
 \begin{align}
-\hat\theta_{t+1} &amp;= \hat\theta_t - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right) \\
-&amp;= \hat\theta_t + \alpha \cdot \left(\frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i \right)
+\boldsymbol{\theta^{(t+1)}} &amp;= \boldsymbol{\theta^{(t)}} - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(\boldsymbol{y}_i - \sigma_i\right) \boldsymbol{X}_i \right) \\
+&amp;= \boldsymbol{\theta^{(t)}} + \alpha \cdot \left(\frac{1}{n} \sum_{i=1}^{n} \left(\boldsymbol{y}_i - \sigma_i\right) \boldsymbol{X}_i \right)
 \end{align}
 $$</p>
 <ul>
-<li>$\hat\theta_t$ is the current estimate of $\theta$ at iteration $t$</li>
+<li>$\boldsymbol{\theta^{(t)}}$ is the current estimate of $\theta$ at iteration $t$</li>
 <li>$\alpha$ is the learning rate</li>
-<li>$-\frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) X_i$ is the gradient of the cross entropy loss</li>
-<li>$\hat\theta_{t+1}$ is the next estimate of $\theta$ computed by subtracting the product of $\alpha$ and the cross entropy loss computed at $\hat\theta_t$</li>
+<li>$-\frac{1}{n} \sum_{i=1}^{n} \left(\boldsymbol{y}_i - \sigma_i\right) \boldsymbol{X}_i$ is the gradient of the cross entropy loss</li>
+<li>$\boldsymbol{\theta^{(t+1)}}$ is the next estimate of $\boldsymbol{\theta}$ computed by subtracting the product of $\alpha$ and the cross entropy loss computed at $\boldsymbol{\theta^{(t)}}$</li>
 </ul>
-<h3 id="Stochastic-Gradient-Descent">Stochastic Gradient Descent<a class="anchor-link" href="#Stochastic-Gradient-Descent">&#182;</a></h3><p>Stochastic gradient descent approximates the gradient of the loss function across all observations using the gradient of the loss of a single data point.The general update formula is below, where $l(\hat\theta, X_i, y_i)$ is the loss function for a single data point:</p>
+<h3 id="Stochastic-Gradient-Descent">Stochastic Gradient Descent<a class="anchor-link" href="#Stochastic-Gradient-Descent">&#182;</a></h3><p>Stochastic gradient descent approximates the gradient of the loss function across all observations using the gradient of the loss of a single data point.The general update formula is below, where $\ell(\boldsymbol{\theta}, \boldsymbol{X}_i, \boldsymbol{y}_i)$ is the loss function for a single data point:</p>
 <p>$$
-\hat\theta_{t+1} = \hat\theta_t - \alpha \nabla_\hat\theta l(\hat\theta, X_i, y_i)
+\boldsymbol{\theta^{(t+1)}} = \boldsymbol{\theta^{(t)}} - \alpha \nabla_\boldsymbol{\theta} \ell(\boldsymbol{\theta}, \boldsymbol{X}_i, \boldsymbol{y}_i)
 $$</p>
-<p>Returning back to our example in logistic regression, we approximate the gradient of the cross entropy loss across all data points using the gradient of the cross entropy loss of one data point. This is shown below, with $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $.</p>
+<p>Returning back to our example in logistic regression, we approximate the gradient of the cross entropy loss across all data points using the gradient of the cross entropy loss of one data point. This is shown below, with $ \sigma_i = f_{\boldsymbol{\theta}}(\boldsymbol{X}_i) = \sigma(\boldsymbol{X}_i \cdot \boldsymbol{\theta}) $.</p>
 <p>$$
 \begin{align}
-\nabla_\hat\theta L(\hat\theta, X, y) &amp;\approx \nabla_\hat\theta l(\hat\theta, X_i, y_i)\\
-&amp;= -(y_i - \sigma_i)X_i
+\nabla_\boldsymbol{\theta} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y}) &amp;\approx \nabla_\boldsymbol{\theta} \ell(\boldsymbol{\theta}, \boldsymbol{X}_i, \boldsymbol{y}_i)\\
+&amp;= -(\boldsymbol{y}_i - \sigma_i)\boldsymbol{X}_i
 \end{align}
 $$</p>
 <p>When we plug this approximation into the general formula for stochastic gradient descent, we find the stochastic gradient descent update formula for logistic regression.</p>
 <p>$$
 \begin{align}
-\hat\theta_{t+1} &amp;= \hat\theta_t - \alpha \nabla_\hat\theta l(\hat\theta, X_i, y_i) \\
-&amp;= \hat\theta_t + \alpha \cdot (y_i - \sigma_i)X_i
+\boldsymbol{\theta^{(t+1)}} &amp;= \boldsymbol{\theta^{(t)}} - \alpha \nabla_\boldsymbol{\theta} \ell(\boldsymbol{\theta}, \boldsymbol{X}_i, \boldsymbol{y}_i) \\
+&amp;= \boldsymbol{\theta^{(t)}} + \alpha \cdot (\boldsymbol{y}_i - \sigma_i)\boldsymbol{X}_i
 \end{align}
 $$</p>
 <h3 id="Mini-batch-Gradient-Descent">Mini-batch Gradient Descent<a class="anchor-link" href="#Mini-batch-Gradient-Descent">&#182;</a></h3><p>Similarly, we can approximate the gradient of the cross entropy loss for all observations using a random sample of data points, known as a mini-batch.</p>
 <p>$$
-\nabla_\hat\theta L(\hat\theta, X, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\hat\theta}l(\hat\theta, X_i, y_i)
+\nabla_\boldsymbol{\theta} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y}) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\boldsymbol{\theta}} \ell(\boldsymbol{\theta}, \boldsymbol{X}_i, \boldsymbol{y}_i)
 $$</p>
 <p>We substitute this approximation for the gradient of the cross entropy loss, yielding a mini-batch gradient descent update formula specific to logistic regression:</p>
 <p>$$
 \begin{align}
-\hat\theta_{t+1} &amp;= \hat\theta_t - \alpha \cdot -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i \\
-&amp;= \hat\theta_t + \alpha \cdot \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)X_i
+\boldsymbol{\theta^{(t+1)}} &amp;= \boldsymbol{\theta^{(t)}} - \alpha \cdot -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(\boldsymbol{y}_i - \sigma_i)\boldsymbol{X}_i \\
+&amp;= \boldsymbol{\theta^{(t)}} + \alpha \cdot \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(\boldsymbol{y}_i - \sigma_i)\boldsymbol{X}_i
 \end{align}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
