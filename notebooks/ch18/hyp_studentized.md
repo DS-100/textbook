@@ -46,8 +46,7 @@ def df_interact(df, nrows=7, ncols=7):
 ```python
 # Generate a bunch of random points. To change the dataset, just
 # change this line and rerun notebook
-times = (np.random.exponential(scale=300, size=13825) +
-         np.abs(np.random.normal(loc=50, scale=40, size=13825)))
+times = pd.read_csv('ilec.csv')['17.5']
 ```
 
 ## The Studentized Bootstrap
@@ -63,33 +62,7 @@ Here, we end up with many test statistics from individual resamples, from which 
 
 Below, we've taken a population and created one thousand bootstrap 95% confidence intervals for the population mean for different sample sizes. The y-axis represents the fraction of the one thousand confidence intervals that contained the real population mean. Notice that at sample sizes below 20, fewer than 90% of the confidence intervals actually contain the population mean.
 
-
-```python
-# Since this plot needs a bunch of prior code to run, I suggest
-# saving this plot as a .png and then just including the picture without the
-# code in the final notebook
-trials['percentile'].plot()
-plt.axhline(0.95, c='red', linestyle='--', label='95% coverage')
-plt.xlabel('Sample Size')
-plt.ylabel('Coverage')
-plt.title('Coverage vs. Sample Size for Percentile Bootstrap');
-```
-
-
-    ---------------------------------------------------------------------------
-
-    NameError                                 Traceback (most recent call last)
-
-    <ipython-input-22-ffab43a63ebd> in <module>()
-          2 # saving this plot as a .png and then just including the picture without the
-          3 # code in the final notebook
-    ----> 4 trials['percentile'].plot()
-          5 plt.axhline(0.95, c='red', linestyle='--', label='95% coverage')
-          6 plt.xlabel('Sample Size')
-
-
-    NameError: name 'trials' is not defined
-
+<img='~/assets/coverage_percent
 
 We can measure *coverage error* by calculating the difference between our measured confidence here and our desired 95% confidence. We can see that the coverage error for percentile bootstrap is very high at small sample sizes. In this chapter, we will introduce a new bootstrap method, called the **studentized bootstrap** method, that has a lower coverage error but requires more computation.
 
@@ -103,14 +76,13 @@ plt.hist(times, bins=20, normed=True)
 plt.xlabel('Repair Time')
 plt.ylabel('Proportion per Hour')
 plt.title('Distribution of Repair Times');
-# insert change here
 ```
 
 
 ![png](hyp_studentized_files/hyp_studentized_9_0.png)
 
 
-Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about NUMBER.
+Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about 8.4 hours.
 
 
 ```python
@@ -127,7 +99,7 @@ theta
 
 
 
-    356.3422627669878
+    8.406145520144333
 
 
 
@@ -208,14 +180,14 @@ plt.figure(figsize=(10, 4))
 plt.subplot(121)
 plt.xlabel('Average Repair Time')
 plt.ylabel('Proportion per Hour')
-plt.hist(pop_sampling_dist, bins=30, range=(0, 1000), normed=True)
-plt.ylim((0,0.01))
+plt.hist(pop_sampling_dist, bins=30, range=(0, 40), normed=True)
+plt.ylim((0,0.2))
 
 plt.subplot(122)
 plt.xlabel('Average Repair Time')
 plt.ylabel('Proportion per Hour')
-plt.hist(bootstrap_stats(sample), bins=30, range=(0, 1000), normed=True)
-plt.ylim((0,0.01))
+plt.hist(bootstrap_stats(sample), bins=30, range=(0, 40), normed=True)
+plt.ylim((0,0.2))
 
 plt.tight_layout();
 ```
@@ -334,7 +306,7 @@ percentile_ci(sample)
 
 
 
-    array([ 185.58,  428.05])
+    array([  4.54,  29.56])
 
 
 
@@ -386,7 +358,7 @@ studentized_ci(sample)
 
 
 
-    (159.14673775224293, 511.41049651961885)
+    (4.4991669064006121, 59.032912108873631)
 
 
 
@@ -429,10 +401,13 @@ trials = run_trials(np.arange(4, 101, 2))
 ```
 
     /Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: divide by zero encountered in true_divide
+    /Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: invalid value encountered in true_divide
+    /Users/andrewkim/anaconda3/lib/python3.6/site-packages/numpy/lib/function_base.py:4116: RuntimeWarning: Invalid value encountered in percentile
+      interpolation=interpolation)
 
 
-    CPU times: user 1min 50s, sys: 927 ms, total: 1min 51s
-    Wall time: 1min 55s
+    CPU times: user 1min 41s, sys: 812 ms, total: 1min 42s
+    Wall time: 1min 45s
 
 
 
