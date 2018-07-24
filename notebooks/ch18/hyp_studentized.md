@@ -68,7 +68,7 @@ We can measure *coverage error* by calculating the difference between our measur
 
 ### Repair Times
 
-The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have a census of repair times for one class of repairs at one time period for a specific *Incumbent Local Exchange Carrier*, which is a company. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
+The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have a census of repair times for one class of repairs at one time period for a specific *Incumbent Local Exchange Carrier*, which is a telephone company which held the regional monopoly on landline service before the market was opened to competitive local exchange carriers, or the corporate successor of such a firm. The commission is interested in estimates of the average repair time. First, let's look at a distribution of all of the times.
 
 
 ```python
