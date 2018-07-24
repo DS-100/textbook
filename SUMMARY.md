@@ -75,7 +75,7 @@
 * [17. Classification](ch17/classification_intro.md)
   * [17.1 Regression on Probabilities](ch17/classification_prob.md)
   * [17.2 Logistic Model](ch17/classification_log_model.md)
-  * [17.3 Logistic Cost](ch17/classification_cost.md)
+  * [17.3 Cross-Entropy Loss](ch17/classification_cost.md)
   * [17.4 Using Logistic Regression](ch17/classification_log_reg.md)
   * [17.5 Justifying Cross-Entropy Loss](ch17/classification_cost_justification.md)
   * [17.6 Fitting a Logistic Model](ch17/classification_sgd.md)
