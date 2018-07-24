@@ -84,7 +84,7 @@ As with loss functions, we will discuss the intuition for gradient descent first
 
 Since the `minimize` function is not given values of $\theta$ to try, we start by picking a $\theta$ anywhere we'd like. Then, we can iteratively improve the estimate of $\theta$. To improve an estimate of $\theta$, we look at the slope of the loss function at that choice of $ \theta $.
 
-For example, suppose we are using MSE for the simple dataset $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.
+For example, suppose we are using MSE for the simple dataset $ \textbf{y} = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.
 
 
 ```python
@@ -133,7 +133,7 @@ When the slope is positive, decreasing $ \theta $ will decrease the loss.
 The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the loss. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $\theta $ should move in the negative direction. Mathematically, we write:
 
 $$
-\theta^{(t+1)} = \theta^{(t)} - \frac{\partial}{\partial \theta} L(\theta^{(t)}, y)
+\theta^{(t+1)} = \theta^{(t)} - \frac{\partial}{\partial \theta} L(\theta^{(t)}, \textbf{y})
 $$
 
 Where $ \theta^{(t)} $ is the current estimate and $ \theta^{(t+1)} $ is the next estimate.
@@ -252,13 +252,13 @@ plot_one_gd_iter(pts, 14.49, mse, grad_mse)
 We now have the full algorithm for gradient descent:
 
 1. Choose a starting value of $ \theta $ (0 is a common choice).
-2. Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, y) $ and store this as the new value of $ \theta $.
+2. Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, \textbf{y}) $ and store this as the new value of $ \theta $.
 3. Repeat until $ \theta $ doesn't change between iterations.
 
 You will more commonly see the gradient $ \nabla_\theta $ in place of the partial derivative $ \frac{\partial}{\partial \theta} $. The two notations are essentially equivalent, but since the gradient notation is more common we will use it in the gradient update formula from now on:
 
 $$
-\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_\theta L(\theta^{(t)}, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_\theta L(\theta^{(t)}, \textbf{y})
 $$
 
 To review notation:
@@ -266,9 +266,9 @@ To review notation:
 - $ \theta^{(t)} $ is the current estimate of $ \theta^* $ at the $t$th iteration.
 - $ \theta^{(t+1)} $ is the next choice of $ \theta $.
 - $ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha^t $ to mark that $ \alpha $ varies over time $ t $.
-- $ \nabla_\theta L(\theta^{(t)}, y) $ is the partial derivative / gradient of the loss function with respect to $ \theta $ at time $t$.
+- $ \nabla_\theta L(\theta^{(t)}, \textbf{y}) $ is the partial derivative / gradient of the loss function with respect to $ \theta $ at time $t$.
 
-You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\theta, y) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
+You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\theta, \textbf{y}) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
 
 The gradient algorithm is simple yet powerful since we can use it for many types of models and many types of loss functions. It is the computational tool of choice for fitting many important models, including linear regression on large datasets and neural networks.
 
@@ -307,7 +307,7 @@ def grad_mse(theta, y_vals):
     return -2 * np.mean(y_vals - theta)
 ```
 
-Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ y = [12.1, 12.8, 14.9, 16.3, 17.2] $.
+Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ \textbf{y} = [12.1, 12.8, 14.9, 16.3, 17.2] $.
 
 
 ```python
@@ -361,7 +361,7 @@ Now, we can apply gradient descent to minimize the Huber loss on our dataset of 
 The Huber loss is:
 
 $$
-L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     \frac{1}{2}(y_i - \theta)^2 &  | y_i - \theta | \le \delta \\
      \delta (|y_i - \theta| - \frac{1}{2} \delta ) & \text{otherwise}
 \end{cases}
@@ -370,7 +370,7 @@ $$
 The gradient of the Huber loss is:
 
 $$
-\nabla_{\theta} L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+\nabla_{\theta} L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     -(y_i - \theta) &  | y_i - \theta | \le \delta \\
     - \delta \cdot \text{sign} (y_i - \theta) & \text{otherwise}
 \end{cases}

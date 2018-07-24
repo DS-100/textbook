@@ -59,17 +59,17 @@ We will use the mean squared error loss function:
 
 $$
 \begin{aligned}
-L(\theta, y)
+L(\theta, \textbf{y})
 &= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
 \end{aligned}
 $$
 
-For simplicity, we will use the dataset $ y = [ 12, 13, 15, 16, 17 ] $. We know from our analytical approach in a previous chapter that the minimizing $ \theta $ for the MSE is $ \text{mean}(y) = 14.6 $. Let's see whether we can find the same value by writing a program.
+For simplicity, we will use the dataset $ \textbf{y} = [ 12, 13, 15, 16, 17 ] $. We know from our analytical approach in a previous chapter that the minimizing $ \theta $ for the MSE is $ \text{mean}(y) = 14.6 $. Let's see whether we can find the same value by writing a program.
 
 If we write the program well, we will be able to use the same program on any loss function in order to find the minimizing value of $ \theta $, including the mathematically complicated Huber loss:
 
 $$
-L_\alpha(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+L_\alpha(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     \frac{1}{2}(y_i - \theta)^2 &  | y_i - \theta | \le \alpha \\
     \alpha ( |y_i - \theta| - \frac{1}{2}\alpha ) & \text{otherwise}
 \end{cases}
