@@ -62,13 +62,13 @@ Here, we end up with many test statistics from individual resamples, from which 
 
 Below, we've taken a population and created one thousand bootstrap 95% confidence intervals for the population mean for different sample sizes. The y-axis represents the fraction of the one thousand confidence intervals that contained the real population mean. Notice that at sample sizes below 20, fewer than 90% of the confidence intervals actually contain the population mean.
 
-<img='~/assets/coverage_percent
+<img src="../../assets/coverage_percentile_bootstrap.png"></img>
 
 We can measure *coverage error* by calculating the difference between our measured confidence here and our desired 95% confidence. We can see that the coverage error for percentile bootstrap is very high at small sample sizes. In this chapter, we will introduce a new bootstrap method, called the **studentized bootstrap** method, that has a lower coverage error but requires more computation.
 
 ### Repair Times
 
-The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have a census of repair times for one class of repairs at one time period. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
+The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have a census of repair times for one class of repairs at one time period for a specific *Incumbent Local Exchange Carrier*, which is a company. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
 
 
 ```python
