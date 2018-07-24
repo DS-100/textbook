@@ -61,7 +61,7 @@ In basketball, players score by shooting a ball through a hoop. One such player,
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/LeBron_James_%2831944491583%29.jpg" alt="LeBron James (31944491583).jpg" height="480" width="308">
 
-LeBron plays in the National Basketball Association (NBA), the United States's premier basketball league. We've collected a dataset of all of LeBron's attempts in 2017 NBA playoff games using the NBA statistics website (https://stats.nba.com/). 
+LeBron plays in the National Basketball Association (NBA), the United States's premier basketball league. We've collected a dataset of all of LeBron's attempts in the 2017 NBA Playoff Games using the NBA statistics website (https://stats.nba.com/). 
 
 
 ```python
