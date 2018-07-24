@@ -10,7 +10,7 @@
   * [1.3 What's in a Name?](ch01/the_students_of_ds100_3.md)
 * [2. Data Design](ch02/data_design.md)
   * [2.1 Dewey Defeats Truman](ch02/dewey_truman.md)
-  * [2.2 Probability Intro](ch02/probability_intro.md)
+  * [2.2 Probability Overview](ch02/probability_overview.md)
   * [2.3 Probability Sampling](ch02/probability_sampling.md)
   * [2.4 SRS vs. "Big Data"](ch02/srs_vs_big_data.md)
 * [3. Tabular Data and `pandas`](ch03/tabular_data.md)
