@@ -76,20 +76,32 @@ plt.title('Coverage vs. Sample Size for Percentile Bootstrap');
 ```
 
 
-![png](hyp_studentized_files/hyp_studentized_6_0.png)
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    <ipython-input-22-ffab43a63ebd> in <module>()
+          2 # saving this plot as a .png and then just including the picture without the
+          3 # code in the final notebook
+    ----> 4 trials['percentile'].plot()
+          5 plt.axhline(0.95, c='red', linestyle='--', label='95% coverage')
+          6 plt.xlabel('Sample Size')
+
+
+    NameError: name 'trials' is not defined
 
 
 We can measure *coverage error* by calculating the difference between our measured confidence here and our desired 95% confidence. We can see that the coverage error for percentile bootstrap is very high at small sample sizes. In this chapter, we will introduce a new bootstrap method, called the **studentized bootstrap** method, that has a lower coverage error but requires more computation.
 
 ### Repair Times
 
-The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have repair times for one class of repairs at one time period. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
+The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have a census of repair times for one class of repairs at one time period. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
 
 
 ```python
 plt.hist(times, bins=20, normed=True)
 plt.xlabel('Repair Time')
-plt.ylabel('Proportion per Second')
+plt.ylabel('Proportion per Hour')
 plt.title('Distribution of Repair Times');
 # insert change here
 ```
@@ -98,7 +110,7 @@ plt.title('Distribution of Repair Times');
 ![png](hyp_studentized_files/hyp_studentized_9_0.png)
 
 
-Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about 354.
+Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about NUMBER.
 
 
 ```python
@@ -115,7 +127,7 @@ theta
 
 
 
-    356.51072447202199
+    356.3422627669878
 
 
 
@@ -139,7 +151,7 @@ pop_sampling_dist = np.array(
 
 plt.hist(pop_sampling_dist, bins=30, normed=True);
 plt.xlabel('Average Repair Time')
-plt.ylabel('Proportion per Second')
+plt.ylabel('Proportion per Hour')
 plt.title(r'Distribution of Sample Means ($\hat{\theta}$)');
 ```
 
@@ -180,7 +192,7 @@ sample = take_sample()
 
 plt.hist(bootstrap_stats(sample), bins=30, normed=True)
 plt.xlabel('Average Repair Time')
-plt.ylabel('Proportion per Second')
+plt.ylabel('Proportion per Hour')
 plt.title(r'Distribution of Bootstrap Sample Means ($\tilde{\theta}$)');
 ```
 
@@ -194,12 +206,18 @@ As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the
 ```python
 plt.figure(figsize=(10, 4))
 plt.subplot(121)
+plt.xlabel('Average Repair Time')
+plt.ylabel('Proportion per Hour')
 plt.hist(pop_sampling_dist, bins=30, range=(0, 1000), normed=True)
 plt.ylim((0,0.01))
 
 plt.subplot(122)
+plt.xlabel('Average Repair Time')
+plt.ylabel('Proportion per Hour')
 plt.hist(bootstrap_stats(sample), bins=30, range=(0, 1000), normed=True)
-plt.ylim((0,0.01));
+plt.ylim((0,0.01))
+
+plt.tight_layout();
 ```
 
 
@@ -287,7 +305,7 @@ To assess the tradeoffs of studentized and percentile bootstrap, let's compare t
 ```python
 plt.hist(times, bins=20, normed=True);
 plt.xlabel('Repair Time')
-plt.ylabel('Proportion per Second')
+plt.ylabel('Proportion per Hour')
 plt.title('Distribution of Repair Times');
 ```
 
@@ -316,7 +334,7 @@ percentile_ci(sample)
 
 
 
-    array([ 328.63,  559.89])
+    array([ 185.58,  428.05])
 
 
 
@@ -368,7 +386,7 @@ studentized_ci(sample)
 
 
 
-    (293.35805475520726, 573.73264989051734)
+    (159.14673775224293, 511.41049651961885)
 
 
 
@@ -413,8 +431,8 @@ trials = run_trials(np.arange(4, 101, 2))
     /Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: divide by zero encountered in true_divide
 
 
-    CPU times: user 1min 54s, sys: 1.22 s, total: 1min 55s
-    Wall time: 1min 59s
+    CPU times: user 1min 50s, sys: 927 ms, total: 1min 51s
+    Wall time: 1min 55s
 
 
 
