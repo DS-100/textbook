@@ -30,14 +30,14 @@ Although a random variable is completely described by its probability mass funct
 
 We are often interested in the long-run average of a random variable because it gives us a sense of the center of the variable's distribution. We call this long-run average the **expected value**, or **expectation** of a random variable. The expected value of a random variable $ X $ is defined as:
 
-$$\mathbb{E}[X] = \sum_{x\in \mathbb{X}} x \cdot \mathbb{P}(X = x)$$
+$$\mathbb{E}[X] = \sum_{x\in \mathbb{X}} x \cdot P(X = x)$$
 
-For example, if $ X $ represents the roll of a single fair six-sided die,
+For example, if $ X $ represents the roll of a single fair six-sided die, 
 
 $$
 \begin{aligned}
 \mathbb{E}[X]
-&= 1 \cdot \mathbb{P}(X = 1) + 2 \cdot \mathbb{P}(X = 2) + \ldots + 6 \cdot \mathbb{P}(X = 6) \\
+&= 1 \cdot P(X = 1) + 2 \cdot P(X = 2) + \ldots + 6 \cdot P(X = 6) \\
 &= 1 \cdot \frac{1}{6} + 2 \cdot \frac{1}{6} + \ldots + 6 \cdot \frac{1}{6} \\
 &= 3.5
 \end{aligned}
@@ -112,7 +112,7 @@ We pick one person from this dataset uniformly at random. Let $ Y $ be a random 
 $$
 \begin{aligned}
 \mathbb{E}[Y]
-&= 50 \cdot \mathbb{P}(Y = 50) + 51 \cdot \mathbb{P}(Y = 51) + 52 \cdot \mathbb{P}(Y = 52) \\
+&= 50 \cdot P(Y = 50) + 51 \cdot P(Y = 51) + 52 \cdot P(Y = 52) \\
 &= 50 \cdot \frac{2}{4} + 51 \cdot \frac{1}{4} + 52 \cdot \frac{1}{4} \\
 &= 50.75
 \end{aligned}
@@ -158,11 +158,11 @@ where $X$ and $Y$ are random variables, and $c$ is a constant.
 
 In words, the expectation of a sum of any two random variables is equal to the sum of the expectations of the variables.
 
-In the previous example, we saw that $ Z = X - Y $. Thus,  $ \mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] $.
+In the previous example, we saw that $ Z = X - Y $. Thus,  $ \mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] $. 
 
 Now we can calculate $ \mathbb{E}[X] $ and  $ \mathbb{E}[Y] $ separately from each other. Since $ \mathbb{E}[X] = \mathbb{E}[Y] = 50.75 $, $ \mathbb{E}[Z] = 50.75 - 50.75 = 0 $.
 
-The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! As an example, let us again consider the case in which we sample two people from the dataset in the previous section but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$ where $X$ and $Y$ are not independent.
+The linearity of expectation holds even if $ X $ and $ Y $ are dependent on each other! As an example, let us again consider the case in which we sample two people from the dataset in the previous section but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$ where $X$ and $Y$ are not independent. 
 
 From the joint distribution of $X$ and $Y$ given in the previous section, we can find $\mathbb{E}[Z]$:
 
