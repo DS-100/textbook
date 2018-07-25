@@ -375,7 +375,7 @@ $$
 \end{aligned}
 $$
 
-As expected, the value of $ \theta $ that minimizes the loss is between 14 and 15.
+We've found the minimizing $ \theta $, and as expected, it is between 14 and 15. We denote the $ \theta $ that minimizes the loss $ \hat{\theta} $.
 
 Turn your attention to the second-to-last line of the simplification above:
 
