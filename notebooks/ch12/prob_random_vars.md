@@ -37,11 +37,11 @@ We must also be able to determine the probability that the random variable takes
 The **probability mass function (PMF)** or the **distribution** of a random variable $X$ yields the probability that $X$ takes on each of its possible values. If we let $\mathbb{X}$ be the set of values that $X$ can take on and $x$ be a particular value in $\mathbb{X}$, the PMF of $X$ must satisfy the following rules:
 
 $$
-1) \sum_{x \in \mathbb{X}} \mathbb{P}(X = x) = 1
+1) \sum_{x \in \mathbb{X}} P(X = x) = 1
 $$
 
 $$
-2) \text{ For all } x \in \mathbb{X}, 0 \leq \mathbb{P}(X = x) \leq 1
+2) \text{ For all } x \in \mathbb{X}, 0 \leq P(X = x) \leq 1
 $$
 
 The first rule states that the probabilities for all possible values of $ X $ sum to $ 1 $.
@@ -68,7 +68,7 @@ plt.show()
 ```
 
 
-![png](random_vars_files/random_vars_5_0.png)
+![png](prob_random_vars_files/prob_random_vars_5_0.png)
 
 
 ### Joint Distributions
@@ -97,7 +97,7 @@ $$
 \end{aligned}
 $$
 
-In the last line of this proof, we treated $Y \; \vert \; X = x$ as a random variable with some unknown PMF. This is important since we used the property that the probabilities in a PMF sum to $1$, which means that $\sum_{y\in \mathbb{Y}} \mathbb{P}(Y = y \; \vert \; X = x) = 1$.
+In the last line of this proof, we treated $Y \; \vert \; X = x$ as a random variable with some unknown PMF. This is important since we used the property that the probabilities in a PMF sum to $1$, which means that $\sum_{y\in \mathbb{Y}} P(Y = y \; \vert \; X = x) = 1$.
 
 #### Independence
 
@@ -243,4 +243,4 @@ Even though we are sampling without replacement, note that $X$ and $Y$ still hav
 
 ## Summary
 
-In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence.
+In this section, we learn that random variables are variables with multiple possible outcomes. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence. 
