@@ -1,4 +1,4 @@
-## Regularization
+# Regularization
 
 Feature engineering can incorporate important information about the data
 generation process into our model. However, adding features to the data also
