@@ -44,8 +44,6 @@ def df_interact(df, nrows=7, ncols=7):
 
 
 ```python
-# Generate a bunch of random points. To change the dataset, just
-# change this line and rerun notebook
 times = pd.read_csv('ilec.csv')['17.5']
 ```
 
@@ -131,13 +129,13 @@ plt.title(r'Distribution of Sample Means ($\hat{\theta}$)');
 ![png](hyp_studentized_files/hyp_studentized_16_0.png)
 
 
-We can see that the center of this distribution is ~350, and that it is skewed right because of the skewed distribution of the original data. 
+We can see that the center of this distribution is ~5, and that it is skewed right because of the skewed distribution of the original data. 
 
 ### Comparing Distributions of the Statistic
 
 Now we can look at how a single bootstrap distribution can stack up against a distribution sampled from the population. 
 
-Generally, we are aiming to estimate $\theta$, our population parameter (in this case, the average repair time of the population, which we found to be ~354). Each individual sample can be used to calculate an estimated statistic, $\hat\theta$ (in this case, the average repair time of a single sample). The plot above shows what we call an *empirical distribution* of $\hat\theta$, which is calculated of many estimated statistics from many samples from the population. For the bootstrap, however, we want the statistic of the resample of the original sample, which is called $\tilde\theta$. 
+Generally, we are aiming to estimate $\theta^*$, our population parameter (in this case, the average repair time of the population, which we found to be ~8.4). Each individual sample can be used to calculate an estimated statistic, $\hat\theta$ (in this case, the average repair time of a single sample). The plot above shows what we call an *empirical distribution* of $\hat\theta$, which is calculated of many estimated statistics from many samples from the population. For the bootstrap, however, we want the statistic of the resample of the original sample, which is called $\tilde\theta$. 
 
 In order for the bootstrap to work, we want our original sample to look similar to the population, so that resamples also look similar to the population. If our original sample *does* look like the population, then the distribution of average repair times calculated from the resamples will look similar to the empirical distribution of samples directly from the population.
 
@@ -180,12 +178,14 @@ plt.figure(figsize=(10, 4))
 plt.subplot(121)
 plt.xlabel('Average Repair Time')
 plt.ylabel('Proportion per Hour')
+plt.title(r'Distribution of Sample Means ($\hat{\theta}$)')
 plt.hist(pop_sampling_dist, bins=30, range=(0, 40), normed=True)
 plt.ylim((0,0.2))
 
 plt.subplot(122)
 plt.xlabel('Average Repair Time')
 plt.ylabel('Proportion per Hour')
+plt.title(r'Distribution of Bootstrap Sample Means ($\tilde{\theta}$)')
 plt.hist(bootstrap_stats(sample), bins=30, range=(0, 40), normed=True)
 plt.ylim((0,0.2))
 
@@ -208,11 +208,11 @@ With this procedure, we hope that the probability that the actual population sta
 
 $$
 \begin{aligned}
-0.95 &= {\cal P}\left(q_{2.5} \leq \theta \leq q_{97.5}\right)
+0.95 &= {\cal P}\left(q_{2.5} \leq \theta^* \leq q_{97.5}\right)
 \end{aligned}
 $$
 
-We make two approximations during this procedure: since we assume our random sample looks like the population, we approximate $\theta$ with $\hat\theta$; since we assume a random resample looks like the original sample, we approximate $\hat\theta$ with $\tilde\theta$. Since the second approximation relies on the first one, they both introduce error in the confidence interval generation, which creates the coverage error we saw in the plot.
+We make two approximations during this procedure: since we assume our random sample looks like the population, we approximate $\theta^*$ with $\hat\theta$; since we assume a random resample looks like the original sample, we approximate $\hat\theta$ with $\tilde\theta$. Since the second approximation relies on the first one, they both introduce error in the confidence interval generation, which creates the coverage error we saw in the plot.
 
 We aim to reduce this error by normalizing our statistic. Instead of using our calculated value of $\tilde\theta$ directly, we use: 
 
@@ -232,17 +232,17 @@ As usual, we compute this statistic for many resamples, and then take the 2.5th 
 
 $$
 \begin{aligned}
-0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
+0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta^*} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
 \end{aligned}
 $$
 
-We can now solve the inequality for $\theta$:
+We can now solve the inequality for $\theta^*$:
 
 $$
 \begin{aligned}
-0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
- &= {\cal P}\left(q_{2.5}SE({\hat{\theta}}) \leq {\hat{\theta} - \theta} \leq q_{97.5}SE({\hat{\theta}})\right) \\
- &= {\cal P}\left(\hat{\theta} - q_{97.5}SE({\hat{\theta}}) \leq {\theta} \leq \hat{\theta} - q_{2.5}SE({\hat{\theta}})\right) 
+0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta^*} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
+ &= {\cal P}\left(q_{2.5}SE({\hat{\theta}}) \leq {\hat{\theta} - \theta^*} \leq q_{97.5}SE({\hat{\theta}})\right) \\
+ &= {\cal P}\left(\hat{\theta} - q_{97.5}SE({\hat{\theta}}) \leq {\theta^*} \leq \hat{\theta} - q_{2.5}SE({\hat{\theta}})\right) 
 \end{aligned}
 $$
 
@@ -406,8 +406,8 @@ trials = run_trials(np.arange(4, 101, 2))
       interpolation=interpolation)
 
 
-    CPU times: user 1min 41s, sys: 812 ms, total: 1min 42s
-    Wall time: 1min 45s
+    CPU times: user 1min 47s, sys: 1.4 s, total: 1min 48s
+    Wall time: 1min 56s
 
 
 
