@@ -62,7 +62,7 @@ $$
 \theta^{(t+1)} = \theta^{(t)} - \alpha \nabla_\theta l(\theta^{(t)}, y_i)
 $$
 
-Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point. 
+Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point.
 
 $$
 \begin{align}
@@ -77,8 +77,8 @@ Stochastic gradient descent relies on the random selection of individual observa
 
 Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.
 
-![](gd.png)
-![](sgd.png)
+![](https://raw.githubusercontent.com/DS-100/textbook/master/assets/gd.png)
+![](https://raw.githubusercontent.com/DS-100/textbook/master/assets/sgd.png)
 
 At each iteration of batch gradient descent, we move in the direction of the true gradient of the loss function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\theta$ parameters eventually converge to the minima of the loss function. Although stochastic gradient descent typically takes more iterations to converge than batch gradient descent, it often converges more quickly because it spends significantly less time computing the update at each iteration.
 
@@ -88,7 +88,7 @@ As we previously did for batch gradient descent, we define a function that compu
 
 
 ```python
-def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
+def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2):
     """
     Uses stochastic gradient descent to minimize loss_fn.
     Returns the minimizing value of theta once theta changes
@@ -99,15 +99,13 @@ def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
     np.random.shuffle(dataset)
     while True:
         for i in range(0, NUM_OBS, 1):
-            if progress:
-                print(f'theta: {theta:.2f} | loss: {loss_fn(theta, dataset):.2f}')
             rand_obs = dataset[i]
             gradient = grad_loss_fn(theta, rand_obs)
             new_theta = theta - alpha * gradient
-        
-            if abs(new_theta - theta) < 0.1:
+
+            if abs(new_theta - theta) < 0.001:
                 return new_theta
-        
+
             theta = new_theta
         np.random.shuffle(dataset)
 ```
@@ -122,12 +120,12 @@ $$
 
 As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.
 
-While we have made the distinction between stochastic and mini-batch gradient descent in this textbook, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size. 
+While we have made the distinction between stochastic and mini-batch gradient descent in this textbook, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size.
 
 
 ### Selecting the Mini-Batch Size
 
-Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations. 
+Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations.
 
 ### Defining a Function for Mini-Batch Gradient Descent
 
@@ -135,7 +133,7 @@ A function for mini-batch gradient descent requires the ability to select a batc
 
 
 ```python
-def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.2, progress=True):
+def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.2):
     """
     Uses mini-batch gradient descent to minimize loss_fn.
     Returns the minimizing value of theta once theta changes
@@ -143,21 +141,18 @@ def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.
     """
     NUM_OBS = len(dataset)
     assert minibatch_size < NUM_OBS
-    
+
     theta = 0
     np.random.shuffle(dataset)
     while True:
         for i in range(0, NUM_OBS, minibatch_size):
-            if progress:
-                print(f'theta: {theta:.2f} | loss: {loss_fn(theta, dataset):.2f}')
-            
             mini_batch = dataset[i:i+minibatch_size]
             gradient = grad_loss_fn(theta, mini_batch)
             new_theta = theta - alpha * gradient
-            
-            if abs(new_theta - theta) < 0.1:
+
+            if abs(new_theta - theta) < 0.001:
                 return new_theta
-            
+
             theta = new_theta
         np.random.shuffle(dataset)
 ```
