@@ -82,6 +82,7 @@
   * [17.7 Evaluating Logistic Models](ch17/classification_sensitivity_specificity.md)
   * [17.8 Multiclass Classification](ch17/classification_multiclass.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
+  * [18.4 Studentized Bootstrap](ch18/hyp_studentized.md)
 
 <!-- end_numbering -->
 
