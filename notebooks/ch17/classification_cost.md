@@ -177,12 +177,11 @@ $$
 \begin{aligned}
 L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})
 &= \frac{1}{n} \sum_i \left(- y_i \ln (f_\boldsymbol{\theta}(\boldsymbol{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\boldsymbol{X}_i) \right) \\
-&= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
+&= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i) \right) \\
 \nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})
 &= \frac{1}{n} \sum_i \left(
     - \frac{y_i}{\sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i
-    + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i
-\right) \\
+    + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i \right) \\
 &= - \frac{1}{n} \sum_i \left(
     \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
 \right) \nabla_{\boldsymbol{\theta}} \sigma_i \\
@@ -197,7 +196,7 @@ $$
 
 The surprisingly simple gradient expression allows us to fit a logistic model to the cross-entropy loss using gradient descent:
 
-$$ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\theta}}  L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})$$
+$$ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\boldsymbol{\theta}}}  L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})$$
 
 
 Section 17.6 delves into deriving update formulas for batch, stochastic, and mini-batch gradient descent.
