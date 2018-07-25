@@ -3,24 +3,24 @@
 
 Many of the concepts that we touch upon in the course contain a certain degree of randomness. Probability is a tool that we can use to analyze these random phenomena.
 
-Let's say we have a random experiment in which we toss two coins. The **sample space** $\Omega$ consists of all the possible outcomes of an experiment. In this experiment, our sample space consists of the outcomes: $\Omega = \{HH, HT, TH, TT\}$.
+Let's say we have a random experiment in which we toss two coins. The **sample space** $\Omega$ consists of all the possible outcomes of an experiment. In this experiment, our sample space consists of the following outcomes: $\Omega = \{HH, HT, TH, TT\}$.
 
 An **event** is any subset of the sample space to which a probability can be assigned. For example, "getting one tails and one heads" would be an event for the coin toss experiment mentioned above. The outcomes that make up the event are $\{HT, TH\}$, and the probability of this event occurring is $\frac{1}{2}$.
 
 ## Probability of Events
 
 Let us consider a sample space in which **every outcome is equally likely to occur**. Then, the probability of an event occurring can be calculated as the ratio of the number of outcomes in the event to the total number of outcomes in the sample space. $ P(\text{an event happens}) = \frac{\text{# of outcomes that make the event happen}}{\text{# of total outcomes}} $.    
-In the coin toss experiment, the events $\{HH, HT, TH, TT\}$ are all equally likely to occur, so to calculate the probability of getting one tails and one heads, we can count the total number of outcomes in the sample space (2) and divide by the total number of outcomes (4) : $P(\text{one heads and one tails}) = \frac{2}{4} = \frac{1}{2} $
+In the coin toss experiment, the events $\{HH, HT, TH, TT\}$ are all equally likely to occur, so to calculate the probability of getting one tails and one heads, we can count the total number of outcomes in the event (2) and divide by the total number of outcomes in the sample space (4): $P(\text{one heads and one tails}) = \frac{2}{4} = \frac{1}{2} $
 
-There are a few important properties of probabilities of events:
+There are a few important properties involving the probabilities of events:
 
 1. The probability of an event is between 0 and 1: $0 \leq P(E) \leq 1$
 2. The probabilities of all the outcomes in a sample space sum to 1: $\sum_{\omega \in \Omega} P(\omega) = 1$
 
 ## Addition Rule
-Sometimes, we want to calculate the probabilities involving the occurrence of one event OR another. To do so, we add the probabilities of the events.
+Sometimes, we want to calculate the probabilities involving the occurrence of one event OR another. To do so, we add the probabilities of the individual events.
 
-When two events $A$ and $B$ are disjoint (they don't share any common outcomes), the probability that either event $A$ or $B$ ($A \cup B$) occurs is the sum of the probability of each event. $P(A \cup B) = P(A) + P(B) \text{ if } A \cap B = \emptyset$. For instance, the events "getting two heads" and "getting two tails" with two coin tosses are disjoint. Therefore, the probability of the combined event "getting two heads or two tails" is equal to the sum of the individual events. $P(\text{getting two heads or two tails}) = P(\text{getting two heads}) + P(\text{getting two tails}) = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}$
+When two events $A$ and $B$ are disjoint (they don't share any common outcomes), the probability that either event $A$ or $B$ ($A \cup B$) occurs is the sum of the probability of each event. $P(A \cup B) = P(A) + P(B) \text{ if } A \cap B = \emptyset$. For instance, the events "getting two heads" and "getting two tails" with two coin tosses are disjoint. Therefore, the probability of the combined event "getting two heads or two tails" is equal to the sum of the probabilities of the individual events. $P(\text{getting two heads or two tails}) = P(\text{getting two heads}) + P(\text{getting two tails}) = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}$
 
 When two events $A$ and $B$ aren't disjoint (they share common outcomes), the probability that either event $A$ or $B$ ($A \cup B$) occurs is the sum of the probability of each event minus the probability of both events occurring ($A \cap B$). $P(A \cup B) = P(A) + P(B) - P(A \cap B) \text{ if } A \cap B \neq \emptyset$. The intuition behind this can better be visualized through a Venn diagram.
 
@@ -28,11 +28,11 @@ When two events $A$ and $B$ aren't disjoint (they share common outcomes), the pr
 
 When we have two events that aren't disjoint, we want to find the area inside the circles to compute the probability that either event happens. However, if we add together the probabilities of $A$ occurring and $B$ occurring, we count the intersection of the circles, $ P(A \cap B) $, twice. That's why we need so subtract the intersection once.
 
-For example, let's say we wish to find the probability of the events "getting two heads" or "getting at least 1 head" in two coin tosses. We can see that there are 3 outcomes in our sample space that have at least one head and 1 outcome that has two heads. If we were to add these probabilities together, we would have $ \frac{3}{4} + \frac{1}{4} = 1$. Clearly, this result is wrong because we could get two tails, which isn't an outcome in either event. We did not account for the fact that the two events share an outcome; getting $ \{HH\} $ falls under both events, so we need to subtract the probability of that occurring. The correct probability of both events occurring would be $ \frac{3}{4} + \frac{1}{4} - \frac{1}{4} = \frac{3}{4} $.
+For example, let's say we wish to find the probability of "getting two heads" or "getting at least 1 head" in two coin tosses. We can see that there are 3 outcomes in our sample space that have at least one head and 1 outcome that has two heads. If we were to add these probabilities together, we would have $ \frac{3}{4} + \frac{1}{4} = 1$. Clearly, this result is wrong because we could get two tails, which isn't an outcome in either event. We did not account for the fact that the two events share an outcome; getting $ \{HH\} $ falls under both events, so we need to subtract the probability of that occurring. The correct probability of both events occurring would be $ \frac{3}{4} + \frac{1}{4} - \frac{1}{4} = \frac{3}{4} $.
 
 ## Multiplication Rule
 
-Other times, we wish to calculate probabilities involving the occurrence of one event AND another. To do so, we multiply the probabilities of the events.
+Other times, we wish to calculate probabilities involving the occurrence of one event AND another. To do so, we multiply the probabilities of the individual events.
 
 In some cases, the occurrence of the first event does not impact the probability of the second. We call these **independent events**. Suppose we want to calculate the probability of "getting heads on a fair coin toss" and "getting a six on a fair dice roll". We can take into account that getting heads on a coin toss doesn't have any effect on the result of the dice roll. $ \frac{1}{2} $ the time we will get heads, and in that fraction of time, we will only get a six $ \frac{1}{6} $ of the time. To find a fraction of a fraction, we can multiply them together. $P(\text{getting heads and a 6}) = \frac{1}{2} \* \frac{1}{6} = \frac{1}{12}$. In general for independent events $A$ and $B$, $P(A \cap B) = P(A)\*P(B)$.
 
