@@ -67,7 +67,7 @@ Our goal is to find the $ \theta $ that results in the line that minimizes the s
 
 $$ L(\theta, \textbf{y}) = \sum_{i = 1}^{n}(y_i - \theta)^2\\ $$
 
-Recall that for the constant model, the minimizing $\theta$ for MSE is $\bar{\textbf{y}}$, the average of the $\textbf{y}$ values.
+Recall that for the constant model, the minimizing $\theta$ for MSE is $\bar{\textbf{y}}$, the average of the $\textbf{y}$ values. The calculus derivation can be found in the Loss Functions lesson in the Modeling and Estimations chapter. For the linear algebra derivation, please refer to the Vector Space Review in the Appendix.
 
 Notice that our loss function is a sum of squares. The *L2*-norm for a vector is also a sum of squares, but with a square root: 
 
@@ -91,8 +91,7 @@ $$
 &= \quad \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n  \end{bmatrix} \quad - \quad 
 \begin{bmatrix} \theta \\ \theta \\ \vdots \\ \theta \end{bmatrix} \\
 &= \quad \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n  \end{bmatrix} \quad - \quad 
-\begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}
-\theta
+\theta \begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}
 \end{aligned}
 $$
 
@@ -103,8 +102,7 @@ $$
 L(\theta, \textbf{y})
 \quad &= \quad \left \Vert  \qquad   
 \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n  \end{bmatrix} \quad - \quad 
-\begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}
-\theta
+\theta \begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}
 \qquad \right \Vert ^2 \\
 \quad &= \quad \left \Vert  \qquad  
 \textbf{y} 
@@ -114,11 +112,11 @@ L(\theta, \textbf{y})
 \end{aligned}
 $$
 
-The expression $\begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix} \ \theta$  is a scalar multiple of the columns of the $\textbf{1}$ vector, and is the result of our predictions, denoted $\hat{\textbf{y}}$.
+The expression $\theta \begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{bmatrix}$  is a scalar multiple of the columns of the $\textbf{1}$ vector, and is the result of our predictions, denoted $\hat{\textbf{y}}$.
 
 This gives us a new perspective on what it means to minimize the least squares error.
 
-$\textbf{y}$ and $\textbf{1}$ are fixed, but $\theta$ can take on any value, so $\hat{\textbf{y}}$ can be any scalar multiple of $\textbf{1}$. We want to find $\theta$ so that $\textbf{1} \theta$ is as close to $\textbf{y}$ as possible. We use $\hat{\theta}$ to denote this best-fit $\theta$.
+$\textbf{y}$ and $\textbf{1}$ are fixed, but $\theta$ can take on any value, so $\hat{\textbf{y}}$ can be any scalar multiple of $\textbf{1}$. We want to find $\theta$ so that $ \theta \textbf{1} $ is as close to $\textbf{y}$ as possible. We use $\hat{\theta}$ to denote this best-fit $\theta$.
 
 <img src="../../notebooks-images/linear_projection__1dprojection.png" width="300" />
 
