@@ -83,6 +83,9 @@
   * [17.7 Evaluating Logistic Models](ch17/classification_sensitivity_specificity.md)
   * [17.8 Multiclass Classification](ch17/classification_multiclass.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
+  * [18.1 Introduction to Hypothesis Testing](ch18/hyp_introduction.md)
+  * [18.2 Permutation Testing](ch18/hyp_introduction_part2.md)
+  * [18.3 Bootstrapping for Linear Regression](ch18/hyp_regression.md)
   * [18.4 Studentized Bootstrap](ch18/hyp_studentized.md)
 
 <!-- end_numbering -->
