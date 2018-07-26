@@ -44,10 +44,7 @@ def df_interact(df, nrows=7, ncols=7):
 
 
 ```python
-# Generate a bunch of random points. To change the dataset, just
-# change this line and rerun notebook
-times = (np.random.exponential(scale=300, size=13825) +
-         np.abs(np.random.normal(loc=50, scale=40, size=13825)))
+times = pd.read_csv('ilec.csv')['17.5']
 ```
 
 ## The Studentized Bootstrap
@@ -63,33 +60,19 @@ Here, we end up with many test statistics from individual resamples, from which 
 
 Below, we've taken a population and created one thousand bootstrap 95% confidence intervals for the population mean for different sample sizes. The y-axis represents the fraction of the one thousand confidence intervals that contained the real population mean. Notice that at sample sizes below 20, fewer than 90% of the confidence intervals actually contain the population mean.
 
-
-```python
-# Since this plot needs a bunch of prior code to run, I suggest
-# saving this plot as a .png and then just including the picture without the
-# code in the final notebook
-trials['percentile'].plot()
-plt.axhline(0.95, c='red', linestyle='--', label='95% coverage')
-plt.xlabel('Sample Size')
-plt.ylabel('Coverage')
-plt.title('Coverage vs. Sample Size for Percentile Bootstrap');
-```
-
-
-![png](hyp_studentized_files/hyp_studentized_6_0.png)
-
+<img src="../../assets/coverage_percentile_bootstrap.png"></img>
 
 We can measure *coverage error* by calculating the difference between our measured confidence here and our desired 95% confidence. We can see that the coverage error for percentile bootstrap is very high at small sample sizes. In this chapter, we will introduce a new bootstrap method, called the **studentized bootstrap** method, that has a lower coverage error but requires more computation.
 
 ### Repair Times
 
-The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have repair times for one class of repairs at one time period. The commission is interested in estimates of the average repair time. First, let's a distribution of all of the times.
+The New York Public Utilities Commission monitors the response time for repairing land-line phone service in the state. These repair times may differ over the year and according to the type of repair. We have a census of repair times for one class of repairs at one time period for a specific *Incumbent Local Exchange Carrier*, which is a telephone company which held the regional monopoly on landline service before the market was opened to competitive local exchange carriers, or the corporate successor of such a firm. The commission is interested in estimates of the average repair time. First, let's look at a distribution of all of the times.
 
 
 ```python
-plt.hist(times, bins=20)
+plt.hist(times, bins=20, normed=True)
 plt.xlabel('Repair Time')
-plt.ylabel('Count')
+plt.ylabel('Proportion per Hour')
 plt.title('Distribution of Repair Times');
 ```
 
@@ -97,7 +80,7 @@ plt.title('Distribution of Repair Times');
 ![png](hyp_studentized_files/hyp_studentized_9_0.png)
 
 
-Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about 354.
+Let's say we want to estimate the population mean of the repair times. We first need to define the main statistic function needed to do this. By passing in the whole population, we can see that actual average repair time is about 8.4 hours.
 
 
 ```python
@@ -114,7 +97,7 @@ theta
 
 
 
-    353.71148132542334
+    8.406145520144333
 
 
 
@@ -136,30 +119,23 @@ pop_sampling_dist = np.array(
     [stat(take_sample()) for _ in range(samples_from_pop)]
 )
 
-plt.hist(pop_sampling_dist, bins=30);
+plt.hist(pop_sampling_dist, bins=30, normed=True);
 plt.xlabel('Average Repair Time')
-plt.ylabel('Count')
-plt.title('Distribution of Sample Means ($\hat{\theta}$)');
+plt.ylabel('Proportion per Hour')
+plt.title(r'Distribution of Sample Means ($\hat{\theta}$)');
 ```
 
 
+![png](hyp_studentized_files/hyp_studentized_16_0.png)
 
 
-    <matplotlib.text.Text at 0x115446ef0>
-
-
-
-
-![png](hyp_studentized_files/hyp_studentized_16_1.png)
-
-
-We can see that the center of this distribution is ~350, and that it is skewed right because of the skewed distribution of the original data. 
+We can see that the center of this distribution is ~5, and that it is skewed right because of the skewed distribution of the original data. 
 
 ### Comparing Distributions of the Statistic
 
 Now we can look at how a single bootstrap distribution can stack up against a distribution sampled from the population. 
 
-Generally, we are aiming to estimate $\theta$, our population parameter (in this case, the average repair time of the population, which we found to be ~354). Each individual sample can be used to calculate an estimated statistic, $\hat\theta$ (in this case, the average repair time of a single sample). The plot above shows what we call an *empirical distribution* of $\hat\theta$, which is calculated of many estimated statistics from many samples from the population. For the bootstrap, however, we want the statistic of the resample of the original sample, which is called $\tilde\theta$. 
+Generally, we are aiming to estimate $\theta^*$, our population parameter (in this case, the average repair time of the population, which we found to be ~8.4). Each individual sample can be used to calculate an estimated statistic, $\hat\theta$ (in this case, the average repair time of a single sample). The plot above shows what we call an *empirical distribution* of $\hat\theta$, which is calculated of many estimated statistics from many samples from the population. For the bootstrap, however, we want the statistic of the resample of the original sample, which is called $\tilde\theta$. 
 
 In order for the bootstrap to work, we want our original sample to look similar to the population, so that resamples also look similar to the population. If our original sample *does* look like the population, then the distribution of average repair times calculated from the resamples will look similar to the empirical distribution of samples directly from the population.
 
@@ -184,21 +160,14 @@ np.random.seed(0)
 
 sample = take_sample()
 
-plt.hist(bootstrap_stats(sample), bins=30)
+plt.hist(bootstrap_stats(sample), bins=30, normed=True)
 plt.xlabel('Average Repair Time')
-plt.ylabel('Count')
-plt.title('Distribution of Bootstrap Sample Means ($\tilde{\theta}$)');
+plt.ylabel('Proportion per Hour')
+plt.title(r'Distribution of Bootstrap Sample Means ($\tilde{\theta}$)');
 ```
 
 
-
-
-    <matplotlib.text.Text at 0x1152cd208>
-
-
-
-
-![png](hyp_studentized_files/hyp_studentized_20_1.png)
+![png](hyp_studentized_files/hyp_studentized_20_0.png)
 
 
 As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the distribution of $\hat\theta$, likely because our original sample did not look like the population. As a result, our confidence intervals perform rather poorly. Below we can see a side-by-side comparison of the two distributions:
@@ -207,12 +176,20 @@ As you can see, our distribution of $\tilde\theta$ doesn't look *quite* like the
 ```python
 plt.figure(figsize=(10, 4))
 plt.subplot(121)
-plt.hist(pop_sampling_dist, bins=30, range=(0, 1000))
-plt.ylim((0,150))
+plt.xlabel('Average Repair Time')
+plt.ylabel('Proportion per Hour')
+plt.title(r'Distribution of Sample Means ($\hat{\theta}$)')
+plt.hist(pop_sampling_dist, bins=30, range=(0, 40), normed=True)
+plt.ylim((0,0.2))
 
 plt.subplot(122)
-plt.hist(bootstrap_stats(sample), bins=30, range=(0, 1000))
-plt.ylim((0,150));
+plt.xlabel('Average Repair Time')
+plt.ylabel('Proportion per Hour')
+plt.title(r'Distribution of Bootstrap Sample Means ($\tilde{\theta}$)')
+plt.hist(bootstrap_stats(sample), bins=30, range=(0, 40), normed=True)
+plt.ylim((0,0.2))
+
+plt.tight_layout();
 ```
 
 
@@ -231,11 +208,11 @@ With this procedure, we hope that the probability that the actual population sta
 
 $$
 \begin{aligned}
-0.95 &= {\cal P}\left(q_{2.5} \leq \theta \leq q_{97.5}\right)
+0.95 &= {\cal P}\left(q_{2.5} \leq \theta^* \leq q_{97.5}\right)
 \end{aligned}
 $$
 
-We make two approximations during this procedure: since we assume our random sample looks like the population, we approximate $\theta$ with $\hat\theta$; since we assume a random resample looks like the original sample, we approximate $\hat\theta$ with $\tilde\theta$. Since the second approximation relies on the first one, they both introduce error in the confidence interval generation, which creates the coverage error we saw in the plot.
+We make two approximations during this procedure: since we assume our random sample looks like the population, we approximate $\theta^*$ with $\hat\theta$; since we assume a random resample looks like the original sample, we approximate $\hat\theta$ with $\tilde\theta$. Since the second approximation relies on the first one, they both introduce error in the confidence interval generation, which creates the coverage error we saw in the plot.
 
 We aim to reduce this error by normalizing our statistic. Instead of using our calculated value of $\tilde\theta$ directly, we use: 
 
@@ -255,17 +232,17 @@ As usual, we compute this statistic for many resamples, and then take the 2.5th 
 
 $$
 \begin{aligned}
-0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
+0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta^*} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
 \end{aligned}
 $$
 
-We can now solve the inequality for $\theta$:
+We can now solve the inequality for $\theta^*$:
 
 $$
 \begin{aligned}
-0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
- &= {\cal P}\left(q_{2.5}SE({\hat{\theta}}) \leq {\hat{\theta} - \theta} \leq q_{97.5}SE({\hat{\theta}})\right) \\
- &= {\cal P}\left(\hat{\theta} - q_{97.5}SE({\hat{\theta}}) \leq {\theta} \leq \hat{\theta} - q_{2.5}SE({\hat{\theta}})\right) 
+0.95 &= {\cal P}\left(q_{2.5} \leq \frac{\hat{\theta} - \theta^*} {SE({\hat{\theta}})} \leq q_{97.5}\right) \\
+ &= {\cal P}\left(q_{2.5}SE({\hat{\theta}}) \leq {\hat{\theta} - \theta^*} \leq q_{97.5}SE({\hat{\theta}})\right) \\
+ &= {\cal P}\left(\hat{\theta} - q_{97.5}SE({\hat{\theta}}) \leq {\theta^*} \leq \hat{\theta} - q_{2.5}SE({\hat{\theta}})\right) 
 \end{aligned}
 $$
 
@@ -298,9 +275,9 @@ To assess the tradeoffs of studentized and percentile bootstrap, let's compare t
 
 
 ```python
-plt.hist(times, bins=20);
+plt.hist(times, bins=20, normed=True);
 plt.xlabel('Repair Time')
-plt.ylabel('Count')
+plt.ylabel('Proportion per Hour')
 plt.title('Distribution of Repair Times');
 ```
 
@@ -329,7 +306,7 @@ percentile_ci(sample)
 
 
 
-    array([ 239.85,  756.91])
+    array([  4.54,  29.56])
 
 
 
@@ -381,7 +358,7 @@ studentized_ci(sample)
 
 
 
-    (245.85339212384062, 1746.4309329397261)
+    (4.4991669064006121, 59.032912108873631)
 
 
 
@@ -424,10 +401,13 @@ trials = run_trials(np.arange(4, 101, 2))
 ```
 
     /Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: divide by zero encountered in true_divide
+    /Users/andrewkim/anaconda3/lib/python3.6/site-packages/ipykernel_launcher.py:20: RuntimeWarning: invalid value encountered in true_divide
+    /Users/andrewkim/anaconda3/lib/python3.6/site-packages/numpy/lib/function_base.py:4116: RuntimeWarning: Invalid value encountered in percentile
+      interpolation=interpolation)
 
 
-    CPU times: user 1min 53s, sys: 1.02 s, total: 1min 54s
-    Wall time: 1min 57s
+    CPU times: user 1min 47s, sys: 1.4 s, total: 1min 48s
+    Wall time: 1min 56s
 
 
 
