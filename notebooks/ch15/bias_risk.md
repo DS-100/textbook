@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Risk-and-Cost-Minimization" data-toc-modified-id="Risk-and-Cost-Minimization-1">Risk and Cost Minimization</a></span></li><li><span><a href="#Risk" data-toc-modified-id="Risk-2">Risk</a></span></li><li><span><a href="#Empirical-Risk" data-toc-modified-id="Empirical-Risk-3">Empirical Risk</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-4">Summary</a></span></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Risk-and-Cost-Minimization" data-toc-modified-id="Risk-and-Cost-Minimization-1">Risk and Loss Minimization</a></span></li><li><span><a href="#Risk" data-toc-modified-id="Risk-2">Risk</a></span></li><li><span><a href="#Empirical-Risk" data-toc-modified-id="Empirical-Risk-3">Empirical Risk</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-4">Summary</a></span></li></ul></div>
 
 
 ```python
@@ -39,9 +39,9 @@ def df_interact(df, nrows=7, ncols=7):
     print('({} rows, {} columns) total'.format(df.shape[0], df.shape[1]))
 ```
 
-## Risk and Cost Minimization
+## Risk and Loss Minimization
 
-In order to make predictions using data, we define a model, select a cost function, and fit the model's parameters by minimizing the cost. For example, to conduct least squares linear regression, we select the model:
+In order to make predictions using data, we define a model, select a loss function across the entire dataset, and fit the model's parameters by minimizing the loss. For example, to conduct least squares linear regression, we select the model:
 
 $$
 \begin{aligned}
@@ -49,7 +49,7 @@ f_\hat{\theta} (x) &= \hat{\theta} \cdot x
 \end{aligned}
 $$
 
-And the cost function:
+And the loss function:
 
 $$
 \begin{aligned}
@@ -60,7 +60,7 @@ $$
 
 As before, we use $ \hat{\theta} $ as our vector of model parameters, $ x $ as a vector containing a row of a data matrix $ X $, and $ y $ as our vector of observed values to predict. $ X_i $ is the $i$'th row of $ X $ and $ y_i $ is the $i$'th entry of y.
 
-Observe that our cost function is the average of the loss function values for each row of our data. If we define the squared loss function:
+Observe that our lost function across the dataset is the average of the loss function values for each row of our data. If we define the squared loss function:
 
 $$
 \begin{aligned}
@@ -69,7 +69,7 @@ $$
 \end{aligned}
 $$
 
-Then we may rewrite our cost function more simply:
+Then we may rewrite our average loss function more simply:
 
 $$
 \begin{aligned}
@@ -78,9 +78,9 @@ L(\hat{\theta}, X, y)
 \end{aligned}
 $$
 
-The expression above abstracts over the specific loss function; regardless of the loss function we choose, our cost is the average loss.
+The expression above abstracts over the specific loss function; regardless of the loss function we choose, our overall loss is the average loss.
 
-By minimizing the cost, we select the model parameters that best fit our observed dataset. Thus far, we have refrained from making statements about the population that generated the dataset. In reality, however, we are quite interested in making good predictions on the entire population, not just our data that we have already seen.
+By minimizing the average loss, we select the model parameters that best fit our observed dataset. Thus far, we have refrained from making statements about the population that generated the dataset. In reality, however, we are quite interested in making good predictions on the entire population, not just our data that we have already seen.
 
 ## Risk
 
@@ -137,7 +137,7 @@ $$
 
 If our dataset is large and the data are drawn at random from the population, the empirical risk $ \hat R(f_\hat{\theta}) $ is close to the true risk $ R(f_\hat{\theta}) $. This allows us to pick the model that minimizes the empirical risk.
 
-Notice that this expression is the cost function at the start of the section! By minimizing the average loss, we also minimize the empirical risk. This explains why we often use the average loss as our cost function instead of the maximum loss, for example.
+Notice that this expression is the average loss function at the start of the section! By minimizing the average loss, we also minimize the empirical risk. This explains why we often use the average loss as our overall loss function instead of the maximum loss, for example.
 
 ## Summary
 
