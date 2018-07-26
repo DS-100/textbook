@@ -25,7 +25,9 @@ pd.set_option('precision', 2)
 
 Recall that in linear regression, we fit a model of the following form
 $$
+\begin{aligned}
 f_\hat{\theta} (x) = \hat{\theta_0} + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p
+\end{aligned}
 $$
 
 We would like to infer the true coefficients of the model. Since the $\hat{\theta_0}$, $\hat{\theta_1}$, $\ldots$ $\hat{\theta_p}$ are estimators that vary based on our training data/observations, we would like to understand how our estimated coefficients compare with the true coefficients. Bootstrapping is a *nonparametric* approach to statistical inference that gives us standard errors and confidence intervals for our parameters. 
@@ -200,11 +202,13 @@ From the plots above, we see that both education and income are positively corre
 We will fit the following model, that explains the prestige of an occupation as a linear function of income and education:
 
 $$
+\begin{aligned}
 \texttt{prestige}_i
 = \theta_0^* 
 + \theta_\texttt{income}^*\cdot\texttt{income}_i
 + \theta_\texttt{education}^*\cdot\texttt{education}_i
 + \varepsilon_i
+\end{aligned}
 $$
 
 In order to fit this model, we will define the design matrix (X) and our response variable (y):
@@ -317,13 +321,15 @@ The coefficients above give us an estimate of the true coefficients. But had our
 
 In our bootstrapping methods and analysis, we will focus on the coefficient of education. We would like to explore the partial relationship between prestige and education holding income constant (rather than the marginal relationship between prestige and education ignoring income). The partial regression coefficient $\widehat\theta_\texttt{education}$ illustrates the partial relationship between prestige and education within our data. 
 
-### Method 1: Bootstrapping the Observations 
+### Bootstrapping the Observations 
 
 In this method, we consider the pairs $(X_i, y_i)$ to be our sample, so we construct the bootstrap resample by sampling with replacement from these pairs:
 
 $$
+\begin{aligned}
 (X_i^*, y_i^*) 
 = (X_I, y_I), \text{ where } I=1,\dots,n \text{ is sampled uniformly at random.}
+\end{aligned}
 $$
 
 In other words, we sample n observations with replacement from our data points; this is our bootstrap sample. Then we will fit a new linear regression model to this sampled data and record the education coefficient $\tilde\theta_\texttt{education}$; this coefficient is our bootstrap statistic.
@@ -404,7 +410,11 @@ From the confidence interval above, we are fairly certain that the true coeffici
 
 We can also create confidence intervals based on normal theory. Since the $\widehat \theta_{educ}$ values appear normally distributed, we can construct a confidence interval using by computing the following:
 
-$[\widehat \theta - z_{\frac{\alpha}{2}}*SE(\theta^*),  \widehat \theta + z_{\frac{\alpha}{2}}*SE(\theta^*)]$
+$$
+\begin{aligned}
+[\widehat \theta - z_{\frac{\alpha}{2}}*SE(\theta^*),  \widehat \theta + z_{\frac{\alpha}{2}}*SE(\theta^*)]
+\end{aligned}
+$$
 
 where $SE(\theta^*)$ is the standard error of our bootstrapped coefficients, $z$ is a constant, and $\widehat \theta$ is our sample coefficient. Note that $z$ varies depending on the confidence level of the interval we are constructing. Since we are creating a 95% confidence interval, we will use 1.96.
 
@@ -468,16 +478,16 @@ In order to build the sampling distribution of the coefficient $\widehat\theta_{
 In some cases, we may want to treat the $X_i$ as fixed (if, for example, the data were derive from an experimental
 design). In the case where the explanatory variables were controlled for, or the values of the explanatory variables were set by the experimenter, then we may consider the following alternative bootstrapping method.
 
-### Method 2: Bootstrapping the Residuals
+### Alternative: Bootstrapping the Residuals
 
-In this method, we consider the *residuals* $e_i := y_i - X_i\widehat\beta $ to be our sample, so we construct the bootstrap resample by sampling with replacement from these residuals. Once we construct each bootstrap sample, we can compute new fitted values using these residuals. Then, we regress these new Y values onto the fixed X values to obtain bootstrap regression coefficients.
+Another approach to hypothesis testing in linear regression is bootstrapping the residuals. This approach makes many underlying assumptions and used less frequently in practice. In this method, we consider the *residuals* $e_i := y_i - X_i\widehat\beta $ to be our sample, so we construct the bootstrap resample by sampling with replacement from these residuals. Once we construct each bootstrap sample, we can compute new fitted values using these residuals. Then, we regress these new Y values onto the fixed X values to obtain bootstrap regression coefficients.
 
 For more clarity, let's break this method down into steps:
 
 1. Estimate the regression coefficients for the original sample, and calculate
 the fitted value $\widehat y$ and residual $e_i$ for each observation.
 
-2. Select bootstrap samples of the residuals; we will denote these bootstrapped residuals as $\tilde e_1, \tilde e_2, \dots \tilde e^*_n$. Then, calculate bootstrapped $\tilde y_i$ values by computing $\widehat y + \tilde e_i$ where the fitted values $\widehat y_i = X_i\widehat\beta$
+2. Select bootstrap samples of the residuals; we will denote these bootstrapped residuals as $\tilde e_1, \tilde e_2, \dots \tilde e_n$. Then, calculate bootstrapped $\tilde y_i$ values by computing $\widehat y + \tilde e_i$ where the fitted values $\widehat y_i = X_i\widehat\beta$
 are obtained from the original regression. 
 
 3.  Regress the bootstrapped $\tilde y_i$ values on the fixed $X$ values to obtain bootstrap regression
@@ -489,10 +499,10 @@ coefficients $\tilde \theta$.
 
 Now that we have the bootstrapped regression coefficients, we can construct a confidence interval using the same techniques as before. We will leave this as an exercise.
 
-#### Method 2 Bootstrapping Reflection
+#### Bootstrapping the Residuals Reflection
 
 Let's reflect on this method. By randomly reattaching resampled residuals to ﬁtted values, this 
-procedure implicitly assumes that the errors are identically distributed. More specifically, this method assumes that the distribution of fluctuations around the regression curve is the same for all values of the input x. This is a disadvantage because the true errors may have nonconstant variance; this phenomenon is called heteroscedasticity.
+procedure implicitly assumes that the errors are identically distributed. More specifically, this method assumes that the distribution of fluctuations around the regression curve is the same for all values of the input $x_i$. This is a disadvantage because the true errors may have nonconstant variance; this phenomenon is called heteroscedasticity.
 
 Although this method does not make any assumptions about the shape of the error distribution, it implicitly assumes that the functional form of the model is correct. By relying on the model to create each bootstrap sample, we assume that the model structure is appropriate.
 
@@ -500,8 +510,8 @@ Although this method does not make any assumptions about the shape of the error 
 
 ## Summary
 
-In this section, we highlight two different types of bootstrapping techniques used in a linear regression setting. 
+In this section, we highlight bootstrapping techniques used in a linear regression setting. 
 
-In general, method 1 is more commonly used for bootstrapping. This method if often more robust because it makes less assumptions; for example, if an incorrect model is fitted, this method will still yield an appropriate sampling distribution of the parameter of interest.
+In general, bootstrapping the observations is more commonly used for bootstrapping. This method is often more robust than other techniques because it makes less underlying assumptions; for example, if an incorrect model is fitted, this method will still yield an appropriate sampling distribution of the parameter of interest.
 
-We use method 2 when we would like the treat X as fixed. Note that this method makes additional assumptions about the errors and form of the model. This method is more efficient if the correct model has been fitted.
+We also highlight an alternative method, which has several disadvantages. Bootstrapping the residuals can be used when we would like the treat our observations $X$ as fixed. Note that this method should be used with caution because it makes additional assumptions about the errors and form of the model.
