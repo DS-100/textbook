@@ -66,17 +66,17 @@ donkeys.head()
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -150,9 +150,7 @@ donkeys.head()
 
 
 
-Now, we will look at how large our dataset is.
-
-It's always a good idea to look at _how much_ data we have by looking at the dimensions of the dataset. An example of how this might be useful: if our data has a large number of observations, it would not be a good idea to print out the whole dataframe.
+It's always a good idea to look at _how much_ data we have by looking at the dimensions of the dataset. If we have a large number of observations, printing out the entire dataframe may crash our notebook.
 
 
 ```python
@@ -166,7 +164,7 @@ donkeys.shape
 
 
 
-The dataset is relatively small, with only 544 rows of observations and 8 columns. Let's look at what columns we have available to us.
+The dataset is relatively small, with only 544 rows of observations and 8 columns. Let's look at what columns are available to us.
 
 
 ```python
@@ -181,13 +179,13 @@ donkeys.columns.values
 
 
 
-Our analysis can be guided by a good understanding of our data, so we should aim to understand what each of these columns represent. A few of these columns are self-explanatory, but others require a little more explanation:
+A good understanding of our data can guide our analysis, so we should understand what each of these columns represent. A few of these columns are self-explanatory, but others require a little more explanation:
 
 - `BCS`: Body Condition Score (a physical health rating)
 - `Girth`: the measurement around the middle of the donkey
-- `WeightAlt`: 31 donkeys in our data were weighed twice in order to check the accuracy of the scale. The second weighing is in `WeightAlt`.
+- `WeightAlt`: the second weighing (31 donkeys in our data were weighed twice in order to check the accuracy of the scale)
 
-It is also a good idea to determine which of our variables are quantitative and which are categorical.
+It is also a good idea to determine which variables are quantitative and which are categorical.
 
 Quantitative: `Length`, `Girth`, `Height`, `Weight`, `WeightAlt`
 
@@ -223,17 +221,17 @@ donkeys.quantile([0.005, 0.995])
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -295,7 +293,7 @@ Also looking at the barplot of `BCS`:
 
 
 ```python
-plt.hist(donkeys['BCS'], normed=True)
+plt.hist(donkeys['BCS'], density=True)
 plt.xlabel('BCS');
 ```
 
@@ -303,7 +301,7 @@ plt.xlabel('BCS');
 ![png](linear_case_study_files/linear_case_study_17_0.png)
 
 
-Considering that `BCS` is an indication of the health of a donkey, a `BCS` of 1 represents an extremely emaciated donkey and a `BCS` of 4.5 an overweight donkey. Also looking at the barplot, there only appear to be two donkeys with such outlier `BCS` values. Thus, it would probably be a good idea to remove these two donkeys.
+Considering that `BCS` is an indication of the health of a donkey, a `BCS` of 1 represents an extremely emaciated donkey and a `BCS` of 4.5 an overweight donkey. Also looking at the barplot, there only appear to be two donkeys with such outlying `BCS` values. Thus, we remove these two donkeys.
 
 ---
 
@@ -384,7 +382,7 @@ The first 2 and last 2 donkeys in the list are far off from the cut-off and most
 
 ---
 
-Since `WeightAlt` closely corresponds to `Weight`, we do not have to check this column for anomalies. Summarizing what we have learned, here is how we want to filter our donkeys:
+Since `WeightAlt` closely corresponds to `Weight`, we skip checking this column for anomalies. Summarizing what we have learned, here is how we want to filter our donkeys:
 
 - Keep donkeys with `BCS` in the range 1.5 and 4
 - Keep donkeys with `Weight` between 71 and 214  
@@ -416,7 +414,7 @@ X_train.shape, X_test.shape
 
 
 
-Let's also create a function that evaluates our predictions on the test set. Recall that our metric for linear regression is mean-squared error. 
+Let's also create a function that evaluates our predictions on the test set. Let's use mean squared error. 
 
 
 ```python
@@ -424,9 +422,9 @@ def mse_test_set(predictions):
     return float(np.sum((predictions - y_test) ** 2))
 ```
 
-## Exploring the Data + Data Visualization
+## Exploratory Data Analysis and Visualization
 
-As in any data science project, we will explore our data before attempting to fit a model to it.
+As usual, we will explore our data before attempting to fit a model to it.
 
 First, we will examine the categorical variables with boxplots.
 
@@ -552,8 +550,8 @@ predictions = model.predict(X_test[['Length']])
 print("MSE:", mse_test_set(predictions))
 ```
 
-    MSE: 26052.580077025486
-    
+    MSE: 26052.58007702549
+
 
 
 ```python
@@ -573,8 +571,8 @@ predictions = model.predict(X_test[['Girth']])
 print("MSE:", mse_test_set(predictions))
 ```
 
-    MSE: 13248.81410593239
-    
+    MSE: 13248.814105932383
+
 
 
 ```python
@@ -594,10 +592,10 @@ predictions = model.predict(X_test[['Height']])
 print("MSE:", mse_test_set(predictions))
 ```
 
-    MSE: 36343.308584306156
-    
+    MSE: 36343.308584306134
 
-Looking at the scatterplots and the mean-squared errors, it seems like `Girth` is the best sole predictor of `Weight` as it has the strongest linear relationship with `Weight` and the smallest mean-squared error.
+
+Looking at the scatterplots and the mean squared errors, it seems like `Girth` is the best sole predictor of `Weight` as it has the strongest linear relationship with `Weight` and the smallest mean squared error.
 
 Can we do better with two variables? Let's try fitting a linear model using both `Girth` and `Length`. Although it is not as easy to visualize this model, we can still look at the MSE of this model.
 
@@ -610,10 +608,10 @@ predictions = model.predict(X_test[['Girth', 'Length']])
 print("MSE:", mse_test_set(predictions))
 ```
 
-    MSE: 9680.90242337725
-    
+    MSE: 9680.902423377258
 
-Wow! Looks like our MSE went down from around 13000 with just `Girth` alone to 10000 with `Girth` and `Length`. Using two variables has improved our model.
+
+Wow! Looks like our MSE went down from around 13000 with just `Girth` alone to 10000 with `Girth` and `Length`. Using including the second variable improved our model.
 
 We can also use categorical variables in our model. Let's now look at a linear model using the categorical variable of `Age`. This is the plot of `Age` versus `Weight`:
 
@@ -643,8 +641,8 @@ predictions = model.predict(with_age_dummies_test)
 print("MSE:", mse_test_set(predictions))
 ```
 
-    MSE: 41511.58282277702
-    
+    MSE: 41398.515625
+
 
 A MSE of around 40000 is worse than what we could get using any single one of the quantitative variables, but this variable could still prove to be useful in our linear model.
 
@@ -659,7 +657,7 @@ Recall from our boxplots that `Sex` was not a useful variable, so we will drop i
 
 ```python
 # HIDDEN
-X_train = X_train.drop('Weight', axis=1)
+X_train.drop('Weight', axis=1, inplace=True)
 ```
 
 
@@ -670,26 +668,26 @@ pd.set_option('max_columns', 15)
 
 
 ```python
-donkeys_train = X_train.drop(['Sex', 'WeightAlt'], axis=1)
-donkeys_train = pd.get_dummies(donkeys_train, columns=['BCS', 'Age'])
-donkeys_train.head()
+X_train.drop(['Sex', 'WeightAlt'], axis=1, inplace=True)
+X_train = pd.get_dummies(X_train, columns=['BCS', 'Age'])
+X_train.head()
 ```
 
 
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -810,38 +808,38 @@ donkeys_train.head()
 
 
 
-Recall that we noticed that the weight distribution of donkeys over the age of 5 does not look very different. Thus, let's combine the columns `Age_10-15`, `Age_15-20`, and `Age_>20` into one column. 
+Recall that we noticed that the weight distribution of donkeys over the age of 5 is not very different. Thus, let's combine the columns `Age_10-15`, `Age_15-20`, and `Age_>20` into one column. 
 
 
 ```python
-age_over_10 = donkeys_train['Age_10-15'] | donkeys_train['Age_15-20'] | donkeys_train['Age_>20']
-donkeys_train['Age_>10'] = age_over_10
-donkeys_train = donkeys_train.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1)
+age_over_10 = X_train['Age_10-15'] | X_train['Age_15-20'] | X_train['Age_>20']
+X_train['Age_>10'] = age_over_10
+X_train.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1, inplace=True)
 ```
 
 Since we do not want our matrix to be over-parameterized, we should drop one category from the `BCS` and `Age` dummies.
 
 
 ```python
-donkeys_train = donkeys_train.drop(['BCS_3.0', 'Age_5-10'], axis=1)
-donkeys_train.head()
+X_train.drop(['BCS_3.0', 'Age_5-10'], axis=1, inplace=True)
+X_train.head()
 ```
 
 
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -942,36 +940,36 @@ We should also add a column of biases in order to have a constant term in our mo
 
 
 ```python
-donkeys_train = donkeys_train.assign(bias=1)
+X_train = X_train.assign(bias=1)
 ```
 
 
 ```python
 # HIDDEN
-donkeys_train = donkeys_train.reindex_axis(['bias'] + list(donkeys_train.columns[:-1]), axis=1)
+X_train = X_train.reindex(columns=['bias'] + list(X_train.columns[:-1]))
 
 ```
 
 
 ```python
-donkeys_train.head()
+X_train.head()
 ```
 
 
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -1081,10 +1079,10 @@ We are finally ready to fit our model to all of the variables we have deemed imp
 Our model looks like this:
 
 $$
-f_\hat{\theta} (x) = \hat{\theta_0} + \hat{\theta_1} (Length) + \hat{\theta_2} (Girth) + \hat{\theta_3} (Height) + ... +  \hat{\theta_{11}} (Age_>10)
+f_\theta (\textbf{x}) = \theta_0 + \theta_1 (Length) + \theta_2 (Girth) + \theta_3 (Height) + ... + \theta_{11} (Age_>10)
 $$
 
-Here are the functions we defined earlier in the multiple linear regression section, which we will use again:
+Here are the functions we defined in the multiple linear regression lesson, which we will use again:
 
 
 ```python
@@ -1102,30 +1100,25 @@ def grad_mse_cost(thetas, X, y):
 
 In order to use the above functions, we need `X`, and `y`. These can both be obtained from our data frames. Remember that `X` and `y` have to be numpy matrices in order to be able to multiply them with `@` notation.
 
-`X` consists of all columns of the data frame `donkeys_train`.
-
 
 ```python
-X = (donkeys_train
-     .as_matrix())
+X_train = X_train.values
 ```
 
-`y` is `y_train` as a matrix.
-
 
 ```python
-y = y_train.as_matrix()
+y_train = y_train.values
 ```
 
 Now we just need to call the `minimize` function defined in a previous section.
 
 
 ```python
-thetas = minimize(mse_cost, grad_mse_cost, X, y)
+thetas = minimize(mse_cost, grad_mse_cost, X_train, y_train)
 ```
 
-    theta: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.] | cost: 23979.72
-    theta: [ 0.01  0.53  0.65  0.56  0.    0.    0.    0.    0.    0.    0.    0.  ] | cost: 1214.03
+    theta: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.] | cost: 23979.72
+    theta: [0.01 0.53 0.65 0.56 0.   0.   0.   0.   0.   0.   0.   0.  ] | cost: 1214.03
     theta: [-0.07  1.84  2.55 -2.87 -0.02 -0.13 -0.34  0.19  0.07 -0.22 -0.3   0.43] | cost: 1002.46
     theta: [-0.25 -0.76  4.81 -3.06 -0.08 -0.38 -1.11  0.61  0.24 -0.66 -0.93  1.27] | cost: 815.50
     theta: [-0.44 -0.33  4.08 -2.7  -0.14 -0.61 -1.89  1.02  0.4  -1.06 -1.57  2.09] | cost: 491.91
@@ -1135,8 +1128,8 @@ thetas = minimize(mse_cost, grad_mse_cost, X, y)
      -12.61   8.24] | cost: 116.92
     theta: [ -5.89   0.75   1.17  -0.5   -2.45 -10.36 -11.81  10.04   6.08  -3.6
      -16.65   8.45] | cost: 110.37
-    theta: [ -7.75   0.67   1.13  -0.35  -3.38 -13.76 -11.84  11.55   8.2   -3.8  -20.
-       7.55] | cost: 105.74
+    theta: [ -7.75   0.67   1.13  -0.35  -3.38 -13.76 -11.84  11.55   8.2   -3.8
+     -20.     7.55] | cost: 105.74
     theta: [ -9.41   0.64   1.15  -0.31  -4.26 -16.36 -10.81  11.97  10.12  -4.33
      -21.88   6.15] | cost: 102.82
     theta: [-11.08   0.66   1.17  -0.32  -5.18 -18.28  -9.43  11.61  11.99  -5.37
@@ -1217,11 +1210,7 @@ thetas = minimize(mse_cost, grad_mse_cost, X, y)
        -3.6    -7.22    1.95] | cost: 63.98
     theta: [-204.03    0.93    1.67    0.74  -10.5    -8.72   -6.39    7.54   11.39
        -3.6    -7.22    1.95] | cost: 63.98
-    theta: [-204.03    0.93    1.67    0.74  -10.5    -8.72   -6.39    7.54   11.39
-       -3.6    -7.22    1.95] | cost: 63.98
-    theta: [-204.03    0.93    1.67    0.74  -10.5    -8.72   -6.39    7.54   11.39
-       -3.6    -7.22    1.95] | cost: 63.98
-    
+
 
 Our linear model is:
 
@@ -1232,13 +1221,13 @@ Let's compare this equation that we obtained to the one we would get if we had u
 
 ```python
 model = LinearRegression(fit_intercept=False) # We already accounted for it with the bias column
-model.fit(X[:, :14], y)
+model.fit(X_train[:, :14], y_train)
 print("Coefficients", model.coef_)
 ```
 
     Coefficients [-204.03    0.93    1.67    0.74  -10.5    -8.72   -6.39    7.54   11.39
        -3.6    -7.22    1.95]
-    
+
 
 The coefficients look exactly the same! Our homemade functions create the same model as an established Python package!
 
@@ -1250,28 +1239,180 @@ Our next step is to evaluate our model's performance on the test set. We need to
 
 
 ```python
-donkeys_test = X_test.drop(['Sex', 'WeightAlt'], axis=1)
-donkeys_test = pd.get_dummies(donkeys_test, columns=['BCS', 'Age'])
-age_over_10 = donkeys_test['Age_10-15'] | donkeys_test['Age_15-20'] | donkeys_test['Age_>20']
-donkeys_test['Age_>10'] = age_over_10
-donkeys_test = donkeys_test.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1)
-donkeys_test = donkeys_test.drop(['BCS_3.0', 'Age_5-10'], axis=1)
-donkeys_test = donkeys_test.assign(bias=1)
+X_test.drop(['Sex', 'WeightAlt'], axis=1, inplace=True)
+X_test = pd.get_dummies(X_test, columns=['BCS', 'Age'])
+age_over_10 = X_test['Age_10-15'] | X_test['Age_15-20'] | X_test['Age_>20']
+X_test['Age_>10'] = age_over_10
+X_test.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1, inplace=True)
+X_test.drop(['BCS_3.0', 'Age_5-10'], axis=1, inplace=True)
+X_test = X_test.assign(bias=1)
 ```
 
 
 ```python
 # HIDDEN
-donkeys_test = donkeys_test.reindex_axis(['bias'] + list(donkeys_test.columns[:-1]), axis=1)
+X_test = X_test.reindex(columns=['bias'] + list(X_test.columns[:-1]))
 ```
-
-We obtain `X` to pass into `predict` of our `LinearRegression` model:
 
 
 ```python
-X = (donkeys_test
-     .as_matrix())
-predictions = model.predict(X)
+X_test
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>bias</th>
+      <th>Length</th>
+      <th>Girth</th>
+      <th>Height</th>
+      <th>BCS_1.5</th>
+      <th>BCS_2.0</th>
+      <th>BCS_2.5</th>
+      <th>BCS_3.5</th>
+      <th>BCS_4.0</th>
+      <th>Age_2-5</th>
+      <th>Age_&lt;2</th>
+      <th>Age_&gt;10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>490</th>
+      <td>1</td>
+      <td>98</td>
+      <td>119</td>
+      <td>103</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>75</th>
+      <td>1</td>
+      <td>86</td>
+      <td>114</td>
+      <td>105</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>352</th>
+      <td>1</td>
+      <td>94</td>
+      <td>114</td>
+      <td>101</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>182</th>
+      <td>1</td>
+      <td>94</td>
+      <td>114</td>
+      <td>102</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>334</th>
+      <td>1</td>
+      <td>104</td>
+      <td>113</td>
+      <td>105</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>543</th>
+      <td>1</td>
+      <td>104</td>
+      <td>124</td>
+      <td>110</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>108 rows × 12 columns</p>
+</div>
+
+
+
+We pass `X_test` into `predict` of our `LinearRegression` model:
+
+
+```python
+X_test = X_test.values
+predictions = model.predict(X_test)
 ```
 
 Let's look at the mean squared error:
@@ -1284,7 +1425,7 @@ mse_test_set(predictions)
 
 
 
-    7261.974205350595
+    7261.974205350604
 
 
 
@@ -1293,9 +1434,9 @@ With these predictions, we can also make a residual plot:
 
 ```python
 # HIDDEN
-y = y_test.as_matrix()
-resid = y - predictions
-resid_prop = resid / y
+y_test = y_test.values
+resid = y_test - predictions
+resid_prop = resid / y_test
 plt.scatter(np.arange(len(resid_prop)), resid_prop, s=15)
 plt.axhline(0)
 plt.title('Residual proportions (resid / actual Weight)')
