@@ -657,7 +657,7 @@ Recall from our boxplots that `Sex` was not a useful variable, so we will drop i
 
 ```python
 # HIDDEN
-X_train = X_train.drop('Weight', axis=1)
+X_train.drop('Weight', axis=1, inplace=True)
 ```
 
 
@@ -668,9 +668,9 @@ pd.set_option('max_columns', 15)
 
 
 ```python
-donkeys_train = X_train.drop(['Sex', 'WeightAlt'], axis=1)
-donkeys_train = pd.get_dummies(donkeys_train, columns=['BCS', 'Age'])
-donkeys_train.head()
+X_train.drop(['Sex', 'WeightAlt'], axis=1, inplace=True)
+X_train = pd.get_dummies(X_train, columns=['BCS', 'Age'])
+X_train.head()
 ```
 
 
@@ -812,17 +812,17 @@ Recall that we noticed that the weight distribution of donkeys over the age of 5
 
 
 ```python
-age_over_10 = donkeys_train['Age_10-15'] | donkeys_train['Age_15-20'] | donkeys_train['Age_>20']
-donkeys_train['Age_>10'] = age_over_10
-donkeys_train = donkeys_train.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1)
+age_over_10 = X_train['Age_10-15'] | X_train['Age_15-20'] | X_train['Age_>20']
+X_train['Age_>10'] = age_over_10
+X_train.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1, inplace=True)
 ```
 
 Since we do not want our matrix to be over-parameterized, we should drop one category from the `BCS` and `Age` dummies.
 
 
 ```python
-donkeys_train = donkeys_train.drop(['BCS_3.0', 'Age_5-10'], axis=1)
-donkeys_train.head()
+X_train.drop(['BCS_3.0', 'Age_5-10'], axis=1, inplace=True)
+X_train.head()
 ```
 
 
@@ -940,19 +940,19 @@ We should also add a column of biases in order to have a constant term in our mo
 
 
 ```python
-donkeys_train = donkeys_train.assign(bias=1)
+X_train = X_train.assign(bias=1)
 ```
 
 
 ```python
 # HIDDEN
-donkeys_train = donkeys_train.reindex(columns=['bias'] + list(donkeys_train.columns[:-1]))
+X_train = X_train.reindex(columns=['bias'] + list(X_train.columns[:-1]))
 
 ```
 
 
 ```python
-donkeys_train.head()
+X_train.head()
 ```
 
 
@@ -1100,26 +1100,21 @@ def grad_mse_cost(thetas, X, y):
 
 In order to use the above functions, we need `X`, and `y`. These can both be obtained from our data frames. Remember that `X` and `y` have to be numpy matrices in order to be able to multiply them with `@` notation.
 
-`X` consists of all columns of the data frame `donkeys_train`.
-
 
 ```python
-X = (donkeys_train
-     .values)
+X_train = X_train.values
 ```
 
-`y` is `y_train` as a matrix.
-
 
 ```python
-y = y_train.values
+y_train = y_train.values
 ```
 
 Now we just need to call the `minimize` function defined in a previous section.
 
 
 ```python
-thetas = minimize(mse_cost, grad_mse_cost, X, y)
+thetas = minimize(mse_cost, grad_mse_cost, X_train, y_train)
 ```
 
     theta: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.] | cost: 23979.72
@@ -1226,7 +1221,7 @@ Let's compare this equation that we obtained to the one we would get if we had u
 
 ```python
 model = LinearRegression(fit_intercept=False) # We already accounted for it with the bias column
-model.fit(X[:, :14], y)
+model.fit(X_train[:, :14], y_train)
 print("Coefficients", model.coef_)
 ```
 
@@ -1244,24 +1239,24 @@ Our next step is to evaluate our model's performance on the test set. We need to
 
 
 ```python
-donkeys_test = X_test.drop(['Sex', 'WeightAlt'], axis=1)
-donkeys_test = pd.get_dummies(donkeys_test, columns=['BCS', 'Age'])
-age_over_10 = donkeys_test['Age_10-15'] | donkeys_test['Age_15-20'] | donkeys_test['Age_>20']
-donkeys_test['Age_>10'] = age_over_10
-donkeys_test = donkeys_test.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1)
-donkeys_test = donkeys_test.drop(['BCS_3.0', 'Age_5-10'], axis=1)
-donkeys_test = donkeys_test.assign(bias=1)
+X_test.drop(['Sex', 'WeightAlt'], axis=1, inplace=True)
+X_test = pd.get_dummies(X_test, columns=['BCS', 'Age'])
+age_over_10 = X_test['Age_10-15'] | X_test['Age_15-20'] | X_test['Age_>20']
+X_test['Age_>10'] = age_over_10
+X_test.drop(['Age_10-15', 'Age_15-20', 'Age_>20'], axis=1, inplace=True)
+X_test.drop(['BCS_3.0', 'Age_5-10'], axis=1, inplace=True)
+X_test = X_test.assign(bias=1)
 ```
 
 
 ```python
 # HIDDEN
-donkeys_test = donkeys_test.reindex(columns=['bias'] + list(donkeys_test.columns[:-1]))
+X_test = X_test.reindex(columns=['bias'] + list(X_test.columns[:-1]))
 ```
 
 
 ```python
-donkeys_test
+X_test
 ```
 
 
@@ -1412,13 +1407,12 @@ donkeys_test
 
 
 
-We obtain `X` to pass into `predict` of our `LinearRegression` model:
+We pass `X_test` into `predict` of our `LinearRegression` model:
 
 
 ```python
-X = (donkeys_test
-     .values)
-predictions = model.predict(X)
+X_test = X_test.values
+predictions = model.predict(X_test)
 ```
 
 Let's look at the mean squared error:
@@ -1440,9 +1434,9 @@ With these predictions, we can also make a residual plot:
 
 ```python
 # HIDDEN
-y = y_test.values
-resid = y - predictions
-resid_prop = resid / y
+y_test = y_test.values
+resid = y_test - predictions
+resid_prop = resid / y_test
 plt.scatter(np.arange(len(resid_prop)), resid_prop, s=15)
 plt.axhline(0)
 plt.title('Residual proportions (resid / actual Weight)')
@@ -1451,7 +1445,7 @@ plt.ylabel('Error proportion');
 ```
 
 
-![png](linear_case_study_files/linear_case_study_92_0.png)
+![png](linear_case_study_files/linear_case_study_91_0.png)
 
 
 Looks like our model does pretty well! The residual proportions indicate that our predictions are mostly within 15% of the correct value. 
