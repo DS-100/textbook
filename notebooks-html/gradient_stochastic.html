@@ -5,7 +5,7 @@
             Show Widgets
         </button>
         <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch11/gradient_stochastic.ipynb">Open on DataHub</a></div>
-
+    
 
 
 
@@ -52,8 +52,8 @@
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="A-Brief-Review">A Brief Review<a class="anchor-link" href="#A-Brief-Review">&#182;</a></h2><p>We initially fit our model to the tips dataset by finding the $\theta$ that minimized the MSE loss function, $L(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \theta)^2$. To calculate the minimizing value of $\theta$, we took the derivative of the MSE, set it equal to zero, and solved for $\theta$. We found that the optimal $\theta$ value was simply the mean of the $y$ values in our dataset.</p>
-<p>However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\theta$ values. Instead, we use the gradient descent algorithm to iteratively improve $\theta$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:</p>
+<h2 id="A-Brief-Review">A Brief Review<a class="anchor-link" href="#A-Brief-Review">&#182;</a></h2><p>We initially fit our model to the tips dataset by finding the $\theta$ that minimized the MSE loss function, $L(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \theta)^2$. To calculate the minimizing value of $\hat\theta$, we took the derivative of the MSE, set it equal to zero, and solved for $\theta$. We found that the optimal $\hat\theta$ was simply the mean of the $\textbf{y}$ values in our dataset.</p>
+<p>However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\hat\theta$ values. Instead, we use the gradient descent algorithm to iteratively improve $\theta$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:</p>
 <p>$$
 {\theta}^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_{\theta} L(\theta^{(t)}, \textbf{y})
 $$</p>
@@ -85,7 +85,7 @@ $$</p>
 <p>Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point.</p>
 <p>$$
 \begin{align}
-\nabla_{\theta}L(\theta, y) &amp;\approx \nabla_{\theta} l(\theta, y_i) \\
+\nabla_{\theta}L(\theta, \textbf{y}) &amp;\approx \nabla_{\theta} l(\theta, y_i) \\
 &amp;= -2(y_i - \theta)
 \end{align}
 $$</p>
@@ -95,7 +95,7 @@ $$</p>
 <h3 id="Visualizing-Stochastic-Gradient-Descent">Visualizing Stochastic Gradient Descent<a class="anchor-link" href="#Visualizing-Stochastic-Gradient-Descent">&#182;</a></h3><p>Below are visual examples of loss minimization in batch gradient descent and stochastic gradient descent.</p>
 <p><img src="https://raw.githubusercontent.com/DS-100/textbook/master/assets/gd.png" alt="">
 <img src="https://raw.githubusercontent.com/DS-100/textbook/master/assets/sgd.png" alt=""></p>
-<p>At each iteration of batch gradient descent, we move in the direction of the true gradient of the loss function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\hat\theta$ parameters eventually converge to the minima of the loss function. Although stochastic gradient descent typically takes more iterations to converge than batch gradient descent, it often converges more quickly because it spends significantly less time computing the update at each iteration.</p></div></div></div>
+<p>At each iteration of batch gradient descent, we move in the direction of the true gradient of the loss function, which is depicted by the ellipses. On the other hand, each iteration of stochastic gradient descent may not lead us in the direction of the true gradient; however, the $\theta$ parameters eventually converge to the minima of the loss function. Although stochastic gradient descent typically takes more iterations to converge than batch gradient descent, it often converges more quickly because it spends significantly less time computing the update at each iteration.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Defining-a-Function-for-Stochastic-Gradient-Descent">Defining a Function for Stochastic Gradient Descent<a class="anchor-link" href="#Defining-a-Function-for-Stochastic-Gradient-Descent">&#182;</a></h3><p>As we previously did for batch gradient descent, we define a function that computes the stochastic gradient descent of the loss function. It will be similar to our <code>minimize</code> function but we will need to implement the random selection of one observation at each iteration.</p></div></div></div>
@@ -103,7 +103,7 @@ $$</p>
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize_sgd</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
@@ -120,10 +120,10 @@ $$</p>
             <span class="n">rand_obs</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">rand_obs</span><span class="p">)</span>
             <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gradient</span>
-
+        
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_theta</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">new_theta</span>
-
+        
             <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 </pre></div></div></div></div></div>
@@ -131,7 +131,7 @@ $$</p>
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Mini-batch-Gradient-Descent">Mini-batch Gradient Descent<a class="anchor-link" href="#Mini-batch-Gradient-Descent">&#182;</a></h2><p><strong>Mini-batch gradient descent</strong> strikes a balance between batch gradient descent and stochastic gradient descent by increasing the number of observations that we select at each iteration. In mini-batch gradient descent, we take a simple random sample of observations called a mini-batch. We use the average of the gradients of their loss functions to construct an estimate of the true gradient of the cross entropy loss. Since our sample is randomly selected, the expectation of this estimate is equal to the true gradient. This is illustrated in the approximation for the gradient of the loss function, where $\mathcal{B}$ is the mini-batch of data points that we randomly sample from the $n$ observations.</p>
 <p>$$
-\nabla_\theta L(\theta, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\theta}l(\theta, y_i)
+\nabla_\theta L(\theta, \textbf{y}) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\theta}l(\theta, y_i)
 $$</p>
 <p>As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.</p>
 <p>While we have made the distinction between stochastic and mini-batch gradient descent in this textbook, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size.</p>
@@ -141,7 +141,7 @@ $$</p>
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize_mini_batch</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">minibatch_size</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
@@ -152,7 +152,7 @@ $$</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">NUM_OBS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">minibatch_size</span> <span class="o">&lt;</span> <span class="n">NUM_OBS</span>
-
+    
     <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -160,10 +160,10 @@ $$</p>
             <span class="n">mini_batch</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">minibatch_size</span><span class="p">]</span>
             <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">mini_batch</span><span class="p">)</span>
             <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gradient</span>
-
+            
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_theta</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">new_theta</span>
-
+            
             <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 </pre></div></div></div></div></div>
