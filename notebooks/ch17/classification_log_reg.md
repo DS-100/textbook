@@ -76,32 +76,32 @@ We have developed all the components of logistic regression. First, the logistic
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x) = \sigma(\hat{\theta} \cdot x)
+f_\hat{\boldsymbol{\theta}} (\boldsymbol{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \boldsymbol{x})
 \end{aligned}
 $$
 
-Then, the cross entropy cost function:
+Then, the cross-entropy loss function:
 
 $$
 \begin{aligned}
-L(\hat{\theta}, X, y) = &= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
+L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y}) = &= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
 \end{aligned}
 $$
 
-Finally, the gradient of the cross entropy cost for gradient descent:
+Finally, the gradient of the cross-entropy loss for gradient descent:
 
 $$
 \begin{aligned}
-\nabla_{\hat{\theta}} L(\hat{\theta}, X, y)
+\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})
 &= - \frac{1}{n} \sum_i \left(
     y_i - \sigma_i
-\right) X_i \\
+\right) \boldsymbol{X}_i \\
 \end{aligned}
 $$
 
-In the expressions above, we let $ X $ represent the $ n \times p $ input data matrix, $ y $ the vector of observed data values, and $ f_\hat{\theta}(x) $ the logistic model. As a shorthand, we define $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $.
+In the expressions above, we let $ \boldsymbol{X} $ represent the $ n \times p $ input data matrix, $\boldsymbol{x}$ a row of $ \boldsymbol{X} $, $ \boldsymbol{y} $ the vector of observed data values, and $ f_\hat{\boldsymbol{\theta}}(\boldsymbol{x}) $ the logistic model with optimal parameters $\hat{\boldsymbol{\theta}}$ . As a shorthand, we define $ \sigma_i = f_\hat{\boldsymbol{\theta}}(\boldsymbol{X}_i) = \sigma(\boldsymbol{X}_i \cdot \hat{\boldsymbol{\theta}}) $.
 
-## Logistic Regression on LeBron Shots
+## Logistic Regression on LeBron's Shots
 
 Let us now return to the problem we faced at the start of this chapter: predicting which shots LeBron James will make. We start by loading the dataset of shots taken by LeBron in the 2017 NBA Playoffs.
 
@@ -246,7 +246,7 @@ df_interact(lebron)
     (384 rows, 7 columns) total
 
 
-We start by using using only the shot distance to predict the shot make or miss. `scikit-learn` conveniently provides a logistic regression classifier as the [`sklearn.linear_model.LogisticRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) class. To use the class, we first create our data matrix `X` and vector of observed outcomes `y`.
+We start by using only the shot distance to predict whether or not the shot is made. `scikit-learn` conveniently provides a logistic regression classifier as the [`sklearn.linear_model.LogisticRegression`](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) class. To use the class, we first create our data matrix `X` and vector of observed outcomes `y`.
 
 
 ```python
@@ -364,7 +364,7 @@ np.count_nonzero(y_test == 1) / len(y_test)
 
 
 
-For this classifier we only used one out of several possible features. As in multivariable linear regression, we will likely achieve a more accurate classifier by incorporating more features.
+For this classifier, we only used one out of several possible features. As in multivariable linear regression, we will likely achieve a more accurate classifier by incorporating more features.
 
 ## Multivariable Logistic Regression
 
@@ -418,7 +418,7 @@ print(f'Test set accuracy: {clf.score(X_test, y_test)}')
     Test set accuracy: 0.725
 
 
-This classifier is around 12% more accurate than the classifier that only took the shot distance into account.
+This classifier is around 12% more accurate than the classifier that only took the shot distance into account. In Section 17.7, we explore additional metrics used to evaluate classifier performance.
 
 ## Summary
 
