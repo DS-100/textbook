@@ -26,7 +26,7 @@ pd.set_option('precision', 2)
 np.random.seed(42)
 ```
 
-## Gradient Descent in Logistic Regression
+## Fitting a Logistic Model
 
 Previously, we covered batch gradient descent, an algorithm that iteratively updates $\hat\theta$ to find the loss-minimizing parameters. We also discussed stochastic gradient descent and mini-batch gradient descent, methods that take advantage of statistical theory and parallelized hardware to decrease the time spent training the gradient descent algorithm. In this section, we will apply these concepts to logistic regression and walk through examples using scikit-learn functions.
 
