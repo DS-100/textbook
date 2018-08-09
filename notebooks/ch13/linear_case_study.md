@@ -553,7 +553,7 @@ print("MSE:", mse_test_set(predictions))
 ```
 
     MSE: 26052.580077025486
-    
+
 
 
 ```python
@@ -574,7 +574,7 @@ print("MSE:", mse_test_set(predictions))
 ```
 
     MSE: 13248.81410593239
-    
+
 
 
 ```python
@@ -595,7 +595,7 @@ print("MSE:", mse_test_set(predictions))
 ```
 
     MSE: 36343.308584306156
-    
+
 
 Looking at the scatterplots and the mean-squared errors, it seems like `Girth` is the best sole predictor of `Weight` as it has the strongest linear relationship with `Weight` and the smallest mean-squared error.
 
@@ -611,7 +611,7 @@ print("MSE:", mse_test_set(predictions))
 ```
 
     MSE: 9680.90242337725
-    
+
 
 Wow! Looks like our MSE went down from around 13000 with just `Girth` alone to 10000 with `Girth` and `Length`. Using two variables has improved our model.
 
@@ -644,7 +644,7 @@ print("MSE:", mse_test_set(predictions))
 ```
 
     MSE: 41511.58282277702
-    
+
 
 A MSE of around 40000 is worse than what we could get using any single one of the quantitative variables, but this variable could still prove to be useful in our linear model.
 
@@ -1221,7 +1221,7 @@ thetas = minimize(mse_cost, grad_mse_cost, X, y)
        -3.6    -7.22    1.95] | cost: 63.98
     theta: [-204.03    0.93    1.67    0.74  -10.5    -8.72   -6.39    7.54   11.39
        -3.6    -7.22    1.95] | cost: 63.98
-    
+
 
 Our linear model is:
 
@@ -1238,7 +1238,7 @@ print("Coefficients", model.coef_)
 
     Coefficients [-204.03    0.93    1.67    0.74  -10.5    -8.72   -6.39    7.54   11.39
        -3.6    -7.22    1.95]
-    
+
 
 The coefficients look exactly the same! Our homemade functions create the same model as an established Python package!
 

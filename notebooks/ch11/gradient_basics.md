@@ -311,7 +311,7 @@ print(f"        Huber loss: theta_hat = 15.50")
                    MSE: theta_hat = 16.08
                    MAE: theta_hat = 15.48
             Huber loss: theta_hat = 15.50
-    
+
 
 We can see that the Huber loss is closer to the MAE since it is less affected by the outliers on the right side of the tip percentage distribution:
 
