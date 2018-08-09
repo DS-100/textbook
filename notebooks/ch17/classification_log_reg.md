@@ -76,7 +76,7 @@ We have developed all the components of logistic regression. First, the logistic
 
 $$
 \begin{aligned}
-f_\hat{\boldsymbol{\theta}} (\boldsymbol{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \boldsymbol{x})
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \textbf{x})
 \end{aligned}
 $$
 
@@ -84,7 +84,7 @@ Then, the cross-entropy loss function:
 
 $$
 \begin{aligned}
-L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y}) = &= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = &= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
 \end{aligned}
 $$
 
@@ -92,14 +92,14 @@ Finally, the gradient of the cross-entropy loss for gradient descent:
 
 $$
 \begin{aligned}
-\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})
+\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
 &= - \frac{1}{n} \sum_i \left(
     y_i - \sigma_i
-\right) \boldsymbol{X}_i \\
+\right) \textbf{X}_i \\
 \end{aligned}
 $$
 
-In the expressions above, we let $ \boldsymbol{X} $ represent the $ n \times p $ input data matrix, $\boldsymbol{x}$ a row of $ \boldsymbol{X} $, $ \boldsymbol{y} $ the vector of observed data values, and $ f_\hat{\boldsymbol{\theta}}(\boldsymbol{x}) $ the logistic model with optimal parameters $\hat{\boldsymbol{\theta}}$ . As a shorthand, we define $ \sigma_i = f_\hat{\boldsymbol{\theta}}(\boldsymbol{X}_i) = \sigma(\boldsymbol{X}_i \cdot \hat{\boldsymbol{\theta}}) $.
+In the expressions above, we let $ \textbf{X} $ represent the $ n \times p $ input data matrix, $\textbf{x}$ a row of $ \textbf{X} $, $ \textbf{y} $ the vector of observed data values, and $ f_\hat{\boldsymbol{\theta}}(\textbf{x}) $ the logistic model with optimal parameters $\hat{\boldsymbol{\theta}}$ . As a shorthand, we define $ \sigma_i = f_\hat{\boldsymbol{\theta}}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \hat{\boldsymbol{\theta}}) $.
 
 ## Logistic Regression on LeBron's Shots
 
