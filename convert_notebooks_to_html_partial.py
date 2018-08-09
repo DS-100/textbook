@@ -104,19 +104,20 @@ def convert_notebooks_to_html_partial(notebook_paths):
             resources=extract_output_config,
         )
 
-        with_wrapper = wrapper.format(
+        final_output = wrapper.format(
             interact_link=INTERACT_LINK.format(
                 paths=PATH_PREFIX.format(notebook_path)
             ),
             html=html,
         )
 
-        # Remove newlines before closing div tags
-        final_output = CLOSING_DIV_REGEX.sub('</div>', with_wrapper)
-
         # Write out HTML
         outfile_path = os.path.join('ch', chapter, outfile_name)
         with open(outfile_path, 'w', encoding='utf-8') as outfile:
+            # Jekyll pages need to start with front-matter, so we'll put
+            # a placeholder front-matter
+            # https://jekyllrb.com/docs/frontmatter/
+            outfile.write('---\n---\n')
             outfile.write(final_output)
 
         # Write out images
@@ -159,8 +160,8 @@ def convert_notebooks_to_markdown(notebook_paths):
 
 if __name__ == '__main__':
     arguments = docopt(__doc__)
-    notebooks = arguments['NOTEBOOKS'] or glob.glob(
-        'notebooks/**/*.ipynb', recursive=True
+    notebooks = arguments['NOTEBOOKS'] or sorted(
+        glob.glob('notebooks/**/*.ipynb', recursive=True)
     )
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)

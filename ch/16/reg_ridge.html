@@ -1,10 +1,13 @@
+---
+---
 
 <div id="ipython-notebook">
     <div class="buttons">
         <button class="interact-button js-nbinteract-widget">
             Show Widgets
         </button>
-        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/16/reg_ridge.ipynb">Open on DataHub</a></div>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/16/reg_ridge.ipynb">Open on DataHub</a>
+    </div>
     
 
 
@@ -24,11 +27,20 @@
 <span class="c1"># Set directory for data loading to work properly</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/16&#39;</span><span class="p">))</span>
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
-<div class="toc"><ul class="toc-item"><li><span><a href="#L2-Regularization:-Ridge-Regression" data-toc-modified-id="L2-Regularization:-Ridge-Regression-1">L2 Regularization: Ridge Regression</a></span></li><li><span><a href="#L2-Regularization-Definition" data-toc-modified-id="L2-Regularization-Definition-2">L2 Regularization Definition</a></span><ul class="toc-item"><li><span><a href="#The-Regularization-Parameter" data-toc-modified-id="The-Regularization-Parameter-2.1">The Regularization Parameter</a></span></li><li><span><a href="#Bias-Term-Exclusion" data-toc-modified-id="Bias-Term-Exclusion-2.2">Bias Term Exclusion</a></span></li><li><span><a href="#Data-Normalization" data-toc-modified-id="Data-Normalization-2.3">Data Normalization</a></span></li></ul></li><li><span><a href="#Using-Ridge-Regression" data-toc-modified-id="Using-Ridge-Regression-3">Using Ridge Regression</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-4">Summary</a></span></li></ul></div></div></div></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#L2-Regularization:-Ridge-Regression" data-toc-modified-id="L2-Regularization:-Ridge-Regression-1">L2 Regularization: Ridge Regression</a></span></li><li><span><a href="#L2-Regularization-Definition" data-toc-modified-id="L2-Regularization-Definition-2">L2 Regularization Definition</a></span><ul class="toc-item"><li><span><a href="#The-Regularization-Parameter" data-toc-modified-id="The-Regularization-Parameter-2.1">The Regularization Parameter</a></span></li><li><span><a href="#Bias-Term-Exclusion" data-toc-modified-id="Bias-Term-Exclusion-2.2">Bias Term Exclusion</a></span></li><li><span><a href="#Data-Normalization" data-toc-modified-id="Data-Normalization-2.3">Data Normalization</a></span></li></ul></li><li><span><a href="#Using-Ridge-Regression" data-toc-modified-id="Using-Ridge-Regression-3">Using Ridge Regression</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-4">Summary</a></span></li></ul></div>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -57,7 +69,13 @@
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.float_format&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -79,7 +97,13 @@
                  <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
                  <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -89,7 +113,13 @@
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;water_large.csv&#39;</span><span class="p">)</span>
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -137,7 +167,13 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Water Flow (Liters)&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -154,7 +190,13 @@
     <span class="n">vals</span> <span class="o">=</span> <span class="n">coefs</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Coefficient Value&#39;</span><span class="p">:</span> <span class="n">vals</span><span class="p">})</span>
             <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;degree&#39;</span><span class="p">))</span>
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -182,7 +224,13 @@
         <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="n">degrees</span><span class="p">]</span>
 
 <span class="n">ridge_curves</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_curve</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span> <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="n">ridge_clfs</span><span class="p">]</span>
-</pre></div></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="L2-Regularization:-Ridge-Regression">L2 Regularization: Ridge Regression<a class="anchor-link" href="#L2-Regularization:-Ridge-Regression">&#182;</a></h2><p>In this section we introduce $ L_2 $ regularization, a method of penalizing large weights in our cost function to lower model variance. We briefly review linear regression, then introduce regularization as a modification to the cost function.</p>
@@ -195,7 +243,11 @@ $$
 L(\hat{\theta}, X, y)
 &amp;= \frac{1}{n} \sum_{i}^n(y_i - f_\hat{\theta} (X_i))^2\\
 \end{aligned}
-$$<p>In the above definitions, $ X $ represents the $ n \times p $ data matrix, $ x $ represents a row of $ X $, $ y $ represents the observed outcomes, and $ \hat{\theta} $ represents the model weights.</p></div></div></div>
+$$<p>In the above definitions, $ X $ represents the $ n \times p $ data matrix, $ x $ represents a row of $ X $, $ y $ represents the observed outcomes, and $ \hat{\theta} $ represents the model weights.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="L2-Regularization-Definition">L2 Regularization Definition<a class="anchor-link" href="#L2-Regularization-Definition">&#182;</a></h2><p>To add $ L_2 $ regularization to the model, we modify the cost function above:</p>
@@ -207,20 +259,36 @@ L(\hat{\theta}, X, y)
 \end{aligned}
 $$<p>Notice that the cost function above is the same as before with the addition of the $ L_2 $ regularization $ \lambda \sum_{j = 1}^{p} \hat{\theta_j}^2 $ term. The summation in this term sums the square of each model weight $ \hat{\theta_1}, \hat{\theta_2}, \ldots, \hat{\theta_p} $. The term also introduces a new scalar model parameter $ \lambda $ that adjusts the regularization penalty.</p>
 <p>The regularization term causes the cost to increase if the values in $ \hat{\theta} $ are further away from 0. With the addition of regularization, the optimal model weights minimize the combination of loss and regularization penalty rather than the loss alone. Since the resulting model weights tend to be smaller in absolute value, the model has lower variance and higher bias.</p>
-<p>Using $ L_2 $ regularization with a linear model and the mean squared error cost function is also known more commonly as <strong>ridge regression</strong>.</p></div></div></div>
+<p>Using $ L_2 $ regularization with a linear model and the mean squared error cost function is also known more commonly as <strong>ridge regression</strong>.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="The-Regularization-Parameter">The Regularization Parameter<a class="anchor-link" href="#The-Regularization-Parameter">&#182;</a></h3><p>The regularization parameter $ \lambda $ controls the regularization penalty. A small $ \lambda $ results in a small penalty—if $ \lambda = 0 $ the regularization term is also $ 0 $ and the cost is not regularized at all.</p>
 <p>A large $ \lambda $ terms results in a large penalty and therefore a simpler model. Increasing $ \lambda $ decreases the variance and increases the bias of the model. We use cross-validation to select the value of $ \lambda $ that minimizes the validation error.</p>
 <p><strong>Note about regularization in <code>scikit-learn</code>:</strong></p>
 <p><code>scikit-learn</code> provides regression models that have regularization built-in. For example, to conduct ridge regression you may use the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html"><code>sklearn.linear_model.Ridge</code></a> regression model. Note that <code>scikit-learn</code> models call the regularization parameter <code>alpha</code> instead of $ \lambda $.</p>
-<p><code>scikit-learn</code> conveniently provides regularized models that perform cross-validation to select a good value of $ \lambda $. For example, the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html#sklearn.linear_model.RidgeCV"><code>sklearn.linear_model.RidgeCV</code></a> allows users to input regularization parameter values and will automatically use cross-validation to select the parameter value with the least validation error.</p></div></div></div>
+<p><code>scikit-learn</code> conveniently provides regularized models that perform cross-validation to select a good value of $ \lambda $. For example, the <a href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html#sklearn.linear_model.RidgeCV"><code>sklearn.linear_model.RidgeCV</code></a> allows users to input regularization parameter values and will automatically use cross-validation to select the parameter value with the least validation error.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Bias-Term-Exclusion">Bias Term Exclusion<a class="anchor-link" href="#Bias-Term-Exclusion">&#182;</a></h3><p>Note that the bias term $ \theta_0 $ is not included in the summation of the regularization term. We do not penalize the bias term because increasing the bias term does not increase the variance of our model—the bias term simply shifts all predictions by a constant value.</p></div></div></div>
+<h3 id="Bias-Term-Exclusion">Bias Term Exclusion<a class="anchor-link" href="#Bias-Term-Exclusion">&#182;</a></h3><p>Note that the bias term $ \theta_0 $ is not included in the summation of the regularization term. We do not penalize the bias term because increasing the bias term does not increase the variance of our model—the bias term simply shifts all predictions by a constant value.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Data-Normalization">Data Normalization<a class="anchor-link" href="#Data-Normalization">&#182;</a></h3><p>Notice that the regularization term $ \lambda \sum_{j = 1}^{p} \hat{\theta_j}^2 $ penalizes each $ \hat{\theta_j} $ equally. However, the effect of each $ \hat{\theta_j} $ differs depending on the data itself. Consider this section of the water flow dataset after adding degree 8 polynomial features:</p></div></div></div>
+<h3 id="Data-Normalization">Data Normalization<a class="anchor-link" href="#Data-Normalization">&#182;</a></h3><p>Notice that the regularization term $ \lambda \sum_{j = 1}^{p} \hat{\theta_j}^2 $ penalizes each $ \hat{\theta_j} $ equally. However, the effect of each $ \hat{\theta_j} $ differs depending on the data itself. Consider this section of the water flow dataset after adding degree 8 polynomial features:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -231,7 +299,11 @@ $$<p>Notice that the cost function above is the same as before with the addition
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clfs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;poly&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]),</span>
              <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="s1">&#39;deg_</span><span class="si">{n}</span><span class="s1">_feat&#39;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)])</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -311,15 +383,32 @@ $$<p>Notice that the cost function above is the same as before with the addition
     </tr>
   </tbody>
 </table>
-<p>5 rows × 8 columns</p></div></div></div></div></div></div>
+<p>5 rows × 8 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We can see that the degree 7 polynomial features have much larger values than the degree 1 features. This means that a large model weight for the degree 7 features affects the predictions much more than a large model weight for the degree 1 features. If we apply regularization to this data directly, the regularization penalty will disproportionately lower the model weight for the lower degree features. In practice, this often results in high model variance even after applying regularization since the features with large effect on prediction will not be affected.</p>
 <p>To combat this, we <em>normalize</em> each data column by subtracting the mean and scaling the values in each column to be between -1 and 1. In <code>scikit-learn</code>, most regression models allow initializing with <code>normalize=True</code> to normalize the data before fitting.</p>
-<p>Another analogous technique is <em>standardizing</em> the data columns by subtracting the mean and dividing by the standard deviation for each data column.</p></div></div></div>
+<p>Another analogous technique is <em>standardizing</em> the data columns by subtracting the mean and dividing by the standard deviation for each data column.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Using-Ridge-Regression">Using Ridge Regression<a class="anchor-link" href="#Using-Ridge-Regression">&#182;</a></h2><p>We have previously used polynomial features to fit polynomials of degree 2, 8, and 12 to water flow data. The original data and resulting model predictions are repeated below.</p></div></div></div>
+<h2 id="Using-Ridge-Regression">Using Ridge Regression<a class="anchor-link" href="#Using-Ridge-Regression">&#182;</a></h2><p>We have previously used polynomial features to fit polynomials of degree 2, 8, and 12 to water flow data. The original data and resulting model predictions are repeated below.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -329,7 +418,11 @@ $$<p>Notice that the cost function above is the same as before with the addition
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">df</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -401,7 +494,16 @@ $$<p>Notice that the cost function above is the same as before with the addition
     </tr>
   </tbody>
 </table>
-<p>23 rows × 2 columns</p></div></div></div></div></div></div>
+<p>23 rows × 2 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -411,7 +513,11 @@ $$<p>Notice that the cost function above is the same as before with the addition
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">plot_curves</span><span class="p">(</span><span class="n">curves</span><span class="p">)</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -425,10 +531,22 @@ $$<p>Notice that the cost function above is the same as before with the addition
 
 <div class="output_png output_subarea ">
 <img src="/notebooks-images/reg_ridge_17_0.png"
-></div></div></div></div></div>
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>To conduct ridge regression, we first extract the data matrix and the vector of outcomes from the data:</p></div></div></div>
+<p>To conduct ridge regression, we first extract the data matrix and the vector of outcomes from the data:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -443,7 +561,11 @@ $$<p>Notice that the cost function above is the same as before with the addition
 <span class="nb">print</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y: &#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -465,10 +587,21 @@ $$<p>Notice that the cost function above is the same as before with the addition
 
 y: 
 [6.04e+10 3.32e+10 9.73e+11 ... 2.36e+11 1.49e+12 3.78e+11]
-</pre></div></div></div></div></div>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Then, we apply a degree 12 polynomial transform to <code>X</code>:</p></div></div></div>
+<p>Then, we apply a degree 12 polynomial transform to <code>X</code>:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -483,7 +616,11 @@ y:
 <span class="n">X_poly_8</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;First two rows of transformed X:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X_poly_8</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -499,10 +636,21 @@ y:
    4.16e+09]
  [-2.92e+01  8.50e+02 -2.48e+04  7.22e+05 -2.11e+07  6.14e+08 -1.79e+10
    5.22e+11]]
-</pre></div></div></div></div></div>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We specify <code>alpha</code> values that <code>scikit-learn</code> will select from using cross-validation, then use the <code>RidgeCV</code> classifier to fit the transformed data.</p></div></div></div>
+<p>We specify <code>alpha</code> values that <code>scikit-learn</code> will select from using cross-validation, then use the <code>RidgeCV</code> classifier to fit the transformed data.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -519,7 +667,11 @@ y:
 
 <span class="c1"># Display the chosen alpha value:</span>
 <span class="n">clf</span><span class="o">.</span><span class="n">alpha_</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -532,10 +684,22 @@ y:
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>0.1</pre></div></div></div></div></div>
+<pre>0.1</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Finally, we plot the model predictions for the base degree 8 polynomial classifier next to the regularized degree 8 classifier:</p></div></div></div>
+<p>Finally, we plot the model predictions for the base degree 8 polynomial classifier next to the regularized degree 8 classifier:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -556,7 +720,11 @@ y:
 <span class="n">plot_curve</span><span class="p">(</span><span class="n">ridge_curves</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Regularized degree 8 polynomial&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -570,11 +738,23 @@ y:
 
 <div class="output_png output_subarea ">
 <img src="/notebooks-images/reg_ridge_25_0.png"
-></div></div></div></div></div>
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We can see that the regularized polynomial is smoother than the base degree 8 polynomial and still captures the major trend in the data.</p>
-<p>Comparing the coefficients of the non-regularized and regularized models shows that ridge regression favors placing model weights on the lower degree polynomial terms:</p></div></div></div>
+<p>Comparing the coefficients of the non-regularized and regularized models shows that ridge regression favors placing model weights on the lower degree polynomial terms:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -589,7 +769,11 @@ y:
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="n">display</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ridge</span><span class="p">))</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -675,10 +859,23 @@ y:
       <td>0.00</td>
     </tr>
   </tbody>
-</table></div></div></div></div></div></div>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Repeating the process for degree 12 polynomial features results in a similar result:</p></div></div></div>
+<p>Repeating the process for degree 12 polynomial features results in a similar result:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -701,7 +898,11 @@ y:
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Regularized degree 12 polynomial&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">5e10</span><span class="p">,</span> <span class="mf">170e10</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -715,10 +916,22 @@ y:
 
 <div class="output_png output_subarea ">
 <img src="/notebooks-images/reg_ridge_29_0.png"
-></div></div></div></div></div>
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Increasing the regularization parameter results in progressively simpler models. The plot below demonstrates the effects of increasing the regularization amount from 0.001 to 100.0.</p></div></div></div>
+<p>Increasing the regularization parameter results in progressively simpler models. The plot below demonstrates the effects of increasing the regularization amount from 0.001 to 100.0.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -738,7 +951,11 @@ y:
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;$</span><span class="se">\\</span><span class="s1">lambda = </span><span class="si">{alpha}</span><span class="s1">$&#39;</span> <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">]</span>
 
 <span class="n">plot_curves</span><span class="p">(</span><span class="n">alpha_curves</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-</pre></div></div></div></div>
+</pre></div>
+
+</div>
+</div>
+</div>
 
 <div class="output_wrapper">
 <div class="output">
@@ -752,10 +969,29 @@ y:
 
 <div class="output_png output_subarea ">
 <img src="/notebooks-images/reg_ridge_31_0.png"
-></div></div></div></div></div>
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As we can see, increasing the regularization parameter increases the bias of our model. If our parameter is too large, the model becomes a constant model because any non-zero model weight is heavily penalized.</p></div></div></div>
+<p>As we can see, increasing the regularization parameter increases the bias of our model. If our parameter is too large, the model becomes a constant model because any non-zero model weight is heavily penalized.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Using $ L_2 $ regularization allows us to tune model bias and variance by penalizing large model weights. $ L_2 $ regularization for least squares linear regression is also known by the more common name ridge regression. Using regularization adds an additional model parameter $ \lambda $ that we adjust using cross-validation.</p></div></div></div></div>
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Using $ L_2 $ regularization allows us to tune model bias and variance by penalizing large model weights. $ L_2 $ regularization for least squares linear regression is also known by the more common name ridge regression. Using regularization adds an additional model parameter $ \lambda $ that we adjust using cross-validation.</p>
+
+</div>
+</div>
+</div>
+
+
+</div>
