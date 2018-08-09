@@ -24,7 +24,14 @@ import nbformat
 from nbinteract import InteractExporter
 from traitlets.config import Config
 
+# The HTML file needs to start with Jekyll front-matter and wrapped in a raw
+# tag so that Jekyll won't process double curly braces in the HTML
 wrapper = """
+---
+---
+
+{{% raw %}}
+
 <div id="ipython-notebook">
     <div class="buttons">
         <button class="interact-button js-nbinteract-widget">
@@ -34,7 +41,9 @@ wrapper = """
     </div>
     {html}
 </div>
-"""
+
+{{% endraw %}}
+""".strip()
 
 html_exporter = InteractExporter(
     config=Config(
@@ -50,7 +59,7 @@ html_exporter = InteractExporter(
 )
 
 # Output notebook HTML partials into this directory
-NOTEBOOK_HTML_DIR = 'notebooks-html'
+NOTEBOOK_HTML_DIR = 'ch'
 
 # Output notebook HTML images into this directory
 NOTEBOOK_IMAGE_DIR = 'notebooks-images'
@@ -112,12 +121,8 @@ def convert_notebooks_to_html_partial(notebook_paths):
         )
 
         # Write out HTML
-        outfile_path = os.path.join('ch', chapter, outfile_name)
+        outfile_path = os.path.join(NOTEBOOK_HTML_DIR, chapter, outfile_name)
         with open(outfile_path, 'w', encoding='utf-8') as outfile:
-            # Jekyll pages need to start with front-matter, so we'll put
-            # a placeholder front-matter
-            # https://jekyllrb.com/docs/frontmatter/
-            outfile.write('---\n---\n')
             outfile.write(final_output)
 
         # Write out images
