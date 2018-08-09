@@ -22,9 +22,9 @@ pd.set_option('precision', 2)
 
 ## A Brief Review
 
-We initially fit our model to the tips dataset by finding the $\theta$ that minimized the MSE loss function, $L(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \theta)^2$. To calculate the minimizing value of $\theta$, we took the derivative of the MSE, set it equal to zero, and solved for $\theta$. We found that the optimal $\theta$ value was simply the mean of the $y$ values in our dataset.
+We initially fit our model to the tips dataset by finding the $\theta$ that minimized the MSE loss function, $L(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^{n}(y_i - \theta)^2$. To calculate the minimizing value of $\hat\theta$, we took the derivative of the MSE, set it equal to zero, and solved for $\theta$. We found that the optimal $\hat\theta$ was simply the mean of the $\textbf{y}$ values in our dataset.
 
-However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\theta$ values. Instead, we use the gradient descent algorithm to iteratively improve $\theta$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:
+However, for more complicated models and loss functions, there may not be simple algebraic expressions that yield the loss-minimizing $\hat\theta$ values. Instead, we use the gradient descent algorithm to iteratively improve $\theta$ until convergence at a loss minimum. To complete an iteration of gradient descent, we calculate the following:
 
 $$
 {\theta}^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_{\theta} L(\theta^{(t)}, \textbf{y})
@@ -62,11 +62,11 @@ $$
 \theta^{(t+1)} = \theta^{(t)} - \alpha \nabla_\theta l(\theta^{(t)}, y_i)
 $$
 
-Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point.
+Returning back to our example using the MSE, we approximate the gradient of the mean squared error using the gradient of the squared loss of one data point. 
 
 $$
 \begin{align}
-\nabla_{\theta}L(\theta, y) &\approx \nabla_{\theta} l(\theta, y_i) \\
+\nabla_{\theta}L(\theta, \textbf{y}) &\approx \nabla_{\theta} l(\theta, y_i) \\
 &= -2(y_i - \theta)
 \end{align}
 $$
@@ -102,10 +102,10 @@ def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2):
             rand_obs = dataset[i]
             gradient = grad_loss_fn(theta, rand_obs)
             new_theta = theta - alpha * gradient
-
+        
             if abs(new_theta - theta) < 0.001:
                 return new_theta
-
+        
             theta = new_theta
         np.random.shuffle(dataset)
 ```
@@ -115,17 +115,17 @@ def minimize_sgd(loss_fn, grad_loss_fn, dataset, alpha=0.2):
 **Mini-batch gradient descent** strikes a balance between batch gradient descent and stochastic gradient descent by increasing the number of observations that we select at each iteration. In mini-batch gradient descent, we take a simple random sample of observations called a mini-batch. We use the average of the gradients of their loss functions to construct an estimate of the true gradient of the cross entropy loss. Since our sample is randomly selected, the expectation of this estimate is equal to the true gradient. This is illustrated in the approximation for the gradient of the loss function, where $\mathcal{B}$ is the mini-batch of data points that we randomly sample from the $n$ observations.
 
 $$
-\nabla_\theta L(\theta, y) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\theta}l(\theta, y_i)
+\nabla_\theta L(\theta, \textbf{y}) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\theta}l(\theta, y_i)
 $$
 
 As with stochastic gradient descent, we perform mini-batch gradient descent by shuffling our training data and selecting mini-batches by iterating through the shuffled data. After each epoch, we re-shuffle our data and select new mini-batches.
 
-While we have made the distinction between stochastic and mini-batch gradient descent in this textbook, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size.
+While we have made the distinction between stochastic and mini-batch gradient descent in this textbook, stochastic gradient descent is sometimes used as an umbrella term that encompasses the selection of a mini-batch of any size. 
 
 
 ### Selecting the Mini-Batch Size
 
-Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations.
+Mini-batch gradient descent is most optimal when running on a Graphical Processing Unit (GPU) or on distributed systems. Since computations on these hardware machines can be executed in parallel, using a mini-batch can increase the accuracy of the gradient without increasing computation time. Depending on the memory of the GPU, the mini-batch size is often set between 10 and 100 observations. 
 
 ### Defining a Function for Mini-Batch Gradient Descent
 
@@ -141,7 +141,7 @@ def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.
     """
     NUM_OBS = len(dataset)
     assert minibatch_size < NUM_OBS
-
+    
     theta = 0
     np.random.shuffle(dataset)
     while True:
@@ -149,10 +149,10 @@ def minimize_mini_batch(loss_fn, grad_loss_fn, dataset, minibatch_size, alpha=0.
             mini_batch = dataset[i:i+minibatch_size]
             gradient = grad_loss_fn(theta, mini_batch)
             new_theta = theta - alpha * gradient
-
+            
             if abs(new_theta - theta) < 0.001:
                 return new_theta
-
+            
             theta = new_theta
         np.random.shuffle(dataset)
 ```

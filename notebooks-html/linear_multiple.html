@@ -4,7 +4,7 @@
         <button class="interact-button js-nbinteract-widget">
             Show Widgets
         </button>
-        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch12/linear_multiple.ipynb">Open on DataHub</a></div>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch13/linear_multiple.ipynb">Open on DataHub</a></div>
     
 
 
@@ -23,12 +23,12 @@
 
 <span class="c1"># Set directory for data loading to work properly</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch12&#39;</span><span class="p">))</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch13&#39;</span><span class="p">))</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Multiple-Linear-Regression" data-toc-modified-id="Multiple-Linear-Regression-1">Multiple Linear Regression</a></span></li><li><span><a href="#MSE-Cost-and-its-Gradient" data-toc-modified-id="MSE-Cost-and-its-Gradient-2">MSE Cost and its Gradient</a></span></li><li><span><a href="#Fitting-the-Model-With-Gradient-Descent" data-toc-modified-id="Fitting-the-Model-With-Gradient-Descent-3">Fitting the Model With Gradient Descent</a></span></li><li><span><a href="#Visualizing-our-Predictions" data-toc-modified-id="Visualizing-our-Predictions-4">Visualizing our Predictions</a></span></li><li><span><a href="#Using-All-the-Data" data-toc-modified-id="Using-All-the-Data-5">Using All the Data</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-6">Summary</a></span></li></ul></div></div></div></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Multiple-Linear-Regression" data-toc-modified-id="Multiple-Linear-Regression-1">Multiple Linear Regression</a></span></li><li><span><a href="#MSE-Loss-and-its-Gradient" data-toc-modified-id="MSE-Loss-and-its-Gradient-2">MSE Loss and its Gradient</a></span></li><li><span><a href="#Fitting-the-Model-With-Gradient-Descent" data-toc-modified-id="Fitting-the-Model-With-Gradient-Descent-3">Fitting the Model With Gradient Descent</a></span></li><li><span><a href="#Visualizing-our-Predictions" data-toc-modified-id="Visualizing-our-Predictions-4">Visualizing our Predictions</a></span></li><li><span><a href="#Using-All-the-Data" data-toc-modified-id="Using-All-the-Data-5">Using All the Data</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-6">Summary</a></span></li></ul></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -83,21 +83,21 @@
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span> <span class="k">as</span> <span class="n">sci_min</span>
-<span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost_fn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Uses scipy.minimize to minimize cost_fn using a form of gradient descent.</span>
+<span class="sd">    Uses scipy.minimize to minimize loss_fn using a form of gradient descent.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">iters</span> <span class="o">=</span> <span class="mi">0</span>
     
     <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">grad_cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">grad_loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">print_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
         <span class="k">nonlocal</span> <span class="n">iters</span>
         <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="n">iters</span> <span class="o">%</span> <span class="n">progress</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta}</span><span class="s1"> | cost: {cost_fn(theta, X, y):.2f}&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta}</span><span class="s1"> | loss: {loss_fn(theta, X, y):.2f}&#39;</span><span class="p">)</span>
         <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
         
     <span class="n">print_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
@@ -289,10 +289,10 @@
 <p>It seems possible that we can get a more accurate model if we could take both horsepower and model year into account when making predictions about the MPG. In fact, perhaps the best model takes into account all the numerical variables in our dataset. We can extend our univariate linear regression to allow prediction based on any number of attributes.</p>
 <p>We state the following model:</p>
 <p>$$
-f_\hat{\theta} (x) = \hat{\theta_0} + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p
+f_\boldsymbol\theta (\textbf{x}) = \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p
 $$</p>
-<p>Where $ x $ now represents a vector containing $ p $ attributes of a single car. The model above says, "Take multiple attributes of a car, multiply them by some weights, and add them together to make a prediction for MPG."</p>
-<p>For example, if we're making a prediction on the first car in our dataset using the horsepower, weight, and model year columns, the vector $ x $ looks like:</p></div></div></div>
+<p>Where $ \textbf{x} $ now represents a vector containing $ p $ attributes of a single car. The model above says, "Take multiple attributes of a car, multiply them by some weights, and add them together to make a prediction for MPG."</p>
+<p>For example, if we're making a prediction on the first car in our dataset using the horsepower, weight, and model year columns, the vector $ \textbf{x} $ looks like:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -348,8 +348,8 @@ $$</p>
 </table></div></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In there examples, we've kept the column names for clarity but keep in mind that $ x $ only contains the numerical values of the table above: $ x = [130.0, 3504.0, 70] $.</p>
-<p>Now, we will perform a notational trick that will greatly simplify later formulas. We will prepend the value $ 1 $ to the vector $ x $, so that we have the following vector for $ x $:</p></div></div></div>
+<p>In there examples, we've kept the column names for clarity but keep in mind that $ \textbf{x} $ only contains the numerical values of the table above: $ \textbf{x} = [130.0, 3504.0, 70] $.</p>
+<p>Now, we will perform a notational trick that will greatly simplify later formulas. We will prepend the value $ 1 $ to the vector $ \textbf{x} $, so that we have the following vector for $ \textbf{x} $:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -411,15 +411,15 @@ $$</p>
 <p>Now, observe what happens to the formula for our model:</p>
 <p>$$
 \begin{aligned}
-f_\hat{\theta} (x)
-&amp;= \hat{\theta_0} + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p \\
-&amp;= \hat{\theta_0} (1) + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p \\
-&amp;= \hat{\theta_0} x_0 + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p \\
-f_\hat{\theta} (x) &amp;= \hat{\theta} \cdot x
+f_\boldsymbol\theta (\textbf{x})
+&amp;= \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p \\
+&amp;= \theta_0 (1) + \theta_1 x_1 + \ldots + \theta_p x_p \\
+&amp;= \theta_0 x_0 + \theta_1 x_1 + \ldots + \theta_p x_p \\
+f_\boldsymbol\theta (\textbf{x}) &amp;= \boldsymbol\theta \cdot \textbf{x}
 \end{aligned}
 $$</p>
-<p>Where $ \hat{\theta} \cdot x $ is the vector dot product of $ \hat{\theta} $ and $ x $. Vector and matrix notation was designed to succinctly write linear combinations and is thus well-suited for our linear models. However, you will have to remember from now on that $ \hat{\theta} \cdot x $ is a vector-vector dot product. When in doubt, you can always expand the dot product into simple multiplications and additions.</p>
-<p>Now, we define the matrix $ X $ as the matrix containing every car model as a row and a first column of biases. For example, here are the first five rows of $ X $:</p></div></div></div>
+<p>Where $ \boldsymbol\theta \cdot \textbf{x} $ is the vector dot product of $ \boldsymbol\theta $ and $ \textbf{x} $. Vector and matrix notation were designed to succinctly write linear combinations and is thus well-suited for our linear models. However, you will have to remember from now on that $ \boldsymbol\theta \cdot \textbf{x} $ is a vector-vector dot product. When in doubt, you can always expand the dot product into simple multiplications and additions.</p>
+<p>Now, we define the matrix $  \textbf{X} $ as the matrix containing every car model as a row and a first column of biases. For example, here are the first five rows of $  \textbf{X} $:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -506,25 +506,25 @@ $$</p>
 </table></div></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Again, keep in mind that the actual matrix $ X $ only contains the numerical values of the table above.</p>
-<p>Notice that $ X $ is composed of multiple $ x $ vectors stacked on top of each other. To keep the notation clear, we define $ X_{i} $ to refer to the row with index $ i $ of $ X $. We define $ X_{i,j} $ to refer to the element with index $ j $ of the row with index $ i $ of $ X $. Thus, $ X_i $ is a $ p $-dimensional vector and $ X_{i,j} $ is a scalar. $ X $ is an $ n \times p $ matrix, where $n$ is the number of car examples we have and $p$ is the number of attributes we have for a single car.</p>
-<p>For example, from the table above we have $ X_4 = [1, 140, 3449, 70] $ and $ X_{4,1} = 140 $. This notation becomes important when we define the cost function since we will need both $ X $, the matrix of input values, and $ y $, the vector of MPGs.</p></div></div></div>
+<p>Again, keep in mind that the actual matrix $  \textbf{X} $ only contains the numerical values of the table above.</p>
+<p>Notice that $ \textbf{X} $ is composed of multiple $ \textbf{x} $ vectors stacked on top of each other. To keep the notation clear, we define $ \textbf{X}_{i} $ to refer to the row vector with index $ i $ of $  \textbf{X} $. We define $ X_{i,j} $ to refer to the element with index $ j $ of the row with index $ i $ of $  \textbf{X} $. Thus, $ \textbf{X}_i $ is a $ p $-dimensional vector and $ X_{i,j} $ is a scalar. $  \textbf{X} $ is an $ n \times p $ matrix, where $n$ is the number of car examples we have and $p$ is the number of attributes we have for a single car.</p>
+<p>For example, from the table above we have $ \textbf{X}_4 = [1, 140, 3449, 70] $ and $ X_{4,1} = 140 $. This notation becomes important when we define the loss function since we will need both $  \textbf{X} $, the matrix of input values, and $ \textbf{y} $, the vector of MPGs.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="MSE-Cost-and-its-Gradient">MSE Cost and its Gradient<a class="anchor-link" href="#MSE-Cost-and-its-Gradient">&#182;</a></h2><p>The mean squared error cost function takes in a vector of weights $ \hat{\theta} $, a matrix of inputs $ X $, and a vector of observed MPGs $ y $:</p>
+<h2 id="MSE-Loss-and-its-Gradient">MSE Loss and its Gradient<a class="anchor-link" href="#MSE-Loss-and-its-Gradient">&#182;</a></h2><p>The mean squared error loss function takes in a vector of weights $ \boldsymbol\theta $, a matrix of inputs $  \textbf{X} $, and a vector of observed MPGs $ \textbf{y} $:</p>
 <p>$$
 \begin{aligned}
-L(\hat{\theta}, X, y)
-&amp;= \frac{1}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))^2\\
+L(\boldsymbol\theta, \textbf{X}, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i}(y_i - f_\boldsymbol\theta (\textbf{X}_i))^2\\
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We've previously derived the gradient of the MSE cost with respect to $ \hat{\theta} $:</p>
+<p>We've previously derived the gradient of the MSE loss with respect to $ \boldsymbol\theta $:</p>
 <p>$$
 \begin{aligned}
-\nabla_{\hat\theta} L(\hat{\theta}, X, y)
-&amp;= -\frac{2}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))(\nabla_{\hat\theta} f_\hat{\theta} (X_i))\\
+\nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{X}, \textbf{y})
+&amp;= -\frac{2}{n} \sum_{i}(y_i - f_\boldsymbol\theta (\textbf{X}_i))(\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{X}_i))\\
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
@@ -532,19 +532,19 @@ $$</p></div></div></div>
 <p>We know that:</p>
 <p>$$
 \begin{aligned}
-f_\hat{\theta} (x) &amp;= \hat{\theta} \cdot x \\
+f_\boldsymbol\theta (\textbf{x}) &amp;= \boldsymbol\theta \cdot \textbf{x} \\
 \end{aligned}
 $$</p>
-<p>Let's now compute $ \nabla_{\hat\theta} f_\hat{\theta} (x) $. The result is surprisingly simple because $ \hat{\theta} \cdot x = \hat{\theta_0} x_0 + \ldots + \hat{\theta_p} x_p $ and thus $ \frac{\partial}{\partial \theta_0}(\hat{\theta} \cdot x) = x_0 $, $ \frac{\partial}{\partial \theta_1}(\hat{\theta} \cdot x) = x_1 $, and so on.</p>
+<p>Let's now compute $ \nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{x}) $. The result is surprisingly simple because $ \boldsymbol\theta \cdot \textbf{x} = \theta_0 x_0 + \ldots + \theta_p x_p $ and thus $ \frac{\partial}{\partial \theta_0}(\boldsymbol\theta \cdot \textbf{x}) = x_0 $, $ \frac{\partial}{\partial \theta_1}(\boldsymbol\theta \cdot \textbf{x}) = x_1 $, and so on.</p>
 <p>$$
 \begin{aligned}
-\nabla_{\hat\theta} f_\hat{\theta} (x)
-&amp;= \nabla_{\hat\theta} [ \hat{\theta} \cdot x ] \\
+\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{x})
+&amp;= \nabla_{\boldsymbol\theta} [ \boldsymbol\theta \cdot \textbf{x} ] \\
 &amp;= \begin{bmatrix}
-     \frac{\partial}{\partial \theta_0} (\hat{\theta} \cdot x) \\
-     \frac{\partial}{\partial \theta_1} (\hat{\theta} \cdot x) \\
+     \frac{\partial}{\partial \theta_0} (\boldsymbol\theta \cdot \textbf{x}) \\
+     \frac{\partial}{\partial \theta_1} (\boldsymbol\theta \cdot \textbf{x}) \\
      \vdots \\
-     \frac{\partial}{\partial \theta_p} (\hat{\theta} \cdot x) \\
+     \frac{\partial}{\partial \theta_p} (\boldsymbol\theta \cdot \textbf{x}) \\
    \end{bmatrix} \\
 &amp;= \begin{bmatrix}
      x_0 \\
@@ -552,7 +552,7 @@ $$</p>
      \vdots \\
      x_p
    \end{bmatrix} \\
-\nabla_{\hat\theta} f_\hat{\theta} (x) &amp;= x
+\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{x}) &amp;= \textbf{x}
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
@@ -560,16 +560,16 @@ $$</p></div></div></div>
 <p>Finally, we plug this result back into our gradient calculations:</p>
 <p>$$
 \begin{aligned}
-\nabla_{\hat\theta} L(\hat{\theta}, X, y)
-&amp;= -\frac{2}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))(\nabla_{\hat\theta} f_\hat{\theta} (X_i))\\
-&amp;= -\frac{2}{n} \sum_{i}(y_i - \hat{\theta} \cdot X_i)(X_i)\\
+\nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{X}, \textbf{y})
+&amp;= -\frac{2}{n} \sum_{i}(y_i - f_\boldsymbol\theta (\textbf{X}_i))(\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{X}_i))\\
+&amp;= -\frac{2}{n} \sum_{i}(y_i - \boldsymbol\theta \cdot \textbf{X}_i)(\textbf{X}_i)\\
 \end{aligned}
 $$</p>
-<p>Remember that since $ y_i - \hat{\theta} \cdot X_i $ is a scalar and $ X_i $ is a $ p $-dimensional vector, the gradient $ \nabla_{\hat\theta} L(\hat{\theta}, X, y) $ is a $ p $-dimensional vector.</p>
-<p>We saw this same type of result when we computed the gradient for univariate linear regression and found that it was 2-dimensional since $ \theta $ was 2-dimensional.</p></div></div></div>
+<p>Remember that since $ y_i - \boldsymbol\theta \cdot \textbf{X}_i $ is a scalar and $ \textbf{X}_i $ is a $ p $-dimensional vector, the gradient $ \nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{X}, \textbf{y}) $ is a $ p $-dimensional vector.</p>
+<p>We saw this same type of result when we computed the gradient for univariate linear regression and found that it was 2-dimensional since $ \boldsymbol\theta $ was 2-dimensional.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Fitting-the-Model-With-Gradient-Descent">Fitting the Model With Gradient Descent<a class="anchor-link" href="#Fitting-the-Model-With-Gradient-Descent">&#182;</a></h2><p>We can now plug in our cost and its derivative into gradient descent. As usual, we will define the model, cost, and gradient cost in Python.</p></div></div></div>
+<h2 id="Fitting-the-Model-With-Gradient-Descent">Fitting the Model With Gradient Descent<a class="anchor-link" href="#Fitting-the-Model-With-Gradient-Descent">&#182;</a></h2><p>We can now plug in our loss and its derivative into gradient descent. As usual, we will define the model, loss, and gradient loss in Python.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -579,14 +579,14 @@ $$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Returns predictions by a linear model on x_vals.&#39;&#39;&#39;</span>
-    <span class="k">return</span> <span class="n">X</span> <span class="o">@</span> <span class="n">thetas</span>
+    <span class="k">return</span>  \<span class="n">textbf</span><span class="p">{</span><span class="n">X</span><span class="p">}</span> <span class="o">@</span> <span class="n">thetas</span>
 
-<span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">grad_mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">grad_mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>  <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">@</span> <span class="n">thetas</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> \<span class="n">textbf</span><span class="p">{</span><span class="n">y</span><span class="p">}</span>  <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span>  \<span class="n">textbf</span><span class="p">{</span><span class="n">X</span><span class="p">}</span> <span class="o">@</span> <span class="n">thetas</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -597,12 +597,12 @@ $$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+ \<span class="n">textbf</span><span class="p">{</span><span class="n">X</span><span class="p">}</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">),</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">grad_mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">[</span> <span class="mf">3.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">grad_mse_cost</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">[</span> <span class="mf">25.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">,</span>  <span class="mf">35.</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">grad_mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">[</span> <span class="mf">3.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">grad_mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span>  \<span class="n">textbf</span><span class="p">{</span><span class="n">X</span><span class="p">}</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">[</span> <span class="mf">25.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">,</span>  <span class="mf">35.</span><span class="p">])</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -615,7 +615,7 @@ $$</p>
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpg_mat</span>
+ \<span class="n">textbf</span><span class="p">{</span><span class="n">X</span><span class="p">}</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpg_mat</span>
      <span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;bias&#39;</span><span class="p">,</span> <span class="s1">&#39;horsepower&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;model year&#39;</span><span class="p">]]</span>
      <span class="o">.</span><span class="n">as_matrix</span><span class="p">())</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">mpg_mat</span><span class="p">[</span><span class="s1">&#39;mpg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
@@ -629,8 +629,8 @@ $$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span> 
 
-thetas = minimize(mse_cost, grad_mse_cost, X, y)
-print(f&#39;theta: {thetas} | cost: {mse_cost(thetas, X, y):.2f}&#39;)
+thetas = minimize(mse_loss, grad_mse_loss, X, y)
+print(f&#39;theta: {thetas} | loss: {mse_loss(thetas, X, y):.2f}&#39;)
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -658,7 +658,7 @@ Wall time: 9.22 ms
 <p>$y = -13.72 - 0.01x_2 + 0.75x_3$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Visualizing-our-Predictions">Visualizing our Predictions<a class="anchor-link" href="#Visualizing-our-Predictions">&#182;</a></h2><p>How does our model do? We can see that the cost decreased dramatically (from 610 to 11.6). We can show the predictions of our model alongside the original values:</p></div></div></div>
+<h2 id="Visualizing-our-Predictions">Visualizing our Predictions<a class="anchor-link" href="#Visualizing-our-Predictions">&#182;</a></h2><p>How does our model do? We can see that the loss decreased dramatically (from 610 to 11.6). We can show the predictions of our model alongside the original values:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -773,7 +773,7 @@ Wall time: 9.22 ms
 <p>392 rows × 5 columns</p></div></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Since we found $ \hat{\theta} $ from gradient descent, we can verify for the first row of our data that $ \hat{\theta} \cdot X_0 $ matches our prediction above:</p></div></div></div>
+<p>Since we found $ \boldsymbol\theta $ from gradient descent, we can verify for the first row of our data that $ \boldsymbol\theta \cdot \textbf{X}_0 $ matches our prediction above:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -842,7 +842,7 @@ Wall time: 9.22 ms
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">resid</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">resid</span> <span class="o">=</span> \<span class="n">textbf</span><span class="p">{</span><span class="n">y</span><span class="p">}</span> <span class="o">-</span> <span class="n">linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resid</span><span class="p">)),</span> <span class="n">resid</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Residuals (actual MPG - predicted MPG)&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Index of row in data&#39;</span><span class="p">)</span>
@@ -897,13 +897,13 @@ Wall time: 9.22 ms
 <p>It looks like our model's predictions are usually within 20% away from the actual MPG values.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Using-All-the-Data">Using All the Data<a class="anchor-link" href="#Using-All-the-Data">&#182;</a></h2><p>Notice that in our example thus far, our $ X $ matrix has four columns: one column of all ones, the horsepower, the weight, and the model year. However, model allows us to handle an arbitrary number of columns:</p>
+<h2 id="Using-All-the-Data">Using All the Data<a class="anchor-link" href="#Using-All-the-Data">&#182;</a></h2><p>Notice that in our example thus far, our $  \textbf{X} $ matrix has four columns: one column of all ones, the horsepower, the weight, and the model year. However, model allows us to handle an arbitrary number of columns:</p>
 <p>$$
 \begin{aligned}
-f_\hat{\theta} (x) &amp;= \hat{\theta} \cdot x
+f_\boldsymbol\theta (\textbf{x}) &amp;= \boldsymbol\theta \cdot \textbf{x}
 \end{aligned}
 $$</p>
-<p>As we include more columns into our data matrix, we extend $ \theta $ so that it has one parameter for each column in $ X $. Instead of only selecting three numerical columns for prediction, why not use all seven of them?</p></div></div></div>
+<p>As we include more columns into our data matrix, we extend $ \boldsymbol\theta $ so that it has one parameter for each column in $  \textbf{X} $. Instead of only selecting three numerical columns for prediction, why not use all seven of them?</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -914,7 +914,7 @@ $$</p>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bias&#39;</span><span class="p">,</span> <span class="s1">&#39;cylinders&#39;</span><span class="p">,</span> <span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="s1">&#39;horsepower&#39;</span><span class="p">,</span>
         <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;acceleration&#39;</span><span class="p">,</span> <span class="s1">&#39;model year&#39;</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">mpg_mat</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+ \<span class="n">textbf</span><span class="p">{</span><span class="n">X</span><span class="p">}</span> <span class="o">=</span> <span class="n">mpg_mat</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
 <span class="n">mpg_mat</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
 </pre></div></div></div></div>
 
@@ -1038,8 +1038,8 @@ $$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span> 
 
-thetas_all = minimize(mse_cost, grad_mse_cost, X, y, progress=10)
-print(f&#39;theta: {thetas_all} | cost: {mse_cost(thetas_all, X, y):.2f}&#39;)
+thetas_all = minimize(mse_loss, grad_mse_loss, X, y, progress=10)
+print(f&#39;theta: {thetas_all} | loss: {mse_loss(thetas_all, X, y):.2f}&#39;)
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -1062,7 +1062,7 @@ Wall time: 11.7 ms
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>According to gradient descent, our linear model is:</p>
 <p>$y = -17.22 - 0.49x_1 + 0.02x_2 - 0.02x_3 - 0.01x_4 + 0.08x_5 + 0.75x_6 + 1.43x_7$</p>
-<p>We see that our cost has decreased from 11.6 with three columns of our dataset to 10.85 when using all seven numerical columns of our dataset. We display the proportion error plots for both old and new predictions below:</p></div></div></div>
+<p>We see that our loss has decreased from 11.6 with three columns of our dataset to 10.85 when using all seven numerical columns of our dataset. We display the proportion error plots for both old and new predictions below:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -1144,7 +1144,7 @@ Wall time: 11.7 ms
 <p>The procedure of fitting a model to data should now be quite familiar:</p>
 <ol>
 <li>Select a model.</li>
-<li>Select a cost function.</li>
-<li>Minimize the cost function using gradient descent.</li>
+<li>Select a loss function.</li>
+<li>Minimize the loss function using gradient descent.</li>
 </ol>
-<p>It is useful to know that we can usually tweak one of the components without changing the others. In this section, we introduced the linear model without changing our cost function or using a different minimization algorithm. Although modeling can get complicated, it is usually easier to learn by focusing on one component at a time, then combining different parts together as needed in practice.</p></div></div></div></div>
+<p>It is useful to know that we can usually tweak one of the components without changing the others. In this section, we introduced the linear model without changing our loss function or using a different minimization algorithm. Although modeling can get complicated, it is usually easier to learn by focusing on one component at a time, then combining different parts together as needed in practice.</p></div></div></div></div>
