@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#Minimizing-the-Huber-cost" data-toc-modified-id="Minimizing-the-Huber-cost-1.4">Minimizing the Huber cost</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#Minimizing-the-Huber-loss" data-toc-modified-id="Minimizing-the-Huber-loss-1.4">Minimizing the Huber loss</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div>
 
 
 ```python
@@ -30,173 +30,161 @@ tips['pcttip'] = tips['tip'] / tips['total_bill'] * 100
 
 ```python
 # HIDDEN
-def mse_cost(theta, y_vals):
+def mse(theta, y_vals):
     return np.mean((y_vals - theta) ** 2)
 
-def grad_mse_cost(theta, y_vals):
+def grad_mse(theta, y_vals):
     return -2 * np.mean(y_vals - theta)
 
-def plot_cost(y_vals, xlim, cost_fn):
+def plot_loss(y_vals, xlim, loss_fn):
     thetas = np.arange(xlim[0], xlim[1] + 0.01, 0.05)
-    costs = [cost_fn(theta, y_vals) for theta in thetas]
+    losses = [loss_fn(theta, y_vals) for theta in thetas]
     
     plt.figure(figsize=(5, 3))
-    plt.plot(thetas, costs, zorder=1)
+    plt.plot(thetas, losses, zorder=1)
     plt.xlim(*xlim)
-    plt.title(cost_fn.__name__)
+    plt.title(loss_fn.__name__)
     plt.xlabel(r'$ \theta $')
-    plt.ylabel('Cost')
+    plt.ylabel('Loss')
     plt.legend()
     
-def plot_theta_on_cost(y_vals, theta, cost_fn, **kwargs):
-    cost = cost_fn(theta, y_vals)
+def plot_theta_on_loss(y_vals, theta, loss_fn, **kwargs):
+    loss = loss_fn(theta, y_vals)
     default_args = dict(label=r'$ \theta $', zorder=2,
                         s=200, c=sns.xkcd_rgb['green'])
-    plt.scatter([theta], [cost], **{**default_args, **kwargs})
+    plt.scatter([theta], [loss], **{**default_args, **kwargs})
 
-def plot_tangent_on_cost(y_vals, theta, cost_fn, eps=1e-6):
-    slope = ((cost_fn(theta + eps, y_vals) - cost_fn(theta - eps, y_vals))
+def plot_tangent_on_loss(y_vals, theta, loss_fn, eps=1e-6):
+    slope = ((loss_fn(theta + eps, y_vals) - loss_fn(theta - eps, y_vals))
              / (2 * eps))
     xs = np.arange(theta - 1, theta + 1, 0.05)
-    ys = cost_fn(theta, y_vals) + slope * (xs - theta)
+    ys = loss_fn(theta, y_vals) + slope * (xs - theta)
     plt.plot(xs, ys, zorder=3, c=sns.xkcd_rgb['green'], linestyle='--')
 ```
 
 ## Gradient Descent
 
-We are interested in creating a function that can minimize a cost function without forcing the user to predetermine which values of $ \theta $ to try. In other words, while the `simple_minimize` function has the following signature:
+We are interested in creating a function that can minimize a loss function without forcing the user to predetermine which values of $\theta$ to try. In other words, while the `simple_minimize` function has the following signature:
 
 ```python
-simple_minimize(cost_fn, dataset, thetas)
+simple_minimize(loss_fn, dataset, thetas)
 ```
 
 We would like a function that has the following signature:
 
 ```python
-minimize(cost_fn, dataset)
+minimize(loss_fn, dataset)
 ```
 
-This function needs to automatically find the minimizing $ \theta $ value no matter how small or large it is. We will use a technique called gradient descent to implement this new `minimize` function.
+This function needs to automatically find the minimizing $\theta$ value no matter how small or large it is. We will use a technique called gradient descent to implement this new `minimize` function.
 
 ### Intuition
 
-As with cost functions, we will discuss the intuition for gradient descent first, then formalize our understanding with mathematics.
+As with loss functions, we will discuss the intuition for gradient descent first, then formalize our understanding with mathematics.
 
-Since the `minimize` function isn't given values of $ \theta $ to try, we start by picking a $ \theta $ anywhere we'd like. Then, we can iteratively improve the estimate of $ \theta $. To improve an estimate of $ \theta $, we look at the slope of the cost function at that choice of $ \theta $.
+Since the `minimize` function is not given values of $\theta$ to try, we start by picking a $\theta$ anywhere we'd like. Then, we can iteratively improve the estimate of $\theta$. To improve an estimate of $\theta$, we look at the slope of the loss function at that choice of $ \theta $.
 
-For example, suppose we are using MSE cost for the simple dataset $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.
-
-
-```python
-# HIDDEN
-pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
-plot_cost(pts, (11, 18), mse_cost)
-plot_theta_on_cost(pts, 12, mse_cost)
-```
-
-    No handles with labels found to put in legend.
-
-
-
-![png](gradient_descent_define_files/gradient_descent_define_6_1.png)
-
-
-We'd like to choose a new value for $ \theta $ that decreases the cost. To do this, we look at the slope of the cost function at $ \theta = 12 $:
+For example, suppose we are using MSE for the simple dataset $ \textbf{y} = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.
 
 
 ```python
 # HIDDEN
 pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
-plot_cost(pts, (11, 18), mse_cost)
-plot_tangent_on_cost(pts, 12, mse_cost)
+plot_loss(pts, (11, 18), mse)
+plot_theta_on_loss(pts, 12, mse)
 ```
 
-    No handles with labels found to put in legend.
+
+![png](gradient_descent_define_files/gradient_descent_define_6_0.png)
 
 
-
-![png](gradient_descent_define_files/gradient_descent_define_8_1.png)
-
-
-The slope is negative, which means that increasing $ \theta $ will decrease the cost.
-
-If $ \theta = 16.5 $ on the other hand, the slope of the cost function is positive:
+We'd like to choose a new value for $\theta$ that decreases the loss. To do this, we look at the slope of the loss function at $\theta= 12 $:
 
 
 ```python
 # HIDDEN
 pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
-plot_cost(pts, (11, 18), mse_cost)
-plot_tangent_on_cost(pts, 16.5, mse_cost)
+plot_loss(pts, (11, 18), mse)
+plot_tangent_on_loss(pts, 12, mse)
 ```
 
-    No handles with labels found to put in legend.
+
+![png](gradient_descent_define_files/gradient_descent_define_8_0.png)
 
 
+The slope is negative, which means that increasing $\theta$ will decrease the loss.
 
-![png](gradient_descent_define_files/gradient_descent_define_10_1.png)
+If $\theta = 16.5 $ on the other hand, the slope of the loss function is positive:
 
 
-When the slope is positive, decreasing $ \theta $ will decrease the cost.
+```python
+# HIDDEN
+pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
+plot_loss(pts, (11, 18), mse)
+plot_tangent_on_loss(pts, 16.5, mse)
+```
 
-The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the cost. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $ \theta $ should move in the negative direction. Mathematically, we write:
+
+![png](gradient_descent_define_files/gradient_descent_define_10_0.png)
+
+
+When the slope is positive, decreasing $ \theta $ will decrease the loss.
+
+The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the loss. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $\theta $ should move in the negative direction. Mathematically, we write:
 
 $$
-\theta_{t+1} = \theta_t - \frac{\partial}{\partial \theta} L(\theta, y)
+\theta^{(t+1)} = \theta^{(t)} - \frac{\partial}{\partial \theta} L(\theta^{(t)}, \textbf{y})
 $$
 
-Where $ \theta_t $ is the current estimate and $ \theta_{t+1} $ is the next estimate.
+Where $ \theta^{(t)} $ is the current estimate and $ \theta^{(t+1)} $ is the next estimate.
 
-For the MSE cost, we have:
+For the MSE, we have:
 
 $$
 \begin{aligned}
 L(\theta, y)
 &= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
-\frac{\partial}{\partial \theta} L(\theta, y)
+\frac{\partial}{\partial \hat{\theta}} L(\theta, y)
 &= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
 &= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
 \end{aligned}
 $$
 
-When $ \theta_t = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta_{t+1} = 12 - (-5.2) = 17.2 $.
+When $ \theta^{(t)} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta^{(t+1)} = 12 - (-5.2) = 17.2 $.
 
-We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the cost curve below.
+We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the loss curve below.
 
 
 ```python
 # HIDDEN
 pts = np.array([12.1, 12.8, 14.9, 16.3, 17.2])
-plot_cost(pts, (11, 18), mse_cost)
-plot_theta_on_cost(pts, 12, mse_cost, c='none',
+plot_loss(pts, (11, 18), mse)
+plot_theta_on_loss(pts, 12, mse, c='none',
                    edgecolor=sns.xkcd_rgb['green'], linewidth=2)
-plot_theta_on_cost(pts, 17.2, mse_cost)
+plot_theta_on_loss(pts, 17.2, mse)
 ```
 
-    No handles with labels found to put in legend.
+
+![png](gradient_descent_define_files/gradient_descent_define_12_0.png)
 
 
-
-![png](gradient_descent_define_files/gradient_descent_define_12_1.png)
-
-
-Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta $. Our final update formula is:
+Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta$. Our final update formula is:
 
 $$
-\theta_{t+1} = \theta_t - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^{(t)}, y)
 $$
-
-Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $ this is the new $ \theta_{t+1} $:
+|
+Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:
 
 
 ```python
 # HIDDEN
-def plot_one_gd_iter(y_vals, theta, cost_fn, grad_cost, alpha=0.3):
-    new_theta = theta - alpha * grad_cost(theta, y_vals)
-    plot_cost(pts, (11, 18), cost_fn)
-    plot_theta_on_cost(pts, theta, cost_fn, c='none',
+def plot_one_gd_iter(y_vals, theta, loss_fn, grad_loss, alpha=0.3):
+    new_theta = theta - alpha * grad_loss(theta, y_vals)
+    plot_loss(pts, (11, 18), loss_fn)
+    plot_theta_on_loss(pts, theta, loss_fn, c='none',
                        edgecolor=sns.xkcd_rgb['green'], linewidth=2)
-    plot_theta_on_cost(pts, new_theta, cost_fn)
+    plot_theta_on_loss(pts, new_theta, loss_fn)
     print(f'old theta: {theta}')
     print(f'new theta: {new_theta}')
 ```
@@ -204,71 +192,59 @@ def plot_one_gd_iter(y_vals, theta, cost_fn, grad_cost, alpha=0.3):
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 12, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 12, mse, grad_mse)
 ```
-
-    No handles with labels found to put in legend.
-
 
     old theta: 12
     new theta: 13.596
+    
 
 
+![png](gradient_descent_define_files/gradient_descent_define_15_1.png)
 
-![png](gradient_descent_define_files/gradient_descent_define_15_2.png)
 
-
-Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum cost because the slope is also smaller.
+Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum loss because the slope is also smaller.
 
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 13.60, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 13.60, mse, grad_mse)
 ```
-
-    No handles with labels found to put in legend.
-
 
     old theta: 13.6
     new theta: 14.236
+    
 
 
-
-![png](gradient_descent_define_files/gradient_descent_define_17_2.png)
+![png](gradient_descent_define_files/gradient_descent_define_17_1.png)
 
 
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 14.24, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 14.24, mse, grad_mse)
 ```
-
-    No handles with labels found to put in legend.
-
 
     old theta: 14.24
     new theta: 14.492
+    
 
 
-
-![png](gradient_descent_define_files/gradient_descent_define_18_2.png)
+![png](gradient_descent_define_files/gradient_descent_define_18_1.png)
 
 
 
 ```python
 # HIDDEN
-plot_one_gd_iter(pts, 14.49, mse_cost, grad_mse_cost)
+plot_one_gd_iter(pts, 14.49, mse, grad_mse)
 ```
-
-    No handles with labels found to put in legend.
-
 
     old theta: 14.49
     new theta: 14.592
+    
 
 
-
-![png](gradient_descent_define_files/gradient_descent_define_19_2.png)
+![png](gradient_descent_define_files/gradient_descent_define_19_1.png)
 
 
 ### Gradient Descent Analysis
@@ -276,42 +252,42 @@ plot_one_gd_iter(pts, 14.49, mse_cost, grad_mse_cost)
 We now have the full algorithm for gradient descent:
 
 1. Choose a starting value of $ \theta $ (0 is a common choice).
-2. Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, y) $ and store this as the new value of $ \theta $.
+2. Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, \textbf{y}) $ and store this as the new value of $ \theta $.
 3. Repeat until $ \theta $ doesn't change between iterations.
 
 You will more commonly see the gradient $ \nabla_\theta $ in place of the partial derivative $ \frac{\partial}{\partial \theta} $. The two notations are essentially equivalent, but since the gradient notation is more common we will use it in the gradient update formula from now on:
 
 $$
-\theta_{t+1} = \theta_t - \alpha \cdot \nabla_\theta L(\theta, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_\theta L(\theta^{(t)}, \textbf{y})
 $$
 
 To review notation:
 
-- $ \theta_t $ is the current choice of $ \theta $.
-- $ \theta_{t+1} $ is the next choice of $ \theta $.
-- $ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha_t $ to mark that $ \alpha $ varies over time $ t $.
-- $ \nabla_\theta L(\theta, y) $ is the partial derivative / gradient of the cost function at $ \theta $.
+- $ \theta^{(t)} $ is the current estimate of $ \theta^* $ at the $t$th iteration.
+- $ \theta^{(t+1)} $ is the next choice of $ \theta $.
+- $ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha^t $ to mark that $ \alpha $ varies over time $ t $.
+- $ \nabla_\theta L(\theta^{(t)}, \textbf{y}) $ is the partial derivative / gradient of the loss function with respect to $ \theta $ at time $t$.
 
-You can now see the importance of choosing a differentiable cost function: $ \nabla_\theta L(\theta, y) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in cost for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
+You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\theta, \textbf{y}) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)
 
-The gradient algorithm is simple yet powerful since we can use it for many types of models and many types of cost functions. It is the computational tool of choice for fitting many important models, including linear regression on large datasets and neural networks.
+The gradient algorithm is simple yet powerful since we can use it for many types of models and many types of loss functions. It is the computational tool of choice for fitting many important models, including linear regression on large datasets and neural networks.
 
 ### Defining the `minimize` Function
 
-Now we return to our original task: defining the `minimize` function. We will have to change our function signature slightly since we now need to compute the gradient of the cost function. 
+Now we return to our original task: defining the `minimize` function. We will have to change our function signature slightly since we now need to compute the gradient of the loss function. 
 
 
 ```python
-def minimize(cost_fn, grad_cost_fn, dataset, alpha=0.2, progress=True):
+def minimize(loss_fn, grad_loss_fn, dataset, alpha=0.2, progress=True):
     '''
-    Uses gradient descent to minimize cost_fn. Returns the minimizing value of
-    theta once theta changes less than 0.001 between iterations.
+    Uses gradient descent to minimize loss_fn. Returns the minimizing value of
+    theta_hat once theta_hat changes less than 0.001 between iterations.
     '''
     theta = 0
     while True:
         if progress:
-            print(f'theta: {theta:.2f} | cost: {cost_fn(theta, dataset):.2f}')
-        gradient = grad_cost_fn(theta, dataset)
+            print(f'theta: {theta:.2f} | loss: {loss_fn(theta, dataset):.2f}')
+        gradient = grad_loss_fn(theta, dataset)
         new_theta = theta - alpha * gradient
         
         if abs(new_theta - theta) < 0.001:
@@ -320,50 +296,49 @@ def minimize(cost_fn, grad_cost_fn, dataset, alpha=0.2, progress=True):
         theta = new_theta
 ```
 
-Then we can define functions to compute our MSE cost and its gradient:
+Then we can define functions to compute our MSE and its gradient:
 
 
 ```python
-def mse_cost(theta, y_vals):
+def mse(theta, y_vals):
     return np.mean((y_vals - theta) ** 2)
 
-def grad_mse_cost(theta, y_vals):
+def grad_mse(theta, y_vals):
     return -2 * np.mean(y_vals - theta)
 ```
 
-Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ y = [12.1, 12.8, 14.9, 16.3, 17.2] $.
+Finally, we can use the `minimize` function to compute the minimizing value of $ \theta $ for $ \textbf{y} = [12.1, 12.8, 14.9, 16.3, 17.2] $.
 
 
 ```python
 %%time
-theta = minimize(mse_cost, grad_mse_cost, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
+theta = minimize(mse, grad_mse, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
 print(f'Minimizing theta: {theta}')
 print()
 ```
 
-    theta: 0.00 | cost: 218.76
-    theta: 5.86 | cost: 81.21
-    theta: 9.38 | cost: 31.70
-    theta: 11.49 | cost: 13.87
-    theta: 12.76 | cost: 7.45
-    theta: 13.52 | cost: 5.14
-    theta: 13.98 | cost: 4.31
-    theta: 14.25 | cost: 4.01
-    theta: 14.41 | cost: 3.90
-    theta: 14.51 | cost: 3.86
-    theta: 14.57 | cost: 3.85
-    theta: 14.61 | cost: 3.85
-    theta: 14.63 | cost: 3.84
-    theta: 14.64 | cost: 3.84
-    theta: 14.65 | cost: 3.84
-    theta: 14.65 | cost: 3.84
-    theta: 14.66 | cost: 3.84
-    theta: 14.66 | cost: 3.84
+    theta: 0.00 | loss: 218.76
+    theta: 5.86 | loss: 81.21
+    theta: 9.38 | loss: 31.70
+    theta: 11.49 | loss: 13.87
+    theta: 12.76 | loss: 7.45
+    theta: 13.52 | loss: 5.14
+    theta: 13.98 | loss: 4.31
+    theta: 14.25 | loss: 4.01
+    theta: 14.41 | loss: 3.90
+    theta: 14.51 | loss: 3.86
+    theta: 14.57 | loss: 3.85
+    theta: 14.61 | loss: 3.85
+    theta: 14.63 | loss: 3.84
+    theta: 14.64 | loss: 3.84
+    theta: 14.65 | loss: 3.84
+    theta: 14.65 | loss: 3.84
+    theta: 14.66 | loss: 3.84
+    theta: 14.66 | loss: 3.84
     Minimizing theta: 14.658511131035242
     
-    CPU times: user 0 ns, sys: 0 ns, total: 0 ns
-    Wall time: 1.74 ms
-
+    Wall time: 1.99 ms
+    
 
 We can see that gradient quickly finds the same solution as the analytic method:
 
@@ -379,33 +354,33 @@ np.mean([12.1, 12.8, 14.9, 16.3, 17.2])
 
 
 
-### Minimizing the Huber cost
+### Minimizing the Huber loss
 
-Now, we can apply gradient descent to minimize the Huber cost on our dataset of tip percentages.
+Now, we can apply gradient descent to minimize the Huber loss on our dataset of tip percentages.
 
-The Huber cost is:
+The Huber loss is:
 
 $$
-L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     \frac{1}{2}(y_i - \theta)^2 &  | y_i - \theta | \le \delta \\
      \delta (|y_i - \theta| - \frac{1}{2} \delta ) & \text{otherwise}
 \end{cases}
 $$
 
-The gradient of the Huber cost is:
+The gradient of the Huber loss is:
 
 $$
-\nabla_{\theta} L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+\nabla_{\theta} L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     -(y_i - \theta) &  | y_i - \theta | \le \delta \\
     - \delta \cdot \text{sign} (y_i - \theta) & \text{otherwise}
 \end{cases}
 $$
 
-(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)
+(Note that in previous definitions of Huber loss we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)
 
 
 ```python
-def huber_cost(theta, dataset, delta = 1):
+def huber_loss(theta, dataset, delta = 1):
     d = np.abs(theta - dataset)
     return np.mean(
         np.where(d <= delta,
@@ -413,7 +388,7 @@ def huber_cost(theta, dataset, delta = 1):
                  delta * (d - delta / 2.0))
     )
 
-def grad_huber_cost(theta, dataset, delta = 1):
+def grad_huber_loss(theta, dataset, delta = 1):
     d = np.abs(theta - dataset)
     return np.mean(
         np.where(d <= delta,
@@ -422,22 +397,21 @@ def grad_huber_cost(theta, dataset, delta = 1):
     )
 ```
 
-Let's minimize the Huber cost on the tips dataset:
+Let's minimize the Huber loss on the tips dataset:
 
 
 ```python
 %%time
-theta = minimize(huber_cost, grad_huber_cost, tips['pcttip'], progress=False)
+theta = minimize(huber_loss, grad_huber_loss, tips['pcttip'], progress=False)
 print(f'Minimizing theta: {theta}')
 print()
 ```
 
     Minimizing theta: 15.506849531471964
     
-    CPU times: user 78.1 ms, sys: 15.6 ms, total: 93.8 ms
-    Wall time: 134 ms
-
+    Wall time: 210 ms
+    
 
 ### Summary
 
-Gradient descent gives us a generic way to minimize a cost function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and cost functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.
+Gradient descent gives us a generic way to minimize a loss function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and loss functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.
