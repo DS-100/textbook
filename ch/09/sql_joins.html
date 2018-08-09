@@ -1,0 +1,808 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/09/sql_joins.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/09&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
+<div class="toc"><ul class="toc-item"><li><span><a href="#SQL-Joins" data-toc-modified-id="SQL-Joins-1">SQL Joins</a></span></li><li><span><a href="#Joins" data-toc-modified-id="Joins-2">Joins</a></span><ul class="toc-item"><li><span><a href="#Inner-Join" data-toc-modified-id="Inner-Join-2.1">Inner Join</a></span></li><li><span><a href="#Full/Outer-Join" data-toc-modified-id="Full/Outer-Join-2.2">Full/Outer Join</a></span></li><li><span><a href="#Left-Join" data-toc-modified-id="Left-Join-2.3">Left Join</a></span></li><li><span><a href="#Right-Join" data-toc-modified-id="Right-Join-2.4">Right Join</a></span></li><li><span><a href="#Implicit-Inner-Joins" data-toc-modified-id="Implicit-Inner-Joins-2.5">Implicit Inner Joins</a></span></li></ul></li><li><span><a href="#Joining-Multiple-Tables" data-toc-modified-id="Joining-Multiple-Tables-3">Joining Multiple Tables</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-4">Summary</a></span></li></ul></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Delete the database if it already exists.</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="n">dbfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;sql_joins.db&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">dbfile</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+<span class="n">sqlite_uri</span> <span class="o">=</span> <span class="s2">&quot;sqlite:///sql_joins.db&quot;</span>
+<span class="n">sqlite_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">sqlite_uri</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Make names table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE TABLE names(</span>
+<span class="s2">    cat_id INTEGER PRIMARY KEY,</span>
+<span class="s2">    name TEXT);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+
+<span class="c1"># Populate names table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">INSERT INTO names VALUES </span>
+<span class="s2">(0, &quot;Apricot&quot;),</span>
+<span class="s2">(1, &quot;Boots&quot;),</span>
+<span class="s2">(2, &quot;Cally&quot;),</span>
+<span class="s2">(4, &quot;Eugene&quot;);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Make colors table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE TABLE colors(</span>
+<span class="s2">    cat_id INTEGER PRIMARY KEY,</span>
+<span class="s2">    color TEXT);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+
+<span class="c1"># Populate colors table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">INSERT INTO colors VALUES </span>
+<span class="s2">(0, &quot;orange&quot;),</span>
+<span class="s2">(1, &quot;black&quot;),</span>
+<span class="s2">(2, &quot;calico&quot;),</span>
+<span class="s2">(3, &quot;white&quot;);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Make ages table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE TABLE ages(</span>
+<span class="s2">    cat_id INTEGER PRIMARY KEY,</span>
+<span class="s2">    age INT);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+
+<span class="c1"># Populate ages table</span>
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">INSERT INTO ages VALUES </span>
+<span class="s2">(0, 4),</span>
+<span class="s2">(1, 3),</span>
+<span class="s2">(2, 9),</span>
+<span class="s2">(4, 20);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="SQL-Joins">SQL Joins<a class="anchor-link" href="#SQL-Joins">&#182;</a></h2></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In <code>pandas</code> we use the <code>pd.merge</code> method to join two tables using matching values in their columns. For example:</p>
+<div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">table1</span><span class="p">,</span> <span class="n">table2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;commmon_column&#39;</span><span class="p">)</span>
+</pre></div>
+<p>In this section, we introduce SQL joins. SQL joins are used to combine multiple tables in a relational database.</p>
+<p>Suppose we are cat store owners with a database for the cats we have in our store. We have <strong>two</strong> different tables: <code>names</code> and <code>colors</code>. The <code>names</code> table contains the columns <code>cat_id</code>, a unique number assigned to each cat, and <code>name</code>, the name for the cat. The <code>colors</code> table contains the columns <code>cat_id</code> and <code>color</code>, the color of each cat.</p>
+<p>Note that there are some missing rows from both tables - a row with <code>cat_id</code> 3 is missing from the <code>names</code> table, and a row with <code>cat_id</code> 4 is missing from the <code>colors</code> table.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div style="display: flex">
+  <div style="margin-right: 2em">
+    <header style="text-align:center"><strong>names</strong></header>
+    <table>
+      <thead>
+        <tr>
+          <th>cat_id</th>
+          <th>name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0</td>
+          <td>Apricot</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Boots</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Cally</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Eugene</td>
+        </tr>
+      </tbody>
+    </table></div>
+  <div>
+    <header style="text-align:center"><strong>colors</strong></header>
+    <table>
+      <thead>
+        <tr>
+          <th>cat_id</th>
+          <th>color</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0</td>
+          <td>orange</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>black</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>calico</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>white</td>
+        </tr>
+      </tbody>
+    </table></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To compute the color of the cat named Apricot, we have to use information in both tables. We can <em>join</em> the tables on the <code>cat_id</code> column, creating a new table with both <code>name</code> and <code>color</code>.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Joins">Joins<a class="anchor-link" href="#Joins">&#182;</a></h2></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A join combines tables by matching values in their columns.</p>
+<p>There are four main types of joins: inner joins, outer joins, left joins, and right joins. Although all four combine tables, each one treats non-matching values differently.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Inner-Join">Inner Join<a class="anchor-link" href="#Inner-Join">&#182;</a></h3></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Definition:</b> In an inner join, the final table only contains rows that have matching columns in <strong>both</strong> tables.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://www.w3schools.com/sql/img_innerjoin.gif" alt="Inner Join"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Example:</b> We would like to join the <code>names</code> and <code>colors</code> tables together to match each cat with its color. Since both tables contain a <code>cat_id</code> column that is the unique identifier for a cat, we can use an inner join on the <code>cat_id</code> column.</p>
+<p><b>SQL:</b> To write an inner join in SQL we modify our <code>FROM</code> clause to use the following syntax:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="p">...</span>
+<span class="k">FROM</span> <span class="o">&lt;</span><span class="n">TABLE_1</span><span class="o">&gt;</span>
+    <span class="k">INNER</span> <span class="k">JOIN</span> <span class="o">&lt;</span><span class="n">TABLE_2</span><span class="o">&gt;</span>
+    <span class="k">ON</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span>
+</pre></div>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="k">AS</span> <span class="n">N</span>
+    <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">colors</span> <span class="k">AS</span> <span class="k">C</span>
+    <span class="k">ON</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cat_id</th>
+      <th>name</th>
+      <th>cat_id</th>
+      <th>color</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+  </tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You may verify that each cat name is matched with its color. Notice that the cats with <code>cat_id</code> 3 and 4 are not present in our resulting table because the <code>colors</code> table doesn't have a row with <code>cat_id</code> 4 and the <code>names</code> table doesn't have a row with <code>cat_id</code> 3. In an inner join, if a row doesn't have a matching value in the other table, the row is not included in the final result.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Assuming we have a DataFrame called <code>names</code> and a DataFrame called <code>colors</code>, we can conduct an inner join in <code>pandas</code> by writing:</p>
+<div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;cat_id&#39;</span><span class="p">)</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Full/Outer-Join">Full/Outer Join<a class="anchor-link" href="#Full/Outer-Join">&#182;</a></h3></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Definition:</b> In a full join (sometimes called an outer join), <strong>all records from both tables</strong> are included in the joined table. If a row doesn't have a match in the other table, the missing values are filled in with <code>NULL</code>.</p>
+<p><img src="https://www.w3schools.com/sql/img_fulljoin.gif" alt="Full outer join"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Example:</b> As before, we join the <code>names</code> and <code>colors</code> tables together to match each cat with its color. This time, we want to keep all rows in either table even if there isn't a match.</p>
+<p><b>SQL:</b> To write an outer join in SQL we modify our <code>FROM</code> clause to use the following syntax:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="p">...</span>
+<span class="k">FROM</span> <span class="o">&lt;</span><span class="n">TABLE_1</span><span class="o">&gt;</span>
+    <span class="k">FULL</span> <span class="k">JOIN</span> <span class="o">&lt;</span><span class="n">TABLE_2</span><span class="o">&gt;</span>
+    <span class="k">ON</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span>
+</pre></div>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="n">N</span>
+    <span class="k">FULL</span> <span class="k">JOIN</span> <span class="n">colors</span> <span class="k">C</span>
+    <span class="k">ON</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th>cat_id</th>
+<th>name</th>
+<th>color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Apricot</td>
+<td>orange</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Boots</td>
+<td>black</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Cally</td>
+<td>calico</td>
+</tr>
+<tr>
+<td>3</td>
+<td>NULL</td>
+<td>white</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Eugene</td>
+<td>NULL</td>
+</tr>
+</tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice that the final output contains the entries with <code>cat_id</code> 3 and 4. If a row does not have a match, it is still included in the final output and any missing values are filled in with <code>NULL</code>.</p>
+<p>In <code>pandas</code>:</p>
+
+<pre><code>pd.merge(names, colors, how='outer', on='cat_id')</code></pre></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Left-Join">Left Join<a class="anchor-link" href="#Left-Join">&#182;</a></h3></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Definition:</b> In a left join, all records from the <strong>left table</strong> are included in the joined table. If a row doesn't have a match in the right table, the missing values are filled in with <code>NULL</code>.</p>
+<p><img src="https://www.w3schools.com/sql/img_leftjoin.gif" alt="left join"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Example:</b> As before, we join the <code>names</code> and <code>colors</code> tables together to match each cat with its color. This time, we want to keep all the cat names even if a cat doesn't have a matching color.</p>
+<p><b>SQL:</b> To write an left join in SQL we modify our <code>FROM</code> clause to use the following syntax:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="p">...</span>
+<span class="k">FROM</span> <span class="o">&lt;</span><span class="n">TABLE_1</span><span class="o">&gt;</span>
+    <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="o">&lt;</span><span class="n">TABLE_2</span><span class="o">&gt;</span>
+    <span class="k">ON</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span>
+</pre></div>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="n">N</span>
+    <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">colors</span> <span class="k">C</span>
+    <span class="k">ON</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th>cat_id</th>
+<th>name</th>
+<th>color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Apricot</td>
+<td>orange</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Boots</td>
+<td>black</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Cally</td>
+<td>calico</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Eugene</td>
+<td>NULL</td>
+</tr>
+</tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice that the final output includes all four cat names. Three of the <code>cat_id</code>s in the <code>names</code> relation had matching <code>cat_id</code>s in the <code>colors</code> table and one did not (Eugene). The cat name that did not have a matching color has <code>NULL</code> as its color.</p>
+<p>In <code>pandas</code>:</p>
+
+<pre><code>pd.merge(names, colors, how='left', on='cat_id')</code></pre></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Right-Join">Right Join<a class="anchor-link" href="#Right-Join">&#182;</a></h3></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Definition:</b> In a right join, all records from the <strong>right table</strong> are included in the joined table. If a row doesn't have a match in the left table, the missing values are filled in with <code>NULL</code>.</p>
+<p><img src="https://www.w3schools.com/sql/img_rightjoin.gif" alt="right join"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>Example:</b> As before, we join the <code>names</code> and <code>colors</code> tables together to match each cat with its color. This time, we want to keep all the cat color even if a cat doesn't have a matching name.</p>
+<p><b>SQL:</b> To write a right join in SQL we modify our <code>FROM</code> clause to use the following syntax:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="p">...</span>
+<span class="k">FROM</span> <span class="o">&lt;</span><span class="n">TABLE_1</span><span class="o">&gt;</span>
+    <span class="k">RIGHT</span> <span class="k">JOIN</span> <span class="o">&lt;</span><span class="n">TABLE_2</span><span class="o">&gt;</span>
+    <span class="k">ON</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span>
+</pre></div>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="n">N</span>
+    <span class="k">RIGHT</span> <span class="k">JOIN</span> <span class="n">colors</span> <span class="k">C</span>
+    <span class="k">ON</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th>cat_id</th>
+<th>name</th>
+<th>color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Apricot</td>
+<td>orange</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Boots</td>
+<td>black</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Cally</td>
+<td>calico</td>
+</tr>
+<tr>
+<td>3</td>
+<td>NULL</td>
+<td>white</td>
+</tr>
+</tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This time, observe that the final output includes all four cat colors. Three of the <code>cat_id</code>s in the <code>colors</code> relation had matching <code>cat_id</code>s in the <code>names</code> table and one did not (white). The cat color that did not have a matching name has <code>NULL</code> as its name.</p>
+<p>You may also notice that a right join produces the same result a left join with the table order swapped. That is, <code>names</code> left joined with <code>colors</code> is the same as <code>colors</code> right joined with <code>names</code>. Because of this, some SQL engines (such as SQLite) do not support right joins.</p>
+<p>In <code>pandas</code>:</p>
+
+<pre><code>pd.merge(names, colors, how='right', on='cat_id')</code></pre></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Implicit-Inner-Joins">Implicit Inner Joins<a class="anchor-link" href="#Implicit-Inner-Joins">&#182;</a></h3></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are typically multiple ways to accomplish the same task in SQL just as there are multiple ways to accomplish the same task in Python. We point out one other method for writing an inner join that appears in practice called an <em>implicit join</em>. Recall that we previously wrote the following to conduct an inner join:</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="k">AS</span> <span class="n">N</span>
+    <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">colors</span> <span class="k">AS</span> <span class="k">C</span>
+    <span class="k">ON</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>An implicit inner join has a slightly different syntax. Notice in particular that the <code>FROM</code> clause uses a comma to select from two tables and that the query includes a <code>WHERE</code> clause to specify the join condition.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="k">AS</span> <span class="n">N</span><span class="p">,</span> <span class="n">colors</span> <span class="k">AS</span> <span class="k">C</span>
+<span class="k">WHERE</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When multiple tables are specified in the <code>FROM</code> clause, SQL creates a table containing every combination of rows from each table. For example:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT *</span>
+<span class="s2">FROM names N, colors C</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cat_id</th>
+      <th>name</th>
+      <th>cat_id</th>
+      <th>color</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>4</td>
+      <td>Eugene</td>
+      <td>3</td>
+      <td>white</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This operation is often called a <em>Cartesian product</em>: each row in the first table is paired with every row in the second table. Notice that many rows contain cat colors that are not matched properly with their names. The additional <code>WHERE</code>  clause in the implicit join filters out rows that do not have matching <code>cat_id</code> values.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="k">names</span> <span class="k">AS</span> <span class="n">N</span><span class="p">,</span> <span class="n">colors</span> <span class="k">AS</span> <span class="k">C</span>
+<span class="k">WHERE</span> <span class="n">N</span><span class="p">.</span><span class="n">cat_id</span> <span class="o">=</span> <span class="k">C</span><span class="p">.</span><span class="n">cat_id</span><span class="p">;</span>
+</pre></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cat_id</th>
+      <th>name</th>
+      <th>cat_id</th>
+      <th>color</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>Apricot</td>
+      <td>0</td>
+      <td>orange</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>Boots</td>
+      <td>1</td>
+      <td>black</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>Cally</td>
+      <td>2</td>
+      <td>calico</td>
+    </tr>
+  </tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Joining-Multiple-Tables">Joining Multiple Tables<a class="anchor-link" href="#Joining-Multiple-Tables">&#182;</a></h2></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To join multiple tables, extend the <code>FROM</code> clause with additional <code>JOIN</code> operators. For example, the following table <code>ages</code> includes data about each cat's age.</p>
+<table>
+<thead><tr>
+<th>cat_id</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>4</td>
+</tr>
+<tr>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>9</td>
+</tr>
+<tr>
+<td>4</td>
+<td>20</td>
+</tr>
+</tbody>
+</table></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To conduct an inner join on the <code>names</code>, <code>colors</code>, and <code>ages</code> table, we write:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Joining three tables</span>
+
+<span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT name, color, age</span>
+<span class="s2">    FROM names n</span>
+<span class="s2">    INNER JOIN colors c ON n.cat_id = c.cat_id</span>
+<span class="s2">    INNER JOIN ages a ON n.cat_id = a.cat_id;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>color</th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Apricot</td>
+      <td>orange</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Boots</td>
+      <td>black</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Cally</td>
+      <td>calico</td>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We have covered the four main types of SQL joins: inner, full, left, and right joins. We use all four joins to combine information in separate relations, and each join differs only in how it handles non-matching rows in the input tables.</p></div></div></div></div>
