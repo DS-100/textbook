@@ -1,5 +1,5 @@
 # Generate chapter list
-CHAPTERS=$(shell ls -1 | grep -E ^ch\\d+$)
+CHAPTERS=$(shell ls -1 notebooks | grep -E ^\\d+$)
 
 .PHONY: help build notebooks serve deploy $(CHAPTERS)
 
