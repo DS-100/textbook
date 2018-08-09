@@ -1,0 +1,344 @@
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/17/classification_prob.ipynb">Open on DataHub</a></div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/17&#39;</span><span class="p">))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Regression-on-Probabilities" data-toc-modified-id="Regression-on-Probabilities-1">Regression on Probabilities</a></span></li><li><span><a href="#Issues-with-Linear-Regression-for-Probabilities" data-toc-modified-id="Issues-with-Linear-Regression-for-Probabilities-2">Issues with Linear Regression for Probabilities</a></span></li></ul></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="k">import</span> <span class="n">DictVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
+                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
+                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">jitter_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">):</span>
+    <span class="n">x_jittered</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x_col</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="n">y_jittered</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y_col</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">x_col</span><span class="p">:</span> <span class="n">x_jittered</span><span class="p">,</span> <span class="n">y_col</span><span class="p">:</span> <span class="n">y_jittered</span><span class="p">})</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Regression-on-Probabilities">Regression on Probabilities<a class="anchor-link" href="#Regression-on-Probabilities">&#182;</a></h2><p>In basketball, players score by shooting a ball through a hoop. One such player, LeBron James, is widely considered one of the best basketball players ever for his incredible ability to score.</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/LeBron_James_%2831944491583%29.jpg" alt="LeBron James (31944491583).jpg" height="480" width="308"></p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>LeBron plays in the National Basketball Association (NBA), the United States's premier basketball league. We've collected a dataset of all of LeBron's attempts in the 2017 NBA Playoff Games using the NBA statistics website (<a href="https://stats.nba.com/">https://stats.nba.com/</a>).</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lebron</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;lebron.csv&#39;</span><span class="p">)</span>
+<span class="n">lebron</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>game_date</th>
+      <th>minute</th>
+      <th>opponent</th>
+      <th>action_type</th>
+      <th>shot_type</th>
+      <th>shot_distance</th>
+      <th>shot_made</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20170415</td>
+      <td>10</td>
+      <td>IND</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20170415</td>
+      <td>11</td>
+      <td>IND</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20170415</td>
+      <td>14</td>
+      <td>IND</td>
+      <td>Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>20170612</td>
+      <td>46</td>
+      <td>GSW</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>382</th>
+      <td>20170612</td>
+      <td>47</td>
+      <td>GSW</td>
+      <td>Turnaround Fadeaway shot</td>
+      <td>2PT Field Goal</td>
+      <td>14</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>383</th>
+      <td>20170612</td>
+      <td>48</td>
+      <td>GSW</td>
+      <td>Driving Layup Shot</td>
+      <td>2PT Field Goal</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>384 rows × 7 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Each row of this dataset contains the following attributes of a shot LeBron attempted:</p>
+<ul>
+<li><code>game_date</code>: The date of the game.</li>
+<li><code>minute</code>: The minute that the shot was attempted (each NBA game is 48 minutes long).</li>
+<li><code>opponent</code>: The team abbreviation of LeBron's opponent.</li>
+<li><code>action_type</code>: The type of action leading up to the shot.</li>
+<li><code>shot_type'</code>: The type of shot (either a 2 point shot or 3 point shot).</li>
+<li><code>shot_distance</code>: LeBron's distance from the basket when the shot was attempted (ft).</li>
+<li><code>shot_made</code>: <code>0</code> if the shot missed, <code>1</code> if the shot went in.</li>
+</ul></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We would like to use this dataset to predict whether LeBron will make future shots. This is a <em>classification problem</em>; we predict a category, not a continuous number as we do in regression.</p>
+<p>We may reframe this classification problem as a type of regression problem by predicting the <em>probability</em> that a shot will go in. For example, we expect that the probability that LeBron makes a shot is lower when he is farther away from the basket.</p>
+<p>We plot the shot attempts below, showing the distance from the basket on the x-axis and whether he made the shot on the y-axis. Jittering the points slightly on the y-axis mitigates overplotting.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">jitter_df</span><span class="p">(</span><span class="n">lebron</span><span class="p">,</span> <span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_made&#39;</span><span class="p">),</span>
+           <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;LeBron Shot Make vs. Shot Distance&#39;</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/classification_prob_10_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can see that LeBron tends to make most shots when he is within five feet of the basket. A simple least squares linear regression model fit on this data produces the following predictions:</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">jitter_df</span><span class="p">(</span><span class="n">lebron</span><span class="p">,</span> <span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_made&#39;</span><span class="p">),</span>
+           <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Simple Linear Regression&#39;</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/classification_prob_12_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Linear regression predicts a continuous value. To perform classification, however, we need to convert this value into a category: a shot make or miss. We can accomplish this by setting a cutoff, or <strong>classification threshold</strong>. If the regression predicts a value greater than 0.5, we predict that the shot will make. Otherwise, we predict that the shot will miss.</p>
+<p>We draw the cutoff below as a green dashed line. According to this cutoff, our model predicts that LeBron will make a shot if he is within 15 feet of the basket.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">jitter_df</span><span class="p">(</span><span class="n">lebron</span><span class="p">,</span> <span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_made&#39;</span><span class="p">),</span>
+           <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Cutoff for Classification&#39;</span><span class="p">);</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/classification_prob_14_0.png"
+></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the steps above, we attempt to perform a regression to predict the probability that a shot will go in. If our regression produces a probability, setting a cutoff of 0.5 means that we predict that a shot will go in when our model thinks the shot going in is more likely than the shot missing. We will revisit the topic of classification thresholds later in the chapter.</p></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Issues-with-Linear-Regression-for-Probabilities">Issues with Linear Regression for Probabilities<a class="anchor-link" href="#Issues-with-Linear-Regression-for-Probabilities">&#182;</a></h2><p>Unfortunately, our linear model's predictions cannot be interpreted as probabilities. Valid probabilities must lie between zero and one, but our linear model violates this condition. For example, the probability that LeBron makes a shot when he is 100 feet away from the basket should be close to zero. In this case, however, our model will predict a negative value.</p>
+<p>If we alter our regression model so that its predictions may be interpreted as probabilities, we will have no qualms about using its predictions for classification. We accomplish this with a new prediction function and a new loss function. The resulting model is called a <strong>logistic model</strong>.</p></div></div></div></div>
