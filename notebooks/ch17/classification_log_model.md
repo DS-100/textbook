@@ -61,30 +61,30 @@ lebron = pd.read_csv('lebron.csv')
 
 In this section, we introduce the **logistic model**, a regression model that we use to predict probabilities.
 
-Recall that fitting a model for prediction requires three components: a model that makes predictions, a cost function, and an optimization method. For the by-now familiar least squares linear regression, we select the model:
+Recall that fitting a model requires three components: a model that makes predictions, a loss function, and an optimization method. For the by-now familiar least squares linear regression, we select the model:
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x) &= \hat{\theta} \cdot x
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) &= \hat{\boldsymbol{\theta}} \cdot \textbf{x}
 \end{aligned}
 $$
 
-And the cost function:
+And the loss function:
 
 $$
 \begin{aligned}
-L(\hat{\theta}, X, y)
-&= \frac{1}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))^2\\
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
+&= \frac{1}{n} \sum_{i}(y_i - f_\boldsymbol{\theta} (\textbf{X}_i))^2\\
 \end{aligned}
 $$
 
-We use gradient descent as our optimization method. In the definitions above, $ X $ represents the $ n \times p $ data matrix, $ x $ represents a row of $ X $, $ y $ represents the observed outcomes, and $ \hat{\theta} $ represents the model weights.
+We use gradient descent as our optimization method. In the definitions above, $ \textbf{X} $ represents the $ n \times p $ data matrix ($n$ is the number of data points and $p$ is the number of attributes), $ \textbf{x} $ represents a row of $ \textbf{X} $, and $ \textbf{y} $ is the vector of observed outcomes. The vector $ \boldsymbol{\hat{\theta}} $ contains the optimal model weights whereas $\boldsymbol{\theta}$ contains intermediate weight values generated during optimization.
 
 ## Real Numbers to Probabilities
 
-Observe that the model $ f_\hat{\theta} (x) = \hat{\theta} \cdot x $ can output any real number $ \mathbb{R} $ since it produces a linear combination of the values in the vector $ x $ which itself can contain any value from $ \mathbb{R} $.
+Observe that the model $ f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \hat{\boldsymbol{\theta}} \cdot \textbf{x} $ can output any real number $ \mathbb{R} $ since it produces a linear combination of the values in $ \textbf{x} $, which itself can contain any value from $ \mathbb{R} $.
 
-We can easily visualize this when $ x $ is a scalar. If $ \hat \theta = 0.5$, our model becomes $ f_\hat{\theta} (x) = 0.5 x $. Its predictions can take on any value from negative infinity to positive infinity:
+We can easily visualize this when $ x $ is a scalar. If $ \hat \theta = 0.5$, our model becomes $ f_\hat{\theta} (\textbf{x}) = 0.5 x $. Its predictions can take on any value from negative infinity to positive infinity:
 
 
 ```python
@@ -94,14 +94,14 @@ ys = 0.5 * xs
 plt.plot(xs, ys)
 plt.xlabel('$x$')
 plt.ylabel(r'$f_\hat{\theta}(x)$')
-plt.title(r'Model predictions for $ \hat{\theta} = 0.5 $');
+plt.title(r'Model Predictions for $ \hat{\theta} = 0.5 $');
 ```
 
 
 ![png](classification_log_model_files/classification_log_model_7_0.png)
 
 
-For classification tasks, we want to constrain $ f_\hat{\theta}(x) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\theta}(x) $ to correspond to high probabilities and small values to low probabilities.
+For classification tasks, we want to constrain $ f_\hat{\boldsymbol{\theta}}(\textbf{x}) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\boldsymbol{\theta}}(\textbf{x}) $ to correspond to high probabilities and small values to low probabilities.
 
 ## The Logistic Function
 
@@ -130,7 +130,7 @@ from scipy.special import expit
 xs = np.linspace(-10, 10, 100)
 ys = expit(xs)
 plt.plot(xs, ys)
-plt.title(r'Sigmoid function')
+plt.title(r'Sigmoid Function')
 plt.xlabel('$ t $')
 plt.ylabel(r'$ \sigma(t) $');
 ```
@@ -143,19 +143,17 @@ Observe that the sigmoid function $ \sigma(t) $ takes in any real number $ \math
 
 ## Logistic Model Definition
 
-We may now take our linear model $ f_\hat{\theta} (x) = \hat{\theta} \cdot x $ and use it as the input to the sigmoid function to create the model:
+We may now take our linear model $ \hat{\boldsymbol{\theta}} \cdot \textbf{x} $ and use it as the input to the sigmoid function to create the **logistic model**:
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x) = \sigma(\hat{\theta} \cdot x)
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \textbf{x})
 \end{aligned}
 $$
 
 In other words, we take the output of linear regression—any number in $ \mathbb{R} $— and use the sigmoid function to restrict the model's final output to be a valid probability between zero and one.
 
-This model is called the **logistic model**.
-
-To develop some intuition for how the model behaves, we restrict $ x $ to be a scalar and plot the logistic model's output for several values of $ \hat{\theta} $.
+To develop some intuition for how the logistic model behaves, we restrict $ x $ to be a scalar and plot the logistic model's output for several values of $ \hat{\theta} $.
 
 
 ```python
@@ -186,8 +184,8 @@ plt.tight_layout()
 ![png](classification_log_model_files/classification_log_model_14_0.png)
 
 
-We see that changing $ \hat{\theta} $ changes the sharpness of the curve; the further away from $ 0 $, the sharper the curve.
+We see that changing the magnitude of $ \hat{\theta} $ changes the sharpness of the curve; the further away from $ 0 $, the sharper the curve. Flipping the sign of $ \hat{\theta} $ while keeping magnitude constant is equivalent to reflecting the curve over the y-axis.
 
 ## Summary
 
-We introduce the logistic model, a new prediction function that outputs probabilities. To construct the model, we use the output of linear regression as the input of the logistic function.
+We introduce the logistic model, a new prediction function that outputs probabilities. To construct the model, we use the output of linear regression as the input to the nonlinear logistic function.

@@ -48,17 +48,17 @@ def df_interact(df, nrows=7, ncols=7):
 lebron = pd.read_csv('lebron.csv')
 ```
 
-## A Cost Function for the Logistic Model
+## A Loss Function for the Logistic Model
 
 We have defined a regression model for probabilities, the logistic model:
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x) = \sigma(\hat{\theta} \cdot x)
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \textbf{x})
 \end{aligned}
 $$
 
-Like the model for linear regression, this model has parameters $ \hat{\theta} $, a vector that contains one parameter for each feature of $ x $. We now address the problem of defining a cost function for this model which allows us to fit the model's parameters to data.
+Like the model for linear regression, this model has parameters $ \hat{\boldsymbol{\theta}} $, a vector that contains one parameter for each feature of $ \textbf{x} $. We now address the problem of defining a loss function for this model that allows us to fit the model's parameters to data.
 
 Intuitively, we want the model's predictions to match the data as closely as possible. Below we recreate a plot of LeBron's shot attempts in the 2017 NBA Playoffs using the distance of each shot from the basket. The points are jittered on the y-axis to mitigate overplotting.
 
@@ -107,34 +107,34 @@ plt.ylabel('Shot Made');
 ![png](classification_cost_files/classification_cost_7_0.png)
 
 
-Although we can use the mean squared error cost function as we have for linear regression, for a logistic model this cost function is non-convex and thus difficult to optimize.
+Although we can use the mean squared error loss function as we have for linear regression, it is non-convex for a logistic model and thus difficult to optimize.
 
-## The Cross Entropy Cost
+## Cross-Entropy Loss
 
-Instead of the mean squared error, we use the **cross entropy cost**. Let $ X $ represent the $ n \times p $ input data matrix, $ y $ the vector of observed data values, and $ f_\hat{\theta}(x) $ the logistic model. Using this notation, the cross entropy cost is defined as:
+Instead of the mean squared error, we use the **cross-entropy loss**. Let $ \textbf{X} $ represent the $ n \times p $ input data matrix, $ \textbf{y} $ the vector of observed data values, and $ f_\boldsymbol{\theta}(\textbf{x}) $ the logistic model. $\boldsymbol{\theta}$ contains the current parameter values. Using this notation, the average cross-entropy loss is defined as:
 
 $$
 \begin{aligned}
-L(\hat{\theta}, X, y) = \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) \right)
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = \frac{1}{n} \sum_i \left(- y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) \right)
 \end{aligned}
 $$
 
-You may observe that as usual we take the mean loss over each point in our dataset. This loss is called the cross entropy loss and forms the inner expression in the above summation: 
+You may observe that as usual we take the mean loss over each point in our dataset. The inner expression in the above summation represents the loss at one data point $(\textbf{X}_i, y_i)$: 
 
 $$
 \begin{aligned}
-\ell(\hat{\theta}, X, y) = - y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) )
+\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i) = - y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) )
 \end{aligned}
 $$
 
-Recall that each $ y_i $ is either 0 or 1 in our dataset. If $ y_i = 0 $, the first term in the loss is zero. If $ y_i = 1 $, the second term in the loss is zero. Thus, only one term of the cross entropy loss contributes to the overall cost for each point in our dataset.
+Recall that each $ y_i $ is either 0 or 1 in our dataset. If $ y_i = 0 $, the first term in the loss is zero. If $ y_i = 1 $, the second term in the loss is zero. Thus, for each point in our dataset, only one term of the cross-entropy loss contributes to the overall loss.
 
-Suppose $ y_i = 0 $ and our predicted probability $ f_\hat{\theta}(X_i) = 0 $—our model is completely correct. The loss for this point will be:
+Suppose $ y_i = 0 $ and our predicted probability $ f_\boldsymbol{\theta}(\textbf{X}_i) = 0 $—our model is completely correct. The loss for this point will be:
 
 $$
 \begin{aligned}
-\ell(\hat{\theta}, X, y)
-&= - y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) ) \\
+\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)
+&= - y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) ) \\
 &= - 0 - (1 - 0) \ln (1 - 0 ) \\
 &= - \ln (1) \\
 &= 0
@@ -143,11 +143,11 @@ $$
 
 As expected, the loss for a correct prediction is $ 0 $. You may verify that the further the predicted probability is from the true value, the greater the loss.
 
-Minimizing the overall cross entropy cost requires the model $ f_\hat{\theta}(x) $ to make the most accurate predictions it can. Conveniently, this cost function is convex, making gradient descent a useful choice for optimization.
+Minimizing the overall cross-entropy loss requires the model $ f_\boldsymbol{\theta}(\textbf{x}) $ to make the most accurate predictions it can. Conveniently, this loss function is convex, making gradient descent a useful choice for optimization.
 
-## Gradient of the Cross Entropy Cost
+## Gradient of the Cross-Entropy Loss
 
-In order to run gradient descent on the cross entropy cost we must calculate the gradient of the cost function. First, we compute the derivative of the sigmoid function since we'll use it in our gradient calculation.
+In order to run gradient descent on a model's cross-entropy loss we must calculate the gradient of the loss function. First, we compute the derivative of the sigmoid function since we'll use it in our gradient calculation.
 
 $$
 \begin{aligned}
@@ -160,43 +160,47 @@ $$
 
 The derivative of the sigmoid function can be conveniently expressed in terms of the sigmoid function itself.
 
-As a shorthand, we define $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $. We will soon need the gradient of $ \sigma_i $ with respect to the vector $ \hat{\theta} $ so we will derive it now using a straightforward application of the chain rule. 
+As a shorthand, we define $ \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) $. We will soon need the gradient of $ \sigma_i $ with respect to the vector $ \boldsymbol{\theta} $ so we will derive it now using a straightforward application of the chain rule. 
 
 $$
 \begin{aligned}
-\nabla_{\hat{\theta}} \sigma_i
-&= \nabla_{\hat{\theta}} \sigma(X_i \cdot \hat \theta) \\
-&= \sigma(X_i \cdot \hat \theta) (1 - \sigma(X_i \cdot \hat \theta))  \nabla_{\hat{\theta}} (X_i \cdot \hat \theta) \\
-&= \sigma_i (1 - \sigma_i) X_i 
+\nabla_{\boldsymbol{\theta}} \sigma_i
+&= \nabla_{\boldsymbol{\theta}} \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \\
+&= \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) (1 - \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}))  \nabla_{\boldsymbol{\theta}} (\textbf{X}_i \cdot \boldsymbol{\theta}) \\
+&= \sigma_i (1 - \sigma_i) \textbf{X}_i 
 \end{aligned}
 $$
 
-Now, we derive the gradient for the cross entropy cost with respect to the model parameters $ \hat{\theta} $. In the derivation below, we let $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $.
+Now, we derive the gradient of the cross-entropy loss with respect to the model parameters $ \boldsymbol{\theta} $. In the derivation below, we let $ \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) $.
 
 $$
 \begin{aligned}
-L(\hat{\theta}, X, y)
-&= \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) \right) \\
-&= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
-\nabla_{\hat{\theta}} L(\hat{\theta}, X, y)
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
+&= \frac{1}{n} \sum_i \left(- y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) \right) \\
+&= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i) \right) \\
+\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
 &= \frac{1}{n} \sum_i \left(
-    - \frac{y_i}{\sigma_i} \nabla_{\hat{\theta}} \sigma_i
-    + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\hat{\theta}} \sigma_i
-\right) \\
+    - \frac{y_i}{\sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i
+    + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i \right) \\
 &= - \frac{1}{n} \sum_i \left(
     \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-\right) \nabla_{\hat{\theta}} \sigma_i \\
+\right) \nabla_{\boldsymbol{\theta}} \sigma_i \\
 &= - \frac{1}{n} \sum_i \left(
     \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-\right) \sigma_i (1 - \sigma_i) X_i \\
+\right) \sigma_i (1 - \sigma_i) \textbf{X}_i \\
 &= - \frac{1}{n} \sum_i \left(
     y_i - \sigma_i
-\right) X_i \\
+\right) \textbf{X}_i \\
 \end{aligned}
 $$
 
-The surprisingly simple gradient expression allows us to fit a logistic model to the cross entropy loss using gradient descent.
+The surprisingly simple gradient expression allows us to fit a logistic model to the cross-entropy loss using gradient descent:
+
+$$ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\boldsymbol{\theta}}}  L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})$$
+
+
+Section 17.6 delves into deriving update formulas for batch, stochastic, and mini-batch gradient descent.
 
 ## Summary
 
-Since the cross-entropy loss function is convex, we minimize this loss using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.
+Since the cross-entropy loss function is convex, we minimize it using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, loss function, and minimization procedure. In Section 17.5, we take a closer look at why we use average cross-entropy loss for logistic regression.

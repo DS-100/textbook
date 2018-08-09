@@ -5,7 +5,7 @@
             Show Widgets
         </button>
         <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch11/gradient_descent_define.ipynb">Open on DataHub</a></div>
-
+    
 
 
 
@@ -28,7 +28,7 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><h1>Table of Contents<span class="tocSkip"></span></h1></p>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#Minimizing-the-Huber-cost" data-toc-modified-id="Minimizing-the-Huber-cost-1.4">Minimizing the Huber cost</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div></div></div></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Gradient-Descent" data-toc-modified-id="Gradient-Descent-1">Gradient Descent</a></span><ul class="toc-item"><li><span><a href="#Intuition" data-toc-modified-id="Intuition-1.1">Intuition</a></span></li><li><span><a href="#Gradient-Descent-Analysis" data-toc-modified-id="Gradient-Descent-Analysis-1.2">Gradient Descent Analysis</a></span></li><li><span><a href="#Defining-the-minimize-Function" data-toc-modified-id="Defining-the-minimize-Function-1.3">Defining the <code>minimize</code> Function</a></span></li><li><span><a href="#Minimizing-the-Huber-loss" data-toc-modified-id="Minimizing-the-Huber-loss-1.4">Minimizing the Huber loss</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-1.5">Summary</a></span></li></ul></li></ul></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -70,51 +70,51 @@
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">grad_mse_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">grad_mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
     <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">plot_cost</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">cost_fn</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">plot_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">):</span>
     <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
-    <span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
-
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+    
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">costs</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">*</span><span class="n">xlim</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">cost_fn</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">loss_fn</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Cost&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">plot_theta_on_cost</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">cost_fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">cost</span> <span class="o">=</span> <span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">plot_theta_on_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
     <span class="n">default_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta $&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                         <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">theta</span><span class="p">],</span> <span class="p">[</span><span class="n">cost</span><span class="p">],</span> <span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="n">default_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">})</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">theta</span><span class="p">],</span> <span class="p">[</span><span class="n">loss</span><span class="p">],</span> <span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="n">default_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">})</span>
 
-<span class="k">def</span> <span class="nf">plot_tangent_on_cost</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">cost_fn</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
-    <span class="n">slope</span> <span class="o">=</span> <span class="p">((</span><span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="o">-</span> <span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">plot_tangent_on_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="p">((</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="o">-</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">))</span>
              <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps</span><span class="p">))</span>
     <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="p">(</span><span class="n">xs</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="p">(</span><span class="n">xs</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Gradient-Descent">Gradient Descent<a class="anchor-link" href="#Gradient-Descent">&#182;</a></h2><p>We are interested in creating a function that can minimize a cost function without forcing the user to predetermine which values of $ \theta $ to try. In other words, while the <code>simple_minimize</code> function has the following signature:</p>
-<div class="highlight"><pre><span></span><span class="n">simple_minimize</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">thetas</span><span class="p">)</span>
+<h2 id="Gradient-Descent">Gradient Descent<a class="anchor-link" href="#Gradient-Descent">&#182;</a></h2><p>We are interested in creating a function that can minimize a loss function without forcing the user to predetermine which values of $\theta$ to try. In other words, while the <code>simple_minimize</code> function has the following signature:</p>
+<div class="highlight"><pre><span></span><span class="n">simple_minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">thetas</span><span class="p">)</span>
 </pre></div>
 <p>We would like a function that has the following signature:</p>
-<div class="highlight"><pre><span></span><span class="n">minimize</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
 </pre></div>
-<p>This function needs to automatically find the minimizing $ \theta $ value no matter how small or large it is. We will use a technique called gradient descent to implement this new <code>minimize</code> function.</p></div></div></div>
+<p>This function needs to automatically find the minimizing $\theta$ value no matter how small or large it is. We will use a technique called gradient descent to implement this new <code>minimize</code> function.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Intuition">Intuition<a class="anchor-link" href="#Intuition">&#182;</a></h3><p>As with cost functions, we will discuss the intuition for gradient descent first, then formalize our understanding with mathematics.</p>
-<p>Since the <code>minimize</code> function isn't given values of $ \theta $ to try, we start by picking a $ \theta $ anywhere we'd like. Then, we can iteratively improve the estimate of $ \theta $. To improve an estimate of $ \theta $, we look at the slope of the cost function at that choice of $ \theta $.</p>
-<p>For example, suppose we are using MSE cost for the simple dataset $ y = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.</p></div></div></div>
+<h3 id="Intuition">Intuition<a class="anchor-link" href="#Intuition">&#182;</a></h3><p>As with loss functions, we will discuss the intuition for gradient descent first, then formalize our understanding with mathematics.</p>
+<p>Since the <code>minimize</code> function is not given values of $\theta$ to try, we start by picking a $\theta$ anywhere we'd like. Then, we can iteratively improve the estimate of $\theta$. To improve an estimate of $\theta$, we look at the slope of the loss function at that choice of $ \theta $.</p>
+<p>For example, suppose we are using MSE for the simple dataset $ \textbf{y} = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $ and our current choice of $ \theta $ is 12.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -124,8 +124,8 @@
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
-<span class="n">plot_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse_cost</span><span class="p">)</span>
-<span class="n">plot_theta_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">)</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
+<span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -136,22 +136,14 @@
 
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
-
-<div class="output_area">
-
-
-
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_7_1.png"
+<img src="/notebooks-images/gradient_descent_define_7_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We'd like to choose a new value for $ \theta $ that decreases the cost. To do this, we look at the slope of the cost function at $ \theta = 12 $:</p></div></div></div>
+<p>We'd like to choose a new value for $\theta$ that decreases the loss. To do this, we look at the slope of the loss function at $\theta= 12 $:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -161,8 +153,8 @@
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
-<span class="n">plot_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse_cost</span><span class="p">)</span>
-<span class="n">plot_tangent_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">)</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
+<span class="n">plot_tangent_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -173,23 +165,15 @@
 
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
-
-<div class="output_area">
-
-
-
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_9_1.png"
+<img src="/notebooks-images/gradient_descent_define_9_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The slope is negative, which means that increasing $ \theta $ will decrease the cost.</p>
-<p>If $ \theta = 16.5 $ on the other hand, the slope of the cost function is positive:</p></div></div></div>
+<p>The slope is negative, which means that increasing $\theta$ will decrease the loss.</p>
+<p>If $\theta = 16.5 $ on the other hand, the slope of the loss function is positive:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -199,8 +183,8 @@
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
-<span class="n">plot_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse_cost</span><span class="p">)</span>
-<span class="n">plot_tangent_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">16.5</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">)</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
+<span class="n">plot_tangent_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">16.5</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -211,39 +195,31 @@
 
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
-
-<div class="output_area">
-
-
-
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_11_1.png"
+<img src="/notebooks-images/gradient_descent_define_11_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>When the slope is positive, decreasing $ \theta $ will decrease the cost.</p>
-<p>The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the cost. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $ \theta $ should move in the negative direction. Mathematically, we write:</p>
+<p>When the slope is positive, decreasing $ \theta $ will decrease the loss.</p>
+<p>The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the loss. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $\theta $ should move in the negative direction. Mathematically, we write:</p>
 <p>$$
-\theta_{t+1} = \theta_t - \frac{\partial}{\partial \theta} L(\theta, y)
+\theta^{(t+1)} = \theta^{(t)} - \frac{\partial}{\partial \theta} L(\theta^{(t)}, \textbf{y})
 $$</p>
-<p>Where $ \theta_t $ is the current estimate and $ \theta_{t+1} $ is the next estimate.</p>
-<p>For the MSE cost, we have:</p>
+<p>Where $ \theta^{(t)} $ is the current estimate and $ \theta^{(t+1)} $ is the next estimate.</p>
+<p>For the MSE, we have:</p>
 <p>$$
 \begin{aligned}
 L(\theta, y)
 &amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
-\frac{\partial}{\partial \theta} L(\theta, y)
+\frac{\partial}{\partial \hat{\theta}} L(\theta, y)
 &amp;= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
 &amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
 \end{aligned}
 $$</p>
-<p>When $ \theta_t = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta_{t+1} = 12 - (-5.2) = 17.2 $.</p>
-<p>We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the cost curve below.</p></div></div></div>
+<p>When $ \theta^{(t)} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta^{(t+1)} = 12 - (-5.2) = 17.2 $.</p>
+<p>We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the loss curve below.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -253,10 +229,10 @@ $$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
-<span class="n">plot_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse_cost</span><span class="p">)</span>
-<span class="n">plot_theta_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
+<span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                    <span class="n">edgecolor</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plot_theta_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">)</span>
+<span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -267,26 +243,19 @@ $$</p>
 
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
-
-<div class="output_area">
-
-
-
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_13_1.png"
+<img src="/notebooks-images/gradient_descent_define_13_0.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta $. Our final update formula is:</p>
+<p>Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta$. Our final update formula is:</p>
 <p>$$
-\theta_{t+1} = \theta_t - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, y)
-$$</p>
-<p>Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $ this is the new $ \theta_{t+1} $:</p></div></div></div>
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^{(t)}, y)
+$$
+|
+Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -295,12 +264,12 @@ $$</p>
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="k">def</span> <span class="nf">plot_one_gd_iter</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
-    <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">grad_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
-    <span class="n">plot_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">cost_fn</span><span class="p">)</span>
-    <span class="n">plot_theta_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">cost_fn</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">plot_one_gd_iter</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
+    <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">grad_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">loss_fn</span><span class="p">)</span>
+    <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                        <span class="n">edgecolor</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">plot_theta_on_cost</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">new_theta</span><span class="p">,</span> <span class="n">cost_fn</span><span class="p">)</span>
+    <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">new_theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;old theta: </span><span class="si">{theta}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;new theta: </span><span class="si">{new_theta}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div></div></div></div></div>
@@ -312,20 +281,12 @@ $$</p>
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">,</span> <span class="n">grad_mse_cost</span><span class="p">)</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area">
-
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
 
 <div class="output_area">
 
@@ -343,11 +304,11 @@ new theta: 13.596
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_16_2.png"
+<img src="/notebooks-images/gradient_descent_define_16_1.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum cost because the slope is also smaller.</p></div></div></div>
+<p>Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum loss because the slope is also smaller.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -356,20 +317,12 @@ new theta: 13.596
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">13.60</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">,</span> <span class="n">grad_mse_cost</span><span class="p">)</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">13.60</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area">
-
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
 
 <div class="output_area">
 
@@ -387,7 +340,7 @@ new theta: 14.236
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_18_2.png"
+<img src="/notebooks-images/gradient_descent_define_18_1.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -397,20 +350,12 @@ new theta: 14.236
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">14.24</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">,</span> <span class="n">grad_mse_cost</span><span class="p">)</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">14.24</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area">
-
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
 
 <div class="output_area">
 
@@ -428,7 +373,7 @@ new theta: 14.492
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_19_2.png"
+<img src="/notebooks-images/gradient_descent_define_19_1.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -438,20 +383,12 @@ new theta: 14.492
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">14.49</span><span class="p">,</span> <span class="n">mse_cost</span><span class="p">,</span> <span class="n">grad_mse_cost</span><span class="p">)</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">14.49</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area">
-
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>No handles with labels found to put in legend.
-</pre></div></div>
 
 <div class="output_area">
 
@@ -469,84 +406,84 @@ new theta: 14.592
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/gradient_descent_define_20_2.png"
+<img src="/notebooks-images/gradient_descent_define_20_1.png"
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Gradient-Descent-Analysis">Gradient Descent Analysis<a class="anchor-link" href="#Gradient-Descent-Analysis">&#182;</a></h3><p>We now have the full algorithm for gradient descent:</p>
 <ol>
 <li>Choose a starting value of $ \theta $ (0 is a common choice).</li>
-<li>Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, y) $ and store this as the new value of $ \theta $.</li>
+<li>Compute $ \theta - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta, \textbf{y}) $ and store this as the new value of $ \theta $.</li>
 <li>Repeat until $ \theta $ doesn't change between iterations.</li>
 </ol>
 <p>You will more commonly see the gradient $ \nabla_\theta $ in place of the partial derivative $ \frac{\partial}{\partial \theta} $. The two notations are essentially equivalent, but since the gradient notation is more common we will use it in the gradient update formula from now on:</p>
 <p>$$
-\theta_{t+1} = \theta_t - \alpha \cdot \nabla_\theta L(\theta, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_\theta L(\theta^{(t)}, \textbf{y})
 $$</p>
 <p>To review notation:</p>
 <ul>
-<li>$ \theta_t $ is the current choice of $ \theta $.</li>
-<li>$ \theta_{t+1} $ is the next choice of $ \theta $.</li>
-<li>$ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha_t $ to mark that $ \alpha $ varies over time $ t $.</li>
-<li>$ \nabla_\theta L(\theta, y) $ is the partial derivative / gradient of the cost function at $ \theta $.</li>
+<li>$ \theta^{(t)} $ is the current estimate of $ \theta^* $ at the $t$th iteration.</li>
+<li>$ \theta^{(t+1)} $ is the next choice of $ \theta $.</li>
+<li>$ \alpha $ is called the learning rate, usually set to a small constant. Sometimes it is useful to start with a larger $ \alpha $ and decrease it over time. If $ \alpha $ changes between iterations, we use the variable $ \alpha^t $ to mark that $ \alpha $ varies over time $ t $.</li>
+<li>$ \nabla_\theta L(\theta^{(t)}, \textbf{y}) $ is the partial derivative / gradient of the loss function with respect to $ \theta $ at time $t$.</li>
 </ul>
-<p>You can now see the importance of choosing a differentiable cost function: $ \nabla_\theta L(\theta, y) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in cost for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)</p>
-<p>The gradient algorithm is simple yet powerful since we can use it for many types of models and many types of cost functions. It is the computational tool of choice for fitting many important models, including linear regression on large datasets and neural networks.</p></div></div></div>
+<p>You can now see the importance of choosing a differentiable loss function: $ \nabla_\theta L(\theta, \textbf{y}) $ is a crucial part of the gradient descent algorithm. (While it is possible to estimate the gradient by computing the difference in loss for two slightly different values of $ \theta $ and dividing by the distance between $ \theta $ values, this typically increases the runtime of gradient descent so significantly that it becomes impractical to use.)</p>
+<p>The gradient algorithm is simple yet powerful since we can use it for many types of models and many types of loss functions. It is the computational tool of choice for fitting many important models, including linear regression on large datasets and neural networks.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Defining-the-minimize-Function">Defining the <code>minimize</code> Function<a class="anchor-link" href="#Defining-the-minimize-Function">&#182;</a></h3><p>Now we return to our original task: defining the <code>minimize</code> function. We will have to change our function signature slightly since we now need to compute the gradient of the cost function.</p></div></div></div>
+<h3 id="Defining-the-minimize-Function">Defining the <code>minimize</code> Function<a class="anchor-link" href="#Defining-the-minimize-Function">&#182;</a></h3><p>Now we return to our original task: defining the <code>minimize</code> function. We will have to change our function signature slightly since we now need to compute the gradient of the loss function.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Uses gradient descent to minimize cost_fn. Returns the minimizing value of</span>
-<span class="sd">    theta once theta changes less than 0.001 between iterations.</span>
+<span class="sd">    Uses gradient descent to minimize loss_fn. Returns the minimizing value of</span>
+<span class="sd">    theta_hat once theta_hat changes less than 0.001 between iterations.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta:.2f}</span><span class="s1"> | cost: {cost_fn(theta, dataset):.2f}&#39;</span><span class="p">)</span>
-        <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;theta: </span><span class="si">{theta:.2f}</span><span class="s1"> | loss: {loss_fn(theta, dataset):.2f}&#39;</span><span class="p">)</span>
+        <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
         <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gradient</span>
-
+        
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_theta</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">new_theta</span>
-
+        
         <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Then we can define functions to compute our MSE cost and its gradient:</p></div></div></div>
+<p>Then we can define functions to compute our MSE and its gradient:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">grad_mse_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">grad_mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
     <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Finally, we can use the <code>minimize</code> function to compute the minimizing value of $ \theta $ for $ y = [12.1, 12.8, 14.9, 16.3, 17.2] $.</p></div></div></div>
+<p>Finally, we can use the <code>minimize</code> function to compute the minimizing value of $ \theta $ for $ \textbf{y} = [12.1, 12.8, 14.9, 16.3, 17.2] $.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
-theta = minimize(mse_cost, grad_mse_cost, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
+theta = minimize(mse, grad_mse, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
 print(f&#39;Minimizing theta: {theta}&#39;)
 print()
 </pre></div></div></div></div>
@@ -560,28 +497,27 @@ print()
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>theta: 0.00 | cost: 218.76
-theta: 5.86 | cost: 81.21
-theta: 9.38 | cost: 31.70
-theta: 11.49 | cost: 13.87
-theta: 12.76 | cost: 7.45
-theta: 13.52 | cost: 5.14
-theta: 13.98 | cost: 4.31
-theta: 14.25 | cost: 4.01
-theta: 14.41 | cost: 3.90
-theta: 14.51 | cost: 3.86
-theta: 14.57 | cost: 3.85
-theta: 14.61 | cost: 3.85
-theta: 14.63 | cost: 3.84
-theta: 14.64 | cost: 3.84
-theta: 14.65 | cost: 3.84
-theta: 14.65 | cost: 3.84
-theta: 14.66 | cost: 3.84
-theta: 14.66 | cost: 3.84
+<pre>theta: 0.00 | loss: 218.76
+theta: 5.86 | loss: 81.21
+theta: 9.38 | loss: 31.70
+theta: 11.49 | loss: 13.87
+theta: 12.76 | loss: 7.45
+theta: 13.52 | loss: 5.14
+theta: 13.98 | loss: 4.31
+theta: 14.25 | loss: 4.01
+theta: 14.41 | loss: 3.90
+theta: 14.51 | loss: 3.86
+theta: 14.57 | loss: 3.85
+theta: 14.61 | loss: 3.85
+theta: 14.63 | loss: 3.84
+theta: 14.64 | loss: 3.84
+theta: 14.65 | loss: 3.84
+theta: 14.65 | loss: 3.84
+theta: 14.66 | loss: 3.84
+theta: 14.66 | loss: 3.84
 Minimizing theta: 14.658511131035242
 
-CPU times: user 0 ns, sys: 0 ns, total: 0 ns
-Wall time: 1.74 ms
+Wall time: 1.99 ms
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -590,7 +526,7 @@ Wall time: 1.74 ms
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
@@ -610,30 +546,32 @@ Wall time: 1.74 ms
 <pre>14.66</pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Minimizing-the-Huber-cost">Minimizing the Huber cost<a class="anchor-link" href="#Minimizing-the-Huber-cost">&#182;</a></h3><p>Now, we can apply gradient descent to minimize the Huber cost on our dataset of tip percentages.</p>
-<p>The Huber cost is:</p>
+<h3 id="Minimizing-the-Huber-loss">Minimizing the Huber loss<a class="anchor-link" href="#Minimizing-the-Huber-loss">&#182;</a></h3><p>Now, we can apply gradient descent to minimize the Huber loss on our dataset of tip percentages.</p>
+<p>The Huber loss is:</p>
 <p>$$
-L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     \frac{1}{2}(y_i - \theta)^2 &amp;  | y_i - \theta | \le \delta \\
      \delta (|y_i - \theta| - \frac{1}{2} \delta ) &amp; \text{otherwise}
 \end{cases}
 $$</p>
-<p>The gradient of the Huber cost is:</p>
+<p>The gradient of the Huber loss is:</p>
 <p>$$
-\nabla_{\theta} L_\delta(\theta, y) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
-    -(y_i - \theta) &amp;  | y_i - \theta | \le \delta \\
-    - \delta \cdot \text{sign} (y_i - \theta) &amp; \text{otherwise}
-\end{cases}
+\nabla<em>{\theta} L</em>\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    -(y_i - \theta) &amp;  | y_i - \theta | \le \delta \</p>
+
+<pre><code>- \delta \cdot \text{sign} (y_i - \theta) &amp; \text{otherwise}
+</code></pre>
+<p>\end{cases}
 $$</p>
-<p>(Note that in previous definitions of Huber cost we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)</p></div></div></div>
+<p>(Note that in previous definitions of Huber loss we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">huber_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">huber_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">dataset</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;=</span> <span class="n">delta</span><span class="p">,</span>
@@ -641,7 +579,7 @@ $$</p>
                  <span class="n">delta</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">delta</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
     <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">grad_huber_cost</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">grad_huber_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">dataset</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;=</span> <span class="n">delta</span><span class="p">,</span>
@@ -651,16 +589,16 @@ $$</p>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's minimize the Huber cost on the tips dataset:</p></div></div></div>
+<p>Let's minimize the Huber loss on the tips dataset:</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell"
-
+  
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
-theta = minimize(huber_cost, grad_huber_cost, tips[&#39;pcttip&#39;], progress=False)
+theta = minimize(huber_loss, grad_huber_loss, tips[&#39;pcttip&#39;], progress=False)
 print(f&#39;Minimizing theta: {theta}&#39;)
 print()
 </pre></div></div></div></div>
@@ -676,9 +614,8 @@ print()
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Minimizing theta: 15.506849531471964
 
-CPU times: user 78.1 ms, sys: 15.6 ms, total: 93.8 ms
-Wall time: 134 ms
+Wall time: 210 ms
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>Gradient descent gives us a generic way to minimize a cost function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and cost functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.</p></div></div></div></div>
+<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>Gradient descent gives us a generic way to minimize a loss function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and loss functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.</p></div></div></div></div>

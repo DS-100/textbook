@@ -4,8 +4,8 @@
         <button class="interact-button js-nbinteract-widget">
             Show Widgets
         </button>
-        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch16/classification_cost.ipynb">Open on DataHub</a></div>
-
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/ch17/classification_cost.ipynb">Open on DataHub</a></div>
+    
 
 
 
@@ -23,7 +23,7 @@
 
 <span class="c1"># Set directory for data loading to work properly</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch16&#39;</span><span class="p">))</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch17&#39;</span><span class="p">))</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -89,13 +89,13 @@
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="A-Cost-Function-for-the-Logistic-Model">A Cost Function for the Logistic Model<a class="anchor-link" href="#A-Cost-Function-for-the-Logistic-Model">&#182;</a></h2><p>We have defined a regression model for probabilities, the logistic model:</p>
+<h2 id="A-Loss-Function-for-the-Logistic-Model">A Loss Function for the Logistic Model<a class="anchor-link" href="#A-Loss-Function-for-the-Logistic-Model">&#182;</a></h2><p>We have defined a regression model for probabilities, the logistic model:</p>
 <p>$$
 \begin{aligned}
-f_\hat{\theta} (x) = \sigma(\hat{\theta} \cdot x)
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \textbf{x})
 \end{aligned}
 $$</p>
-<p>Like the model for linear regression, this model has parameters $ \hat{\theta} $, a vector that contains one parameter for each feature of $ x $. We now address the problem of defining a cost function for this model which allows us to fit the model's parameters to data.</p>
+<p>Like the model for linear regression, this model has parameters $ \hat{\boldsymbol{\theta}} $, a vector that contains one parameter for each feature of $ \textbf{x} $. We now address the problem of defining a loss function for this model that allows us to fit the model's parameters to data.</p>
 <p>Intuitively, we want the model's predictions to match the data as closely as possible. Below we recreate a plot of LeBron's shot attempts in the 2017 NBA Playoffs using the distance of each shot from the basket. The points are jittered on the y-axis to mitigate overplotting.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -173,31 +173,31 @@ $$</p>
 ></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Although we can use the mean squared error cost function as we have for linear regression, for a logistic model this cost function is non-convex and thus difficult to optimize.</p></div></div></div>
+<p>Although we can use the mean squared error loss function as we have for linear regression, it is non-convex for a logistic model and thus difficult to optimize.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="The-Cross-Entropy-Cost">The Cross Entropy Cost<a class="anchor-link" href="#The-Cross-Entropy-Cost">&#182;</a></h2><p>Instead of the mean squared error, we use the <strong>cross entropy cost</strong>. Let $ X $ represent the $ n \times p $ input data matrix, $ y $ the vector of observed data values, and $ f_\hat{\theta}(x) $ the logistic model. Using this notation, the cross entropy cost is defined as:</p>
+<h2 id="Cross-Entropy-Loss">Cross-Entropy Loss<a class="anchor-link" href="#Cross-Entropy-Loss">&#182;</a></h2><p>Instead of the mean squared error, we use the <strong>cross-entropy loss</strong>. Let $ \textbf{X} $ represent the $ n \times p $ input data matrix, $ \textbf{y} $ the vector of observed data values, and $ f_\boldsymbol{\theta}(\textbf{x}) $ the logistic model. $\boldsymbol{\theta}$ contains the current parameter values. Using this notation, the average cross-entropy loss is defined as:</p>
 <p>$$
 \begin{aligned}
-L(\hat{\theta}, X, y) = \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) \right)
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = \frac{1}{n} \sum_i \left(- y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) \right)
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>You may observe that as usual we take the mean loss over each point in our dataset. This loss is called the cross entropy loss and forms the inner expression in the above summation:</p>
+<p>You may observe that as usual we take the mean loss over each point in our dataset. The inner expression in the above summation represents the loss at one data point $(\textbf{X}_i, y_i)$:</p>
 <p>$$
 \begin{aligned}
-\ell(\hat{\theta}, X, y) = - y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) )
+\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i) = - y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) )
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Recall that each $ y_i $ is either 0 or 1 in our dataset. If $ y_i = 0 $, the first term in the loss is zero. If $ y_i = 1 $, the second term in the loss is zero. Thus, only one term of the cross entropy loss contributes to the overall cost for each point in our dataset.</p>
-<p>Suppose $ y_i = 0 $ and our predicted probability $ f_\hat{\theta}(X_i) = 0 $—our model is completely correct. The loss for this point will be:</p>
+<p>Recall that each $ y_i $ is either 0 or 1 in our dataset. If $ y_i = 0 $, the first term in the loss is zero. If $ y_i = 1 $, the second term in the loss is zero. Thus, for each point in our dataset, only one term of the cross-entropy loss contributes to the overall loss.</p>
+<p>Suppose $ y_i = 0 $ and our predicted probability $ f_\boldsymbol{\theta}(\textbf{X}_i) = 0 $—our model is completely correct. The loss for this point will be:</p>
 <p>$$
 \begin{aligned}
-\ell(\hat{\theta}, X, y)
-&amp;= - y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) ) \\
+\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)
+&amp;= - y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) ) \\
 &amp;= - 0 - (1 - 0) \ln (1 - 0 ) \\
 &amp;= - \ln (1) \\
 &amp;= 0
@@ -206,10 +206,10 @@ $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As expected, the loss for a correct prediction is $ 0 $. You may verify that the further the predicted probability is from the true value, the greater the loss.</p>
-<p>Minimizing the overall cross entropy cost requires the model $ f_\hat{\theta}(x) $ to make the most accurate predictions it can. Conveniently, this cost function is convex, making gradient descent a useful choice for optimization.</p></div></div></div>
+<p>Minimizing the overall cross-entropy loss requires the model $ f_\boldsymbol{\theta}(\textbf{x}) $ to make the most accurate predictions it can. Conveniently, this loss function is convex, making gradient descent a useful choice for optimization.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Gradient-of-the-Cross-Entropy-Cost">Gradient of the Cross Entropy Cost<a class="anchor-link" href="#Gradient-of-the-Cross-Entropy-Cost">&#182;</a></h2><p>In order to run gradient descent on the cross entropy cost we must calculate the gradient of the cost function. First, we compute the derivative of the sigmoid function since we'll use it in our gradient calculation.</p>
+<h2 id="Gradient-of-the-Cross-Entropy-Loss">Gradient of the Cross-Entropy Loss<a class="anchor-link" href="#Gradient-of-the-Cross-Entropy-Loss">&#182;</a></h2><p>In order to run gradient descent on a model's cross-entropy loss we must calculate the gradient of the loss function. First, we compute the derivative of the sigmoid function since we'll use it in our gradient calculation.</p>
 <p>$$
 \begin{aligned}
 \sigma(t) &amp;= \frac{1}{1 + e^{-t}} \\
@@ -221,42 +221,45 @@ $$</p>
 <p>The derivative of the sigmoid function can be conveniently expressed in terms of the sigmoid function itself.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As a shorthand, we define $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $. We will soon need the gradient of $ \sigma_i $ with respect to the vector $ \hat{\theta} $ so we will derive it now using a straightforward application of the chain rule.</p>
+<p>As a shorthand, we define $ \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) $. We will soon need the gradient of $ \sigma_i $ with respect to the vector $ \boldsymbol{\theta} $ so we will derive it now using a straightforward application of the chain rule.</p>
 <p>$$
 \begin{aligned}
-\nabla_{\hat{\theta}} \sigma_i
-&amp;= \nabla_{\hat{\theta}} \sigma(X_i \cdot \hat \theta) \\
-&amp;= \sigma(X_i \cdot \hat \theta) (1 - \sigma(X_i \cdot \hat \theta))  \nabla_{\hat{\theta}} (X_i \cdot \hat \theta) \\
-&amp;= \sigma_i (1 - \sigma_i) X_i
+\nabla_{\boldsymbol{\theta}} \sigma_i
+&amp;= \nabla_{\boldsymbol{\theta}} \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \\
+&amp;= \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) (1 - \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}))  \nabla_{\boldsymbol{\theta}} (\textbf{X}_i \cdot \boldsymbol{\theta}) \\
+&amp;= \sigma_i (1 - \sigma_i) \textbf{X}_i 
 \end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now, we derive the gradient for the cross entropy cost with respect to the model parameters $ \hat{\theta} $. In the derivation below, we let $ \sigma_i = f_\hat{\theta}(X_i) = \sigma(X_i \cdot \hat \theta) $.</p>
+<p>Now, we derive the gradient of the cross-entropy loss with respect to the model parameters $ \boldsymbol{\theta} $. In the derivation below, we let $ \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) $.</p>
 <p>$$
-  \begin{aligned}
-  L(\hat{\theta}, X, y)
-  &amp;= \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\theta}(X_i)) - (1 - y_i) \ln (1 - f_\hat{\theta}(X_i) \right) \\
-  &amp;= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i ) \right) \\
-  \nabla_{\hat{\theta}} L(\hat{\theta}, X, y)
-  &amp;= \frac{1}{n} \sum_i \left(
-      - \frac{y_i}{\sigma_i} \nabla_{\hat{\theta}} \sigma_i
-      + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\hat{\theta}} \sigma_i
-  \right) \\
-  &amp;= - \frac{1}{n} \sum_i \left(
-      \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-  \right) \nabla_{\hat{\theta}} \sigma_i \\
-  &amp;= - \frac{1}{n} \sum_i \left(
-      \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-  \right) \sigma_i (1 - \sigma_i) X_i \\
-  &amp;= - \frac{1}{n} \sum_i \left(
-      y_i - \sigma_i
-  \right) X_i \\
-  \end{aligned}
+\begin{aligned}
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
+&amp;= \frac{1}{n} \sum_i \left(- y<em>i \ln (f</em>\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y<em>i) \ln (1 - f</em>\boldsymbol{\theta}(\textbf{X}_i) \right) \
+&amp;= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma<em>i) \right) \
+\nabla</em>{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
+&amp;= \frac{1}{n} \sum_i \left(</p>
+
+<pre><code>- \frac{y_i}{\sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i
++ \frac{1 - y_i}{1 - \sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i \right) \\
+</code></pre>
+<p>&amp;= - \frac{1}{n} \sum_i \left(
+    \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma<em>i}
+\right) \nabla</em>{\boldsymbol{\theta}} \sigma_i \
+&amp;= - \frac{1}{n} \sum_i \left(
+    \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
+\right) \sigma_i (1 - \sigma_i) \textbf{X}_i \
+&amp;= - \frac{1}{n} \sum_i \left(
+    y_i - \sigma_i
+\right) \textbf{X}_i \
+\end{aligned}
 $$</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The surprisingly simple gradient expression allows us to fit a logistic model to the cross entropy loss using gradient descent.</p></div></div></div>
+<p>The surprisingly simple gradient expression allows us to fit a logistic model to the cross-entropy loss using gradient descent:</p>
+<p>$$ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\boldsymbol{\theta}}}  L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})$$</p>
+<p>Section 17.6 delves into deriving update formulas for batch, stochastic, and mini-batch gradient descent.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Since the cross-entropy loss function is convex, we minimize this loss using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, cost function, and minimization procedure.</p></div></div></div></div>
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Since the cross-entropy loss function is convex, we minimize it using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, loss function, and minimization procedure. In Section 17.5, we take a closer look at why we use average cross-entropy loss for logistic regression.</p></div></div></div></div>
