@@ -4,8 +4,6 @@ This script takes the .ipynb files in the notebooks/ folder and removes the
 hidden cells as well as the newlines before closing </div> tags so that the
 resulting HTML partial can be embedded in a Gitbook page easily.
 
-It also converts the input notebooks into Markdown for reviewing.
-
 For reference:
 https://nbconvert.readthedocs.org/en/latest/nbconvert_library.html
 http://nbconvert.readthedocs.org/en/latest/nbconvert_library.html#using-different-preprocessors
@@ -77,16 +75,14 @@ def convert_notebooks_to_html_partial(notebook_paths):
     Converts notebooks in notebook_paths to HTML partials in NOTEBOOK_HTML_DIR
     """
     for notebook_path in notebook_paths:
-        # Computes <name>.ipynb from notebooks/ch1/<name>.ipynb
+        # Computes <name>.ipynb from notebooks/01/<name>.ipynb
         path, filename = os.path.split(notebook_path)
-        # Computes ch1 from notebooks/ch1
+        # Computes 01 from notebooks/01
         _, chapter = os.path.split(path)
         # Computes <name> from <name>.ipynb
         basename, _ = os.path.splitext(filename)
         # Computes <name>.html from notebooks/<name>.ipynb
         outfile_name = basename + '.html'
-        # Computes <name>.md from notebooks/<name>.ipynb
-        mdfile_name = basename + '.md'
 
         # This results in images like AB_5_1.png for a notebook called AB.ipynb
         unique_image_key = basename
@@ -119,7 +115,7 @@ def convert_notebooks_to_html_partial(notebook_paths):
         final_output = CLOSING_DIV_REGEX.sub('</div>', with_wrapper)
 
         # Write out HTML
-        outfile_path = os.path.join(NOTEBOOK_HTML_DIR, outfile_name)
+        outfile_path = os.path.join('ch', chapter, outfile_name)
         with open(outfile_path, 'w', encoding='utf-8') as outfile:
             outfile.write(final_output)
 
@@ -129,13 +125,6 @@ def convert_notebooks_to_html_partial(notebook_paths):
             final_image_path = os.path.join(NOTEBOOK_IMAGE_DIR, image_name)
             with open(final_image_path, 'wb') as outimage:
                 outimage.write(image_data)
-
-        # Write out Markdown placeholder
-        with open(os.path.join(chapter, mdfile_name), 'w') as outfile:
-            # Replace backslashes with forward slashes for Windows
-            outfile.write(
-                '!INCLUDE "../{}"\n'.format(outfile_path.replace('\\', '/'))
-            )
 
         print(outfile_path + " written.")
 
