@@ -22,7 +22,7 @@ notebooks: ## Convert notebooks to HTML pages
 
 	python convert_notebooks_to_html_partial.py
 
-	git add notebooks-html notebooks-images notebooks/**/*.{md,png}
+	git add ch notebooks-images notebooks/**/*.{md,png}
 	git commit -m "Build notebooks"
 
 	touch SUMMARY.md
