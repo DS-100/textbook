@@ -197,7 +197,7 @@ plot_one_gd_iter(pts, 12, mse, grad_mse)
 
     old theta: 12
     new theta: 13.596
-    
+
 
 
 ![png](gradient_descent_define_files/gradient_descent_define_15_1.png)
@@ -213,7 +213,7 @@ plot_one_gd_iter(pts, 13.60, mse, grad_mse)
 
     old theta: 13.6
     new theta: 14.236
-    
+
 
 
 ![png](gradient_descent_define_files/gradient_descent_define_17_1.png)
@@ -227,7 +227,7 @@ plot_one_gd_iter(pts, 14.24, mse, grad_mse)
 
     old theta: 14.24
     new theta: 14.492
-    
+
 
 
 ![png](gradient_descent_define_files/gradient_descent_define_18_1.png)
@@ -241,7 +241,7 @@ plot_one_gd_iter(pts, 14.49, mse, grad_mse)
 
     old theta: 14.49
     new theta: 14.592
-    
+
 
 
 ![png](gradient_descent_define_files/gradient_descent_define_19_1.png)
@@ -338,7 +338,7 @@ print()
     Minimizing theta: 14.658511131035242
     
     Wall time: 1.99 ms
-    
+
 
 We can see that gradient quickly finds the same solution as the analytic method:
 
@@ -410,7 +410,7 @@ print()
     Minimizing theta: 15.506849531471964
     
     Wall time: 210 ms
-    
+
 
 ### Summary
 

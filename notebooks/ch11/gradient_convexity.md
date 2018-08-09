@@ -110,7 +110,7 @@ plot_one_gd_iter(pts, -21, quartic_loss, grad_quartic_loss)
 
     old theta: -21
     new theta: -9.944999999999999
-    
+
 
 
 ![png](gradient_convexity_files/gradient_convexity_7_1.png)
@@ -124,7 +124,7 @@ plot_one_gd_iter(pts, -9.9, quartic_loss, grad_quartic_loss)
 
     old theta: -9.9
     new theta: -12.641412
-    
+
 
 
 ![png](gradient_convexity_files/gradient_convexity_8_1.png)
@@ -138,7 +138,7 @@ plot_one_gd_iter(pts, -12.6, quartic_loss, grad_quartic_loss)
 
     old theta: -12.6
     new theta: -14.162808
-    
+
 
 
 ![png](gradient_convexity_files/gradient_convexity_9_1.png)
@@ -152,7 +152,7 @@ plot_one_gd_iter(pts, -14.2, quartic_loss, grad_quartic_loss)
 
     old theta: -14.2
     new theta: -14.497463999999999
-    
+
 
 
 ![png](gradient_convexity_files/gradient_convexity_10_1.png)

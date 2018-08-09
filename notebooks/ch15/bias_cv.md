@@ -272,7 +272,7 @@ print(f'      Test set size: {len(X_test)}')
 
       Training set size: 217
           Test set size: 92
-    
+
 
 We now fit polynomial regression models using the training set, one for each polynomial degree from 1 to 10.
 
@@ -481,7 +481,7 @@ print(f'      Test error: {test_error:0.5f}')
       Training error: 0.04409
     Validation error: 0.04506
           Test error: 0.04698
-    
+
 
 For future reference, `scikit-learn` has a [`cross_val_predict`](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html) method to automatically perform cross-validation, so we don't have to break the data into training and validation sets ourselves. 
 
