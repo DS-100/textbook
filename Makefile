@@ -31,9 +31,9 @@ section_labels: ## Add section labels
 	python add_section_numbers_to_book.py
 	@echo
 
-chNN: ## Converts a specific chapter's notebooks (e.g. make ch02)
+chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 	@echo To use this command, replace NN with the chapter number. Example:
-	@echo "  make ch01"
+	@echo "  make 01"
 
 $(CHAPTERS): ## Converts a specific chapter's notebooks (e.g. make ch02)
 	python convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
