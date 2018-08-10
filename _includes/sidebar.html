@@ -8,7 +8,14 @@ sidebar.
 
 If a chapter or any of its sections are the current page, we should display the
 chapter's sections. Otherwise, we hide the sections to keep the sidebar short.
+
+We also prefix the sidebar entries with the chapter/section number. We assume
+a 1-level nesting; we will label 1.2, but not 1.2.1.
 {% endcomment %}
+
+{% assign chapter_num = 1 %}
+{% assign section_num = 1 %}
+
 <nav id="js-sidebar" class="c-textbook__sidebar">
   <ul class="c-sidebar__chapters">
     {% for chapter in site.data.toc %}
@@ -27,6 +34,9 @@ chapter's sections. Otherwise, we hide the sections to keep the sidebar short.
         <a class="c-sidebar__entry {{ active_class }}"
           href="{{ chapter.url }}"
         >
+          {% unless chapter.not_numbered %}
+            {{ chapter_num }}.
+          {% endunless %}
           {{ chapter.title }}
         </a>
 
@@ -42,6 +52,8 @@ chapter's sections. Otherwise, we hide the sections to keep the sidebar short.
             {% assign hide_section_class = "u-hidden-visually" %}
           {% endif %}
 
+          {% assign section_num = 1 %}
+
           <ul class="c-sidebar__sections {{ hide_section_class }}">
             {% for section in chapter.sections %}
               {% if section.url == page.url %}
@@ -54,6 +66,10 @@ chapter's sections. Otherwise, we hide the sections to keep the sidebar short.
                 <a class="c-sidebar__entry {{ active_class }}"
                   href="{{ section.url }}"
                 >
+                  {% unless section.not_numbered %}
+                    {{ chapter_num }}.{{ section_num }}
+                    {% assign section_num = section_num | plus: 1 %}
+                  {% endunless %}
                   {{ section.title }}
                 </a>
               </li>
@@ -61,6 +77,10 @@ chapter's sections. Otherwise, we hide the sections to keep the sidebar short.
           </ul>
         {% endif %}
       </li>
+
+      {% unless chapter.not_numbered %}
+        {% assign chapter_num = chapter_num | plus: 1 %}
+      {% endunless %}
     {% endfor %}
   </ul>
 </nav>
