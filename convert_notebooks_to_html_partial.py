@@ -1,8 +1,10 @@
 """Usage: convert_notebooks_to_html_partial.py [NOTEBOOKS ...]
 
-This script takes the .ipynb files in the notebooks/ folder and removes the
-hidden cells as well as the newlines before closing </div> tags so that the
-resulting HTML partial can be embedded in a Gitbook page easily.
+This script takes the .ipynb files in the notebooks/ folder converts them to
+HTML partials in the ch/ folder, recreating the folder structure in notebooks/.
+
+It also adds the prev_page and next_page frontmatter keys to each HTML page
+using _data/toc.yml to find the previous and next page in the book.
 
 For reference:
 https://nbconvert.readthedocs.org/en/latest/nbconvert_library.html
@@ -16,9 +18,12 @@ Arguments:
 import glob
 import re
 import os
+import yaml
+import toolz.curried as t
 from textwrap import dedent
 from docopt import docopt
 from subprocess import run
+from itertools import chain
 
 import nbformat
 from nbinteract import InteractExporter
@@ -28,6 +33,8 @@ from traitlets.config import Config
 # tag so that Jekyll won't process double curly braces in the HTML
 wrapper = """
 ---
+prev_page: {prev_page}
+next_page: {next_page}
 ---
 
 {{% raw %}}
@@ -78,8 +85,11 @@ PATH_PREFIX = 'subPath={}'
 # parse them properly
 CLOSING_DIV_REGEX = re.compile('\s+</div>')
 
+# YAML file containing textbook table of contents
+TOC_PATH = '_data/toc.yml'
 
-def convert_notebooks_to_html_partial(notebook_paths):
+
+def convert_notebooks_to_html_partial(notebook_paths, url_map):
     """
     Converts notebooks in notebook_paths to HTML partials in NOTEBOOK_HTML_DIR
     """
@@ -101,6 +111,9 @@ def convert_notebooks_to_html_partial(notebook_paths):
         # well and we'd rather not have to do that.
         output_files_dir = '/' + NOTEBOOK_IMAGE_DIR
 
+        # Path to output final HTML file
+        outfile_path = os.path.join(NOTEBOOK_HTML_DIR, chapter, outfile_name)
+
         extract_output_config = {
             'unique_key': unique_image_key,
             'output_files_dir': output_files_dir,
@@ -118,10 +131,11 @@ def convert_notebooks_to_html_partial(notebook_paths):
                 paths=PATH_PREFIX.format(notebook_path)
             ),
             html=html,
+            prev_page=url_map[outfile_path]['prev'],
+            next_page=url_map[outfile_path]['next'],
         )
 
         # Write out HTML
-        outfile_path = os.path.join(NOTEBOOK_HTML_DIR, chapter, outfile_name)
         with open(outfile_path, 'w', encoding='utf-8') as outfile:
             outfile.write(final_output)
 
@@ -163,6 +177,67 @@ def convert_notebooks_to_markdown(notebook_paths):
     run(['jupyter', 'nbconvert', '--to', 'markdown', *notebook_paths])
 
 
+#
+# Construct mapping between entry URLs and prev / next pages.
+#
+
+flatmap = t.curry(lambda f, items: chain.from_iterable(map(f, items)))
+
+
+def _not_internal_link(entry):
+    return not entry.get('url', '').startswith('/')
+
+
+def _flatten_sections(entry):
+    sections = entry.get('sections', [])
+    return [t.dissoc(entry, 'sections')] + sections
+
+
+def _sliding_three(entries):
+    return ([(None, entries[0], entries[1])] +
+            list(t.sliding_window(3, entries)) +
+            [(entries[-2], entries[-1], None)])
+
+
+wrap_url = "'{}'".format
+
+
+def _adj_pages(triplet):
+    prev, cur, nex = triplet
+    return {
+        cur.strip('/'): {
+            'prev': wrap_url(prev) if prev is not None else 'false',
+            'next': wrap_url(nex) if nex is not None else 'false',
+        }
+    }
+
+
+def generate_url_map(yaml_path=TOC_PATH) -> dict:
+    """
+    Generates mapping from each URL to its previous and next URLs in the
+    textbook. The dictionary looks like:
+
+    {
+        'ch/10/some_page.html' : {
+            'prev': 'ch/09/foo.html',
+            'next': 'ch/10/bar.html',
+        },
+        ...
+    }
+    """
+    with open(yaml_path) as f:
+        data = yaml.load(f)
+
+    pipeline = [
+        t.remove(_not_internal_link),
+        flatmap(_flatten_sections),
+        t.map(t.get('url')), list, _sliding_three,
+        t.map(_adj_pages),
+        t.merge()
+    ]
+    return t.pipe(data, *pipeline)
+
+
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     notebooks = arguments['NOTEBOOKS'] or sorted(
@@ -170,5 +245,8 @@ if __name__ == '__main__':
     )
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)
-    convert_notebooks_to_html_partial(notebooks)
+
+    url_map = generate_url_map()
+
+    convert_notebooks_to_html_partial(notebooks, url_map)
     convert_notebooks_to_markdown(notebooks)
