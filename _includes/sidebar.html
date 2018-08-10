@@ -1,37 +1,66 @@
+{% comment %}
+Partial for the textbook sidebar. Renders each chapter and its sections from
+_data/toc.yml .
+
+Much of the logic here is to add active classes to the currently active
+section. The currently active section / chapter should be highlighted in the
+sidebar.
+
+If a chapter or any of its sections are the current page, we should display the
+chapter's sections. Otherwise, we hide the sections to keep the sidebar short.
+{% endcomment %}
 <nav class="c-textbook__sidebar">
   <ul class="c-sidebar__chapters">
     {% for chapter in site.data.toc %}
       {% if chapter.divider %}
         <li class="c-sidebar__divider"></li>
-      {% else %}
-        {% assign entry_class = "c-sidebar__entry" %}
-        {% if chapter.url == page.url %}
-          {% assign entry_class = "c-sidebar__entry c-sidebar__entry--active" %}
-        {% endif %}
-
-        <li class="c-sidebar__chapter">
-          <a class="{{ entry_class }}" href="{{ chapter.url }}">
-            {{ chapter.title }}
-          </a>
-
-          {% if chapter.sections %}
-            <ul class="c-sidebar__sections">
-              {% for section in chapter.sections %}
-                {% assign entry_class = "c-sidebar__entry" %}
-                {% if section.url == page.url %}
-                  {% assign entry_class = "c-sidebar__entry c-sidebar__entry--active" %}
-                {% endif %}
-
-                <li class="c-sidebar__section">
-                  <a class="{{ entry_class }}" href="{{ section.url }}">
-                    {{ section.title }}
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </li>
+        {% continue %}
       {% endif %}
+
+      {% if chapter.url == page.url %}
+        {% assign active_class = "c-sidebar__entry--active" %}
+      {% else %}
+        {% assign active_class = "" %}
+      {% endif %}
+
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry {{ active_class }}"
+          href="{{ chapter.url }}"
+        >
+          {{ chapter.title }}
+        </a>
+
+        {% if chapter.sections %}
+          {% assign any_section_active = chapter.sections
+            | push: chapter
+            | where_exp: "sec", "sec.url == page.url"
+            | size
+          %}
+          {% if any_section_active > 0 %}
+            {% assign hide_section_class = "" %}
+          {% else %}
+            {% assign hide_section_class = "u-hidden-visually" %}
+          {% endif %}
+
+          <ul class="c-sidebar__sections {{ hide_section_class }}">
+            {% for section in chapter.sections %}
+              {% if section.url == page.url %}
+                {% assign active_class = "c-sidebar__entry--active" %}
+              {% else %}
+                {% assign active_class = "" %}
+              {% endif %}
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry {{ active_class }}"
+                  href="{{ section.url }}"
+                >
+                  {{ section.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
     {% endfor %}
   </ul>
 </nav>
