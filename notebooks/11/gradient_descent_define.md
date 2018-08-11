@@ -142,9 +142,9 @@ For the MSE, we have:
 
 $$
 \begin{aligned}
-L(\theta, y)
+L(\theta, \textbf{y})
 &= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
-\frac{\partial}{\partial \hat{\theta}} L(\theta, y)
+\frac{\partial}{\partial \hat{\theta}} L(\theta, \textbf{y})
 &= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
 &= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
 \end{aligned}
@@ -171,10 +171,10 @@ plot_theta_on_loss(pts, 17.2, mse)
 Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta$. Our final update formula is:
 
 $$
-\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^{(t)}, y)
+\theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^{(t)}, \textbf{y})
 $$
-|
-Where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:
+
+where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:
 
 
 ```python
