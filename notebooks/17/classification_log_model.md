@@ -65,7 +65,7 @@ Recall that fitting a model requires three components: a model that makes predic
 
 $$
 \begin{aligned}
-f_\hat{\boldsymbol{\theta}} (\boldsymbol{x}) &= \hat{\boldsymbol{\theta}} \cdot \boldsymbol{x}
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) &= \hat{\boldsymbol{\theta}} \cdot \textbf{x}
 \end{aligned}
 $$
 
@@ -73,18 +73,18 @@ And the loss function:
 
 $$
 \begin{aligned}
-L(\boldsymbol{\theta}, \boldsymbol{X}, \boldsymbol{y})
-&= \frac{1}{n} \sum_{i}(y_i - f_\boldsymbol{\theta} (\boldsymbol{X}_i))^2\\
+L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
+&= \frac{1}{n} \sum_{i}(y_i - f_\boldsymbol{\theta} (\textbf{X}_i))^2\\
 \end{aligned}
 $$
 
-We use gradient descent as our optimization method. In the definitions above, $ \boldsymbol{X} $ represents the $ n \times p $ data matrix ($n$ is the number of data points and $p$ is the number of attributes), $ \boldsymbol{x} $ represents a row of $ \boldsymbol{X} $, and $ \boldsymbol{y} $ is the vector of observed outcomes. The vector $ \boldsymbol{\hat{\theta}} $ contains the optimal model weights whereas $\boldsymbol{\theta}$ contains intermediate weight values generated during optimization.
+We use gradient descent as our optimization method. In the definitions above, $ \textbf{X} $ represents the $ n \times p $ data matrix ($n$ is the number of data points and $p$ is the number of attributes), $ \textbf{x} $ represents a row of $ \textbf{X} $, and $ \textbf{y} $ is the vector of observed outcomes. The vector $ \boldsymbol{\hat{\theta}} $ contains the optimal model weights whereas $\boldsymbol{\theta}$ contains intermediate weight values generated during optimization.
 
 ## Real Numbers to Probabilities
 
-Observe that the model $ f_\hat{\boldsymbol{\theta}} (\boldsymbol{x}) = \hat{\boldsymbol{\theta}} \cdot \boldsymbol{x} $ can output any real number $ \mathbb{R} $ since it produces a linear combination of the values in $ \boldsymbol{x} $, which itself can contain any value from $ \mathbb{R} $.
+Observe that the model $ f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \hat{\boldsymbol{\theta}} \cdot \textbf{x} $ can output any real number $ \mathbb{R} $ since it produces a linear combination of the values in $ \textbf{x} $, which itself can contain any value from $ \mathbb{R} $.
 
-We can easily visualize this when $ x $ is a scalar. If $ \hat \theta = 0.5$, our model becomes $ f_\hat{\theta} (x) = 0.5 x $. Its predictions can take on any value from negative infinity to positive infinity:
+We can easily visualize this when $ x $ is a scalar. If $ \hat \theta = 0.5$, our model becomes $ f_\hat{\theta} (\textbf{x}) = 0.5 x $. Its predictions can take on any value from negative infinity to positive infinity:
 
 
 ```python
@@ -101,7 +101,7 @@ plt.title(r'Model Predictions for $ \hat{\theta} = 0.5 $');
 ![png](classification_log_model_files/classification_log_model_7_0.png)
 
 
-For classification tasks, we want to constrain $ f_\hat{\boldsymbol{\theta}}(\boldsymbol{x}) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\boldsymbol{\theta}}(\boldsymbol{x}) $ to correspond to high probabilities and small values to low probabilities.
+For classification tasks, we want to constrain $ f_\hat{\boldsymbol{\theta}}(\textbf{x}) $ so that its output can be interpreted as a probability. This means that it may only output values in the range $ [0, 1] $. In addition, we would like large values of $ f_\hat{\boldsymbol{\theta}}(\textbf{x}) $ to correspond to high probabilities and small values to low probabilities.
 
 ## The Logistic Function
 
@@ -143,11 +143,11 @@ Observe that the sigmoid function $ \sigma(t) $ takes in any real number $ \math
 
 ## Logistic Model Definition
 
-We may now take our linear model $ \hat{\boldsymbol{\theta}} \cdot \boldsymbol{x} $ and use it as the input to the sigmoid function to create the **logistic model**:
+We may now take our linear model $ \hat{\boldsymbol{\theta}} \cdot \textbf{x} $ and use it as the input to the sigmoid function to create the **logistic model**:
 
 $$
 \begin{aligned}
-f_\hat{\boldsymbol{\theta}} (\boldsymbol{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \boldsymbol{x})
+f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \textbf{x})
 \end{aligned}
 $$
 

@@ -1,6 +1,6 @@
 
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Multiple-Linear-Regression" data-toc-modified-id="Multiple-Linear-Regression-1">Multiple Linear Regression</a></span></li><li><span><a href="#MSE-Cost-and-its-Gradient" data-toc-modified-id="MSE-Cost-and-its-Gradient-2">MSE Cost and its Gradient</a></span></li><li><span><a href="#Fitting-the-Model-With-Gradient-Descent" data-toc-modified-id="Fitting-the-Model-With-Gradient-Descent-3">Fitting the Model With Gradient Descent</a></span></li><li><span><a href="#Visualizing-our-Predictions" data-toc-modified-id="Visualizing-our-Predictions-4">Visualizing our Predictions</a></span></li><li><span><a href="#Using-All-the-Data" data-toc-modified-id="Using-All-the-Data-5">Using All the Data</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-6">Summary</a></span></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Multiple-Linear-Regression" data-toc-modified-id="Multiple-Linear-Regression-1">Multiple Linear Regression</a></span></li><li><span><a href="#MSE-Loss-and-its-Gradient" data-toc-modified-id="MSE-Loss-and-its-Gradient-2">MSE Loss and its Gradient</a></span></li><li><span><a href="#Fitting-the-Model-With-Gradient-Descent" data-toc-modified-id="Fitting-the-Model-With-Gradient-Descent-3">Fitting the Model With Gradient Descent</a></span></li><li><span><a href="#Visualizing-our-Predictions" data-toc-modified-id="Visualizing-our-Predictions-4">Visualizing our Predictions</a></span></li><li><span><a href="#Using-All-the-Data" data-toc-modified-id="Using-All-the-Data-5">Using All the Data</a></span></li><li><span><a href="#Summary" data-toc-modified-id="Summary-6">Summary</a></span></li></ul></div>
 
 
 ```python
@@ -43,21 +43,21 @@ def df_interact(df, nrows=7, ncols=7):
 ```python
 # HIDDEN
 from scipy.optimize import minimize as sci_min
-def minimize(cost_fn, grad_cost_fn, X, y, progress=True):
+def minimize(loss_fn, grad_loss_fn, X, y, progress=True):
     '''
-    Uses scipy.minimize to minimize cost_fn using a form of gradient descent.
+    Uses scipy.minimize to minimize loss_fn using a form of gradient descent.
     '''
     theta = np.zeros(X.shape[1])
     iters = 0
     
     def objective(theta):
-        return cost_fn(theta, X, y)
+        return loss_fn(theta, X, y)
     def gradient(theta):
-        return grad_cost_fn(theta, X, y)
+        return grad_loss_fn(theta, X, y)
     def print_theta(theta):
         nonlocal iters
         if progress and iters % progress == 0:
-            print(f'theta: {theta} | cost: {cost_fn(theta, X, y):.2f}')
+            print(f'theta: {theta} | loss: {loss_fn(theta, X, y):.2f}')
         iters += 1
         
     print_theta(theta)
@@ -213,13 +213,13 @@ It seems possible that we can get a more accurate model if we could take both ho
 We state the following model:
 
 $$
-f_\hat{\theta} (x) = \hat{\theta_0} + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p
+f_\boldsymbol\theta (\textbf{x}) = \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p
 $$
 
-Where $ x $ now represents a vector containing $ p $ attributes of a single car. The model above says, "Take multiple attributes of a car, multiply them by some weights, and add them together to make a prediction for MPG."
+Where $ \textbf{x} $ now represents a vector containing $ p $ attributes of a single car. The model above says, "Take multiple attributes of a car, multiply them by some weights, and add them together to make a prediction for MPG."
 
 
-For example, if we're making a prediction on the first car in our dataset using the horsepower, weight, and model year columns, the vector $ x $ looks like:
+For example, if we're making a prediction on the first car in our dataset using the horsepower, weight, and model year columns, the vector $ \textbf{x} $ looks like:
 
 
 ```python
@@ -266,9 +266,9 @@ mpg.loc[0:0, ['horsepower', 'weight', 'model year']]
 
 
 
-In there examples, we've kept the column names for clarity but keep in mind that $ x $ only contains the numerical values of the table above: $ x = [130.0, 3504.0, 70] $.
+In there examples, we've kept the column names for clarity but keep in mind that $ \textbf{x} $ only contains the numerical values of the table above: $ \textbf{x} = [130.0, 3504.0, 70] $.
 
-Now, we will perform a notational trick that will greatly simplify later formulas. We will prepend the value $ 1 $ to the vector $ x $, so that we have the following vector for $ x $:
+Now, we will perform a notational trick that will greatly simplify later formulas. We will prepend the value $ 1 $ to the vector $ \textbf{x} $, so that we have the following vector for $ \textbf{x} $:
 
 
 ```python
@@ -322,17 +322,17 @@ Now, observe what happens to the formula for our model:
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x)
-&= \hat{\theta_0} + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p \\
-&= \hat{\theta_0} (1) + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p \\
-&= \hat{\theta_0} x_0 + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p \\
-f_\hat{\theta} (x) &= \hat{\theta} \cdot x
+f_\boldsymbol\theta (\textbf{x})
+&= \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p \\
+&= \theta_0 (1) + \theta_1 x_1 + \ldots + \theta_p x_p \\
+&= \theta_0 x_0 + \theta_1 x_1 + \ldots + \theta_p x_p \\
+f_\boldsymbol\theta (\textbf{x}) &= \boldsymbol\theta \cdot \textbf{x}
 \end{aligned}
 $$
 
-Where $ \hat{\theta} \cdot x $ is the vector dot product of $ \hat{\theta} $ and $ x $. Vector and matrix notation was designed to succinctly write linear combinations and is thus well-suited for our linear models. However, you will have to remember from now on that $ \hat{\theta} \cdot x $ is a vector-vector dot product. When in doubt, you can always expand the dot product into simple multiplications and additions.
+Where $ \boldsymbol\theta \cdot \textbf{x} $ is the vector dot product of $ \boldsymbol\theta $ and $ \textbf{x} $. Vector and matrix notation were designed to succinctly write linear combinations and is thus well-suited for our linear models. However, you will have to remember from now on that $ \boldsymbol\theta \cdot \textbf{x} $ is a vector-vector dot product. When in doubt, you can always expand the dot product into simple multiplications and additions.
 
-Now, we define the matrix $ X $ as the matrix containing every car model as a row and a first column of biases. For example, here are the first five rows of $ X $:
+Now, we define the matrix $  \textbf{X} $ as the matrix containing every car model as a row and a first column of biases. For example, here are the first five rows of $  \textbf{X} $:
 
 
 ```python
@@ -410,29 +410,29 @@ mpg_mat.loc[0:4, ['bias', 'horsepower', 'weight', 'model year']]
 
 
 
-Again, keep in mind that the actual matrix $ X $ only contains the numerical values of the table above.
+Again, keep in mind that the actual matrix $  \textbf{X} $ only contains the numerical values of the table above.
 
-Notice that $ X $ is composed of multiple $ x $ vectors stacked on top of each other. To keep the notation clear, we define $ X_{i} $ to refer to the row with index $ i $ of $ X $. We define $ X_{i,j} $ to refer to the element with index $ j $ of the row with index $ i $ of $ X $. Thus, $ X_i $ is a $ p $-dimensional vector and $ X_{i,j} $ is a scalar. $ X $ is an $ n \times p $ matrix, where $n$ is the number of car examples we have and $p$ is the number of attributes we have for a single car.
+Notice that $ \textbf{X} $ is composed of multiple $ \textbf{x} $ vectors stacked on top of each other. To keep the notation clear, we define $ \textbf{X}_{i} $ to refer to the row vector with index $ i $ of $  \textbf{X} $. We define $ X_{i,j} $ to refer to the element with index $ j $ of the row with index $ i $ of $  \textbf{X} $. Thus, $ \textbf{X}_i $ is a $ p $-dimensional vector and $ X_{i,j} $ is a scalar. $  \textbf{X} $ is an $ n \times p $ matrix, where $n$ is the number of car examples we have and $p$ is the number of attributes we have for a single car.
 
-For example, from the table above we have $ X_4 = [1, 140, 3449, 70] $ and $ X_{4,1} = 140 $. This notation becomes important when we define the cost function since we will need both $ X $, the matrix of input values, and $ y $, the vector of MPGs.
+For example, from the table above we have $ \textbf{X}_4 = [1, 140, 3449, 70] $ and $ X_{4,1} = 140 $. This notation becomes important when we define the loss function since we will need both $  \textbf{X} $, the matrix of input values, and $ \textbf{y} $, the vector of MPGs.
 
-## MSE Cost and its Gradient
+## MSE Loss and its Gradient
 
-The mean squared error cost function takes in a vector of weights $ \hat{\theta} $, a matrix of inputs $ X $, and a vector of observed MPGs $ y $:
+The mean squared error loss function takes in a vector of weights $ \boldsymbol\theta $, a matrix of inputs $  \textbf{X} $, and a vector of observed MPGs $ \textbf{y} $:
 
 $$
 \begin{aligned}
-L(\hat{\theta}, X, y)
-&= \frac{1}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))^2\\
+L(\boldsymbol\theta, \textbf{X}, \textbf{y})
+&= \frac{1}{n} \sum_{i}(y_i - f_\boldsymbol\theta (\textbf{X}_i))^2\\
 \end{aligned}
 $$
 
-We've previously derived the gradient of the MSE cost with respect to $ \hat{\theta} $:
+We've previously derived the gradient of the MSE loss with respect to $ \boldsymbol\theta $:
 
 $$
 \begin{aligned}
-\nabla_{\hat\theta} L(\hat{\theta}, X, y)
-&= -\frac{2}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))(\nabla_{\hat\theta} f_\hat{\theta} (X_i))\\
+\nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{X}, \textbf{y})
+&= -\frac{2}{n} \sum_{i}(y_i - f_\boldsymbol\theta (\textbf{X}_i))(\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{X}_i))\\
 \end{aligned}
 $$
 
@@ -440,21 +440,21 @@ We know that:
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x) &= \hat{\theta} \cdot x \\
+f_\boldsymbol\theta (\textbf{x}) &= \boldsymbol\theta \cdot \textbf{x} \\
 \end{aligned}
 $$
 
-Let's now compute $ \nabla_{\hat\theta} f_\hat{\theta} (x) $. The result is surprisingly simple because $ \hat{\theta} \cdot x = \hat{\theta_0} x_0 + \ldots + \hat{\theta_p} x_p $ and thus $ \frac{\partial}{\partial \theta_0}(\hat{\theta} \cdot x) = x_0 $, $ \frac{\partial}{\partial \theta_1}(\hat{\theta} \cdot x) = x_1 $, and so on.
+Let's now compute $ \nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{x}) $. The result is surprisingly simple because $ \boldsymbol\theta \cdot \textbf{x} = \theta_0 x_0 + \ldots + \theta_p x_p $ and thus $ \frac{\partial}{\partial \theta_0}(\boldsymbol\theta \cdot \textbf{x}) = x_0 $, $ \frac{\partial}{\partial \theta_1}(\boldsymbol\theta \cdot \textbf{x}) = x_1 $, and so on.
 
 $$
 \begin{aligned}
-\nabla_{\hat\theta} f_\hat{\theta} (x)
-&= \nabla_{\hat\theta} [ \hat{\theta} \cdot x ] \\
+\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{x})
+&= \nabla_{\boldsymbol\theta} [ \boldsymbol\theta \cdot \textbf{x} ] \\
 &= \begin{bmatrix}
-     \frac{\partial}{\partial \theta_0} (\hat{\theta} \cdot x) \\
-     \frac{\partial}{\partial \theta_1} (\hat{\theta} \cdot x) \\
+     \frac{\partial}{\partial \theta_0} (\boldsymbol\theta \cdot \textbf{x}) \\
+     \frac{\partial}{\partial \theta_1} (\boldsymbol\theta \cdot \textbf{x}) \\
      \vdots \\
-     \frac{\partial}{\partial \theta_p} (\hat{\theta} \cdot x) \\
+     \frac{\partial}{\partial \theta_p} (\boldsymbol\theta \cdot \textbf{x}) \\
    \end{bmatrix} \\
 &= \begin{bmatrix}
      x_0 \\
@@ -462,7 +462,7 @@ $$
      \vdots \\
      x_p
    \end{bmatrix} \\
-\nabla_{\hat\theta} f_\hat{\theta} (x) &= x
+\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{x}) &= \textbf{x}
 \end{aligned}
 $$
 
@@ -470,44 +470,44 @@ Finally, we plug this result back into our gradient calculations:
 
 $$
 \begin{aligned}
-\nabla_{\hat\theta} L(\hat{\theta}, X, y)
-&= -\frac{2}{n} \sum_{i}(y_i - f_\hat{\theta} (X_i))(\nabla_{\hat\theta} f_\hat{\theta} (X_i))\\
-&= -\frac{2}{n} \sum_{i}(y_i - \hat{\theta} \cdot X_i)(X_i)\\
+\nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{X}, \textbf{y})
+&= -\frac{2}{n} \sum_{i}(y_i - f_\boldsymbol\theta (\textbf{X}_i))(\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (\textbf{X}_i))\\
+&= -\frac{2}{n} \sum_{i}(y_i - \boldsymbol\theta \cdot \textbf{X}_i)(\textbf{X}_i)\\
 \end{aligned}
 $$
 
-Remember that since $ y_i - \hat{\theta} \cdot X_i $ is a scalar and $ X_i $ is a $ p $-dimensional vector, the gradient $ \nabla_{\hat\theta} L(\hat{\theta}, X, y) $ is a $ p $-dimensional vector.
+Remember that since $ y_i - \boldsymbol\theta \cdot \textbf{X}_i $ is a scalar and $ \textbf{X}_i $ is a $ p $-dimensional vector, the gradient $ \nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{X}, \textbf{y}) $ is a $ p $-dimensional vector.
 
-We saw this same type of result when we computed the gradient for univariate linear regression and found that it was 2-dimensional since $ \theta $ was 2-dimensional.
+We saw this same type of result when we computed the gradient for univariate linear regression and found that it was 2-dimensional since $ \boldsymbol\theta $ was 2-dimensional.
 
 ## Fitting the Model With Gradient Descent
 
-We can now plug in our cost and its derivative into gradient descent. As usual, we will define the model, cost, and gradient cost in Python.
+We can now plug in our loss and its derivative into gradient descent. As usual, we will define the model, loss, and gradient loss in Python.
 
 
 ```python
 def linear_model(thetas, X):
     '''Returns predictions by a linear model on x_vals.'''
-    return X @ thetas
+    return  \textbf{X} @ thetas
 
-def mse_cost(thetas, X, y):
+def mse_loss(thetas, X, y):
     return np.mean((y - linear_model(thetas, X)) ** 2)
 
-def grad_mse_cost(thetas, X, y):
+def grad_mse_loss(thetas, X, y):
     n = len(X)
-    return -2 / n * (X.T @ y  - X.T @ X @ thetas)
+    return -2 / n * (X.T @ \textbf{y}  - X.T @  \textbf{X} @ thetas)
 ```
 
 
 ```python
 # HIDDEN
 thetas = np.array([1, 1, 1, 1])
-X = np.array([[2, 1, 0, 1], [1, 2, 3, 4]])
+ \textbf{X} = np.array([[2, 1, 0, 1], [1, 2, 3, 4]])
 y = np.array([3, 9])
 assert np.allclose(linear_model(thetas, X), [4, 10])
-assert np.allclose(mse_cost(thetas, X, y), 1.0)
-assert np.allclose(grad_mse_cost(thetas, X, y), [ 3.,  3.,  3.,  5.])
-assert np.allclose(grad_mse_cost(thetas, X + 1, y), [ 25.,  25.,  25.,  35.])
+assert np.allclose(mse_loss(thetas, X, y), 1.0)
+assert np.allclose(grad_mse_loss(thetas, X, y), [ 3.,  3.,  3.,  5.])
+assert np.allclose(grad_mse_loss(thetas,  \textbf{X} + 1, y), [ 25.,  25.,  25.,  35.])
 ```
 
 Now, we can simply plug in our functions into our gradient descent minimizer:
@@ -515,7 +515,7 @@ Now, we can simply plug in our functions into our gradient descent minimizer:
 
 ```python
 # HIDDEN
-X = (mpg_mat
+ \textbf{X} = (mpg_mat
      .loc[:, ['bias', 'horsepower', 'weight', 'model year']]
      .as_matrix())
 y = mpg_mat['mpg'].as_matrix()
@@ -525,8 +525,8 @@ y = mpg_mat['mpg'].as_matrix()
 ```python
 %%time 
 
-thetas = minimize(mse_cost, grad_mse_cost, X, y)
-print(f'theta: {thetas} | cost: {mse_cost(thetas, X, y):.2f}')
+thetas = minimize(mse_loss, grad_mse_loss, X, y)
+print(f'theta: {thetas} | loss: {mse_loss(thetas, X, y):.2f}')
 ```
 
     theta: [ 0.  0.  0.  0.] | cost: 610.47
@@ -547,7 +547,7 @@ $y = -13.72 - 0.01x_2 + 0.75x_3$
 
 ## Visualizing our Predictions
 
-How does our model do? We can see that the cost decreased dramatically (from 610 to 11.6). We can show the predictions of our model alongside the original values:
+How does our model do? We can see that the loss decreased dramatically (from 610 to 11.6). We can show the predictions of our model alongside the original values:
 
 
 ```python
@@ -653,7 +653,7 @@ with_predictions
 
 
 
-Since we found $ \hat{\theta} $ from gradient descent, we can verify for the first row of our data that $ \hat{\theta} \cdot X_0 $ matches our prediction above:
+Since we found $ \boldsymbol\theta $ from gradient descent, we can verify for the first row of our data that $ \boldsymbol\theta \cdot \textbf{X}_0 $ matches our prediction above:
 
 
 ```python
@@ -696,7 +696,7 @@ We can also plot the residuals of our predictions (actual values - predicted val
 
 
 ```python
-resid = y - linear_model(thetas, X)
+resid = \textbf{y} - linear_model(thetas, X)
 plt.scatter(np.arange(len(resid)), resid, s=15)
 plt.title('Residuals (actual MPG - predicted MPG)')
 plt.xlabel('Index of row in data')
@@ -726,22 +726,22 @@ It looks like our model's predictions are usually within 20% away from the actua
 
 ## Using All the Data
 
-Notice that in our example thus far, our $ X $ matrix has four columns: one column of all ones, the horsepower, the weight, and the model year. However, model allows us to handle an arbitrary number of columns:
+Notice that in our example thus far, our $  \textbf{X} $ matrix has four columns: one column of all ones, the horsepower, the weight, and the model year. However, model allows us to handle an arbitrary number of columns:
 
 $$
 \begin{aligned}
-f_\hat{\theta} (x) &= \hat{\theta} \cdot x
+f_\boldsymbol\theta (\textbf{x}) &= \boldsymbol\theta \cdot \textbf{x}
 \end{aligned}
 $$
 
-As we include more columns into our data matrix, we extend $ \theta $ so that it has one parameter for each column in $ X $. Instead of only selecting three numerical columns for prediction, why not use all seven of them?
+As we include more columns into our data matrix, we extend $ \boldsymbol\theta $ so that it has one parameter for each column in $  \textbf{X} $. Instead of only selecting three numerical columns for prediction, why not use all seven of them?
 
 
 ```python
 # HIDDEN
 cols = ['bias', 'cylinders', 'displacement', 'horsepower',
         'weight', 'acceleration', 'model year', 'origin']
-X = mpg_mat[cols].as_matrix()
+ \textbf{X} = mpg_mat[cols].as_matrix()
 mpg_mat[cols]
 ```
 
@@ -857,8 +857,8 @@ mpg_mat[cols]
 ```python
 %%time 
 
-thetas_all = minimize(mse_cost, grad_mse_cost, X, y, progress=10)
-print(f'theta: {thetas_all} | cost: {mse_cost(thetas_all, X, y):.2f}')
+thetas_all = minimize(mse_loss, grad_mse_loss, X, y, progress=10)
+print(f'theta: {thetas_all} | loss: {mse_loss(thetas_all, X, y):.2f}')
 ```
 
     theta: [ 0.  0.  0.  0.  0.  0.  0.  0.] | cost: 610.47
@@ -873,7 +873,7 @@ According to gradient descent, our linear model is:
 
 $y = -17.22 - 0.49x_1 + 0.02x_2 - 0.02x_3 - 0.01x_4 + 0.08x_5 + 0.75x_6 + 1.43x_7$
 
-We see that our cost has decreased from 11.6 with three columns of our dataset to 10.85 when using all seven numerical columns of our dataset. We display the proportion error plots for both old and new predictions below:
+We see that our loss has decreased from 11.6 with three columns of our dataset to 10.85 when using all seven numerical columns of our dataset. We display the proportion error plots for both old and new predictions below:
 
 
 ```python
@@ -927,7 +927,7 @@ We have introduced the linear model for regression. Unlike the constant model, t
 The procedure of fitting a model to data should now be quite familiar:
 
 1. Select a model.
-1. Select a cost function.
-1. Minimize the cost function using gradient descent.
+1. Select a loss function.
+1. Minimize the loss function using gradient descent.
 
-It is useful to know that we can usually tweak one of the components without changing the others. In this section, we introduced the linear model without changing our cost function or using a different minimization algorithm. Although modeling can get complicated, it is usually easier to learn by focusing on one component at a time, then combining different parts together as needed in practice.
+It is useful to know that we can usually tweak one of the components without changing the others. In this section, we introduced the linear model without changing our loss function or using a different minimization algorithm. Although modeling can get complicated, it is usually easier to learn by focusing on one component at a time, then combining different parts together as needed in practice.
