@@ -1,3 +1,7 @@
+---
+prev_page: '/'
+next_page: '/ch/01/the_data_science_lifecycle.html'
+---
 ## About This Book
 
 In this book, we will proceed as though the reader is comfortable with the
