@@ -1,5 +1,7 @@
 ---
 layout: default
+
+next_page: '/about_this_book.html'
 ---
 
 # Principles and Techniques of Data Science
