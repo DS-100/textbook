@@ -128,8 +128,9 @@ def convert_notebooks_to_html_partial(notebook_paths, url_map):
 
         if outfile_path not in url_map:
             print(
-                '[Warning]: {} not found in _data/toc.yml. This page will'
-                'likely not appear in the textbook table of contents.'
+                '[Warning]: {} not found in _data/toc.yml. This page will '
+                'not appear in the textbook table of contents.'
+                .format(outfile_path)
             )
         prev_page = url_map.get(outfile_path, {}).get('prev', 'false')
         next_page = url_map.get(outfile_path, {}).get('next', 'false')
