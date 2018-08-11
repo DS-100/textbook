@@ -2,18 +2,27 @@
  * Site-wide JS
  */
 
-// Run MathJax when Turbolinks navigates to a page
-document.addEventListener('turbolinks:load', () => {
-  if (window.MathJax) MathJax.Hub.Queue(['Typeset', MathJax.Hub])
-})
-
 const togglerId = 'js-sidebar-toggle'
 const textbookId = 'js-textbook'
 const togglerActiveClass = 'is-active'
 const textbookActiveClass = 'js-show-sidebar'
 
+const mathRenderedClass = 'js-mathjax-rendered'
+
 const getToggler = () => document.getElementById(togglerId)
 const getTextbook = () => document.getElementById(textbookId)
+
+// Run MathJax when Turbolinks navigates to a page.
+// When Turbolinks caches a page, it also saves the MathJax rendering. We mark
+// each page with a CSS class after rendering to prevent double renders when
+// navigating back to a cached page.
+document.addEventListener('turbolinks:load', () => {
+  const textbook = getTextbook()
+  if (window.MathJax && !textbook.classList.contains(mathRenderedClass)) {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub])
+    textbook.classList.add(mathRenderedClass)
+  }
+})
 
 /**
  * Toggles sidebar and menu icon
@@ -32,17 +41,6 @@ const toggleSidebar = () => {
 }
 
 /**
- * Auto-close sidebar on smaller screens after page load.
- *
- * Having the sidebar be open by default then closing it on page load for
- * small screens gives the illusion that the sidebar closes in response
- * to selecting a page in the sidebar. However, it does cause a bit of jank
- * on the first page load.
- *
- * Since we don't want to persist state in between page navigation, this is
- * the best we can do while optimizing for larger screens where most
- * viewers will read the textbook.
- *
  * Keep the variable below in sync with the tablet breakpoint value in
  * _sass/inuitcss/tools/_tools.mq.scss
  *
@@ -53,7 +51,20 @@ const autoCloseSidebarBreakpoint = 740
 document.addEventListener('turbolinks:load', () => {
   getToggler().addEventListener('click', toggleSidebar)
 
-  // This assumes that the sidebar is open by default
+  /**
+   * Auto-close sidebar on smaller screens after page load.
+   *
+   * Having the sidebar be open by default then closing it on page load for
+   * small screens gives the illusion that the sidebar closes in response
+   * to selecting a page in the sidebar. However, it does cause a bit of jank
+   * on the first page load.
+   *
+   * Since we don't want to persist state in between page navigation, this is
+   * the best we can do while optimizing for larger screens where most
+   * viewers will read the textbook.
+   *
+   * The code below assumes that the sidebar is open by default.
+   */
   if (window.innerWidth < autoCloseSidebarBreakpoint) toggleSidebar()
 })
 
