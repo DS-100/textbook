@@ -19,17 +19,9 @@ help:
 notebooks: ## Convert notebooks to HTML pages
 	@echo "${BLUE}Converting notebooks to HTML.${NOCOLOR}"
 	@echo "${BLUE}=============================${NOCOLOR}"
-
 	python convert_notebooks_to_html_partial.py
-
 	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
 	@echo ""
-
-section_labels: ## Add section labels
-	@echo "${BLUE}Adding section labels to SUMMARY.md...${NOCOLOR}"
-
-	python add_section_numbers_to_book.py
-	@echo
 
 chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 	@echo To use this command, replace NN with the chapter number. Example:
@@ -38,14 +30,24 @@ chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 $(CHAPTERS): ## Converts a specific chapter's notebooks (e.g. make ch02)
 	python convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
 
+website:
+	jekyll build
+
 build: ## Run build steps
-	make notebooks section_labels
+	make notebooks website
 
-serve: build ## Run gitbook to preview changes locally
-	gitbook install
-	gitbook serve
+serve: build ## Run Jekyll to preview changes locally
+	jekyll serve
 
-deploy: ## Publish gitbook
+
+clean: ## Removes generated files (Jekyll and notebook conversion output)
+	find notebooks -name '*.md' -exec rm {} \;
+	find notebooks -type d -name '*_files' -exec rm -rf {} \;
+	rm ch/*/*.html
+	rm notebooks-images/*
+	jekyll clean
+
+deploy: ## Publish textbook
 ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/master)
 	@echo "Please check out the deployment branch, master, if you want to deploy your revisions."
 	@echo "For example: 'git checkout master && make deploy'"
@@ -69,20 +71,3 @@ ping_binder: ## Force-updates BinderHub image
 	curl -s https://mybinder.org/build/gh/DS-100/textbook/master |\
 		grep -E '${BINDER_REGEXP}' |\
 		sed -E 's/${BINDER_REGEXP}/\1/' &
-
-deploy-live: ## Publish gitbook to live student version
-ifneq ($(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)),origin/master)
-	@echo "Please check out the deployment branch, master, if you want to deploy your revisions."
-	@echo "For example: 'git checkout master && make deploy'"
-	@echo "(Current branch: $(shell git for-each-ref --format='%(upstream:short)' $(shell git symbolic-ref -q HEAD)))"
-	exit 1
-endif
-	git pull
-	git checkout $(VERSION)
-	git rebase master
-	@echo "${BLUE}Deploying book to live Gitbook.${NOCOLOR}"
-	@echo "${BLUE}=========================${NOCOLOR}"
-	git push origin $(VERSION)
-	git checkout master
-	@echo ""
-	@echo "${BLUE}Done, see book at ${LIVE_URL}.${NOCOLOR}"
