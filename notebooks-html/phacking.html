@@ -44,10 +44,17 @@
 <div class="input">
 
 <div class="inner_cell"
-  
+  style="display:none;"
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### HIDDEN</span>
+<span class="c1"># does this make it hidden?</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stat</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -59,10 +66,8 @@
 <h2 id="Multiple-Hypothesis-Testing">Multiple Hypothesis Testing<a class="anchor-link" href="#Multiple-Hypothesis-Testing">&#182;</a></h2></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="A/B-Testing">A/B Testing<a class="anchor-link" href="#A/B-Testing">&#182;</a></h2><p>A/B testing is a very simple concept. We measure a statistic in a normal, controlled environment (we'll call this A), and then we compare that to the same statistic in an environment with <em>one</em> change. This form of testing is used frequently in marketing and ad research to compare the effectiveness of certain features of ads.</p>
-<p>Let's say we are working for a company whose website lets users make their own custom videogames. The company has a free version, which lets users make very basic videogames, and a paid version, which gives users access to more advanced tools for making videogames. When a user has finished making a videogame via a free account, we send them to a landing page that gives them the option to sign up for a paid account. Our measured statistic in this case would be how many free users sign up for a paid account upon reaching this page. We can send half of our users one version of the page, which may have text explaining in detail the benefits of the paid account (this will be version A), and the other half of our users will get another version of the page, which may have a colorful graphic that explains some of the benefits of the paid account (this will be version B).</p>
-<p>There is a very specific reason why it's called A/B testing, and not A/B/C/D... testing. That is because we can very easily run into problems if we try to test multiple versions at the same time.</p>
-<p>Let's say that we have 20 different sign up pages, each with something different about them (one has a picture of a puppy, one has a quote from a customer, one has a graphic, etc.), and let's say that in this case, none of our variations actually has an effect on user interaction (so we can use a Gaussian distribution with a mean of 0 and a stf of 0.05).</p></div></div></div>
+<p>One of the biggest dangers of blindly relying on the p-value to determine "statistical significance" comes when we are just trying to find the "sexiest" results that give us "good" p-values. This is commonly done when doing "food frequency questionairres," or FFQs, to study eating habits' correlation with other characteristics (diseases, weight, etc). 
+FiveThirtyEight, an online blog that focuses on opinion poll analysis among other things, made their own FFQ, and we can use their data to run our own analysis to find some silly results that can be considered "statistically significant."</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -70,8 +75,414 @@
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">landing_pages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<span class="n">landing_pages</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;raw_anonymized_data.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># These are the columns that give us characteristics of FFQ-takers</span>
+<span class="n">characteristics</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">27</span><span class="p">]</span>
+
+<span class="c1"># These are the columns that give us the quantities/frequencies of different food the FFQ-takers ate</span>
+<span class="n">ffq</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">27</span><span class="p">:]</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">characteristics</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cancer</th>
+      <th>diabetes</th>
+      <th>heart_disease</th>
+      <th>belly</th>
+      <th>ever_smoked</th>
+      <th>currently_smoke</th>
+      <th>smoke_often</th>
+      <th>smoke_rarely</th>
+      <th>never_smoked</th>
+      <th>quit_smoking</th>
+      <th>...</th>
+      <th>neutralCable</th>
+      <th>noCrash</th>
+      <th>yesCrash</th>
+      <th>uhCrash</th>
+      <th>rash</th>
+      <th>cat</th>
+      <th>dog</th>
+      <th>Dems</th>
+      <th>atheist</th>
+      <th>Jewish</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Innie</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>...</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Outie</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>...</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Innie</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>...</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Innie</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>...</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Innie</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>...</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 26 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">ffq</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BREAKFASTSANDWICHFREQ</th>
+      <th>BREAKFASTSANDWICHQUAN</th>
+      <th>EGGSFREQ</th>
+      <th>EGGSQUAN</th>
+      <th>YOGURTFREQ</th>
+      <th>YOGURTQUAN</th>
+      <th>COTTAGECHEESEFREQ</th>
+      <th>COTTAGECHEESEQUAN</th>
+      <th>CREAMCHEESEFREQ</th>
+      <th>CREAMCHEESEQUAN</th>
+      <th>...</th>
+      <th>DT_FIBER_INSOL</th>
+      <th>DT_FIBER_SOL</th>
+      <th>DT_PROT_ANIMAL</th>
+      <th>DT_PROT_VEGETABLE</th>
+      <th>DT_NITROGEN</th>
+      <th>PHYTIC_ACID</th>
+      <th>OXALIC_ACID</th>
+      <th>COUMESTROL</th>
+      <th>BIOCHANIN_A</th>
+      <th>FORMONONETIN</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5</td>
+      <td>1</td>
+      <td>7</td>
+      <td>3</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>2</td>
+      <td>7</td>
+      <td>3</td>
+      <td>...</td>
+      <td>7.38</td>
+      <td>1.25</td>
+      <td>75.46</td>
+      <td>16.00</td>
+      <td>14.89</td>
+      <td>365.70</td>
+      <td>318.11</td>
+      <td>0.0117</td>
+      <td>0.0658</td>
+      <td>0.00324</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>4</td>
+      <td>2</td>
+      <td>3</td>
+      <td>1</td>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+      <td>...</td>
+      <td>9.11</td>
+      <td>3.37</td>
+      <td>59.41</td>
+      <td>18.25</td>
+      <td>12.51</td>
+      <td>434.98</td>
+      <td>112.66</td>
+      <td>0.0107</td>
+      <td>0.1390</td>
+      <td>0.00743</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2</td>
+      <td>4</td>
+      <td>2</td>
+      <td>5</td>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+      <td>6</td>
+      <td>3</td>
+      <td>...</td>
+      <td>11.56</td>
+      <td>4.74</td>
+      <td>61.49</td>
+      <td>28.46</td>
+      <td>14.45</td>
+      <td>606.43</td>
+      <td>213.41</td>
+      <td>0.0965</td>
+      <td>0.0519</td>
+      <td>0.00946</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2</td>
+      <td>1</td>
+      <td>7</td>
+      <td>2</td>
+      <td>8</td>
+      <td>3</td>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>2</td>
+      <td>...</td>
+      <td>26.34</td>
+      <td>10.85</td>
+      <td>28.71</td>
+      <td>44.59</td>
+      <td>12.15</td>
+      <td>1570.07</td>
+      <td>334.08</td>
+      <td>0.2830</td>
+      <td>0.0890</td>
+      <td>0.01260</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>1</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+      <td>4</td>
+      <td>2</td>
+      <td>...</td>
+      <td>16.48</td>
+      <td>4.80</td>
+      <td>32.41</td>
+      <td>28.23</td>
+      <td>9.80</td>
+      <td>616.99</td>
+      <td>422.55</td>
+      <td>0.1630</td>
+      <td>0.0994</td>
+      <td>0.02070</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 1066 columns</p></div></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Do some EDA on the data so that categorical values get changed to 1s and 0s</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Innie&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Outie&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Calculate the p value between every characteristic and food frequency/quantity</span>
+<span class="n">pvalues</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characteristics</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ffq</span><span class="p">:</span>
+        <span class="n">pvalues</span><span class="p">[</span><span class="n">stat</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">])[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sorted_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pvalues</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="n">sorted_values</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">[</span><span class="n">key</span><span class="p">])]</span>
+<span class="n">sorted_values</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">150</span><span class="p">]</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -85,10 +496,92 @@
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([-0.01870342,  0.0832369 ,  0.03916772,  0.0012117 , -0.0051528 ,
-       -0.00275833,  0.07176296, -0.07479985,  0.00096446, -0.0191211 ,
-       -0.02486946,  0.00338606,  0.01341394, -0.01466   , -0.06877501,
-       -0.07680622, -0.01459887,  0.03828281, -0.07422514,  0.00573118])</pre></div></div></div></div></div>
+<pre>[(6.358126097548407e-63, (&#39;readingMath&#39;, &#39;VITAMINEQUAN&#39;)),
+ (6.6214062008543634e-63, (&#39;rash&#39;, &#39;OTHERSOUPQUAN&#39;)),
+ (7.6903104344215803e-63, (&#39;Jewish&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (7.924293507849059e-63, (&#39;smoke_rarely&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (8.4095237986025954e-63, (&#39;currently_smoke&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (8.9183757464713533e-63, (&#39;yesCrash&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (8.9662001457940954e-63, (&#39;Jewish&#39;, &#39;LIVERQUAN&#39;)),
+ (9.0613706048428091e-63, (&#39;unfavCable&#39;, &#39;VITAMINEQUAN&#39;)),
+ (9.7275141675628686e-63, (&#39;rash&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.0009811370750712e-62, (&#39;favCable&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.1204243469978213e-62, (&#39;diabetes&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.1519587976886106e-62, (&#39;readingMath&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.1841793766753675e-62, (&#39;unfavCable&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.2170942152162999e-62, (&#39;noCrash&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.2507113140199772e-62, (&#39;dog&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.2749047717364511e-62, (&#39;noCrash&#39;, &#39;VITAMINEQUAN&#39;)),
+ (1.2850385340105879e-62, (&#39;cat&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.3923572355954996e-62, (&#39;mathReading&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.4429807111480728e-62, (&#39;Jewish&#39;, &#39;MINERALSYESORNO&#39;)),
+ (1.4675906055414749e-62, (&#39;neutralCable&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.4921444186594713e-62, (&#39;Jewish&#39;, &#39;PUDDINGQUAN&#39;)),
+ (1.5463783306000627e-62, (&#39;favCable&#39;, &#39;LENTILSOUPQUAN&#39;)),
+ (1.5861102830912664e-62, (&#39;cancer&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.6271545209384683e-62, (&#39;uhCrash&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (1.7710512714167032e-62, (&#39;dog&#39;, &#39;VITAMINEQUAN&#39;)),
+ (1.9365728037394257e-62, (&#39;atheist&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (2.0322275434385771e-62, (&#39;never_smoked&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (2.1818641127738961e-62, (&#39;Dems&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (2.4212479707245423e-62, (&#39;currently_smoke&#39;, &#39;MEATSUBSTITUTESQUAN&#39;)),
+ (2.4294027322207792e-62, (&#39;cat&#39;, &#39;VITAMINEQUAN&#39;)),
+ (2.6173843137025856e-62, (&#39;belly&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (2.675567336257232e-62, (&#39;right_hand&#39;, &#39;GROUP_SOLID_COUNT&#39;)),
+ (2.9200619403975e-62, (&#39;smoke_rarely&#39;, &#39;BANANASQUAN&#39;)),
+ (3.6846874183612466e-62, (&#39;Jewish&#39;, &#39;CANNEDFRUITQUAN&#39;)),
+ (3.9833035518075475e-62, (&#39;Jewish&#39;, &#39;SPAGHETTIQUAN&#39;)),
+ (4.9112811758307594e-62, (&#39;favCable&#39;, &#39;OTHERSOUPQUAN&#39;)),
+ (5.8180405698122421e-62, (&#39;mathReading&#39;, &#39;VITAMINEQUAN&#39;)),
+ (9.7908755356540434e-62, (&#39;neutralCable&#39;, &#39;VITAMINEQUAN&#39;)),
+ (1.9501696385567028e-61, (&#39;cancer&#39;, &#39;VITAMINEQUAN&#39;)),
+ (2.031802496631482e-61, (&#39;smoke_often&#39;, &#39;COLDCEREALQUAN&#39;)),
+ (2.0318024966315393e-61, (&#39;Jewish&#39;, &#39;COLDCEREALQUAN&#39;)),
+ (2.126328127399533e-61, (&#39;rash&#39;, &#39;VEGETABLESOUPQUAN&#39;)),
+ (2.3946563950587075e-61, (&#39;uhCrash&#39;, &#39;VITAMINEQUAN&#39;)),
+ (2.670114135628953e-61, (&#39;yesCrash&#39;, &#39;PEACHESQUAN&#39;)),
+ (3.7718701944868199e-61, (&#39;smoke_rarely&#39;, &#39;SPAGHETTIQUAN&#39;)),
+ (7.1582767067797031e-61, (&#39;atheist&#39;, &#39;VITAMINEQUAN&#39;)),
+ (8.7561199803539314e-61, (&#39;never_smoked&#39;, &#39;VITAMINEQUAN&#39;)),
+ (9.7235378859665905e-61, (&#39;right_hand&#39;, &#39;VITAMINEQUAN&#39;)),
+ (1.0404958035361395e-60, (&#39;belly&#39;, &#39;VITAMINEQUAN&#39;)),
+ (1.0769332382521734e-60, (&#39;Dems&#39;, &#39;VITAMINEQUAN&#39;))]</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="A/B-Testing">A/B Testing<a class="anchor-link" href="#A/B-Testing">&#182;</a></h2><p>A/B testing is a very simple concept. We measure a statistic in a normal, controlled environment (we'll call this A), and then we compare that to the same statistic in an environment with <em>one</em> change. This form of testing is used frequently in marketing and ad research to compare the effectiveness of certain features of ads.</p>
+<p>Let's say we are working for a company whose website lets users make their own custom videogames. The company has a free version, which lets users make very basic videogames, and a paid version, which gives users access to more advanced tools for making videogames. When a user has finished making a videogame via a free account, we send them to a landing page that gives them the option to sign up for a paid account. Our measured statistic in this case would be how many free users sign up for a paid account upon reaching this page. We can send half of our users one version of the page, which may have text explaining in detail the benefits of the paid account (this will be version A), and the other half of our users will get another version of the page, which may have a colorful graphic that explains some of the benefits of the paid account (this will be version B).</p>
+<p>There is a very specific reason why it's called A/B testing, and not A/B/C/D... testing. That is because we can very easily run into problems if we try to test multiple versions at the same time.</p>
+<p>Let's say that we have 15 different sign up pages (one is the control, in this case "A"), each with something different about them (one has a picture of a puppy, one has a quote from a customer, one has a graphic, etc.), and let's say that in this case, none of our variations actually has an effect on user interaction (so we can use a Gaussian distribution with a mean of 0 and a std of 0.1).</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">landing_pages</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">)]</span> <span class="c1"># can&#39;t seem to get the seed to work??</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">pvalues</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">observed_differences</span> <span class="o">=</span> <span class="n">A</span> <span class="o">-</span> <span class="n">B</span>
+    <span class="n">differences</span> <span class="o">=</span> <span class="n">A</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="n">pvalues</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">observed_differences</span> <span class="o">&gt;=</span> <span class="n">differences</span><span class="p">)</span> <span class="o">/</span> <span class="mi">50</span><span class="p">]</span>
+<span class="nb">min</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.44</pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As we can see, more than one of these ads seems to have exceeded a 5% difference in user engagement, despite our knowing that there actually no difference. This is why we do single A/B testing with multiple trials, as opposed to multiple hypothesis testing with only single trials.</p></div></div></div>
