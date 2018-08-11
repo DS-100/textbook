@@ -1,6 +1,24 @@
 /**
- * Site-wide JS
+ * Site-wide JS that sets up:
+ *
+ * [1] MathJax rendering on navigation
+ * [2] Sidebar toggling
+ * [3] Sidebar scroll preserving
+ * [4] Keyboard navigation
+ * [5] nbinteract
  */
+
+const runWhenDOMLoaded = cb => {
+  if (document.readyState != 'loading') {
+    cb()
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', run)
+  } else {
+    document.attachEvent('onreadystatechange', function() {
+      if (document.readyState == 'complete') run()
+    })
+  }
+}
 
 const togglerId = 'js-sidebar-toggle'
 const textbookId = 'js-textbook'
@@ -12,7 +30,7 @@ const mathRenderedClass = 'js-mathjax-rendered'
 const getToggler = () => document.getElementById(togglerId)
 const getTextbook = () => document.getElementById(textbookId)
 
-// Run MathJax when Turbolinks navigates to a page.
+// [1] Run MathJax when Turbolinks navigates to a page.
 // When Turbolinks caches a page, it also saves the MathJax rendering. We mark
 // each page with a CSS class after rendering to prevent double renders when
 // navigating back to a cached page.
@@ -25,7 +43,7 @@ document.addEventListener('turbolinks:load', () => {
 })
 
 /**
- * Toggles sidebar and menu icon
+ * [2] Toggles sidebar and menu icon
  */
 const toggleSidebar = () => {
   const toggler = getToggler()
@@ -48,7 +66,7 @@ const toggleSidebar = () => {
 const autoCloseSidebarBreakpoint = 740
 
 // Set up event listener for sidebar toggle button
-document.addEventListener('turbolinks:load', () => {
+const sidebarButtonHandler = () => {
   getToggler().addEventListener('click', toggleSidebar)
 
   /**
@@ -66,10 +84,13 @@ document.addEventListener('turbolinks:load', () => {
    * The code below assumes that the sidebar is open by default.
    */
   if (window.innerWidth < autoCloseSidebarBreakpoint) toggleSidebar()
-})
+}
+
+runWhenDOMLoaded(sidebarButtonHandler)
+document.addEventListener('turbolinks:load', sidebarButtonHandler)
 
 /**
- * Preserve sidebar scroll when navigating between pages
+ * [3] Preserve sidebar scroll when navigating between pages
  */
 let sidebarScrollTop = 0
 const getSidebar = () => document.getElementById('js-sidebar')
@@ -85,12 +106,14 @@ document.addEventListener('turbolinks:load', () => {
 /**
  * Focus textbook page by default so that user can scroll with spacebar
  */
-document.addEventListener('turbolinks:load', () => {
+const focusPage = () => {
   document.querySelector('.c-textbook__page').focus()
-})
+}
+runWhenDOMLoaded(focusPage)
+document.addEventListener('turbolinks:load', focusPage)
 
 /**
- * Use left and right arrow keys to navigate forward and backwards.
+ * [4] Use left and right arrow keys to navigate forward and backwards.
  */
 const LEFT_ARROW_KEYCODE = 37
 const RIGHT_ARROW_KEYCODE = 39
@@ -106,3 +129,32 @@ document.addEventListener('keydown', event => {
     Turbolinks.visit(getNextUrl())
   }
 })
+
+/**
+ * [5] Set up nbinteract to render widgets on page load
+ */
+
+let interact
+
+const setupNbinteract = () => {
+  // If NbInteract hasn't loaded, wait one second and try again
+  if (window.NbInteract === undefined) {
+    setTimeout(setupNbinteract, 1000)
+    return
+  }
+
+  if (interact === undefined) {
+    console.log('Initializing nbinteract...')
+    interact = new window.NbInteract({
+      baseUrl: 'https://mybinder.org',
+      spec: 'DS-100/textbook/master',
+      provider: 'gh',
+    })
+    window.interact = interact
+  }
+
+  interact.prepare()
+}
+
+runWhenDOMLoaded(setupNbinteract)
+document.addEventListener('turbolinks:load', setupNbinteract)
