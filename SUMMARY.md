@@ -46,7 +46,7 @@
 * [10. Modeling and Estimation](ch10/modeling_estimation.md)
   * [10.1 A Simple Model](ch10/modeling_simple.md)
   * [10.2 Loss Functions](ch10/modeling_loss_functions.md)
-  * [10.3 Absolute Cost and Huber Cost](ch10/modeling_abs_huber.md)
+  * [10.3 Absolute Loss and Huber Loss](ch10/modeling_abs_huber.md)
 * [11. Gradient Descent](ch11/gradient_descent.md)
   * [11.1 Basic Numerical Optimization](ch11/gradient_basics.md)
   * [11.2 Defining Gradient Descent](ch11/gradient_descent_define.md)
@@ -66,7 +66,7 @@
   * [14.1 One-Hot Encoding](ch14/feature_one_hot.md)
   * [14.2 Polynomial Regression](ch14/feature_polynomial.md)
 * [15. Bias-Variance Tradeoff](ch15/bias_intro.md)
-  * [15.1 Risk and Cost Minimization](ch15/bias_risk.md)
+  * [15.1 Risk and Loss Minimization](ch15/bias_risk.md)
   * [15.2 Model Bias and Variance](ch15/bias_modeling.md)
   * [15.3 Cross Validation](ch15/bias_cv.md)
 * [16. Regularization](ch16/reg_intro.md)
@@ -83,6 +83,9 @@
   * [17.7 Evaluating Logistic Models](ch17/classification_sensitivity_specificity.md)
   * [17.8 Multiclass Classification](ch17/classification_multiclass.md)
 * [18. Statistical Inference](ch18/hyp_intro.md)
+  * [18.1 Introduction to Hypothesis Testing](ch18/hyp_introduction.md)
+  * [18.2 Permutation Testing](ch18/hyp_introduction_part2.md)
+  * [18.3 Bootstrapping for Linear Regression](ch18/hyp_regression.md)
   * [18.4 Studentized Bootstrap](ch18/hyp_studentized.md)
 
 <!-- end_numbering -->
