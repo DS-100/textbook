@@ -414,8 +414,12 @@ data.replace('Outie', 0, inplace=True)
 pvalues = {}
 for c in characteristics:
     for f in ffq:
-        pvalues[stat.ttest_ind(data[c].tolist(), data[f].tolist(), equal_var=False)[1]] = (c, f)
+        pvalues[stat.pearsonr(data[c].tolist(), data[f].tolist())[1]] = (c, f)
 ```
+
+    /Users/andrewkim/anaconda3/lib/python3.6/site-packages/scipy/stats/stats.py:3021: RuntimeWarning: invalid value encountered in double_scalars
+      r = r_num / r_den
+
 
 
 ```python
@@ -426,119 +430,51 @@ for key in sorted(pvalues.keys()):
 
 
 ```python
-sorted_values[2000:2100]
+sorted_values[0:30]
 ```
 
 
 
 
-    [(2.3648241474577024e-26, ('Jewish', 'FRIESFREQ')),
-     (2.3793938164610517e-26, ('readingMath', 'EGGSQUAN')),
-     (2.4257035809442306e-26, ('smoke_rarely', 'ASH')),
-     (2.5172312265496039e-26, ('right_hand', 'GROUP_SUGARYBEVG_TOTAL_FREQUENCY')),
-     (2.544424004492252e-26, ('favCable', 'FRIESFREQ')),
-     (2.5763300883291532e-26, ('currently_smoke', 'ASH')),
-     (2.6205744857515174e-26, ('belly', 'VEGGIESFREQ')),
-     (2.6365909377739635e-26, ('cancer', 'COOKEDGREENSQUAN')),
-     (2.6652602262111569e-26, ('mathReading', 'MAYOQUAN')),
-     (2.7289075788443869e-26, ('uhCrash', 'BROCCOLIFREQ')),
-     (2.7431115431268559e-26, ('yesCrash', 'ASH')),
-     (2.8108805895937193e-26, ('cancer', 'BERRIESQUAN')),
-     (2.845061863498948e-26, ('belly', 'V_REDOR_OTHER')),
-     (2.9205917867356232e-26, ('belly', 'FATRNP')),
-     (3.0137708614710861e-26, ('Jewish', 'SLOWWALKTIME')),
-     (3.0137708614710866e-26, ('smoke_often', 'SLOWWALKTIME')),
-     (3.0275989228139054e-26, ('rash', 'ASH')),
-     (3.1014395638929791e-26, ('right_hand', 'PSVEGPOT')),
-     (3.1326215198600197e-26, ('favCable', 'ASH')),
-     (3.1366890856379454e-26, ('Jewish', 'SLICEDCHEESEFREQ')),
-     (3.1669719082216128e-26, ('smoke_rarely', 'SLICEDCHEESEFREQ')),
-     (3.2610107414345672e-26, ('favCable', 'DT_VITB6')),
-     (3.3064228544084095e-26, ('currently_smoke', 'SLICEDCHEESEFREQ')),
-     (3.4001591380551358e-26, ('currently_smoke', 'SLOWWALKTIME')),
-     (3.4090170735731775e-26, ('noCrash', 'BARBECUESAUCEQUAN')),
-     (3.558184613002788e-26, ('yesCrash', 'SLICEDCHEESEFREQ')),
-     (3.6073566135001483e-26, ('Dems', 'OYSTERSQUAN')),
-     (3.6118323233868756e-26, ('diabetes', 'ASH')),
-     (3.675704444013712e-26, ('right_hand', 'VEGGIESFREQ')),
-     (3.7481787661825261e-26, ('readingMath', 'ASH')),
-     (3.8919317883079915e-26, ('unfavCable', 'ASH')),
-     (4.0435325616942995e-26, ('noCrash', 'ASH')),
-     (4.0837038500260336e-26, ('right_hand', 'DT_M201')),
-     (4.0911872483880518e-26, ('uhCrash', 'TUNAQUAN')),
-     (4.146771395569101e-26, ('right_hand', 'STEAKQUAN')),
-     (4.1884274452317456e-26, ('rash', 'SLICEDCHEESEFREQ')),
-     (4.2034519784050791e-26, ('dog', 'ASH')),
-     (4.2809736847197643e-26, ('diabetes', 'FRIESFREQ')),
-     (4.291581975156661e-26, ('yesCrash', 'HICQUAN')),
-     (4.3721927964005876e-26, ('cat', 'ASH')),
-     (4.3921253128321055e-26, ('unfavCable', 'CREAMCHEESEQUAN')),
-     (4.4350825316464269e-26, ('diabetes', 'DT_THIA')),
-     (4.4817104555037101e-26, ('favCable', 'SLICEDCHEESEFREQ')),
-     (4.4826970694501157e-26, ('mathReading', 'LIGHTHOUSETIME')),
-     (4.5467487274008567e-26, ('readingMath', 'OTHERBREADSQUAN')),
-     (4.6180018643021147e-26, ('unfavCable', 'EGGSQUAN')),
-     (4.8728166592136976e-26, ('uhCrash', 'COOKEDGREENSQUAN')),
-     (4.9368990813839132e-26, ('mathReading', 'ASH')),
-     (5.0514148130974568e-26, ('readingMath', 'FRIESFREQ')),
-     (5.3683522429915653e-26, ('neutralCable', 'ASH')),
-     (5.6441805479086806e-26, ('mathReading', 'CABBAGEQUAN')),
-     (5.6976036778089817e-26, ('uhCrash', 'BERRIESQUAN')),
-     (6.0359587858911605e-26, ('unfavCable', 'FRIESFREQ')),
-     (6.1125482005747637e-26, ('cancer', 'ASH')),
-     (6.1497319883394071e-26, ('atheist', 'CARROTSQUAN')),
-     (6.1566700228749851e-26, ('Jewish', 'DT_MAGN')),
-     (6.1712323081055326e-26, ('smoke_rarely', 'DT_MAGN')),
-     (6.2004926814671537e-26, ('currently_smoke', 'DT_MAGN')),
-     (6.2299351623111835e-26, ('yesCrash', 'DT_MAGN')),
-     (6.2487573965510624e-26, ('diabetes', 'SLICEDCHEESEFREQ')),
-     (6.2744430777919058e-26, ('rash', 'DT_MAGN')),
-     (6.2893714664074544e-26, ('favCable', 'DT_MAGN')),
-     (6.3438977483978232e-26, ('Jewish', 'DT_KCAL')),
-     (6.3466106448157961e-26, ('smoke_rarely', 'DT_KCAL')),
-     (6.3495513560086257e-26, ('diabetes', 'DT_MAGN')),
-     (6.3520409699339736e-26, ('currently_smoke', 'DT_KCAL')),
-     (6.3574773442942995e-26, ('yesCrash', 'DT_KCAL')),
-     (6.3647137161203254e-26, ('readingMath', 'DT_MAGN')),
-     (6.3656432644580298e-26, ('rash', 'DT_KCAL')),
-     (6.3683682705416912e-26, ('favCable', 'DT_KCAL')),
-     (6.3792834832606428e-26, ('diabetes', 'DT_KCAL')),
-     (6.3799233550283297e-26, ('unfavCable', 'DT_MAGN')),
-     (6.3820160882132378e-26, ('readingMath', 'DT_KCAL')),
-     (6.384750215748186e-26, ('unfavCable', 'DT_KCAL')),
-     (6.3874858668028671e-26, ('noCrash', 'DT_KCAL')),
-     (6.3898668706358933e-26, ('uhCrash', 'ASH')),
-     (6.3902230423156149e-26, ('dog', 'DT_KCAL')),
-     (6.3926557979670842e-26, ('diabetes', 'ICECREAMTYPE')),
-     (6.3929617432252591e-26, ('cat', 'DT_KCAL')),
-     (6.3951804356665366e-26, ('noCrash', 'DT_MAGN')),
-     (6.401187007734326e-26, ('mathReading', 'DT_KCAL')),
-     (6.4066781616334502e-26, ('neutralCable', 'DT_KCAL')),
-     (6.4104851215882502e-26, ('dog', 'DT_MAGN')),
-     (6.4149263776693737e-26, ('cancer', 'DT_KCAL')),
-     (6.4176788495066232e-26, ('uhCrash', 'DT_KCAL')),
-     (6.42583757696944e-26, ('cat', 'DT_MAGN')),
-     (6.4369891803709244e-26, ('atheist', 'DT_KCAL')),
-     (6.4425202766307165e-26, ('never_smoked', 'DT_KCAL')),
-     (6.4508284985823945e-26, ('Dems', 'DT_KCAL')),
-     (6.4721832110152647e-26, ('mathReading', 'DT_MAGN')),
-     (6.4730518605868334e-26, ('belly', 'DT_KCAL')),
-     (6.4758367631659466e-26, ('right_hand', 'DT_KCAL')),
-     (6.5033221858021692e-26, ('neutralCable', 'DT_MAGN')),
-     (6.5503968290410524e-26, ('cancer', 'DT_MAGN')),
-     (6.5661867014172405e-26, ('uhCrash', 'DT_MAGN')),
-     (6.6385266259568142e-26, ('right_hand', 'SALMONQUAN')),
-     (6.6408620938365295e-26, ('unfavCable', 'SLICEDCHEESETYPE')),
-     (6.6781099289295654e-26, ('atheist', 'DT_MAGN')),
-     (6.7105413041097542e-26, ('never_smoked', 'DT_MAGN')),
-     (6.731227852206363e-26, ('currently_smoke', 'RAWTOMATOESQUAN'))]
+    [(3.7392930595140498e-09, ('Jewish', 'GROUP_ALL_BRAN_ORIGINAL_TOTAL_GRAMS')),
+     (3.7392930595140713e-09, ('Jewish', 'ALLBRANORIGTYPE')),
+     (3.7392930595141143e-09,
+      ('smoke_often', 'GROUP_COOK_FAT_ANIMAL_FAT_TOTAL_GRAMS')),
+     (9.4530340028772084e-09,
+      ('smoke_often', 'GROUP_LOW_CAL_KOOLAID_TOTAL_GRAMS')),
+     (2.865639565547171e-08,
+      ('Jewish', 'GROUP_ICE_CREAM_FROZEN_YOGURT_LOW_FAT_TOTAL_GRAMS')),
+     (5.2203280690755088e-08,
+      ('smoke_often', 'GROUP_STEAK_ROAST_FAT_ON_TOTAL_GRAMS')),
+     (5.9917513301454779e-08, ('Jewish', 'GROUP_RAW_TOMATOES_TOTAL_GRAMS')),
+     (6.0267821160795707e-07,
+      ('smoke_often', 'GROUP_CORN_FLAKES_CORN_PUFFS_TOTAL_GRAMS')),
+     (4.5182117663961682e-06, ('smoke_often', 'F18D1TN7')),
+     (8.0499444720125634e-06, ('smoke_rarely', 'FLAXHEMPSEEDOILTYPE')),
+     (8.0499444720126362e-06, ('smoke_rarely', 'GROUP_CHEX_OTHER_TOTAL_GRAMS')),
+     (8.0499444720126701e-06, ('smoke_rarely', 'GROUP_LIFE_TOTAL_GRAMS')),
+     (8.8030660205637771e-06, ('smoke_often', 'GROUP_PORK_FAT_ON_TOTAL_GRAMS')),
+     (1.1446426335225304e-05, ('smoke_rarely', 'F18D3CN3')),
+     (1.6158156614271367e-05, ('smoke_rarely', 'GROUP_SOY_MILK_TOTAL_GRAMS')),
+     (2.1945383378396457e-05, ('smoke_rarely', 'SUP_OM_6')),
+     (2.8476184473490123e-05, ('dog', 'EGGROLLQUAN')),
+     (3.1447466606889132e-05, ('smoke_rarely', 'F20D3N3')),
+     (3.9156738423019172e-05, ('smoke_often', 'GROUP_BAGELS_WHITE_TOTAL_GRAMS')),
+     (5.4472799562211073e-05,
+      ('smoke_often', 'GROUP_HOT_DOG_BEEF_OR_PORK_TOTAL_GRAMS')),
+     (5.4976262450193749e-05, ('Jewish', 'V_REDOR_TOMATO')),
+     (6.6642014484263388e-05, ('currently_smoke', 'ENERGYDRINKSQUAN')),
+     (7.2255229976485587e-05, ('smoke_rarely', 'CAMD5')),
+     (7.7299724934785873e-05, ('smoke_often', 'LATINO')),
+     (8.1320697785677561e-05, ('smoke_often', 'BUTTERQUAN')),
+     (0.00010682433178383818, ('currently_smoke', 'BEERQUAN')),
+     (0.00012496025027669932,
+      ('quit_smoking', 'GROUP_WHOLE_GRAIN_CRACKERS_LOW_FAT_TOTAL_GRAMS')),
+     (0.0001386176772447345, ('mathReading', 'OTHERCHIPSFREQ')),
+     (0.00014468096634093775, ('smoke_often', 'F18D2CLA')),
+     (0.00017717189454132738, ('rash', 'SODAQUAN'))]
 
 
-
-
-```python
-As you can see, a lot of 
-```
 
 ## A/B Testing
 A/B testing is a very simple concept. We measure a statistic in a normal, controlled environment (we'll call this A), and then we compare that to the same statistic in an environment with *one* change. This form of testing is used frequently in marketing and ad research to compare the effectiveness of certain features of ads. 
