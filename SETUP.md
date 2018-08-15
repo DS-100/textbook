@@ -7,7 +7,7 @@ All pages live in the `chNN` folders e.g. `ch12/linear_grad.md`. Some pages are
 Markdown files that just contain text content (for example,
 `ch12/linear_models.md`).
 
-Most pages, however, are generated from Jupyter noteoboks that live in the
+Most pages, however, are generated from Jupyter notebooks that live in the
 `notebooks/` folder. For example, the `notebooks/ch10/modeling_simple.ipynb`
 notebook will automatically built into the `ch10/modeling_simple.md` page in
 the textbook.
