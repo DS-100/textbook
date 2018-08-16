@@ -59,7 +59,7 @@ html_exporter = InteractExporter(
             preprocessors=[
                 'nbconvert.preprocessors.ExtractOutputPreprocessor'
             ],
-            template_file='gitbook',
+            template_file='plain',
             button_at_top=False,
         )
     )
