@@ -28,6 +28,7 @@ chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 	@echo "  make 01"
 
 $(CHAPTERS): ## Converts a specific chapter's notebooks (e.g. make ch02)
+	rm -rf ch/$@/*
 	python convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
 
 website:
