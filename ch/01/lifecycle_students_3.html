@@ -1,5 +1,5 @@
 ---
-prev_page: '/ch/01/the_students_of_ds100_2.html'
+prev_page: '/ch/01/lifecycle_students_2.html'
 next_page: '/ch/02/data_design.html'
 ---
 
@@ -10,7 +10,7 @@ next_page: '/ch/02/data_design.html'
         <button class="interact-button js-nbinteract-widget">
             Show Widgets
         </button>
-        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/01/the_students_of_ds100_3.ipynb">Open on DataHub</a>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/01/lifecycle_students_3.ipynb">Open on DataHub</a>
     </div>
     
 
@@ -46,6 +46,13 @@ next_page: '/ch/02/data_design.html'
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -57,7 +64,12 @@ next_page: '/ch/02/data_design.html'
 
 <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 
 </div>
@@ -85,8 +97,8 @@ next_page: '/ch/02/data_design.html'
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="What's-in-a-Name?">What's in a Name?<a class="anchor-link" href="#What's-in-a-Name?">&#182;</a></h2><p>So far, we have asked a broad question about our data: "Do the first names of students in Data 100 tell us anything about the class?"</p>
-<p>We have done a bit of data cleaning by converting all our names to lowercase. During our exploratory data analysis we discovered that our roster contains about 270 names of students in the class and on the waitlist, and that most of our first names are between 4 and 8 characters long.</p>
-<p>What else can we discover about our class based on first names? We might consider a single name from our dataset:</p>
+<p>We have cleaned our data by converting all our names to lowercase. During our exploratory data analysis we discovered that our roster contains about 270 names of students in the class and on the waitlist. Most of our first names are between 4 and 8 characters long.</p>
+<p>What else can we discover about our class based on their first names? We might consider a single name from our dataset:</p>
 
 </div>
 </div>
@@ -133,8 +145,8 @@ next_page: '/ch/02/data_design.html'
 <li>"Do the first names of students in Data 100 tell us the distribution of sex in the class?"</li>
 <li>"Do the first names of students in Data 100 tell us the distribution of ages in the class?"</li>
 </ol>
-<p>In order to investigate these questions, we will need a dataset that associates names with sex and year. Conveniently, the US Social Security department hosts such a dataset online: <a href="https://www.ssa.gov/oact/babynames/index.html">https://www.ssa.gov/oact/babynames/index.html</a>. Their dataset records the names given to babies at birth and as such is often referred to as the Baby Names dataset.</p>
-<p>We will start by downloading and then loading the dataset into Python. Again, don't worry about understanding the code in this first chapter. It's more important that you understand the overall process.</p>
+<p>In order to investigate these questions, we will need a dataset that associates names with sex and year. Conveniently, the US Social Security department hosts such a dataset online (<a href="https://www.ssa.gov/oact/babynames/index.html">https://www.ssa.gov/oact/babynames/index.html</a>). Their dataset records the names given to babies at birth and is thus often referred to as the Baby Names dataset.</p>
+<p>We will start by downloading and then loading the dataset into Python. Again, don't worry about understanding the code in this this chapter—focus instead on understanding the overall process.</p>
 
 </div>
 </div>
@@ -186,17 +198,17 @@ next_page: '/ch/02/data_design.html'
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -271,45 +283,13 @@ next_page: '/ch/02/data_design.html'
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ls</span> <span class="o">-</span><span class="n">alh</span> <span class="n">babynames</span><span class="o">.</span><span class="n">csv</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>-rw-r--r--  1 sam  staff    30M Jan 22 15:31 babynames.csv
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It looks like the dataset contains names, the sex given to the baby, the number of babies with that name, and the year of birth for those babies. To be sure, we check the dataset description from the SSN Office: <a href="https://www.ssa.gov/oact/babynames/background.html">https://www.ssa.gov/oact/babynames/background.html</a></p>
+<p>It looks like the dataset contains names, the sex given to the baby, the number of babies with that name, and the year of birth for those babies. To be sure, we check the dataset description from the SSN Office (<a href="https://www.ssa.gov/oact/babynames/background.html">https://www.ssa.gov/oact/babynames/background.html</a>).</p>
 <blockquote><p>All names are from Social Security card applications for births that occurred in the United States after 1879. Note  that many people born before 1937 never applied for a Social Security card, so their names are not included in our data. For others who did apply, our records may not show the place of birth, and again their names are not included in our data.</p>
 <p>All data are from a 100% sample of our records on Social Security card applications as of March 2017.</p>
 </blockquote>
-<p>A useful visualization for this data is to plot the number of male and female babies born each year:</p>
+<p>We begin by plotting the number of male and female babies born each year:</p>
 
 </div>
 </div>
@@ -347,7 +327,7 @@ next_page: '/ch/02/data_design.html'
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/the_students_of_ds100_3_9_0.png"
+<img src="/notebooks-images/lifecycle_students_3_8_0.png"
 >
 </div>
 
@@ -359,7 +339,7 @@ next_page: '/ch/02/data_design.html'
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This plot makes us question whether the US had babies in 1880. A sentence from the quote above helps explain:</p>
+<p>The meteoric rise in babies born in the years leading up to 1920 may seem suspicious. A sentence from the quote above helps explain:</p>
 <blockquote><p>Note that many people born before 1937 never applied for a Social Security card, so their names are not included in our data. For others who did apply, our records may not show the place of birth, and again their names are not included in our data.</p>
 </blockquote>
 <p>We can also see the <a href="https://www.wikiwand.com/en/Baby_boomers">baby boomer period</a> quite clearly in the plot above.</p>
@@ -604,7 +584,7 @@ next_page: '/ch/02/data_design.html'
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>To decide whether a name is male or female, we can compute the proportion of times the name was given to a female baby.</p>
+<p>To determine whether a name is more popular for male or female babies, we can compute the proportion of times the name was given to a female baby.</p>
 
 </div>
 </div>
@@ -672,21 +652,21 @@ next_page: '/ch/02/data_design.html'
       <td>0</td>
       <td>96</td>
       <td>96</td>
-      <td>0.000000</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>aabha</th>
       <td>35</td>
       <td>0</td>
       <td>35</td>
-      <td>1.000000</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>aabid</th>
       <td>0</td>
       <td>10</td>
       <td>10</td>
-      <td>0.000000</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>...</th>
@@ -700,21 +680,21 @@ next_page: '/ch/02/data_design.html'
       <td>0</td>
       <td>6</td>
       <td>6</td>
-      <td>0.000000</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>zzyzx</th>
       <td>0</td>
       <td>5</td>
       <td>5</td>
-      <td>0.000000</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>All</th>
       <td>170639571</td>
       <td>173894326</td>
       <td>344533897</td>
-      <td>0.495277</td>
+      <td>0.5</td>
     </tr>
   </tbody>
 </table>
@@ -747,7 +727,8 @@ next_page: '/ch/02/data_design.html'
         <span class="n">prop</span> <span class="o">=</span> <span class="n">sex_counts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;prop_female&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="s1">&#39;F&#39;</span> <span class="k">if</span> <span class="n">prop</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="s1">&#39;M&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="s1">&#39;Name not in dataset&#39;</span>
+
 <span class="n">sex_from_name</span><span class="p">(</span><span class="s1">&#39;sam&#39;</span><span class="p">)</span>
 </pre></div>
 
@@ -777,7 +758,8 @@ next_page: '/ch/02/data_design.html'
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Try typing some names in this box to see whether the function outputs what you expect:</p>
+<h3 id="Our-First-Widget">Our First Widget<a class="anchor-link" href="#Our-First-Widget">&#182;</a></h3><p>In this book, we include widgets that allow the reader to interact with functions defined in the book. The widget below displays the output of <code>sex_from_name</code> on a reader-provided name.</p>
+<p>Try typing in the name "josephine" and see how the inferred sex changes as more characters are entered.</p>
 
 </div>
 </div>
@@ -808,7 +790,7 @@ next_page: '/ch/02/data_design.html'
 
 <div class="output_subarea output_widget_view ">
   <button class="js-nbinteract-widget">
-    Show Widget
+    Loading widgets...
   </button>
 </div>
 
@@ -871,6 +853,7 @@ next_page: '/ch/02/data_design.html'
       <th>Name</th>
       <th>Role</th>
       <th>sex</th>
+      <th>year</th>
     </tr>
   </thead>
   <tbody>
@@ -879,21 +862,25 @@ next_page: '/ch/02/data_design.html'
       <td>keeley</td>
       <td>Student</td>
       <td>F</td>
+      <td>1998.15</td>
     </tr>
     <tr>
       <th>1</th>
       <td>john</td>
       <td>Student</td>
       <td>M</td>
+      <td>1951.08</td>
     </tr>
     <tr>
       <th>2</th>
       <td>bryan</td>
       <td>Student</td>
       <td>M</td>
+      <td>1983.57</td>
     </tr>
     <tr>
       <th>...</th>
+      <td>...</td>
       <td>...</td>
       <td>...</td>
       <td>...</td>
@@ -903,22 +890,25 @@ next_page: '/ch/02/data_design.html'
       <td>ernesto</td>
       <td>Waitlist Student</td>
       <td>M</td>
+      <td>1981.44</td>
     </tr>
     <tr>
       <th>277</th>
       <td>athan</td>
       <td>Waitlist Student</td>
       <td>M</td>
+      <td>2004.40</td>
     </tr>
     <tr>
       <th>278</th>
       <td>michael</td>
       <td>Waitlist Student</td>
       <td>M</td>
+      <td>1971.18</td>
     </tr>
   </tbody>
 </table>
-<p>279 rows × 3 columns</p>
+<p>279 rows × 4 columns</p>
 </div>
 </div>
 
@@ -960,8 +950,9 @@ next_page: '/ch/02/data_design.html'
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>M    144
-F     92
+<pre>M                      144
+F                       92
+Name not in dataset     43
 Name: sex, dtype: int64</pre>
 </div>
 
@@ -1040,15 +1031,15 @@ Name: sex, dtype: int64</pre>
   <tbody>
     <tr>
       <th>aaban</th>
-      <td>2012.572917</td>
+      <td>2012.57</td>
     </tr>
     <tr>
       <th>aabha</th>
-      <td>2013.714286</td>
+      <td>2013.71</td>
     </tr>
     <tr>
       <th>aabid</th>
-      <td>2009.500000</td>
+      <td>2009.50</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1056,15 +1047,15 @@ Name: sex, dtype: int64</pre>
     </tr>
     <tr>
       <th>zyyanna</th>
-      <td>2010.000000</td>
+      <td>2010.00</td>
     </tr>
     <tr>
       <th>zyyon</th>
-      <td>2014.000000</td>
+      <td>2014.00</td>
     </tr>
     <tr>
       <th>zzyzx</th>
-      <td>2010.000000</td>
+      <td>2010.00</td>
     </tr>
   </tbody>
 </table>
@@ -1077,6 +1068,13 @@ Name: sex, dtype: int64</pre>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As before, we define a function to lookup the average birth year using a given name. We've included a widget for the reader to try out some names. We suggest trying names that seem older (e.g. "Mary") and names that seem newer (e.g. "Beyonce").</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -1110,7 +1108,7 @@ Name: sex, dtype: int64</pre>
 
 <div class="output_subarea output_widget_view ">
   <button class="js-nbinteract-widget">
-    Show Widget
+    Loading widgets...
   </button>
 </div>
 
@@ -1119,6 +1117,13 @@ Name: sex, dtype: int64</pre>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we can mark each name in Data 100 with its inferred birth year.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -1175,21 +1180,21 @@ Name: sex, dtype: int64</pre>
       <td>keeley</td>
       <td>Student</td>
       <td>F</td>
-      <td>1998.147952</td>
+      <td>1998.15</td>
     </tr>
     <tr>
       <th>1</th>
       <td>john</td>
       <td>Student</td>
       <td>M</td>
-      <td>1951.084937</td>
+      <td>1951.08</td>
     </tr>
     <tr>
       <th>2</th>
       <td>bryan</td>
       <td>Student</td>
       <td>M</td>
-      <td>1983.565113</td>
+      <td>1983.57</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1203,21 +1208,21 @@ Name: sex, dtype: int64</pre>
       <td>ernesto</td>
       <td>Waitlist Student</td>
       <td>M</td>
-      <td>1981.439873</td>
+      <td>1981.44</td>
     </tr>
     <tr>
       <th>277</th>
       <td>athan</td>
       <td>Waitlist Student</td>
       <td>M</td>
-      <td>2004.397863</td>
+      <td>2004.40</td>
     </tr>
     <tr>
       <th>278</th>
       <td>michael</td>
       <td>Waitlist Student</td>
       <td>M</td>
-      <td>1971.179231</td>
+      <td>1971.18</td>
     </tr>
   </tbody>
 </table>
@@ -1263,7 +1268,7 @@ Name: sex, dtype: int64</pre>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/the_students_of_ds100_3_30_0.png"
+<img src="/notebooks-images/lifecycle_students_3_31_0.png"
 >
 </div>
 
@@ -1316,9 +1321,9 @@ Name: sex, dtype: int64</pre>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Which makes it appear like the average student is 35 years old. This is a course for college undergrads, so we were expecting an average age of around 20. Why might our estimate be so far off?</p>
-<p>As data scientists, we often run into results that don't agree with our expectations and must make judgement calls about whether our results were caused by our data, our processes, or incorrect hypotheses. It is impossible to define rules that apply to every situation. Instead, we will give you the tools to re-examine each step of your data analysis and show you how to use them.</p>
-<p>In this case, the most likely possibility for our unexpected result is that most names are old. For example, the name John was quite popular throughout the history recorded in our data, which means that we'd likely guess that a person named John is born around 1950. We can confirm this by looking at the data:</p>
+<p>Our class has an average age of 35 years old—nearly twice our expected age in a course for college undergraduates. Why might our estimate be so far off?</p>
+<p>As data scientists, we often run into results that don't agree with our expectations. Our constant challenge is to determine whether surprising results are caused by an error in our procedure or by an actual, real-world phenomenon. Since there are no simple recipes to guarantee accurate conclusions, data scientists must equip themselves with guidelines and principles to reduce the likelihood of false discovery.</p>
+<p>In this particular case, the most likely explanation for our unexpected result is that most common names have been used for many years. For example, the name John was quite popular throughout the history recorded in our data. We can confirm this by plotting the number of babies given the name "John" each year:</p>
 
 </div>
 </div>
@@ -1332,7 +1337,8 @@ Name: sex, dtype: int64</pre>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">names</span> <span class="o">=</span> <span class="n">babynames</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>
 <span class="n">john</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;john&#39;</span><span class="p">]</span>
-<span class="n">john</span><span class="p">[</span><span class="n">john</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">);</span>
+<span class="n">john</span><span class="p">[</span><span class="n">john</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Frequency of &quot;John&quot;&#39;</span><span class="p">);</span>
 </pre></div>
 
 </div>
@@ -1350,7 +1356,7 @@ Name: sex, dtype: int64</pre>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/the_students_of_ds100_3_34_0.png"
+<img src="/notebooks-images/lifecycle_students_3_35_0.png"
 >
 </div>
 
@@ -1362,7 +1368,54 @@ Name: sex, dtype: int64</pre>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>If we happen to believe that no one in our class is over the age of 40 or under the age of 10 (we might find out by looking at our classroom during lecture) we can incorporate this into our analysis by only examining the data between 1978 and 2008. We will soon discuss data manipulation and you may revisit this analysis to find out if incorporating this prior belief gives a more sensible result.</p>
+<p>It appears that the average birth year does not provide an accurate estimate for a given person's age in general. In a few cases, however, a person's first name is quite revealing!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">names</span> <span class="o">=</span> <span class="n">babynames</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>
+<span class="n">kanye</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;kanye&#39;</span><span class="p">]</span>
+<span class="n">kanye</span><span class="p">[</span><span class="n">kanye</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Frequency of &quot;Kanye&quot;&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/lifecycle_students_3_37_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>In this chapter, we walk through a complete iteration of the data science lifecycle: question formulation, data manipulation, exploratory data analysis, and prediction. We expand upon each of these steps in the following chapters.</p>
+<p>The first half of the book (chapters 1-9) broadly covers the first three steps in the lifecycle and has a strong focus on computation. The second half of the book (chapters 10-18) uses both computational and statistical thinking to cover modeling, inference, and prediction.</p>
+<p>As a whole, this book hopes to impart the reader with the principles and techniques of data science.</p>
 
 </div>
 </div>
