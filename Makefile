@@ -19,6 +19,9 @@ help:
 notebooks: ## Convert notebooks to HTML pages
 	@echo "${BLUE}Converting notebooks to HTML.${NOCOLOR}"
 	@echo "${BLUE}=============================${NOCOLOR}"
+	rm -rf ch/*
+	@echo "${BLUE}Removed existing HTML files.${NOCOLOR}"
+	@echo ""
 	python convert_notebooks_to_html_partial.py
 	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
 	@echo ""

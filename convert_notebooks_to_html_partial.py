@@ -113,6 +113,7 @@ def convert_notebooks_to_html_partial(notebook_paths, url_map):
 
         # Path to output final HTML file
         outfile_path = os.path.join(NOTEBOOK_HTML_DIR, chapter, outfile_name)
+        os.makedirs(os.path.join(NOTEBOOK_HTML_DIR, chapter), exist_ok=True)
 
         extract_output_config = {
             'unique_key': unique_image_key,
