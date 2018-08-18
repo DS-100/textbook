@@ -1,6 +1,6 @@
 ---
 prev_page: '/'
-next_page: '/ch/01/the_data_science_lifecycle.html'
+next_page: '/ch/01/lifecycle_intro.html'
 ---
 ## About This Book
 
