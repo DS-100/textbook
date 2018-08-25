@@ -25,21 +25,6 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/ch18&#39;</span><span class="p">))</span>
 </pre></div></div></div></div></div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>FROM DEB:</strong></p>
-<ul>
-<li><p>Testing many hypotheses on the same data set. (Maybe this could be a genetics example).</p>
-</li>
-<li><p>Collecting many data sets and carrying out one test on each (A/B testing with ads)</p>
-</li>
-<li><p>Entirely different people/institutions investigating a similar phenomenon - this is the example of Paul the Octopus.</p>
-</li>
-<li><p>Making many decisions in the data collection, EDA process, and analysis process. This is "tip of the iceberg" phenomen.</p>
-</li>
-</ul>
-<p><strong>START SECTION</strong></p>
-<p>⬇️⬇️⬇️⬇️</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -47,14 +32,14 @@
   style="display:none;"
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### HIDDEN</span>
-<span class="c1"># does this make it hidden?</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stat</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 </pre></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -66,7 +51,7 @@
 <h2 id="Multiple-Hypothesis-Testing">Multiple Hypothesis Testing<a class="anchor-link" href="#Multiple-Hypothesis-Testing">&#182;</a></h2></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>One of the biggest dangers of blindly relying on the p-value to determine "statistical significance" comes when we are just trying to find the "sexiest" results that give us "good" p-values. This is commonly done when doing "food frequency questionairres," or FFQs, to study eating habits' correlation with other characteristics (diseases, weight, etc). 
+<p>One of the biggest dangers of blindly relying on the p-value to determine "statistical significance" comes when we are just trying to find the "sexiest" results that give us "good" p-values. This is commonly done when doing "food frequency questionairres," or FFQs, to study eating habits' correlation with other characteristics (diseases, weight, religion, etc). 
 FiveThirtyEight, an online blog that focuses on opinion poll analysis among other things, made their own FFQ, and we can use their data to run our own analysis to find some silly results that can be considered "statistically significant."</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -76,13 +61,21 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;raw_anonymized_data.csv&#39;</span><span class="p">)</span>
+<span class="c1"># Do some EDA on the data so that categorical values get changed to 1s and 0s</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Innie&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Outie&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># These are the columns that give us characteristics of FFQ-takers</span>
-<span class="n">characteristics</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">27</span><span class="p">]</span>
+<span class="c1"># These are some of the columns that give us characteristics of FFQ-takers</span>
+<span class="n">characteristics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;right_hand&#39;</span><span class="p">,</span> <span class="s1">&#39;left_hand&#39;</span><span class="p">]</span>
 
-<span class="c1"># These are the columns that give us the quantities/frequencies of different food the FFQ-takers ate</span>
-<span class="n">ffq</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">27</span><span class="p">:]</span>
+<span class="c1"># These are some of the columns that give us the quantities/frequencies of different food the FFQ-takers ate</span>
+<span class="n">ffq</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EGGROLLQUAN&#39;</span><span class="p">,</span> <span class="s1">&#39;SHELLFISHQUAN&#39;</span><span class="p">,</span> <span class="s1">&#39;COFFEEDRINKSFREQ&#39;</span><span class="p">]</span>
 </pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We will look specifically whether people own cats, dogs, or what handedness they are.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -121,153 +114,53 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>cancer</th>
-      <th>diabetes</th>
-      <th>heart_disease</th>
-      <th>belly</th>
-      <th>ever_smoked</th>
-      <th>currently_smoke</th>
-      <th>smoke_often</th>
-      <th>smoke_rarely</th>
-      <th>never_smoked</th>
-      <th>quit_smoking</th>
-      <th>...</th>
-      <th>neutralCable</th>
-      <th>noCrash</th>
-      <th>yesCrash</th>
-      <th>uhCrash</th>
-      <th>rash</th>
       <th>cat</th>
       <th>dog</th>
-      <th>Dems</th>
-      <th>atheist</th>
-      <th>Jewish</th>
+      <th>right_hand</th>
+      <th>left_hand</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Innie</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>...</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>No</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Outie</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>...</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Innie</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>...</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Innie</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>...</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Innie</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>...</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>No</td>
-      <td>No</td>
-      <td>No</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>No</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
     </tr>
   </tbody>
-</table>
-<p>5 rows × 26 columns</p></div></div></div></div></div></div>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Additionally, we will look at how much shellfish, eggrolls, and coffee people consumed.</p></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -306,153 +199,58 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>BREAKFASTSANDWICHFREQ</th>
-      <th>BREAKFASTSANDWICHQUAN</th>
-      <th>EGGSFREQ</th>
-      <th>EGGSQUAN</th>
-      <th>YOGURTFREQ</th>
-      <th>YOGURTQUAN</th>
-      <th>COTTAGECHEESEFREQ</th>
-      <th>COTTAGECHEESEQUAN</th>
-      <th>CREAMCHEESEFREQ</th>
-      <th>CREAMCHEESEQUAN</th>
-      <th>...</th>
-      <th>DT_FIBER_INSOL</th>
-      <th>DT_FIBER_SOL</th>
-      <th>DT_PROT_ANIMAL</th>
-      <th>DT_PROT_VEGETABLE</th>
-      <th>DT_NITROGEN</th>
-      <th>PHYTIC_ACID</th>
-      <th>OXALIC_ACID</th>
-      <th>COUMESTROL</th>
-      <th>BIOCHANIN_A</th>
-      <th>FORMONONETIN</th>
+      <th>EGGROLLQUAN</th>
+      <th>SHELLFISHQUAN</th>
+      <th>COFFEEDRINKSFREQ</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>5</td>
-      <td>1</td>
-      <td>7</td>
-      <td>3</td>
       <td>1</td>
       <td>3</td>
-      <td>1</td>
       <td>2</td>
-      <td>7</td>
-      <td>3</td>
-      <td>...</td>
-      <td>7.38</td>
-      <td>1.25</td>
-      <td>75.46</td>
-      <td>16.00</td>
-      <td>14.89</td>
-      <td>365.70</td>
-      <td>318.11</td>
-      <td>0.0117</td>
-      <td>0.0658</td>
-      <td>0.00324</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>1</td>
-      <td>4</td>
-      <td>4</td>
       <td>2</td>
       <td>3</td>
-      <td>1</td>
-      <td>2</td>
-      <td>2</td>
-      <td>2</td>
-      <td>...</td>
-      <td>9.11</td>
-      <td>3.37</td>
-      <td>59.41</td>
-      <td>18.25</td>
-      <td>12.51</td>
-      <td>434.98</td>
-      <td>112.66</td>
-      <td>0.0107</td>
-      <td>0.1390</td>
-      <td>0.00743</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>2</td>
       <td>3</td>
-      <td>2</td>
-      <td>4</td>
-      <td>2</td>
-      <td>5</td>
-      <td>2</td>
-      <td>2</td>
-      <td>2</td>
-      <td>6</td>
       <td>3</td>
-      <td>...</td>
-      <td>11.56</td>
-      <td>4.74</td>
-      <td>61.49</td>
-      <td>28.46</td>
-      <td>14.45</td>
-      <td>606.43</td>
-      <td>213.41</td>
-      <td>0.0965</td>
-      <td>0.0519</td>
-      <td>0.00946</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2</td>
-      <td>1</td>
-      <td>7</td>
-      <td>2</td>
-      <td>8</td>
       <td>3</td>
-      <td>1</td>
       <td>2</td>
       <td>1</td>
-      <td>2</td>
-      <td>...</td>
-      <td>26.34</td>
-      <td>10.85</td>
-      <td>28.71</td>
-      <td>44.59</td>
-      <td>12.15</td>
-      <td>1570.07</td>
-      <td>334.08</td>
-      <td>0.2830</td>
-      <td>0.0890</td>
-      <td>0.01260</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
-      <td>1</td>
-      <td>5</td>
-      <td>2</td>
-      <td>8</td>
       <td>2</td>
       <td>2</td>
       <td>2</td>
-      <td>4</td>
-      <td>2</td>
-      <td>...</td>
-      <td>16.48</td>
-      <td>4.80</td>
-      <td>32.41</td>
-      <td>28.23</td>
-      <td>9.80</td>
-      <td>616.99</td>
-      <td>422.55</td>
-      <td>0.1630</td>
-      <td>0.0994</td>
-      <td>0.02070</td>
     </tr>
   </tbody>
-</table>
-<p>5 rows × 1066 columns</p></div></div></div></div></div></div>
+</table></div></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So now we can calculate the p-value for every pair of characteristic and food frequency/quantity features.</p></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">findpvalue</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">stat</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div></div></div></div></div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -460,50 +258,12 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
   
 >
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Do some EDA on the data so that categorical values get changed to 1s and 0s</span>
-<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Innie&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Outie&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># Calculate the p value between every characteristic and food frequency/quantity</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Calculate the p value between every characteristic and food frequency/quantity pair</span>
 <span class="n">pvalues</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characteristics</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ffq</span><span class="p">:</span>
-        <span class="n">pvalues</span><span class="p">[</span><span class="n">stat</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-</pre></div></div></div></div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/Users/andrewkim/anaconda3/lib/python3.6/site-packages/scipy/stats/stats.py:3021: RuntimeWarning: invalid value encountered in double_scalars
-  r = r_num / r_den
-</pre></div></div></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sorted_values</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pvalues</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-    <span class="n">sorted_values</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">[</span><span class="n">key</span><span class="p">])]</span>
-</pre></div></div></div></div></div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell"
-  
->
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sorted_values</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">30</span><span class="p">]</span>
+        <span class="n">pvalues</span><span class="p">[(</span><span class="n">c</span><span class="p">,</span><span class="n">f</span><span class="p">)]</span> <span class="o">=</span> <span class="n">findpvalue</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="n">pvalues</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -517,43 +277,52 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[(3.7392930595140498e-09, (&#39;Jewish&#39;, &#39;GROUP_ALL_BRAN_ORIGINAL_TOTAL_GRAMS&#39;)),
- (3.7392930595140713e-09, (&#39;Jewish&#39;, &#39;ALLBRANORIGTYPE&#39;)),
- (3.7392930595141143e-09,
-  (&#39;smoke_often&#39;, &#39;GROUP_COOK_FAT_ANIMAL_FAT_TOTAL_GRAMS&#39;)),
- (9.4530340028772084e-09,
-  (&#39;smoke_often&#39;, &#39;GROUP_LOW_CAL_KOOLAID_TOTAL_GRAMS&#39;)),
- (2.865639565547171e-08,
-  (&#39;Jewish&#39;, &#39;GROUP_ICE_CREAM_FROZEN_YOGURT_LOW_FAT_TOTAL_GRAMS&#39;)),
- (5.2203280690755088e-08,
-  (&#39;smoke_often&#39;, &#39;GROUP_STEAK_ROAST_FAT_ON_TOTAL_GRAMS&#39;)),
- (5.9917513301454779e-08, (&#39;Jewish&#39;, &#39;GROUP_RAW_TOMATOES_TOTAL_GRAMS&#39;)),
- (6.0267821160795707e-07,
-  (&#39;smoke_often&#39;, &#39;GROUP_CORN_FLAKES_CORN_PUFFS_TOTAL_GRAMS&#39;)),
- (4.5182117663961682e-06, (&#39;smoke_often&#39;, &#39;F18D1TN7&#39;)),
- (8.0499444720125634e-06, (&#39;smoke_rarely&#39;, &#39;FLAXHEMPSEEDOILTYPE&#39;)),
- (8.0499444720126362e-06, (&#39;smoke_rarely&#39;, &#39;GROUP_CHEX_OTHER_TOTAL_GRAMS&#39;)),
- (8.0499444720126701e-06, (&#39;smoke_rarely&#39;, &#39;GROUP_LIFE_TOTAL_GRAMS&#39;)),
- (8.8030660205637771e-06, (&#39;smoke_often&#39;, &#39;GROUP_PORK_FAT_ON_TOTAL_GRAMS&#39;)),
- (1.1446426335225304e-05, (&#39;smoke_rarely&#39;, &#39;F18D3CN3&#39;)),
- (1.6158156614271367e-05, (&#39;smoke_rarely&#39;, &#39;GROUP_SOY_MILK_TOTAL_GRAMS&#39;)),
- (2.1945383378396457e-05, (&#39;smoke_rarely&#39;, &#39;SUP_OM_6&#39;)),
- (2.8476184473490123e-05, (&#39;dog&#39;, &#39;EGGROLLQUAN&#39;)),
- (3.1447466606889132e-05, (&#39;smoke_rarely&#39;, &#39;F20D3N3&#39;)),
- (3.9156738423019172e-05, (&#39;smoke_often&#39;, &#39;GROUP_BAGELS_WHITE_TOTAL_GRAMS&#39;)),
- (5.4472799562211073e-05,
-  (&#39;smoke_often&#39;, &#39;GROUP_HOT_DOG_BEEF_OR_PORK_TOTAL_GRAMS&#39;)),
- (5.4976262450193749e-05, (&#39;Jewish&#39;, &#39;V_REDOR_TOMATO&#39;)),
- (6.6642014484263388e-05, (&#39;currently_smoke&#39;, &#39;ENERGYDRINKSQUAN&#39;)),
- (7.2255229976485587e-05, (&#39;smoke_rarely&#39;, &#39;CAMD5&#39;)),
- (7.7299724934785873e-05, (&#39;smoke_often&#39;, &#39;LATINO&#39;)),
- (8.1320697785677561e-05, (&#39;smoke_often&#39;, &#39;BUTTERQUAN&#39;)),
- (0.00010682433178383818, (&#39;currently_smoke&#39;, &#39;BEERQUAN&#39;)),
- (0.00012496025027669932,
-  (&#39;quit_smoking&#39;, &#39;GROUP_WHOLE_GRAIN_CRACKERS_LOW_FAT_TOTAL_GRAMS&#39;)),
- (0.0001386176772447345, (&#39;mathReading&#39;, &#39;OTHERCHIPSFREQ&#39;)),
- (0.00014468096634093775, (&#39;smoke_often&#39;, &#39;F18D2CLA&#39;)),
- (0.00017717189454132738, (&#39;rash&#39;, &#39;SODAQUAN&#39;))]</pre></div></div></div></div></div>
+<pre>{(&#39;cat&#39;, &#39;EGGROLLQUAN&#39;): 0.69295273146288583,
+ (&#39;cat&#39;, &#39;SHELLFISHQUAN&#39;): 0.39907214094767007,
+ (&#39;cat&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.0016303467897390215,
+ (&#39;dog&#39;, &#39;EGGROLLQUAN&#39;): 2.8476184473490123e-05,
+ (&#39;dog&#39;, &#39;SHELLFISHQUAN&#39;): 0.14713568495622972,
+ (&#39;dog&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.3507350497291003,
+ (&#39;right_hand&#39;, &#39;EGGROLLQUAN&#39;): 0.20123440208411372,
+ (&#39;right_hand&#39;, &#39;SHELLFISHQUAN&#39;): 0.00020312599063263847,
+ (&#39;right_hand&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.48693234457564749,
+ (&#39;left_hand&#39;, &#39;EGGROLLQUAN&#39;): 0.75803051153936374,
+ (&#39;left_hand&#39;, &#39;SHELLFISHQUAN&#39;): 0.00035282554635466211,
+ (&#39;left_hand&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.1692235856830212}</pre></div></div></div></div></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our study finds that:</p>
+<table>
+<thead><tr>
+<th>Eating/Drinking</th>
+<th>is linked to:</th>
+<th>P-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Egg rolls</td>
+<td>Dog ownership</td>
+<td>&lt;0.0001</td>
+</tr>
+<tr>
+<td>Shellfish</td>
+<td>Right-handedness</td>
+<td>0.0002</td>
+</tr>
+<tr>
+<td>Shellfish</td>
+<td>Left-handedness</td>
+<td>0.0004</td>
+</tr>
+<tr>
+<td>Coffee</td>
+<td>Cat ownership</td>
+<td>0.0016</td>
+</tr>
+</tbody>
+</table>
+<p>Clearly this is flawed! Aside from the fact that some of these correlations seem to make no sense, we also found that shellfish is linked to both right and left handedness! Because we blindly tested all columns against each other for statistical significance, we were able to just choose whatever pairs gave us "statistically significant" results. This shows the dangers of blindly following the p-value without a care for proper experimental design.</p></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="A/B-Testing">A/B Testing<a class="anchor-link" href="#A/B-Testing">&#182;</a></h2><p>A/B testing is a very simple concept. We measure a statistic in a normal, controlled environment (we'll call this A), and then we compare that to the same statistic in an environment with <em>one</em> change. This form of testing is used frequently in marketing and ad research to compare the effectiveness of certain features of ads.</p>
@@ -564,14 +333,37 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
 <div class="input">
 
 <div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_pages</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">shuffled</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">shuffled</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+
+<span class="k">def</span> <span class="nf">permutedpvalue</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="p">[</span><span class="n">test_stat</span><span class="p">(</span><span class="o">*</span><span class="n">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reps</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">obs</span> <span class="o">&gt;=</span> <span class="n">resampled</span><span class="p">)</span> <span class="o">/</span> <span class="n">reps</span>
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
   
 >
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
 <span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">num_pages</span> <span class="o">=</span> <span class="mi">15</span>
-
-<span class="n">landing_pages</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pages</span><span class="p">)]</span>
+<span class="c1"># This will represent percentage of users that make a paid account from the landing page</span>
+<span class="c1"># Note that all pages have no effect, so they all just have a base 10% of interactions.</span>
+<span class="n">landing_pages</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pages</span><span class="p">)]</span>
 
 <span class="c1"># This will be our &quot;control&quot;</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -580,19 +372,36 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
 <span class="k">def</span> <span class="nf">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
-    <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
-    <span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">shuffled</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">shuffled</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
-
 <span class="n">p_vals</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_pages</span><span class="p">):</span>
+    <span class="c1"># We test against each of the non-control landing pages</span>
     <span class="n">B</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="p">[</span><span class="n">test_stat</span><span class="p">(</span><span class="o">*</span><span class="n">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reps</span><span class="p">)]</span>
-    <span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">obs</span> <span class="o">&gt;=</span> <span class="n">resampled</span><span class="p">)</span> <span class="o">/</span> <span class="n">reps</span>
+    <span class="n">p_val</span> <span class="o">=</span> <span class="n">permutedpvalue</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
     <span class="n">p_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_val</span><span class="p">)</span>
-<span class="n">p_vals</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_vals</span><span class="p">)</span>
+</pre></div></div></div></div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[0.732, 0.668, 0.037, 0.245, 0.717, 0.256, 0.683, 0.654, 0.43, 0.503, 0.897, 0.868, 0.328, 0.044]
+</pre></div></div></div></div></div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">p_vals</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">kde</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div></div></div></div>
 
 <div class="output_wrapper">
@@ -605,21 +414,9 @@ FiveThirtyEight, an online blog that focuses on opinion poll analysis among othe
 
 
 
-<div class="output_text output_subarea output_execute_result">
-<pre>[0.434,
- 0.208,
- 0.01,
- 0.02,
- 0.631,
- 0.171,
- 0.222,
- 0.212,
- 0.276,
- 0.772,
- 0.006,
- 0.001,
- 0.572,
- 0.593]</pre></div></div></div></div></div>
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/phacking_17_0.png"
+></div></div></div></div></div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As we can see, more than one of these ads seems to have p-values less than 0.05, despite our knowing that there actually no difference between the pages. This is why we do single A/B testing with multiple trials, as opposed to multiple hypothesis testing with only single trials. It is too easy for a p-value to give us a false positive if we just try a bunch of times.</p></div></div></div>
