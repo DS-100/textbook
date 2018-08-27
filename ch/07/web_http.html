@@ -1,0 +1,651 @@
+---
+prev_page: '/ch/07/web_intro.html'
+next_page: '/ch/08/text_intro.html'
+---
+
+{% raw %}
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/07/web_http.ipynb">Open on DataHub</a>
+    </div>
+    
+
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  style="display:none;"
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/07&#39;</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="HTTP">HTTP<a class="anchor-link" href="#HTTP">&#182;</a></h2><p>HTTP (AKA <strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol) is a <em>request-response</em> protocol that allows one computer to talk to another over the Internet.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Requests-and-Responses">Requests and Responses<a class="anchor-link" href="#Requests-and-Responses">&#182;</a></h2><p>The Internet allows computers to send text to one another, but does not impose any restrictions on what that text contains. HTTP defines a structure on the text communication between one computer (client) and another (server). In this protocol, a client submits a <em>request</em> to a server, a specially formatted text message. The server sends a text <em>response</em> back to the client.</p>
+<p>The command line tool <code>curl</code> gives us a simple way to send HTTP requests. In the output below, lines starting with <code>&gt;</code> indicate the text sent in our request; the remaining lines are the server's response.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="highlight"><pre><span></span>$ curl -v https://httpbin.org/html
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+<pre><code>&gt; GET /html HTTP/1.1
+&gt; Host: httpbin.org
+&gt; User-Agent: curl/7.55.1
+&gt; Accept: */*
+&gt; 
+&lt; HTTP/1.1 200 OK
+&lt; Connection: keep-alive
+&lt; Server: meinheld/0.6.1
+&lt; Date: Wed, 11 Apr 2018 18:15:03 GMT
+&lt; 
+&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Herman Melville - Moby-Dick&lt;/h1&gt;
+    &lt;p&gt;
+      Availing himself of the mild...
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Running the <code>curl</code> command above causes the client's computer to construct a text message that looks like:</p>
+
+<pre><code>GET /html HTTP/1.1
+Host: httpbin.org
+User-Agent: curl/7.55.1
+Accept: */*
+{blank_line}</code></pre>
+<p>This message follows a specific format: it starts with <code>GET /html HTTP/1.1</code> which indicates that the message is an HTTP <code>GET</code> request to the <code>/html</code> page. Each of the three lines that follow form HTTP headers, optional information that <code>curl</code> sends to the server. The HTTP headers have the format <code>{name}: {value}</code>. Finally, the blank line at the end of the message tells the server that the message ends after three headers. Note that we've marked the blank line with <code>{blank_line}</code> in the snippet above; in the actual message <code>{blank_line}</code> is replaced with a blank line.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The client's computer then uses the Internet to send this message to the <code>https://httpbin.org</code> web server. The server processes the request, and sends the following response:</p>
+
+<pre><code>HTTP/1.1 200 OK
+Connection: keep-alive
+Server: meinheld/0.6.1
+Date: Wed, 11 Apr 2018 18:15:03 GMT
+{blank_line}</code></pre>
+<p>The first line of the response states that the request completed successfully. The following three lines form the HTTP response headers, optional information that the server sends back to the client. Finally, the blank line at the end of the message tells the client that the server has finished sending its response headers and will next send the response body:</p>
+
+<pre><code>&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Herman Melville - Moby-Dick&lt;/h1&gt;
+    &lt;p&gt;
+      Availing himself of the mild...
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This HTTP protocol is used in almost every application that interacts with the Internet. For example, visiting <a href="https://httpbin.org/html">https://httpbin.org/html</a> in your web browser makes the same basic HTTP request as the <code>curl</code> command above. Instead of displaying the response as plain text as we have above, your browser recognizes that the text is an HTML document and will display it accordingly.</p>
+<p>In practice, we will not write out full HTTP requests in text. Instead, we use tools like <code>curl</code> or Python libraries to construct requests for us.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="In-Python">In Python<a class="anchor-link" href="#In-Python">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The Python <strong>requests</strong> library allows us to make HTTP requests in Python. The code below makes the same HTTP request as running <code>curl -v https://httpbin.org/html</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://httpbin.org/html&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">response</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;Response [200]&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-Request">The Request<a class="anchor-link" href="#The-Request">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's take a closer look at the request we made. We can access the original request using <code>response</code> object; we display the request's HTTP headers below:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">request</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span> <span class="c1"># The headers in the response are stored as a dictionary.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{key}</span><span class="s1">: </span><span class="si">{request.headers[key]}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>User-Agent: python-requests/2.12.4
+Accept-Encoding: gzip, deflate
+Accept: */*
+Connection: keep-alive
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Every HTTP request has a type. In this case, we used a <code>GET</code> request which retrieves information from a server.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">request</span><span class="o">.</span><span class="n">method</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;GET&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-Response">The Response<a class="anchor-link" href="#The-Response">&#182;</a></h3><p>Let's examine the response we received from the server. First, we will print the response's HTTP headers.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{key}</span><span class="s1">: </span><span class="si">{response.headers[key]}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Connection: keep-alive
+Server: gunicorn/19.7.1
+Date: Wed, 25 Apr 2018 18:32:51 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 3741
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+X-Powered-By: Flask
+X-Processed-Time: 0
+Via: 1.1 vegur
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>An HTTP response contains a status code, a special number that indicates whether the request succeeded or failed. The status code <code>200</code> indicates that the request succeeded.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>200</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, we display the first 100 characters of the response's content (the entire response content is too long to display nicely here).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n  &lt;head&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n      &lt;h1&gt;Herman Melville - Moby-Dick&lt;/h1&gt;\n\n     &#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Types-of-Requests">Types of Requests<a class="anchor-link" href="#Types-of-Requests">&#182;</a></h2><p>The request we made above was a <code>GET</code> HTTP request. There are multiple HTTP request types; the most important two are <code>GET</code> and <code>POST</code> requests.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="GET-Requests">GET Requests<a class="anchor-link" href="#GET-Requests">&#182;</a></h3><p>The <code>GET</code> request is used to retrieve information from the server. Since your web browser makes <code>GET</code> request whenever you enter in a URL into its address bar, <code>GET</code> requests are the most common type of HTTP requests.</p>
+<p><code>curl</code> uses <code>GET</code> requests by default, so running <code>curl https://www.google.com/</code> makes a <code>GET</code> request to <code>https://www.google.com/</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="POST-Request">POST Request<a class="anchor-link" href="#POST-Request">&#182;</a></h3><p>The <code>POST</code> request is used to send information from the client to the server. For example, some web pages contain forms for the user to fill out—a login form, for example. After clicking the "Submit" button, most web browsers will make a <code>POST</code> request to send the form data to the server for processing.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's look an example of a <code>POST</code> request that sends <code>'sam'</code> as the parameter <code>'name'</code>. This one can be done by running <strong><code>curl -d 'name=sam' https://httpbin.org/post</code></strong> on the command line.</p>
+<p>Notice that our request has a body this time (filled with the parameters of the <code>POST</code> request), and the content of the response is different from our <code>GET</code> response from before.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Like HTTP headers, the data sent in a <code>POST</code> request uses a key-value format. In Python, we can make a <code>POST</code> request by using <code>requests.post</code> and passing in a dictionary as an argument.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">post_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/post&quot;</span><span class="p">,</span>
+                              <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sam&#39;</span><span class="p">})</span>
+<span class="n">post_response</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;Response [200]&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The server will respond with a status code to indicate whether the <code>POST</code> request successfully completed. In addition, the server will usually send a response body to display to the client.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">post_response</span><span class="o">.</span><span class="n">status_code</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>200</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">post_response</span><span class="o">.</span><span class="n">text</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;{\n  &#34;args&#34;: {}, \n  &#34;data&#34;: &#34;&#34;, \n  &#34;files&#34;: {}, \n  &#34;form&#34;: {\n    &#34;name&#34;: &#34;sam&#34;\n  }, \n  &#34;headers&#34;: {\n    &#34;Accept&#34;: &#34;*/*&#34;, \n    &#34;Accept-Encoding&#34;: &#34;gzip, deflate&#34;, \n    &#34;Connection&#34;: &#34;close&#34;, \n    &#34;Content-Length&#34;: &#34;8&#34;, \n    &#34;Content-Type&#34;: &#34;application/x-www-form-urlencoded&#34;, \n    &#34;Host&#34;: &#34;httpbin.org&#34;, \n    &#34;User-Agent&#34;: &#34;python-requests/2.12.4&#34;\n  }, \n  &#34;json&#34;: null, \n  &#34;origin&#34;: &#34;136.152.143.72&#34;, \n  &#34;url&#34;: &#34;https://httpbin.org/post&#34;\n}\n&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Types-of-Response-Status-Codes">Types of Response Status Codes<a class="anchor-link" href="#Types-of-Response-Status-Codes">&#182;</a></h2><p>The previous HTTP responses had the HTTP status code <code>200</code>. This status code indicates that the request completed successfully. There are hundreds of other HTTP status codes. Thankfully, they are grouped into categories to make them easier to remember:</p>
+<ul>
+<li><strong>100s</strong> - Informational: More input is expected from client or server <em>(e.g. 100 Continue, 102 Processing)</em></li>
+<li><strong>200s</strong> - Success: The client's request was successful <em>(e.g. 200 OK, 202 Accepted)</em></li>
+<li><strong>300s</strong> - Redirection: Requested URL is located elsewhere; May need user's further action <em>(e.g. 300 Multiple Choices, 301 Moved Permanently)</em></li>
+<li><strong>400s</strong> - Client Error: Client-side error <em>(e.g. 400 Bad Request, 403 Forbidden, 404 Not Found)</em></li>
+<li><strong>500s</strong> - Server Error: Server-side error or server is incapable of performing the request <em>(e.g. 500 Internal Server Error, 503 Service Unavailable)</em></li>
+</ul>
+<p>We can look at examples of some of these errors.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This page doesn&#39;t exist, so we get a 404 page not found error</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://www.youtube.com/404errorwow&quot;</span>
+<span class="n">errorResponse</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">errorResponse</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;Response [404]&gt;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell"
+  
+>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This specific page results in a 500 server error</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://httpstat.us/500&quot;</span>
+<span class="n">serverResponse</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">serverResponse</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;Response [500]&gt;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We have introduced the HTTP protocol, the basic communication method for applications that use the Web. Although the protocol specifies a specific text format, we typically turn to other tools to make HTTP requests for us, such as the command line tool <code>curl</code> and the Python library <code>requests</code>.</p>
+
+</div>
+</div>
+</div>
+
+
+</div>
+
+{% endraw %}
