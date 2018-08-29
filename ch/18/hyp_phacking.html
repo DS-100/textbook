@@ -1,0 +1,681 @@
+---
+prev_page: '/ch/18/hyp_studentized.html'
+next_page: '/ch/19/vector_space_review.html'
+---
+
+{% raw %}
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/18/hyp_phacking.ipynb">Open on DataHub</a>
+    </div>
+    
+
+
+
+
+
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/18&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stat</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="P-hacking">P-hacking<a class="anchor-link" href="#P-hacking">&#182;</a></h1><p>As we discussed, a p-value or probability value is the chance, based on the model in the null hypothesis, that the test statistic is equal to the value that was observed in the data or is even further in the direction of the alternative. If a p-value is small, that means the tail beyond the observed statistic is small and so the observed statistic is far away from what the null predicts. This implies that the data support the alternative hypothesis better than they support the null. By convention, when we see that the p-value is below 0.05, the result is called statistically significant, and we reject the null hypothesis.</p>
+<p>There are dangers that present itself when the p-value is misused. <em>P-hacking</em> is the act of misusing data analysis to show that patterns in data are statistically significant, when in reality they are not. This is often done by performing multiple tests on data and only focusing on the tests that return results that are significant.</p>
+<p>In this section, we will go over a few examples of the dangers of p-values and p-hacking.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Multiple-Hypothesis-Testing">Multiple Hypothesis Testing<a class="anchor-link" href="#Multiple-Hypothesis-Testing">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>One of the biggest dangers of blindly relying on the p-value to determine "statistical significance" comes when we are just trying to find the "sexiest" results that give us "good" p-values. This is commonly done when doing "food frequency questionairres," or FFQs, to study eating habits' correlation with other characteristics (diseases, weight, religion, etc). 
+FiveThirtyEight, an online blog that focuses on opinion poll analysis among other things, made their own FFQ, and we can use their data to run our own analysis to find some silly results that can be considered "statistically significant."</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;raw_anonymized_data.csv&#39;</span><span class="p">)</span>
+<span class="c1"># Do some EDA on the data so that categorical values get changed to 1s and 0s</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Innie&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Outie&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># These are some of the columns that give us characteristics of FFQ-takers</span>
+<span class="n">characteristics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;right_hand&#39;</span><span class="p">,</span> <span class="s1">&#39;left_hand&#39;</span><span class="p">]</span>
+
+<span class="c1"># These are some of the columns that give us the quantities/frequencies of different food the FFQ-takers ate</span>
+<span class="n">ffq</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EGGROLLQUAN&#39;</span><span class="p">,</span> <span class="s1">&#39;SHELLFISHQUAN&#39;</span><span class="p">,</span> <span class="s1">&#39;COFFEEDRINKSFREQ&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We will look specifically whether people own cats, dogs, or what handedness they are.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">characteristics</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cat</th>
+      <th>dog</th>
+      <th>right_hand</th>
+      <th>left_hand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Additionally, we will look at how much shellfish, eggrolls, and coffee people consumed.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">ffq</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>EGGROLLQUAN</th>
+      <th>SHELLFISHQUAN</th>
+      <th>COFFEEDRINKSFREQ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>3</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So now we can calculate the p-value for every pair of characteristic and food frequency/quantity features.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">findpvalue</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">stat</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Calculate the p value between every characteristic and food frequency/quantity pair</span>
+<span class="n">pvalues</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characteristics</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ffq</span><span class="p">:</span>
+        <span class="n">pvalues</span><span class="p">[(</span><span class="n">c</span><span class="p">,</span><span class="n">f</span><span class="p">)]</span> <span class="o">=</span> <span class="n">findpvalue</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="n">pvalues</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{(&#39;cat&#39;, &#39;EGGROLLQUAN&#39;): 0.69295273146288583,
+ (&#39;cat&#39;, &#39;SHELLFISHQUAN&#39;): 0.39907214094767007,
+ (&#39;cat&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.0016303467897390215,
+ (&#39;dog&#39;, &#39;EGGROLLQUAN&#39;): 2.8476184473490123e-05,
+ (&#39;dog&#39;, &#39;SHELLFISHQUAN&#39;): 0.14713568495622972,
+ (&#39;dog&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.3507350497291003,
+ (&#39;right_hand&#39;, &#39;EGGROLLQUAN&#39;): 0.20123440208411372,
+ (&#39;right_hand&#39;, &#39;SHELLFISHQUAN&#39;): 0.00020312599063263847,
+ (&#39;right_hand&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.48693234457564749,
+ (&#39;left_hand&#39;, &#39;EGGROLLQUAN&#39;): 0.75803051153936374,
+ (&#39;left_hand&#39;, &#39;SHELLFISHQUAN&#39;): 0.00035282554635466211,
+ (&#39;left_hand&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.1692235856830212}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our study finds that:</p>
+<table>
+<thead><tr>
+<th>Eating/Drinking</th>
+<th>is linked to:</th>
+<th>P-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Egg rolls</td>
+<td>Dog ownership</td>
+<td>&lt;0.0001</td>
+</tr>
+<tr>
+<td>Shellfish</td>
+<td>Right-handedness</td>
+<td>0.0002</td>
+</tr>
+<tr>
+<td>Shellfish</td>
+<td>Left-handedness</td>
+<td>0.0004</td>
+</tr>
+<tr>
+<td>Coffee</td>
+<td>Cat ownership</td>
+<td>0.0016</td>
+</tr>
+</tbody>
+</table>
+<p>Clearly this is flawed! Aside from the fact that some of these correlations seem to make no sense, we also found that shellfish is linked to both right and left handedness! Because we blindly tested all columns against each other for statistical significance, we were able to just choose whatever pairs gave us "statistically significant" results. This shows the dangers of blindly following the p-value without a care for proper experimental design.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="A/B-Testing">A/B Testing<a class="anchor-link" href="#A/B-Testing">&#182;</a></h2><p>A/B testing is a very simple concept. We measure a statistic in a normal, controlled environment (we'll call this A), and then we compare that to the same statistic in an environment with <em>one</em> change. This form of testing is used frequently in marketing and ad research to compare the effectiveness of certain features of ads.</p>
+<p>Let's say we are working for a company whose website lets users make their own custom videogames. The company has a free version, which lets users make very basic videogames, and a paid version, which gives users access to more advanced tools for making videogames. When a user has finished making a videogame via a free account, we send them to a landing page that gives them the option to sign up for a paid account. Our measured statistic in this case would be how many free users sign up for a paid account upon reaching this page. We can send half of our users one version of the page, which may have text explaining in detail the benefits of the paid account (this will be version A), and the other half of our users will get another version of the page, which may have a colorful graphic that explains some of the benefits of the paid account (this will be version B).</p>
+<p>There is a very specific reason why it's called A/B testing, and not A/B/C/D... testing. That is because we can very easily run into problems if we try to test multiple versions at the same time.</p>
+<p>Let's say that we have 15 different sign up pages (one is the control, in this case "A"), each with something different about them (one has a picture of a puppy, one has a quote from a customer, one has a graphic, etc.), and let's say that in this case, none of our variations actually has an effect on user interaction (so we can use a Gaussian distribution with a mean of 0 and a std of 0.1).</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_pages</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">shuffled</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">shuffled</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+
+<span class="k">def</span> <span class="nf">permutedpvalue</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="p">[</span><span class="n">test_stat</span><span class="p">(</span><span class="o">*</span><span class="n">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reps</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">obs</span> <span class="o">&gt;=</span> <span class="n">resampled</span><span class="p">)</span> <span class="o">/</span> <span class="n">reps</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_pages</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="c1"># This will represent percentage of users that make a paid account from the landing page</span>
+<span class="c1"># Note that all pages have no effect, so they all just have a base 10% of interactions.</span>
+<span class="n">landing_pages</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pages</span><span class="p">)]</span>
+
+<span class="c1"># This will be our &quot;control&quot;</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Our test statistic will be the difference between the mean percentage </span>
+<span class="k">def</span> <span class="nf">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+
+<span class="n">p_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_pages</span><span class="p">):</span>
+    <span class="c1"># We test against each of the non-control landing pages</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">p_val</span> <span class="o">=</span> <span class="n">permutedpvalue</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">p_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_val</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_vals</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[0.732, 0.668, 0.037, 0.245, 0.717, 0.256, 0.683, 0.654, 0.43, 0.503, 0.897, 0.868, 0.328, 0.044]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">p_vals</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">kde</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/hyp_phacking_17_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As we can see, more than one of these ads seems to have p-values less than 0.05, despite our knowing that there actually no difference between the pages. This is why we do single A/B testing with multiple trials, as opposed to multiple hypothesis testing with only single trials. It is too easy for a p-value to give us a false positive if we just try a bunch of times.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Many-Tests-for-One-Phenomenon">Many Tests for One Phenomenon<a class="anchor-link" href="#Many-Tests-for-One-Phenomenon">&#182;</a></h2><p>Sometimes, multiple testing can happen by accident. If many researchers are investigating the same phenomenon at the same time, then it's very possible that one of the researchers can end up with a lucky trial. That is exactly what happened during the 2010 World Cup.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Paul-the-Octopus">Paul the Octopus<a class="anchor-link" href="#Paul-the-Octopus">&#182;</a></h3><p>Paul the Octopus was a common octopus who lived in a Sea Life Centre in Oberhausen, Germany. He is most well known for correctly guessing all seven soccer matches Germany played during the 2010 World Cup, as well as the final match, which was between Netherlands and Spain.</p>
+<p>Before a match was played, Paul's owners would place two boxes in his tank containing food, each box labeled with a different flag of the opposing countries. Whichever box Paul chose to eat from first was considered his prediction for the outcome of the match.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="https://news.bbcimg.co.uk/media/images/49659000/jpg/_49659323_octopus.jpg" width="400" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So why was Paul so good at predicting the outcome of these matches? Was he actually psychic, or was he just lucky? We might ask what’s the chance he got all of the predictions correct, assuming he was just “guessing”?</p>
+<p>Paul correctly predicted 8 of the 2010 World Cup games, each time he had a 1/2 chance of making the correct prediction. The one way to get all 8 matches correct out of 8 is:
+$$(1/2)^8 = 1/256$$</p>
+<p>So was he actually psychic? Or is there something more to uncover?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Turns out, there were tons of animals (some of them in the same zoo as Paul!) doing the same thing, trying to guess the outcome of their respective home countries' matches, including:</p>
+<ul>
+<li>Mani the Parakeet, from Singapore</li>
+<li>Leon the Porcupine, from Germany</li>
+<li>Petty the Pygmy Hippopotamus, from Germany</li>
+<li>Otto Armstrong the Octopus, from Germany</li>
+<li>Anton the Tamarin, from Germany</li>
+<li>Jimmy the Peruvian Guinea Pig, from Germany</li>
+<li>Xiaoge the Octopus, from China</li>
+<li>Pauline the Octopus, from the Netherlands</li>
+<li>Pino the Chimpanzee, from Estonia</li>
+<li>Apelsin the Red River Hog, from Estonia</li>
+<li>Harry the Crocodile, from Australia
+None of whom got them all right (although Mani the Parakeet got 7 matches out of 8 right).</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Some might argue that getting them all wrong would also be remarkable. So what are the chances that at least one of the 12 animals would get either all right or all wrong?</p>
+<p>We can use simple probability to figure this out. We have 12 trials (in this case, animals), where each independent trial has a $2*(1/2)^8 = 1/128$ chance of getting all predictions right or wrong. So what is the probability of having <em>at least</em> one success? That's $1 - P_{all \textrm{ }failures} = 1 - (127/128)^{12} = 1 - 0.910 = 0.090$</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have an 9% chance of getting an animal that will select all of the right predictions, and that's not including all of the animals in the world that were also doing these "predictions." That's not that rare - it's the dangers of multiple testing that caused this "phenomenon." This one octopus out of many different animals in the world happened to have guessed all of the right predictions, and the popularity of the situation caused it to become magical.</p>
+<p>To those of you wondering if it really was luck, it has been shown that the species <em>Octopus vulgaris</em> is actually colorblind, and some believe that octopuses are drawn to horizontal shapes, hence Paul's decision to choose Germany, except when playing against Spain and Serbia.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the end, we know that studies are more trustworthy when they are replicated. Data scientists should try to avoid cases like Paul the Octopus's where there has only been one real case of the animal correctly predicting a bunch of World Cup matches in a row. Only when we see him doing that for multiple soccer tournaments should we start looking at the data.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="P-Hacking-is-just-the-tip-of-the-iceberg">P-Hacking is just the tip of the iceberg<a class="anchor-link" href="#P-Hacking-is-just-the-tip-of-the-iceberg">&#182;</a></h2><p>As it turns out, p-hacking isn't the only thing data scientists and statisticians have to worry about when making sound inferences from data. There are many stages to the design and analysis of a successful study, as shown below (from Leek &amp; Peng's <em>P values are just the tip of the iceberg</em>).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src='https://www.nature.com/polopoly_fs/7.25671.1429983882!/image/P1.jpg_gen/derivatives/landscape_300/P1.jpg'></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As shown, the last step of the whole "data pipeline" is the calculation of an inferential statistic like the p-value, and having a rule applied to it (e.g. p &gt; 0.05). But there are many other decisions that are made beforehand, like experimental design or EDA, that can have much greater effects on the results - mistakes like simple rounding or measurement errors, choosing the wrong model, or not taking into account confounding factors can change everything. By changing the way data are cleaned, summarized, or modeled, we can achieve arbitrary levels of statistical significance.</p>
+<p>A simple example of this would be in the case of rolling a pair of dice and getting two 6s. If we were to take a null hypothesis that the dice are fair and not weighted, and take our test statistic to be the sum of the dice, we will find that the p-value of this outcome will be 1/36 or 0.028, and gives us statistically signficant results that the dice are fair. But obviously, a single roll is not nearly enough rolls to provide us with good evidence to say whether the results are statistically significant or not, and shows that blindly applying the p-value without properly designing a good experiment can result in bad results.</p>
+<p>In the end, what is most important is education on the subject of safe hypothesis testing, and making sure you don't fall into the follies of poor statistical decisions.</p>
+
+</div>
+</div>
+</div>
+
+
+</div>
+
+{% endraw %}
