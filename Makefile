@@ -1,7 +1,7 @@
 # Generate chapter list
 CHAPTERS=$(shell ls -1 notebooks | grep -E ^\\d+$)
 
-.PHONY: help build notebooks serve deploy $(CHAPTERS)
+.PHONY: help build notebooks serve deploy pdf $(CHAPTERS)
 
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
@@ -26,6 +26,9 @@ notebooks: ## Convert notebooks to HTML pages
 	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
 	@echo ""
 
+pdf: ## Generates PDF of textbook
+	python scripts/create_single_page_html.py
+
 chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 	@echo To use this command, replace NN with the chapter number. Example:
 	@echo "  make 01"
@@ -38,7 +41,7 @@ website:
 	jekyll build
 
 build: ## Run build steps
-	make notebooks website
+	make notebooks website pdf
 
 serve: build ## Run Jekyll to preview changes locally
 	jekyll serve
