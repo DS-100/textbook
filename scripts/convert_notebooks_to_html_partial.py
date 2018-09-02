@@ -16,7 +16,6 @@ Arguments:
 """
 
 import glob
-import re
 import os
 import yaml
 import toolz.curried as t
@@ -80,10 +79,6 @@ INTERACT_LINK = (
 
 # The prefix for each notebook + its dependencies
 PATH_PREFIX = 'subPath={}'
-
-# Used to ensure all the closing div tags are on the same line for Markdown to
-# parse them properly
-CLOSING_DIV_REGEX = re.compile('\s+</div>')
 
 # YAML file containing textbook table of contents
 TOC_PATH = '_data/toc.yml'
