@@ -22,7 +22,7 @@ notebooks: ## Convert notebooks to HTML pages
 	rm -rf ch/*
 	@echo "${BLUE}Removed existing HTML files.${NOCOLOR}"
 	@echo ""
-	python convert_notebooks_to_html_partial.py
+	python scripts/convert_notebooks_to_html_partial.py
 	@echo "${BLUE}Done, output is in notebooks-html${NOCOLOR}"
 	@echo ""
 
@@ -32,7 +32,7 @@ chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 
 $(CHAPTERS): ## Converts a specific chapter's notebooks (e.g. make ch02)
 	rm -rf ch/$@/*
-	python convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
+	python scripts/convert_notebooks_to_html_partial.py notebooks/$@/*.ipynb
 
 website:
 	jekyll build
