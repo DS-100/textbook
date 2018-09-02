@@ -17,16 +17,15 @@ Arguments:
 
 import glob
 import os
-import yaml
-import toolz.curried as t
 from textwrap import dedent
 from docopt import docopt
 from subprocess import run
-from itertools import chain
 
 import nbformat
 from nbinteract import InteractExporter
 from traitlets.config import Config
+
+from read_url_map import read_url_map
 
 # The HTML file needs to start with Jekyll front-matter and wrapped in a raw
 # tag so that Jekyll won't process double curly braces in the HTML
@@ -131,7 +130,7 @@ def convert_notebooks_to_html_partial(notebook_paths, url_map):
         prev_page = url_map.get(outfile_path, {}).get('prev', 'false')
         next_page = url_map.get(outfile_path, {}).get('next', 'false')
 
-        final_output = wrapper.format(
+        textbook_page = wrapper.format(
             interact_link=INTERACT_LINK.format(
                 paths=PATH_PREFIX.format(notebook_path)
             ),
@@ -142,7 +141,7 @@ def convert_notebooks_to_html_partial(notebook_paths, url_map):
 
         # Write out HTML
         with open(outfile_path, 'w', encoding='utf-8') as outfile:
-            outfile.write(final_output)
+            outfile.write(textbook_page)
 
         # Write out images
         for relative_path, image_data in resources['outputs'].items():
@@ -182,67 +181,6 @@ def convert_notebooks_to_markdown(notebook_paths):
     run(['jupyter', 'nbconvert', '--to', 'markdown', *notebook_paths])
 
 
-#
-# Construct mapping between entry URLs and prev / next pages.
-#
-
-flatmap = t.curry(lambda f, items: chain.from_iterable(map(f, items)))
-
-
-def _not_internal_link(entry):
-    return not entry.get('url', '').startswith('/')
-
-
-def _flatten_sections(entry):
-    sections = entry.get('sections', [])
-    return [t.dissoc(entry, 'sections')] + sections
-
-
-def _sliding_three(entries):
-    return ([(None, entries[0], entries[1])] +
-            list(t.sliding_window(3, entries)) +
-            [(entries[-2], entries[-1], None)])
-
-
-wrap_url = "'{}'".format
-
-
-def _adj_pages(triplet):
-    prev, cur, nex = triplet
-    return {
-        cur.strip('/'): {
-            'prev': wrap_url(prev) if prev is not None else 'false',
-            'next': wrap_url(nex) if nex is not None else 'false',
-        }
-    }
-
-
-def generate_url_map(yaml_path=TOC_PATH) -> dict:
-    """
-    Generates mapping from each URL to its previous and next URLs in the
-    textbook. The dictionary looks like:
-
-    {
-        'ch/10/some_page.html' : {
-            'prev': 'ch/09/foo.html',
-            'next': 'ch/10/bar.html',
-        },
-        ...
-    }
-    """
-    with open(yaml_path) as f:
-        data = yaml.load(f)
-
-    pipeline = [
-        t.remove(_not_internal_link),
-        flatmap(_flatten_sections),
-        t.map(t.get('url')), list, _sliding_three,
-        t.map(_adj_pages),
-        t.merge()
-    ]
-    return t.pipe(data, *pipeline)
-
-
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     notebooks = arguments['NOTEBOOKS'] or sorted(
@@ -251,7 +189,7 @@ if __name__ == '__main__':
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)
 
-    url_map = generate_url_map()
+    url_map = read_url_map()
 
     convert_notebooks_to_html_partial(notebooks, url_map)
     # convert_notebooks_to_markdown(notebooks)
