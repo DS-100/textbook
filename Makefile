@@ -28,6 +28,8 @@ notebooks: ## Convert notebooks to HTML pages
 
 pdf: ## Generates PDF of textbook
 	python scripts/create_single_page_html.py
+	make website
+	ebook-convert _site/book.html book.pdf --chapter "//h:h1" --level1-toc "//h:h1" --level2-toc "//h:h2"
 
 chNN: ## Converts a specific chapter's notebooks (e.g. make 02)
 	@echo To use this command, replace NN with the chapter number. Example:
