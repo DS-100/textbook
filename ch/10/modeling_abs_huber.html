@@ -52,6 +52,13 @@ next_page: '/ch/11/gradient_descent.html'
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -63,8 +70,12 @@ next_page: '/ch/11/gradient_descent.html'
 
 <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 
     </div>
@@ -148,15 +159,21 @@ next_page: '/ch/11/gradient_descent.html'
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Absolute-and-Huber-Loss">Absolute and Huber Loss<a class="anchor-link" href="#Absolute-and-Huber-Loss">&#182;</a></h2><p>Previously, we said that our model is accurate if it minimizes the squared difference between the predictions and the actual values. We used the mean squared error (MSE) loss to capture this measure of accuracy:</p>
+<h2 id="Absolute-and-Huber-Loss">Absolute and Huber Loss<a class="anchor-link" href="#Absolute-and-Huber-Loss">&#182;</a></h2><p>To fit a model, we select a loss function and select the model parameters that minimize the loss. In the previous section, we introduced the mean squared error (MSE) loss function:</p>
 $$
 \begin{aligned}
 L(\theta, \textbf{y})
 &amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
 \end{aligned}
-$$<p>We used a simple model that always predicts the same number:</p>
-$$ \theta = C $$<p>Where $ C $ is some constant. When we optimize this constant model using MSE, we found that $ C $ will always be the mean of the data points. When applied to the tips dataset, we found that the constant model should predict $ 16.08\% $ since $ 16.08\% $ is the mean of the tip percents.</p>
-<p>Now, we will keep our model the same but switch to a different loss function: the mean absolute error (MAE). Instead taking the squared difference for each point and our prediction, this loss function takes the absolute difference:</p>
+$$<p>We used a constant model that predicts the same number $ \theta $ for all entries in the dataset. When we fit this model using the MSE loss, we found that $ \hat{\theta} = \text{mean} (\textbf{y}) $. On the tips dataset, we found that a fitted constant model will predict $ 16.08\% $ since $ 16.08\% $ is the mean of the tip percents.</p>
+<p>In this section, we introduce two new loss functions, the <strong>mean absolute error</strong> loss function and the <strong>Huber</strong> loss function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Mean-Absolute-Error">Mean Absolute Error<a class="anchor-link" href="#Mean-Absolute-Error">&#182;</a></h3><p>Now, we will keep our model the same but switch to a different loss function: the mean absolute error (MAE). Instead taking the squared difference for each point and our prediction, this loss function takes the absolute difference:</p>
 $$
 \begin{aligned}
 L(\theta, \textbf{y})
@@ -202,7 +219,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_7_0.png"
+<img src="/notebooks-images/modeling_abs_huber_8_0.png"
 >
 </div>
 
@@ -249,7 +266,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_9_0.png"
+<img src="/notebooks-images/modeling_abs_huber_10_0.png"
 >
 </div>
 
@@ -261,8 +278,8 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Remember that the actual loss values themselves are not very interesting to us; they are only useful for comparing different values of $ \theta $. Once we choose a loss function, we will look for the $ \theta $ that produces the least loss. Thus, we are interested in whether the loss functions are minimized by different values of $ \theta $.</p>
-<p>So far, the two loss functions seem to agree on the $ \theta $ values that produce the least loss for the values that we've tried. If we look a bit closer, however, we will start to see some differences. We first take the losses and plot them against $ \theta $ for each of the six $ \theta $ values we tried.</p>
+<p>Remember that the actual loss values themselves are not very interesting to us; they are only useful for comparing different values of $ \theta $. Once we choose a loss function, we will look for $ \hat{\theta} $, the $ \theta $ that produces the least loss. Thus, we are interested in whether the loss functions produce different $ \hat{\theta} $.</p>
+<p>So far, the two loss functions seem to agree on $ \hat{\theta} $. If we look a bit closer, however, we will start to see some differences. We first take the losses and plot them against $ \theta $ for each of the six $ \theta $ values we tried.</p>
 
 </div>
 </div>
@@ -305,7 +322,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_11_0.png"
+<img src="/notebooks-images/modeling_abs_huber_12_0.png"
 >
 </div>
 
@@ -360,7 +377,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_13_0.png"
+<img src="/notebooks-images/modeling_abs_huber_14_0.png"
 >
 </div>
 
@@ -392,19 +409,21 @@ $$
 <span class="n">mse_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
 <span class="n">abs_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">abs_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
 
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">mse_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MSE&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">abs_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MAE&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_vals</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
-            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minima of MSE&#39;</span><span class="p">)</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum MSE&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y_vals</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
-            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minima of MAE&#39;</span><span class="p">)</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum MAE&#39;</span><span class="p">)</span>
 
 
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $ \bf</span><span class="si">{y}</span><span class="s1">$$ = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
 </pre></div>
 
     </div>
@@ -422,7 +441,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_15_0.png"
+<img src="/notebooks-images/modeling_abs_huber_16_0.png"
 >
 </div>
 
@@ -434,7 +453,7 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We've found empirically that the MSE and MAE can be minimized by different values of $ \theta $ for the same dataset. However, we don't have a good sense of when they will differ and more importantly, why they differ.</p>
+<p>We've found empirically that the MSE and MAE can produce different $ \hat{\theta} $ for the same dataset. A closer analysis reveals when they will differ and more importantly, why they differ.</p>
 
 </div>
 </div>
@@ -564,7 +583,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_21_0.png"
+<img src="/notebooks-images/modeling_abs_huber_22_0.png"
 >
 </div>
 
@@ -602,7 +621,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_22_0.png"
+<img src="/notebooks-images/modeling_abs_huber_23_0.png"
 >
 </div>
 
@@ -614,7 +633,7 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As we move the point further away from the rest of the data, the MSE curve moves with it. When $ y_3 = 14 $, both MSE and MAE will be minimized by the same value of $ \theta $ at $ \theta = 13 $. However, when $ y_3 = 25 $, the MSE curve will tell us that the best $ \theta $ is around 16.7 while the MAE will still say that $ \theta = 13 $ is best.</p>
+<p>As we move the point further away from the rest of the data, the MSE curve moves with it. When $ y_3 = 14 $, both MSE and MAE have $ \hat{\theta} = 13 $. However, when $ y_3 = 25 $, the MSE loss produces $ \hat{\theta} = 16.7 $ while the MAE produces $ \hat{\theta} = 13 $, unchanged from before.</p>
 
 </div>
 </div>
@@ -645,7 +664,7 @@ $$
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>What does the result above mean? On the left hand side, we have one term for each data point less than $ \theta $. On the right, we have one for each data point greater than $ \theta $. Then, in order to satisfy the equation we need to pick a value for $ \theta $ that has the same number of smaller and larger points. This is the definition for the <em>median</em> of a set of numbers. Thus, the minimizing value of $ \theta $ for the MAE is $ \theta = \text{median} (\textbf{y}) $.</p>
+<p>What does the result above mean? On the left hand side, we have one term for each data point less than $ \theta $. On the right, we have one for each data point greater than $ \theta $. Then, in order to satisfy the equation we need to pick a value for $ \theta $ that has the same number of smaller and larger points. This is the definition for the <em>median</em> of a set of numbers. Thus, the minimizing value of $ \theta $ for the MAE is $ \hat \theta = \text{median} (\textbf{y}) $.</p>
 <p>When we have an odd number of points, the median is simply the middle point when the points are arranged in sorted order. We can see that in the example below with five points, the loss is minimized when $ \theta $ lies at the median:</p>
 
 </div>
@@ -695,7 +714,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_26_0.png"
+<img src="/notebooks-images/modeling_abs_huber_27_0.png"
 >
 </div>
 
@@ -740,7 +759,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_28_0.png"
+<img src="/notebooks-images/modeling_abs_huber_29_0.png"
 >
 </div>
 
@@ -785,7 +804,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_30_0.png"
+<img src="/notebooks-images/modeling_abs_huber_31_0.png"
 >
 </div>
 
@@ -797,9 +816,8 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="MSE-and-MAE-Comparison">MSE and MAE Comparison<a class="anchor-link" href="#MSE-and-MAE-Comparison">&#182;</a></h3><p>Our investigation and the derivation above show that the MSE is easier to differentiate but is more sensitive to outliers than the MAE. The minimizing $ \theta $ for MSE is the mean of the data points, and the minimizing $ \theta $ for the MAE is the median of the data points. Notice that the median is robust to outliers while the mean is not! This phenomenon arises from our construction of the two loss functions.</p>
-<p>We have also seen that the MSE will be minimized by a unique value of $ \theta $, whereas the mean absolute value can be minimized by multiple values of $ \theta $ when there are an even number of data points.</p>
-<p>In the examples so far, the ability to differentiate the loss function isn't that useful since we know the exact minimizing value of $ \theta $ in both cases. However, the ability to differentiate the loss function becomes very important once we start using complicated models. For complicated models, we will not be able to differentiate the loss function by hand and will need a computer to minimize the loss function for us. We will return to this issue when we cover gradient descent and numerical optimization.</p>
+<h3 id="MSE-and-MAE-Comparison">MSE and MAE Comparison<a class="anchor-link" href="#MSE-and-MAE-Comparison">&#182;</a></h3><p>Our investigation and the derivation above show that the MSE is easier to differentiate but is more sensitive to outliers than the MAE. For the MSE, $ \hat{\theta} = \text{mean}(\textbf{y}) $, while for the MAE $ \hat{\theta} = \text{median}(\textbf{y}) $. Notice that the median is less affected by outliers than the mean. This phenomenon arises from our construction of the two loss functions.</p>
+<p>We have also seen that the MSE has a unique $ \hat{\theta} $, whereas the mean absolute value can multiple possible $ \hat{\theta} $ values when there are an even number of data points.</p>
 
 </div>
 </div>
@@ -854,7 +872,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_33_0.png"
+<img src="/notebooks-images/modeling_abs_huber_34_0.png"
 >
 </div>
 
@@ -906,7 +924,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_35_0.png"
+<img src="/notebooks-images/modeling_abs_huber_36_0.png"
 >
 </div>
 
@@ -957,7 +975,7 @@ $$
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_abs_huber_37_0.png"
+<img src="/notebooks-images/modeling_abs_huber_38_0.png"
 >
 </div>
 
@@ -969,7 +987,7 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This choice results in a different loss curve and can thus result in different values of $ \theta $. If we want to use the Huber loss function, we have the additional task of setting this transition point to a suitable value.</p>
+<p>This choice results in a different loss curve and can thus result in different values of $ \hat \theta $. If we want to use the Huber loss function, we have the additional task of setting this transition point to a suitable value.</p>
 <p>The Huber loss function is defined mathematically as follows:</p>
 $$
 L_\alpha(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
@@ -978,6 +996,13 @@ L_\alpha(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
 \end{cases}
 $$<p>It is more complex than the previous loss functions because it combines both MSE and MAE. The additional parameter $ \alpha $ sets the point where the Huber loss transitions from the MSE to the absolute loss.</p>
 <p>Attempting to take the derivative of the Huber loss function is tedious and does not result in an elegant result like the MSE and MAE. Instead, we can use a computational method called gradient descent to find minimizing value of $ \theta $.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>In this section, we introduce two loss functions: the mean absolute error and the Huber loss functions. We show for a constant model fitted using the MAE, $ \hat{\theta} = \text{median}(\textbf{y}) $.</p>
 
 </div>
 </div>
