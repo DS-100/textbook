@@ -49,9 +49,6 @@ def _replace_url(url):
     )
 
 
-files_to_read = list(map(_replace_url, read_url_list()))
-
-
 def read_md_file(filename):
     return markdown_path(filename, extras=['metadata'])
 
@@ -75,6 +72,12 @@ def read_file(filename):
 
 
 def concat_pages(output_filename=OUTPUT_FILENAME):
+    """
+    Takes invidividual pages from the table of contents and concatenates them
+    into a single, long HTML page.
+    """
+    files_to_read = list(map(_replace_url, read_url_list()))[:5]
+
     print('Concatenating book pages...')
     with open(output_filename, 'w') as f:
         f.write(output_preamble)
@@ -88,6 +91,9 @@ def concat_pages(output_filename=OUTPUT_FILENAME):
 
 
 def render_math(output_filename=OUTPUT_FILENAME):
+    """
+    Uses the mjpage binary to render math in the textbook.
+    """
     print('Rendering math (takes a couple minutes)...')
     with open(output_filename) as book, open(TEMP_FILENAME, 'w') as temp:
         check_call(['mjpage', '--dollars', '--format', '"TeX"'],
@@ -115,6 +121,19 @@ def render_math(output_filename=OUTPUT_FILENAME):
     print('Done!')
 
 
+def fix_image_paths(output_filename=OUTPUT_FILENAME):
+    """
+    Replaces absolute image URLs with links to localhost so that ebook-convert
+    can locate them.
+    """
+    check_call([
+        'sed', '-i', "",
+        "'s#/notebooks-images#http://localhost:4000/notebooks-images#g'",
+        output_filename
+    ])
+
+
 if __name__ == '__main__':
     concat_pages()
     render_math()
+    fix_image_paths()
