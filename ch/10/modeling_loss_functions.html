@@ -52,6 +52,13 @@ next_page: '/ch/10/modeling_abs_huber.html'
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -63,8 +70,12 @@ next_page: '/ch/10/modeling_abs_huber.html'
 
 <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 
     </div>
@@ -93,9 +104,10 @@ next_page: '/ch/10/modeling_abs_huber.html'
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Loss-Functions">Loss Functions<a class="anchor-link" href="#Loss-Functions">&#182;</a></h2><p>For now, our model assumes that there is a single population tip percentage $ \theta^* $. We are trying to estimate this parameter, and we use the variable $ \theta $ to denote our estimate. Since our sample of tips is a random sample drawn from the population, we believe that using our sample to create a best estimate $ \hat{\theta} $ will give a value close to $ \theta^* $.</p>
-<p>To precisely decide which value of $ \theta $ is best, we need to define a <em>loss function</em>. A loss function is a mathematical function that takes in an estimate $ \theta $ and the points in our dataset $y_1, y_2, \ldots, y_n$. It outputs a single number that we can use to choose between two different values of $ \theta $. In mathematical notation, we want to create the function:</p>
-$$ L(\theta, y_1, y_2, \ldots, y_n) =\ \ldots $$<p>By convention, the loss function outputs lower values for preferable values of $ \theta $ and larger values for worse values of $ \theta $. In the previous section, we compared $ \theta = 10 $ and $ \theta = 15 $.</p>
+<h2 id="Loss-Functions">Loss Functions<a class="anchor-link" href="#Loss-Functions">&#182;</a></h2><p>Recall our assumptions thus far: we assume that there is a single population tip percentage $ \theta^* $. Our model estimates this parameter; we use the variable $ \theta $ to denote our estimate. We would like to use the collected data on tips to determine the value that $ \theta $ should have,</p>
+<p>To precisely decide which value of $ \theta $ is best, we define a <strong>loss function</strong>. A loss function is a mathematical function that takes in an estimate $ \theta $ and the points in our dataset $y_1, y_2, \ldots, y_n$. It outputs a single number, the <strong>loss</strong>, that measures how well $ \theta $ fits our data. In mathematical notation, we want to create the function:</p>
+$$ L(\theta, y_1, y_2, \ldots, y_n) =\ \ldots $$<p>By convention, the loss function outputs lower values for preferable values of $ \theta $ and larger values for worse values of $ \theta $. To fit our model, we select the value of $ \theta $ that produces a lower loss than all other choices of $ \theta $—the $ \theta $ that <strong>minimizes the loss</strong>. We use the notation $ \hat{\theta} $ to denote the value of $ \theta $ that minimizes a specified loss function.</p>
+<p>Consider once again two possible values of $ \theta $: $ \theta = 10 $ and $ \theta = 15 $.</p>
 
 </div>
 </div>
@@ -113,7 +125,7 @@ $$ L(\theta, y_1, y_2, \ldots, y_n) =\ \ldots $$<p>By convention, the loss funct
 <span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 10$&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;goldenrod&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 15$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 15$&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
@@ -150,6 +162,12 @@ $$ L(\theta, y_1, y_2, \ldots, y_n) =\ \ldots $$<p>By convention, the loss funct
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Since $ \theta = 15 $ falls closer to most of the points, our loss function should output a small value for $ \theta = 15 $ and a larger value for $ \theta = 10 $.</p>
 <p>Let's use this intuition to create a loss function.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Our-First-Loss-Function:-Mean-Squared-Error">Our First Loss Function: Mean Squared Error<a class="anchor-link" href="#Our-First-Loss-Function:-Mean-Squared-Error">&#182;</a></h3><p>We would like our choice of $ \theta $ to fall close to the points in our dataset. Thus, we can define a loss function that outputs a larger value as $ \theta $ gets further away from the points in the dataset. We start with a simple loss function called the <em>mean squared error</em>. Here's the idea:</p>
 <ol>
 <li>We select a value of $ \theta $.</li>
@@ -157,6 +175,12 @@ $$ L(\theta, y_1, y_2, \ldots, y_n) =\ \ldots $$<p>By convention, the loss funct
 <li>To compute the final loss, take the average of each of the individual squared differences.</li>
 </ol>
 <p>This gives us a final loss function of:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 $$
 \begin{aligned}
 L(\theta, y_1, y_2, \ldots, y_n)
@@ -164,7 +188,7 @@ L(\theta, y_1, y_2, \ldots, y_n)
 &amp;= \frac{1}{n} \left((y_1 - \theta)^2 + (y_2 - \theta)^2 + \ldots + (y_n - \theta)^2 \right) \\
 &amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
 \end{aligned}
-$$<p>Creating a Python function to compute the loss is simple to do:</p>
+$$<p>Creating a Python function to compute the loss is simple:</p>
 
 </div>
 </div>
@@ -239,7 +263,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_loss_functions_8_0.png"
+<img src="/notebooks-images/modeling_loss_functions_10_0.png"
 >
 </div>
 
@@ -314,7 +338,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As we hoped, our loss is larger as $ \theta $ is further away from our data and is smallest when $ \theta $ falls exactly onto our data point. Let's now see how our mean squared error behaves when we have five points instead of one. Our data this time are: $ \{ 12.1, 12.8, 14.9, 16.3, 17.2 \} $.</p>
+<p>As we hoped, our loss is larger as $ \theta $ is further away from our data and is smallest when $ \theta $ falls exactly onto our data point. Let's now see how our mean squared error behaves when we have five points instead of one. Our data this time are: $ [11, 12, 15, 17, 18 ] $.</p>
 
 </div>
 </div>
@@ -330,8 +354,8 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span>
-           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">],</span>
-           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">18.5</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -349,7 +373,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_loss_functions_12_0.png"
+<img src="/notebooks-images/modeling_loss_functions_14_0.png"
 >
 </div>
 
@@ -362,7 +386,6 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Of the values of $ \theta $ we tried $ \theta = 15 $ has the lowest loss. However, a value of $ \theta $ in between 14 and 15 might have an even lower loss than $ \theta = 15 $. See if you can find a better value of $ \theta $ using the interactive plot below.</p>
-<p>(How might we know for certain whether we've found the best value of $ \theta $? We will tackle this issue soon.)</p>
 
 </div>
 </div>
@@ -378,8 +401,8 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">mse_interact</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
-             <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">],</span>
-             <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+             <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+             <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">18.5</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -446,7 +469,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_loss_functions_16_0.png"
+<img src="/notebooks-images/modeling_loss_functions_18_0.png"
 >
 </div>
 
@@ -473,7 +496,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+<span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">14.5</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
            <span class="n">y_vals</span><span class="o">=</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span>
            <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 </pre></div>
@@ -493,7 +516,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_loss_functions_18_0.png"
+<img src="/notebooks-images/modeling_loss_functions_20_0.png"
 >
 </div>
 
@@ -553,7 +576,7 @@ $$<p>Creating a Python function to compute the loss is simple to do:</p>
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It looks like the best value of $ \theta $ that we've tried so far is 16.00. This is slightly above our original blind guess of 15% tip. It appears that our waiter gets a bit more tip than we originally thought.</p>
+<p>It looks like the best value of $ \theta $ that we've tried so far is 16.00, slightly above our original guess of 15% tip.</p>
 
 </div>
 </div>
@@ -579,8 +602,8 @@ $$
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Finding-the-Best-Value-of-$-\theta-$">Finding the Best Value of $ \theta $<a class="anchor-link" href="#Finding-the-Best-Value-of-$-\theta-$">&#182;</a></h3><p>So far, we have found the best value of $ \theta $ by simply trying out a bunch of values and then picking the one with the least loss. Although this method works decently well, we can find a better method by using the properties of our loss function.</p>
-<p>For the time being, let's return to our example with five points: $ \textbf{y} = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $.</p>
+<h3 id="Minimizing-the-Loss">Minimizing the Loss<a class="anchor-link" href="#Minimizing-the-Loss">&#182;</a></h3><p>So far, we have found the best value of $ \theta $ by simply trying out a bunch of values and then picking the one with the least loss. Although this method works decently well, we can find a better method by using the properties of our loss function.</p>
+<p>For the following example, we use a dataset containing five points: $ \textbf{y} = [ 11, 12, 15, 16, 17 ] $.</p>
 
 </div>
 </div>
@@ -596,59 +619,8 @@ $$
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span>
-           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">],</span>
-           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    
-
-
-
-<div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_loss_functions_24_0.png"
->
-</div>
-
-</div>
-
-</div>
-</div>
-
-  </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>In the plots above, we've used integer $ \theta $ values in between 12 and 17. When we change $ \theta $, the loss seems to start high (at 10.92), decrease until $ \theta = 15 $, then increase again. We can see that the loss changes as $ \theta $ changes, so let's make a plot comparing the loss to $ \theta $ for each of the six $ \theta $s we've tried.</p>
-
-</div>
-</div>
-</div>
-
-  
-
-  <div class="
-      cell border-box-sizing code_cell rendered">
-    <div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">])</span>
-<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
-<span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $\bf</span><span class="si">{y}</span><span class="s1">$$ = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">);</span>
+           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">18.5</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -678,7 +650,7 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The scatter plot shows the downward, then upward trend that we noticed before. We can try more values of $ \theta $ to see a complete curve that shows how the loss changes as $ \theta $ changes.</p>
+<p>In the plots above, we've used integer $ \theta $ values in between 12 and 17. When we change $ \theta $, the loss seems to start high (at 10.92), decrease until $ \theta = 15 $, then increase again. We can see that the loss changes as $ \theta $ changes, so let's make a plot comparing the loss to $ \theta $ for each of the six $ \theta $s we've tried.</p>
 
 </div>
 </div>
@@ -686,18 +658,19 @@ $$
 
   
 
-  <div class="
+  <div class="nbinteract-hide_in
       cell border-box-sizing code_cell rendered">
     <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
-<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">])</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
 <span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $\bf</span><span class="si">{y}</span><span class="s1">$$ = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $\bf</span><span class="si">{y}</span><span class="s1">$$ = [11, 12, 15, 17, 18] $&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">);</span>
 </pre></div>
@@ -729,33 +702,102 @@ $$
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The plot above shows that in fact, $ \theta = 15$ was not the best choice; a $ \theta $ of around 14.7 would have gotten a lower loss! We can use calculus to find that minimizing value of $ \theta $ exactly. First, we start with our loss function:</p>
+<p>The scatter plot shows the downward, then upward trend that we noticed before. We can try more values of $ \theta $ to see a complete curve that shows how the loss changes as $ \theta $ changes.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $\bf</span><span class="si">{y}</span><span class="s1">$$ = [11, 12, 15, 17, 18] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/modeling_loss_functions_30_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The plot above shows that in fact, $ \theta = 15$ was not the best choice; a $ \theta $ between 14 and 15 would have gotten a lower loss. We can use calculus to find that minimizing value of $ \theta $ exactly. At the minimum loss, the derivative of the loss function with respect to $ \theta $ is 0.</p>
+<p>First, we start with our loss function:</p>
 $$
 \begin{aligned}
 L(\theta, \textbf{y})
 &amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
 \end{aligned}
-$$<p>And plug in our points $ \textbf{y} = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $:</p>
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, we plug in our points $ \textbf{y} = [11, 12, 15, 17, 18] $:</p>
 $$
 \begin{aligned}
 L(\theta, \textbf{y})
-&amp;= \frac{1}{n} \big((12.1 - \theta)^2 + (12.8 - \theta)^2 + (14.9 - \theta)^2 + (16.3 - \theta)^2 + (17.2 - \theta)^2 \big)\\
+&amp;= \frac{1}{5} \big((11 - \theta)^2 + (12 - \theta)^2 + (15 - \theta)^2 + (17 - \theta)^2 + (18 - \theta)^2 \big)\\
 \end{aligned}
-$$<p>To find the value of $ \theta $ that minimizes this function, we compute the derivative with respect to $ \theta $:</p>
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To find the value of $ \theta $ that minimizes this function, we compute the derivative with respect to $ \theta $:</p>
 $$
 \begin{aligned}
 \frac{\partial}{\partial \theta} L(\theta, \textbf{y})
-&amp;= \frac{1}{n} \big(-2(12.1 - \theta) - 2(12.8 - \theta) - 2(14.9 - \theta) - 2(16.3 - \theta) -2(17.2 - \theta) \big)\\
-&amp;= - \frac{2}{n} \big((12.1 - \theta) + (12.8 - \theta) + (14.9 - \theta) + (16.3 - \theta) + (17.2 - \theta) \big)
+&amp;= \frac{1}{5} \big(-2(11 - \theta) - 2(12 - \theta) - 2(15 - \theta) - 2(17 - \theta) -2(18 - \theta) \big)\\
+&amp;= \frac{1}{5} \big(10 \cdot \theta - 146 \big)\\
 \end{aligned}
-$$<p>Then, we find the value of $ \theta $ where the derivative is zero:</p>
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then, we find the value of $ \theta $ where the derivative is zero:</p>
 $$
 \begin{aligned}
-0 &amp;= - \frac{2}{n} \big((12.1 - \theta) + (12.8 - \theta) + (14.9 - \theta) + (16.3 - \theta) + (17.2 - \theta) \big) \\
-0 &amp;= (12.1 - \theta) + (12.8 - \theta) + (14.9 - \theta) + (16.3 - \theta) + (17.2 - \theta) \\
-5 \theta &amp;= 12.1 + 12.8 + 14.9 + 16.3 + 17.2 \\
-\theta &amp;= \frac{12.1 + 12.8 + 14.9 + 16.3 + 17.2}{5} \\
-\theta &amp;= 14.66
+\frac{1}{5} \big(10 \cdot \theta - 146 \big) &amp;= 0 \\
+10 \cdot \theta - 146 &amp;= 0 \\
+\theta &amp;= 14.6
 \end{aligned}
 $$
 </div>
@@ -763,16 +805,22 @@ $$
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We've found the minimizing $ \theta $, and as expected, it is between 14 and 15. We denote the $ \theta $ that minimizes the loss $ \hat{\theta} $.</p>
-<p>Turn your attention to the second-to-last line of the simplification above:</p>
-$$ \hat{\theta} = \frac{12.1 + 12.8 + 14.9 + 16.3 + 17.2}{5} $$<p>Notice that this is a familiar expression: it is the average of the five data points. Could this be a pattern for all values of $ \textbf{y} $?</p>
-
+<p>We've found the minimizing $ \theta $, and as expected, it is between 14 and 15. We denote the $ \theta $ that minimizes the loss $ \hat{\theta} $. Thus, for the dataset $ \textbf{y} = [11, 12, 15, 17, 18] $ and the MSE loss function:</p>
+$$ \hat{\theta} = 14.6 $$
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="The-Minimizing-Value-of-the-Mean-Squared-Error">The Minimizing Value of the Mean Squared Error<a class="anchor-link" href="#The-Minimizing-Value-of-the-Mean-Squared-Error">&#182;</a></h3><p>We have seen that different values of $ \theta $ produce different losses when using mean squared error as our loss function. The arithmetic above hints that the value of $ \theta $ that minimizes the loss is the mean of all of the data points. To confirm this, we turn back to the definition of our loss function. Instead of plugging in points, we take the derivative with respect to $ \theta $ of the loss function as-is:</p>
+<p>If we happen to compute the mean of the data values, we notice a curious equivalence:</p>
+$$ \text{mean} (\textbf{y}) = \hat{\theta} = 14.6 $$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-Minimizing-Value-of-the-Mean-Squared-Error">The Minimizing Value of the Mean Squared Error<a class="anchor-link" href="#The-Minimizing-Value-of-the-Mean-Squared-Error">&#182;</a></h3><p>As it turns out, the equivalence above is no mere coincidence; the average of the data values <em>always</em> produces $ \hat{\theta} $, the $ \theta $ that minimizes the MSE loss.</p>
+<p>To show this, we take the derivative of our loss function once more. Instead of plugging in points, we leave the $ y_i $ terms intact to generalize to other datasets.</p>
 $$
 \begin{aligned}
 L(\theta, \textbf{y})
@@ -781,7 +829,13 @@ L(\theta, \textbf{y})
 &amp;= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
 &amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
 \end{aligned}
-$$<p>Notice that we have left the variables $ y_i $ untouched. We are no longer working with the previous example dataset of five points; this equation can be used with any dataset with any number of points.</p>
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Since we did not substitute in specific values for $ y_i $, this equation can be used with any dataset with any number of points.</p>
 <p>Now, we set the derivative equal to zero and solve for $ \theta $ to find the minimizing value of $ \theta $ as before:</p>
 $$
 \begin{aligned}
@@ -791,9 +845,15 @@ $$
 \sum_{i = 1}^{n} \theta &amp;= \sum_{i = 1}^{n} y_i \\
 n \cdot \theta &amp;= y_1 + \ldots + y_n \\
 \theta &amp;= \frac{y_1 + \ldots + y_n}{n} \\
-\theta &amp;= \text{mean} (\textbf{y})
+\hat \theta = \theta &amp;= \text{mean} (\textbf{y})
 \end{aligned}
-$$<p>Lo and behold, we see that there is a single value of $ \theta $ that gives the least MSE no matter what the dataset is. For the mean squared error, we can set $ \theta $ equal to the mean of the dataset and be confident knowing that we have minimized the loss.</p>
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Lo and behold, we see that there is a single value of $ \theta $ that gives the least MSE no matter what the dataset is. For the mean squared error, we know that $ \hat{\theta} $ is the mean of the dataset values.</p>
 
 </div>
 </div>
@@ -832,7 +892,7 @@ $$<p>Lo and behold, we see that there is a single value of $ \theta $ that gives
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>16.08025817225047</pre>
+<pre>16.080258172250463</pre>
 </div>
 
 </div>
@@ -853,7 +913,7 @@ $$<p>Lo and behold, we see that there is a single value of $ \theta $ that gives
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">16.08</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 16.08$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">16.08</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \hat \theta = 16.08$&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
@@ -877,7 +937,7 @@ $$<p>Lo and behold, we see that there is a single value of $ \theta $ that gives
 
 
 <div class="output_png output_subarea ">
-<img src="/notebooks-images/modeling_loss_functions_34_0.png"
+<img src="/notebooks-images/modeling_loss_functions_42_0.png"
 >
 </div>
 
@@ -889,9 +949,15 @@ $$<p>Lo and behold, we see that there is a single value of $ \theta $ that gives
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>First, we restricted our model to only make a single number as its prediction for all tables. Next, we assume that the waiter's dataset of tips is similar to the population distribution of tip percentages. If this assumption holds, predicting $ 16.08\% $ will give us the most accurate predictions that we can given our data.</p>
-<p>To be more precise, we say that the model is accurate if it minimizes the squared difference between the predictions and the actual values.</p>
-<p>Although our model is simple, it illustrates concepts that we'll see over and over again. Future chapters will introduce complicated models. Still, we will discuss each model's assumptions, define loss functions, and find the model that minimizes the loss. It is very helpful to understand this process for simple models before attempting to understand complex ones.</p>
+<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>We have introduced a <strong>constant model</strong>, a model that outputs the same number for all entries in the dataset.</p>
+<p>A <strong>loss function</strong> $ L(\theta, \textbf{y}) $ measures how well a given value of $ \theta $ fits the data. In this section, we introduce the mean squared error loss function and showed that $ \hat{\theta} = \text{mean}(\textbf{y}) $ for the constant model.</p>
+<p>The steps we took in this section apply to many modeling scenarios:</p>
+<ol>
+<li>Select a model.</li>
+<li>Select a loss function.</li>
+<li>Fit the model by minimizing the loss.</li>
+</ol>
+<p>In this book, all of our modeling techniques expand upon one or more of these steps. We introduce new models (1), new loss functions (2), and new techniques for minimizing loss (3).</p>
 
 </div>
 </div>
