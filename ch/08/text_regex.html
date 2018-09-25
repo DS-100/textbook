@@ -52,6 +52,13 @@ next_page: '/ch/08/text_re.html'
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -60,7 +67,6 @@ next_page: '/ch/08/text_re.html'
 <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
 <span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
-<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
@@ -1621,7 +1627,7 @@ next_page: '/ch/08/text_re.html'
 <p>This table includes most of the important <em>meta characters</em>, which help us specify certain patterns we want to match in a string.</p>
 <table>
 <thead><tr>
-<th></th>
+<th>Char</th>
 <th>Description</th>
 <th>Example</th>
 <th>Matches</th>
@@ -1632,56 +1638,56 @@ next_page: '/ch/08/text_re.html'
 <tr>
 <td>.</td>
 <td>Any character except \n</td>
-<td>...</td>
+<td><code>...</code></td>
 <td>abc</td>
 <td>ab<br>abcd</td>
 </tr>
 <tr>
 <td>[ ]</td>
 <td>Any character inside brackets</td>
-<td>[cb.]ar</td>
+<td><code>[cb.]ar</code></td>
 <td>car<br>.ar</td>
 <td>jar</td>
 </tr>
 <tr>
 <td>[^ ]</td>
 <td>Any character <em>not</em> inside brackets</td>
-<td>[^b]ar</td>
+<td><code>[^b]ar</code></td>
 <td>car<br>par</td>
 <td>bar<br>ar</td>
 </tr>
 <tr>
 <td>*</td>
 <td>≥ 0 or more of last symbol</td>
-<td>[pb]*ark</td>
+<td><code>[pb]\*ark</code></td>
 <td>bbark<br>ark</td>
 <td>dark</td>
 </tr>
 <tr>
 <td>+</td>
 <td>≥ 1 or more of last symbol</td>
-<td>[pb]+ark</td>
+<td><code>[pb]+ark</code></td>
 <td>bbpark<br>bark</td>
 <td>dark<br>ark</td>
 </tr>
 <tr>
 <td>?</td>
 <td>0 or 1 of last symbol</td>
-<td>s?he</td>
+<td><code>s?he</code></td>
 <td>she<br>he</td>
 <td>the</td>
 </tr>
 <tr>
 <td>{<em>n</em>}</td>
 <td>Exactly <em>n</em> of last symbol</td>
-<td>hello{3}</td>
+<td><code>hello{3}</code></td>
 <td>hellooo</td>
 <td>hello</td>
 </tr>
 <tr>
 <td>&#124;</td>
 <td>Pattern before or after bar</td>
-<td>we&#124;[ui]s</td>
+<td><code>we&amp;#124;[ui]s</code></td>
 <td>we<br>us<br>is</td>
 <td>e<br>s</td>
 </tr>
@@ -1695,14 +1701,14 @@ next_page: '/ch/08/text_re.html'
 <tr>
 <td>^</td>
 <td>Beginning of line</td>
-<td>^ark</td>
+<td><code>^ark</code></td>
 <td>ark two</td>
 <td>dark</td>
 </tr>
 <tr>
 <td>\$</td>
 <td>End of line</td>
-<td>ark$</td>
+<td><code>ark$</code></td>
 <td>noahs ark</td>
 <td>noahs arks</td>
 </tr>
@@ -1718,41 +1724,41 @@ next_page: '/ch/08/text_re.html'
 <p>Some commonly used character sets have shorthands.</p>
 <table>
 <thead><tr>
+<th>Description</th>
 <th>Bracket Form</th>
 <th>Shorthand</th>
-<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>[a-zA-Z0-9]</td>
-<td>\w</td>
 <td>Alphanumeric character</td>
+<td><code>[a-zA-Z0-9]</code></td>
+<td><code>\w</code></td>
 </tr>
 <tr>
-<td>[^a-zA-Z0-9]</td>
-<td>\W</td>
 <td>Not an alphanumeric character</td>
+<td><code>[^a-za-z0-9]</code></td>
+<td><code>\W</code></td>
 </tr>
 <tr>
-<td>[0-9]</td>
-<td>\d</td>
 <td>Digit</td>
+<td><code>[0-9]</code></td>
+<td><code>\d</code></td>
 </tr>
 <tr>
-<td>[^0-9]</td>
-<td>\D</td>
 <td>Not a digit</td>
+<td><code>[^0-9]</code></td>
+<td><code>\D</code></td>
 </tr>
 <tr>
-<td>[\t\n\f\r\p{Z}]</td>
-<td>\s</td>
 <td>Whitespace</td>
+<td><code>[\t\n\f\r\p{Z}]</code></td>
+<td><code>\s</code></td>
 </tr>
 <tr>
-<td>[^\t\n\f\r\p{Z}]</td>
-<td>\S</td>
 <td>Not whitespace</td>
+<td><code>[^\t\n\f\r\p{z}]</code></td>
+<td><code>\S</code></td>
 </tr>
 </tbody>
 </table>
