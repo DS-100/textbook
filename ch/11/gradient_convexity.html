@@ -1,0 +1,657 @@
+---
+prev_page: '/ch/11/gradient_descent_define.html'
+next_page: '/ch/11/gradient_stochastic.html'
+---
+
+{% raw %}
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/11/gradient_convexity.ipynb">Open on DataHub</a>
+    </div>
+    
+
+
+
+
+
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/11&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
+<span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;total_bill&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">abs_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">quartic_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">5000</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span> <span class="o">+</span> <span class="mi">12</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span> <span class="o">+</span> <span class="mi">23</span><span class="p">)</span>
+                   <span class="o">*</span> <span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span> <span class="o">-</span> <span class="mi">14</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span> <span class="o">-</span> <span class="mi">15</span><span class="p">)</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">grad_quartic_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2500</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">9</span><span class="o">*</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+                      <span class="o">-</span> <span class="mi">529</span><span class="o">*</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">-</span> <span class="mi">327</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">plot_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">):</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">*</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">loss_fn</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">plot_theta_on_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">default_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta $&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">theta</span><span class="p">],</span> <span class="p">[</span><span class="n">loss</span><span class="p">],</span> <span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="n">default_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">})</span>
+    
+<span class="k">def</span> <span class="nf">plot_connected_thetas</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta_1</span><span class="p">,</span> <span class="n">theta_2</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta_1</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">)</span>
+    <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta_2</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">)</span>
+    <span class="n">loss_1</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta_1</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">loss_2</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta_2</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">theta_1</span><span class="p">,</span> <span class="n">theta_2</span><span class="p">],</span> <span class="p">[</span><span class="n">loss_1</span><span class="p">,</span> <span class="n">loss_2</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">plot_one_gd_iter</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">2.5</span><span class="p">):</span>
+    <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">grad_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">loss_fn</span><span class="p">)</span>
+    <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                       <span class="n">edgecolor</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">new_theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;old theta: </span><span class="si">{theta}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;new theta: </span><span class="si">{new_theta[0]}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Convexity">Convexity<a class="anchor-link" href="#Convexity">&#182;</a></h2><p>Gradient descent provides a general method for minimizing a function. As we observe for the Huber loss, gradient descent is especially useful when the function's minimum is difficult to find analytically.</p>
+<h2 id="Gradient-Descent-Finds-Local-Minima">Gradient Descent Finds Local Minima<a class="anchor-link" href="#Gradient-Descent-Finds-Local-Minima">&#182;</a></h2><p>Unfortunately, gradient descent does not always find the globally minimizing $ \theta $. Consider the following gradient descent run using an initial $ \theta = -21 $ on the loss function below.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">quartic_loss</span><span class="p">)</span>
+<span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mi">21</span><span class="p">,</span> <span class="n">quartic_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_6_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mi">21</span><span class="p">,</span> <span class="n">quartic_loss</span><span class="p">,</span> <span class="n">grad_quartic_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>old theta: -21
+new theta: -9.944999999999999
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_7_1.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.9</span><span class="p">,</span> <span class="n">quartic_loss</span><span class="p">,</span> <span class="n">grad_quartic_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>old theta: -9.9
+new theta: -12.641412
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_8_1.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.6</span><span class="p">,</span> <span class="n">quartic_loss</span><span class="p">,</span> <span class="n">grad_quartic_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>old theta: -12.6
+new theta: -14.162808
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_9_1.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mf">14.2</span><span class="p">,</span> <span class="n">quartic_loss</span><span class="p">,</span> <span class="n">grad_quartic_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>old theta: -14.2
+new theta: -14.497463999999999
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_10_1.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On this loss function and $ \theta $ value, gradient descent converges to $ \theta = -14.5 $, producing a loss of roughly 8. However, the global minimum for this loss function is $ \theta = 18 $, corresponding to a loss of nearly zero. From this example, we observe that gradient descent finds a <em>local minimum</em> which may not necessarily have the same loss as the <em>global minimum</em>.</p>
+<p>Luckily, a number of useful loss functions have identical local and global minima. Consider the familiar mean squared error loss function, for example:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_12_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Running gradient descent on this loss function with an appropriate learning rate will always find the globally optimal $ \theta $ since the sole local minimum is also the global minimum.</p>
+<p>The mean absolute error sometimes has multiple local minima. However, all the local minima produce the globally lowest loss possible.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">abs_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_14_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On this loss function, gradient descent will converge to one of the local minima in the range $ [-1, 1] $. Since all of these local minima have the lowest loss possible for this function, gradient descent will still return an optimal choice of $ \theta $.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Definition-of-Convexity">Definition of Convexity<a class="anchor-link" href="#Definition-of-Convexity">&#182;</a></h2><p>For some functions, any local minimum is also a global minimum. This set of functions are called <strong>convex functions</strong> since they curve upward. For a constant model, the MSE, MAE, and Huber loss are all convex.</p>
+<p>With an appropriate learning rate, gradient descent finds the globally optimal $\theta$ for convex loss functions. Because of this useful property, we prefer to fit our models using convex loss functions unless we have a good reason not to.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Formally, a function $f$ is convex if and only if it satisfies the following inequality for all possible function inputs $a$ and $b$, for all $t \in [0, 1]$:</p>
+$$tf(a) + (1-t)f(b) \geq f(ta + (1-t)b)$$<p>This inequality states that all lines connecting two points of the function must reside on or above the function itself. For the loss function at the start of the section, we can easily find such a line that appears below the graph:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">quartic_loss</span><span class="p">)</span>
+<span class="n">plot_connected_thetas</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">quartic_loss</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_18_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Thus, this loss function is non-convex.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For MSE, all lines connecting two points of the graph appear above the graph. We plot one such line below.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
+<span class="n">plot_connected_thetas</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_png output_subarea ">
+<img src="/notebooks-images/gradient_convexity_21_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The mathematical definition of convexity gives us a precise way of determining whether a function is convex. In this textbook, we will omit mathematical proofs of convexity and will instead state whether a chosen loss function is convex.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>For a convex function, any local minimum is also a global minimum. This useful property allows gradient descent to efficiently find the globally optimal model parameters for a given loss function. While gradient descent will converge to a local minimum for non-convex loss functions, these local minima are not guaranteed to be globally optimal.</p>
+
+</div>
+</div>
+</div>
+
+
+</div>
+
+{% endraw %}
