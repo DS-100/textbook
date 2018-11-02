@@ -17,12 +17,16 @@ next_page: '/ch/11/gradient_convexity.html'
 
 
 
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="c1"># Clear previously defined variables</span>
@@ -33,19 +37,28 @@ next_page: '/ch/11/gradient_convexity.html'
 <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/11&#39;</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -57,38 +70,46 @@ next_page: '/ch/11/gradient_convexity.html'
 
 <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
 <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;total_bill&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
@@ -107,7 +128,6 @@ next_page: '/ch/11/gradient_convexity.html'
     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">loss_fn</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
     
 <span class="k">def</span> <span class="nf">plot_theta_on_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
@@ -123,11 +143,11 @@ next_page: '/ch/11/gradient_convexity.html'
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Gradient-Descent">Gradient Descent<a class="anchor-link" href="#Gradient-Descent">&#182;</a></h2><p>We are interested in creating a function that can minimize a loss function without forcing the user to predetermine which values of $\theta$ to try. In other words, while the <code>simple_minimize</code> function has the following signature:</p>
@@ -150,12 +170,14 @@ next_page: '/ch/11/gradient_convexity.html'
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
@@ -163,7 +185,7 @@ next_page: '/ch/11/gradient_convexity.html'
 <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -187,7 +209,7 @@ next_page: '/ch/11/gradient_convexity.html'
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We'd like to choose a new value for $\theta$ that decreases the loss. To do this, we look at the slope of the loss function at $\theta= 12 $:</p>
@@ -195,12 +217,14 @@ next_page: '/ch/11/gradient_convexity.html'
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
@@ -208,7 +232,7 @@ next_page: '/ch/11/gradient_convexity.html'
 <span class="n">plot_tangent_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -232,7 +256,7 @@ next_page: '/ch/11/gradient_convexity.html'
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The slope is negative, which means that increasing $\theta$ will decrease the loss.</p>
@@ -241,12 +265,14 @@ next_page: '/ch/11/gradient_convexity.html'
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
@@ -254,7 +280,7 @@ next_page: '/ch/11/gradient_convexity.html'
 <span class="n">plot_tangent_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">16.5</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -278,16 +304,17 @@ next_page: '/ch/11/gradient_convexity.html'
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>When the slope is positive, decreasing $ \theta $ will decrease the loss.</p>
 <p>The slope of the tangent line tells us which direction to move $ \theta $ in order to decrease the loss. If the slope is negative, we want $ \theta $ to move in the positive direction. If the slope is positive, $\theta $ should move in the negative direction. Mathematically, we write:</p>
-$$
+<p>$$
 \theta^{(t+1)} = \theta^{(t)} - \frac{\partial}{\partial \theta} L(\theta^{(t)}, \textbf{y})
-$$<p>Where $ \theta^{(t)} $ is the current estimate and $ \theta^{(t+1)} $ is the next estimate.</p>
+$$</p>
+<p>Where $ \theta^{(t)} $ is the current estimate and $ \theta^{(t+1)} $ is the next estimate.</p>
 <p>For the MSE, we have:</p>
-$$
+<p>$$
 \begin{aligned}
 L(\theta, \textbf{y})
 &amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
@@ -295,28 +322,31 @@ L(\theta, \textbf{y})
 &amp;= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
 &amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
 \end{aligned}
-$$<p>When $ \theta^{(t)} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.2 $. Thus, $ \theta^{(t+1)} = 12 - (-5.2) = 17.2 $.</p>
+$$</p>
+<p>When $ \theta^{(t)} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) = -5.32 $. Thus, $ \theta^{(t+1)} = 12 - (-5.32) = 17.32 $.</p>
 <p>We've plotted the old value of $ \theta $ as a green outlined circle and the new value as a filled in circle on the loss curve below.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
 <span class="n">plot_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">mse</span><span class="p">)</span>
 <span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                    <span class="n">edgecolor</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
+<span class="n">plot_theta_on_loss</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">17.32</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -340,23 +370,26 @@ $$<p>When $ \theta^{(t)} = 12 $, we can compute $ -\frac{2}{n} \sum_{i = 1}^{n} 
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Although $ \theta $ went in the right direction, it ended up as far away from the minimum as it started. We can remedy this by multiplying the slope by a small constant before subtracting it from $ \theta$. Our final update formula is:</p>
-$$
+<p>$$
 \theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \frac{\partial}{\partial \theta} L(\theta^{(t)}, \textbf{y})
-$$<p>where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:</p>
+$$</p>
+<p>where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3 $, this is the new $ \theta^{(t+1)} $:</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="k">def</span> <span class="nf">plot_one_gd_iter</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
@@ -369,23 +402,25 @@ $$<p>where $ \alpha $ is a small constant. For example, if we set $ \alpha = 0.3
     <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;new theta: </span><span class="si">{new_theta}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -420,7 +455,7 @@ new theta: 13.596
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Here are the $ \theta $ values for successive iterations of this process. Notice that $ \theta $ changes more slowly as it gets closer to the minimum loss because the slope is also smaller.</p>
@@ -428,18 +463,20 @@ new theta: 13.596
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">13.60</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -474,19 +511,21 @@ new theta: 14.236
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">14.24</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -521,19 +560,21 @@ new theta: 14.492
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="n">plot_one_gd_iter</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="mf">14.49</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">grad_mse</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -568,7 +609,7 @@ new theta: 14.592
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Gradient-Descent-Analysis">Gradient Descent Analysis<a class="anchor-link" href="#Gradient-Descent-Analysis">&#182;</a></h3><p>We now have the full algorithm for gradient descent:</p>
@@ -578,9 +619,10 @@ new theta: 14.592
 <li>Repeat until $ \theta $ doesn't change between iterations.</li>
 </ol>
 <p>You will more commonly see the gradient $ \nabla_\theta $ in place of the partial derivative $ \frac{\partial}{\partial \theta} $. The two notations are essentially equivalent, but since the gradient notation is more common we will use it in the gradient update formula from now on:</p>
-$$
+<p>$$
 \theta^{(t+1)} = \theta^{(t)} - \alpha \cdot \nabla_\theta L(\theta^{(t)}, \textbf{y})
-$$<p>To review notation:</p>
+$$</p>
+<p>To review notation:</p>
 <ul>
 <li>$ \theta^{(t)} $ is the current estimate of $ \theta^* $ at the $t$th iteration.</li>
 <li>$ \theta^{(t+1)} $ is the next choice of $ \theta $.</li>
@@ -600,12 +642,14 @@ $$<p>To review notation:</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
@@ -625,11 +669,11 @@ $$<p>To review notation:</p>
         <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Then we can define functions to compute our MSE and its gradient:</p>
@@ -637,12 +681,14 @@ $$<p>To review notation:</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
@@ -651,11 +697,11 @@ $$<p>To review notation:</p>
     <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally, we can use the <code>minimize</code> function to compute the minimizing value of $ \theta $ for $ \textbf{y} = [12.1, 12.8, 14.9, 16.3, 17.2] $.</p>
@@ -663,12 +709,14 @@ $$<p>To review notation:</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
 theta = minimize(mse, grad_mse, np.array([12.1, 12.8, 14.9, 16.3, 17.2]))
@@ -676,7 +724,7 @@ print(f&#39;Minimizing theta: {theta}&#39;)
 print()
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -709,7 +757,8 @@ theta: 14.66 | loss: 3.84
 theta: 14.66 | loss: 3.84
 Minimizing theta: 14.658511131035242
 
-Wall time: 1.99 ms
+CPU times: user 7.88 ms, sys: 3.58 ms, total: 11.5 ms
+Wall time: 8.54 ms
 </pre>
 </div>
 </div>
@@ -717,25 +766,27 @@ Wall time: 1.99 ms
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see that gradient quickly finds the same solution as the analytic method:</p>
+<p>We can see that gradient descent quickly finds the same solution as the analytic method:</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -758,33 +809,39 @@ Wall time: 1.99 ms
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Minimizing-the-Huber-loss">Minimizing the Huber loss<a class="anchor-link" href="#Minimizing-the-Huber-loss">&#182;</a></h3><p>Now, we can apply gradient descent to minimize the Huber loss on our dataset of tip percentages.</p>
 <p>The Huber loss is:</p>
-$$
+<p>$$
 L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
     \frac{1}{2}(y_i - \theta)^2 &amp;  | y_i - \theta | \le \delta \\
      \delta (|y_i - \theta| - \frac{1}{2} \delta ) &amp; \text{otherwise}
 \end{cases}
-$$<p>The gradient of the Huber loss is:</p>
-$$
-\nabla_{\theta} L_\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
-    -(y_i - \theta) &amp;  | y_i - \theta | \le \delta \\
-    - \delta \cdot \text{sign} (y_i - \theta) &amp; \text{otherwise}
-\end{cases}
-$$<p>(Note that in previous definitions of Huber loss we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)</p>
+$$</p>
+<p>The gradient of the Huber loss is:</p>
+<p>$$
+\nabla<em>{\theta} L</em>\delta(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    -(y_i - \theta) &amp;  | y_i - \theta | \le \delta \</p>
+
+<pre><code>- \delta \cdot \text{sign} (y_i - \theta) &amp; \text{otherwise}
+</code></pre>
+<p>\end{cases}
+$$</p>
+<p>(Note that in previous definitions of Huber loss we used the variable $ \alpha $ to denote the transition point. To avoid confusion with the $ \alpha $ used in gradient descent, we replace the transition point parameter of the Huber loss with $ \delta $.)</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">huber_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span> <span class="o">-</span> <span class="n">dataset</span><span class="p">)</span>
@@ -803,11 +860,11 @@ $$<p>(Note that in previous definitions of Huber loss we used the variable $ \al
     <span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's minimize the Huber loss on the tips dataset:</p>
@@ -815,12 +872,14 @@ $$<p>(Note that in previous definitions of Huber loss we used the variable $ \al
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">time</span>
 theta = minimize(huber_loss, grad_huber_loss, tips[&#39;pcttip&#39;], progress=False)
@@ -828,7 +887,7 @@ print(f&#39;Minimizing theta: {theta}&#39;)
 print()
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -843,7 +902,8 @@ print()
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Minimizing theta: 15.506849531471964
 
-Wall time: 210 ms
+CPU times: user 194 ms, sys: 4.13 ms, total: 198 ms
+Wall time: 208 ms
 </pre>
 </div>
 </div>
@@ -851,7 +911,7 @@ Wall time: 210 ms
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3><p>Gradient descent gives us a generic way to minimize a loss function when we cannot solve for the minimizing value of $ \theta $ analytically. As our models and loss functions increase in complexity, we will turn to gradient descent as our tool of choice to fit models.</p>
