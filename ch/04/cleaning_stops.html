@@ -1,0 +1,1256 @@
+---
+prev_page: '/ch/04/cleaning_calls.html'
+next_page: '/ch/05/eda_intro.html'
+---
+
+{% raw %}
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/04/cleaning_stops.ipynb">Open on DataHub</a>
+    </div>
+    
+
+
+
+
+
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/04&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="mi">5</span><span class="p">]</span>
+    <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Cleaning-The-Stops-Dataset">Cleaning The Stops Dataset<a class="anchor-link" href="#Cleaning-The-Stops-Dataset">&#182;</a></h2><p>The Stops dataset (<a href="https://data.cityofberkeley.info/Public-Safety/Berkeley-PD-Stop-Data/6e9j-pj9p">webpage</a>) records police stops of pedestrians and vehicles. Let's prepare it for further analysis.</p>
+<p>We can use the <code>head</code> command to display the first few lines of the file.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>head data/stops.json
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{
+  &#34;meta&#34; : {
+    &#34;view&#34; : {
+      &#34;id&#34; : &#34;6e9j-pj9p&#34;,
+      &#34;name&#34; : &#34;Berkeley PD - Stop Data&#34;,
+      &#34;attribution&#34; : &#34;Berkeley Police Department&#34;,
+      &#34;averageRating&#34; : 0,
+      &#34;category&#34; : &#34;Public Safety&#34;,
+      &#34;createdAt&#34; : 1444171604,
+      &#34;description&#34; : &#34;This data was extracted from the Department’s Public Safety Server and covers the data beginning January 26, 2015.  On January 26, 2015 the department began collecting data pursuant to General Order B-4 (issued December 31, 2014).  Under that order, officers were required to provide certain data after making all vehicle detentions (including bicycles) and pedestrian detentions (up to five persons).  This data set lists stops by police in the categories of traffic, suspicious vehicle, pedestrian and bicycle stops.  Incident number, date and time, location and disposition codes are also listed in this data.\r\n\r\nAddress data has been changed from a specific address, where applicable, and listed as the block where the incident occurred.  Disposition codes were entered by officers who made the stop.  These codes included the person(s) race, gender, age (range), reason for the stop, enforcement action taken, and whether or not a search was conducted.\r\n\r\nThe officers of the Berkeley Police Department are prohibited from biased based policing, which is defined as any police-initiated action that relies on the race, ethnicity, or national origin rather than the behavior of an individual or information that leads the police to a particular individual who has been identified as being engaged in criminal activity.&#34;,
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>stops.json</code> file is clearly not a CSV file. In this case, the file contains data in the JSON (JavaScript Object Notation) format, a commonly used data format where data is recorded in a dictionary format. Python's <a href="https://docs.python.org/3/library/json.html"><code>json</code> module</a> makes reading in this file as a dictionary simple.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1"># Note that this could cause our computer to run out of memory if the file</span>
+<span class="c1"># is large. In this case, we&#39;ve verified that the file is small enough to</span>
+<span class="c1"># read in beforehand.</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/stops.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">stops_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">stops_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>dict_keys([&#39;meta&#39;, &#39;data&#39;])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note that <code>stops_dict</code> is a Python dictionary, so displaying it will display the entire dataset in the notebook. This could cause the browser to crash, so we only display the keys of the dictionary above. To peek at the data without potentially crashing the browser, we can print the dictionary to a string and only output some of the first characters of the string.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
+
+<span class="k">def</span> <span class="nf">print_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">num_chars</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pformat</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)[:</span><span class="n">num_chars</span><span class="p">])</span>
+
+<span class="n">print_dict</span><span class="p">(</span><span class="n">stops_dict</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{&#39;view&#39;: {&#39;attribution&#39;: &#39;Berkeley Police Department&#39;,
+          &#39;averageRating&#39;: 0,
+          &#39;category&#39;: &#39;Public Safety&#39;,
+          &#39;columns&#39;: [{&#39;dataTypeName&#39;: &#39;meta_data&#39;,
+                       &#39;fieldName&#39;: &#39;:sid&#39;,
+                       &#39;flags&#39;: [&#39;hidden&#39;],
+                       &#39;format&#39;: {},
+                       &#39;id&#39;: -1,
+                       &#39;name&#39;: &#39;sid&#39;,
+                       &#39;position&#39;: 0,
+                       &#39;renderTypeName&#39;: &#39;meta_data&#39;},
+                      {&#39;dataTypeName&#39;: &#39;meta_data&#39;,
+                       &#39;fieldName&#39;: &#39;:id&#39;,
+                       &#39;flags&#39;: [&#39;hidden&#39;],
+                       &#39;format&#39;: {},
+                       &#39;id&#39;: -1,
+                       &#39;name&#39;: &#39;id&#39;,
+                       &#39;position&#39;: 0,
+                       &#39;renderTypeName&#39;: &#39;meta_data&#39;},
+                      {&#39;dataTypeName&#39;: &#39;meta_data&#39;,
+                       &#39;fieldName&#39;: &#39;:position&#39;,
+                       &#39;flags&#39;: [&#39;hidden&#39;],
+                       &#39;format&#39;: {},
+              
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">print_dict</span><span class="p">(</span><span class="n">stops_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">num_chars</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[1,
+  &#39;29A1B912-A0A9-4431-ADC9-FB375809C32E&#39;,
+  1,
+  1444146408,
+  &#39;932858&#39;,
+  1444146408,
+  &#39;932858&#39;,
+  None,
+  &#39;2015-00004825&#39;,
+  &#39;2015-01-26T00:10:00&#39;,
+  &#39;SAN PABLO AVE / MARIN AVE&#39;,
+  &#39;T&#39;,
+  &#39;M&#39;,
+  None,
+  None],
+ [2,
+  &#39;1644D161-1113-4C4F-BB2E-BF780E7AE73E&#39;,
+  2,
+  1444146408,
+  &#39;932858&#39;,
+  14
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can likely deduce that the <code>'meta'</code> key in the dictionary contains a description of the data and its columns and the <code>'data'</code> contains a list of data rows. We can use this information to initialize a DataFrame.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load the data from JSON and assign column titles</span>
+<span class="n">stops</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">stops_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">stops_dict</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;view&#39;</span><span class="p">][</span><span class="s1">&#39;columns&#39;</span><span class="p">]])</span>
+
+<span class="n">stops</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sid</th>
+      <th>id</th>
+      <th>position</th>
+      <th>created_at</th>
+      <th>...</th>
+      <th>Incident Type</th>
+      <th>Dispositions</th>
+      <th>Location - Latitude</th>
+      <th>Location - Longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>29A1B912-A0A9-4431-ADC9-FB375809C32E</td>
+      <td>1</td>
+      <td>1444146408</td>
+      <td>...</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1644D161-1113-4C4F-BB2E-BF780E7AE73E</td>
+      <td>2</td>
+      <td>1444146408</td>
+      <td>...</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>5338ABAB-1C96-488D-B55F-6A47AC505872</td>
+      <td>3</td>
+      <td>1444146408</td>
+      <td>...</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>29205</th>
+      <td>31079</td>
+      <td>C2B606ED-7872-4B0B-BC9B-4EF45149F34B</td>
+      <td>31079</td>
+      <td>1496269085</td>
+      <td>...</td>
+      <td>T</td>
+      <td>BM2TWN;</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>29206</th>
+      <td>31080</td>
+      <td>8FADF18D-7FE9-441D-8709-7BFEABDACA7A</td>
+      <td>31080</td>
+      <td>1496269085</td>
+      <td>...</td>
+      <td>T</td>
+      <td>HM4TCS;</td>
+      <td>37.8698757000001</td>
+      <td>-122.286550846</td>
+    </tr>
+    <tr>
+      <th>29207</th>
+      <td>31081</td>
+      <td>F60BD2A4-8C47-4BE7-B1C6-4934BE9DF838</td>
+      <td>31081</td>
+      <td>1496269085</td>
+      <td>...</td>
+      <td>1194</td>
+      <td>AR;</td>
+      <td>37.867207539</td>
+      <td>-122.256529377</td>
+    </tr>
+  </tbody>
+</table>
+<p>29208 rows × 15 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Prints column names</span>
+<span class="n">stops</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index([&#39;sid&#39;, &#39;id&#39;, &#39;position&#39;, &#39;created_at&#39;, &#39;created_meta&#39;, &#39;updated_at&#39;,
+       &#39;updated_meta&#39;, &#39;meta&#39;, &#39;Incident Number&#39;, &#39;Call Date/Time&#39;, &#39;Location&#39;,
+       &#39;Incident Type&#39;, &#39;Dispositions&#39;, &#39;Location - Latitude&#39;,
+       &#39;Location - Longitude&#39;],
+      dtype=&#39;object&#39;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The website contains documentation about the following columns:</p>
+<table>
+<thead><tr>
+<th>Column</th>
+<th>Description</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incident Number</td>
+<td>Number of incident created by Computer Aided Dispatch (CAD) program</td>
+<td>Plain Text</td>
+</tr>
+<tr>
+<td>Call Date/Time</td>
+<td>Date and time of the incident/stop</td>
+<td>Date &amp; Time</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>General location of the incident/stop</td>
+<td>Plain Text</td>
+</tr>
+<tr>
+<td>Incident Type</td>
+<td>This is the occurred incident type created in the CAD program. A code signifies a traffic stop (T), suspicious vehicle stop (1196), pedestrian stop (1194) and bicycle stop (1194B).</td>
+<td>Plain Text</td>
+</tr>
+<tr>
+<td>Dispositions</td>
+<td>Ordered in the following sequence: 1st Character = Race, as follows: A (Asian) B (Black) H (Hispanic) O (Other) W (White) 2nd Character = Gender, as follows: F (Female) M (Male) 3rd Character = Age Range, as follows: 1 (Less than 18) 2 (18-29) 3 (30-39), 4 (Greater than 40) 4th Character = Reason, as follows: I (Investigation) T (Traffic) R (Reasonable Suspicion) K (Probation/Parole) W (Wanted) 5th Character = Enforcement, as follows: A (Arrest) C (Citation) O (Other) W (Warning) 6th Character = Car Search, as follows: S (Search) N (No Search) Additional dispositions may also appear. They are: P - Primary case report M - MDT narrative only AR - Arrest report only (no case report submitted) IN - Incident report FC - Field Card CO - Collision investigation report MH - Emergency Psychiatric Evaluation TOW - Impounded vehicle 0 or 00000 – Officer made a stop of more than five persons</td>
+<td>Plain Text</td>
+</tr>
+<tr>
+<td>Location - Latitude</td>
+<td>General latitude of the call. This data is only uploaded after January 2017</td>
+<td>Number</td>
+</tr>
+<tr>
+<td>Location - Longitude</td>
+<td>General longitude of the call. This data is only uploaded after January 2017.</td>
+<td>Number</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice that the website doesn't contain descriptions for the first 8 columns of the <code>stops</code> table. Since these columns appear to contain metadata that we're not interested in analyzing this time, we drop them from the table.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">columns_to_drop</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sid&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;created_meta&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;updated_at&#39;</span><span class="p">,</span> <span class="s1">&#39;updated_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;meta&#39;</span><span class="p">]</span>
+
+<span class="c1"># This function takes in a DF and returns a DF so we can use it for .pipe</span>
+<span class="k">def</span> <span class="nf">drop_unneeded_cols</span><span class="p">(</span><span class="n">stops</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">stops</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns_to_drop</span><span class="p">)</span>
+
+<span class="n">stops</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_unneeded_cols</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Incident Number</th>
+      <th>Call Date/Time</th>
+      <th>Location</th>
+      <th>Incident Type</th>
+      <th>Dispositions</th>
+      <th>Location - Latitude</th>
+      <th>Location - Longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2015-00004825</td>
+      <td>2015-01-26T00:10:00</td>
+      <td>SAN PABLO AVE / MARIN AVE</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2015-00004829</td>
+      <td>2015-01-26T00:50:00</td>
+      <td>SAN PABLO AVE / CHANNING WAY</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2015-00004831</td>
+      <td>2015-01-26T01:03:00</td>
+      <td>UNIVERSITY AVE / NINTH ST</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>29205</th>
+      <td>2017-00024245</td>
+      <td>2017-04-30T22:59:26</td>
+      <td>UNIVERSITY AVE/6TH ST</td>
+      <td>T</td>
+      <td>BM2TWN;</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>29206</th>
+      <td>2017-00024250</td>
+      <td>2017-04-30T23:19:27</td>
+      <td>UNIVERSITY AVE /  WEST ST</td>
+      <td>T</td>
+      <td>HM4TCS;</td>
+      <td>37.8698757000001</td>
+      <td>-122.286550846</td>
+    </tr>
+    <tr>
+      <th>29207</th>
+      <td>2017-00024254</td>
+      <td>2017-04-30T23:38:34</td>
+      <td>CHANNING WAY /  BOWDITCH ST</td>
+      <td>1194</td>
+      <td>AR;</td>
+      <td>37.867207539</td>
+      <td>-122.256529377</td>
+    </tr>
+  </tbody>
+</table>
+<p>29208 rows × 7 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As with the Calls dataset, we will answer the following three questions about the Stops dataset:</p>
+<ol>
+<li>Are there missing values in the dataset?</li>
+<li>Are there any missing values that were filled in (e.g. a 999 for unknown age or 12:00am for unknown date)?</li>
+<li>Which parts of the data were entered by a human?</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Are-there-missing-values?">Are there missing values?<a class="anchor-link" href="#Are-there-missing-values?">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can clearly see that there are many missing latitude and longitudes. The data description states that these two columns are only filled in after Jan 2017.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># True if row contains at least one null value</span>
+<span class="n">null_rows</span> <span class="o">=</span> <span class="n">stops</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">stops</span><span class="p">[</span><span class="n">null_rows</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Incident Number</th>
+      <th>Call Date/Time</th>
+      <th>Location</th>
+      <th>Incident Type</th>
+      <th>Dispositions</th>
+      <th>Location - Latitude</th>
+      <th>Location - Longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2015-00004825</td>
+      <td>2015-01-26T00:10:00</td>
+      <td>SAN PABLO AVE / MARIN AVE</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2015-00004829</td>
+      <td>2015-01-26T00:50:00</td>
+      <td>SAN PABLO AVE / CHANNING WAY</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2015-00004831</td>
+      <td>2015-01-26T01:03:00</td>
+      <td>UNIVERSITY AVE / NINTH ST</td>
+      <td>T</td>
+      <td>M</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>29078</th>
+      <td>2017-00023764</td>
+      <td>2017-04-29T01:59:36</td>
+      <td>2180 M L KING JR WAY</td>
+      <td>1194</td>
+      <td>BM4IWN;</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>29180</th>
+      <td>2017-00024132</td>
+      <td>2017-04-30T12:54:23</td>
+      <td>6TH/UNI</td>
+      <td>1194</td>
+      <td>M;</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>29205</th>
+      <td>2017-00024245</td>
+      <td>2017-04-30T22:59:26</td>
+      <td>UNIVERSITY AVE/6TH ST</td>
+      <td>T</td>
+      <td>BM2TWN;</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>25067 rows × 7 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can check the other columns for missing values:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># True if row contains at least one null value without checking</span>
+<span class="c1"># the latitude and longitude columns</span>
+<span class="n">null_rows</span> <span class="o">=</span> <span class="n">stops</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">df_interact</span><span class="p">(</span><span class="n">stops</span><span class="p">[</span><span class="n">null_rows</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(63 rows, 7 columns) total
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>By browsing through the table above, we can see that all other missing values are in the Dispositions column. Unfortunately, we do not know from the data description why these Dispositions might be missing. Since only there are only 63 missing values compared to 25,000 rows in the original table, we can proceed with analysis while being mindful that these missing values could impact results.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Are-there-any-missing-values-that-were-filled-in?">Are there any missing values that were filled in?<a class="anchor-link" href="#Are-there-any-missing-values-that-were-filled-in?">&#182;</a></h3><p>It doesn't seem like any previously missing values were filled in for us. Unlike in the Calls dataset where the date and time were in separate columns, the Call Date/Time column in the Stops dataset contains both date and time.</p>
+<h3 id="Which-parts-of-the-data-were-entered-by-a-human?">Which parts of the data were entered by a human?<a class="anchor-link" href="#Which-parts-of-the-data-were-entered-by-a-human?">&#182;</a></h3><p>As with the Calls dataset, it looks like most of the columns in this dataset were recorded by a machine or were a category selected by a human (e.g. Incident Type).</p>
+<p>However, the Location column doesn't have consistently entered values. Sure enough, we spot some typos in the data:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">stops</span><span class="p">[</span><span class="s1">&#39;Location&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>2200 BLOCK SHATTUCK AVE            229
+37.8693028530001~-122.272234021    213
+UNIVERSITY AVE / SAN PABLO AVE     202
+                                  ... 
+VALLEY ST / DWIGHT WAY               1
+COLLEGE AVE / SIXTY-THIRD ST         1
+GRIZZLY PEAK BLVD / MARIN AVE        1
+Name: Location, Length: 6393, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What a mess! It looks like sometimes an address was entered, sometimes a cross-street, and other times a latitude-longitude pair. Unfortunately, we don't have very complete latitude-longitude data to use in place of this column. We may have to manually clean this column if we want to use locations for future analysis.</p>
+<p>We can also check the Dispositions column:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dispositions</span> <span class="o">=</span> <span class="n">stops</span><span class="p">[</span><span class="s1">&#39;Dispositions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+
+<span class="c1"># Outputs a slider to pan through the unique Dispositions in</span>
+<span class="c1"># order of how often they appear</span>
+<span class="n">interact</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span> <span class="n">dispositions</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span><span class="o">+</span><span class="mi">7</span><span class="p">],</span>
+         <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dispositions</span><span class="p">),</span> <span class="mi">7</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;function __main__.&lt;lambda&gt;&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The Dispositions columns also contains inconsistencies. For example, some dispositions start with a space, some end with a semicolon, and some contain multiple entries. The variety of values suggests that this field contains human-entered values and should be treated with caution.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Strange values...</span>
+<span class="n">dispositions</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">266</span><span class="p">,</span> <span class="mi">1027</span><span class="p">]]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>M           1683
+M;           238
+ M           176
+HF4TWN;       14
+ OM4KWS        1
+Name: Dispositions, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In addition, the most common disposition is <code>M</code> which isn't a permitted first character in the Dispositions column. This could mean that the format of the column changed over time or that officers are allowed to enter in the disposition without matching the format in the data description. In any case, the column will be challenging to work with.</p>
+<p>We can take some simple steps to clean the Dispositions column by removing leading and trailing whitespace, removing trailing semi-colons, and replacing the remaining semi-colons with commas.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">clean_dispositions</span><span class="p">(</span><span class="n">stops</span><span class="p">):</span>
+    <span class="n">cleaned</span> <span class="o">=</span> <span class="p">(</span><span class="n">stops</span><span class="p">[</span><span class="s1">&#39;Dispositions&#39;</span><span class="p">]</span>
+               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">stops</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Dispositions</span><span class="o">=</span><span class="n">cleaned</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As before, we can now pipe the <code>stops</code> DF through the cleaning functions we've defined:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">stops_final</span> <span class="o">=</span> <span class="p">(</span><span class="n">stops</span>
+               <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_unneeded_cols</span><span class="p">)</span>
+               <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">clean_dispositions</span><span class="p">))</span>
+<span class="n">df_interact</span><span class="p">(</span><span class="n">stops_final</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(29208 rows, 7 columns) total
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>As these two datasets have shown, data cleaning can often be both difficult and tedious. Cleaning 100% of the data often takes too long, but not cleaning the data at all results in faulty conclusions; we have to weigh our options and strike a balance each time we encounter a new dataset.</p>
+<p>The decisions made during data cleaning impact all future analyses. For example, we chose not to clean the Location column of the Stops dataset so we should treat that column with caution. Each decision made during data cleaning should be carefully documented for future reference, preferably in a notebook so that both code and explanations appear together.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Save data to CSV for other chapters</span>
+<span class="c1"># stops_final.to_csv(&#39;../ch5/data/stops.csv&#39;, index=False)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+
+</div>
+
+{% endraw %}
