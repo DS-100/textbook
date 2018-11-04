@@ -1,6 +1,6 @@
 ---
 prev_page: '/ch/09/sql_basics.html'
-next_page: '/ch/10/modeling_estimation.html'
+next_page: '/ch/10/modeling_intro.html'
 ---
 
 {% raw %}
@@ -17,12 +17,16 @@ next_page: '/ch/10/modeling_estimation.html'
 
 
 
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
-  style="display:none;"
->
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="c1"># Clear previously defined variables</span>
@@ -33,43 +37,60 @@ next_page: '/ch/10/modeling_estimation.html'
 <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/09&#39;</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
-<span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-<span class="c1"># Delete the database if it already exists.</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
-<span class="n">dbfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;sql_joins.db&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">dbfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-    <span class="n">dbfile</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-
-<span class="n">sqlite_uri</span> <span class="o">=</span> <span class="s2">&quot;sqlite:///sql_joins.db&quot;</span>
-<span class="n">sqlite_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">sqlite_uri</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="c1"># Make names table</span>
@@ -92,17 +113,19 @@ next_page: '/ch/10/modeling_estimation.html'
 <span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="c1"># Make colors table</span>
@@ -125,17 +148,19 @@ next_page: '/ch/10/modeling_estimation.html'
 <span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+  </div>
 
-<div class="inner_cell"
-  style="display:none;"
->
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
 <span class="c1"># Make ages table</span>
@@ -158,11 +183,11 @@ next_page: '/ch/10/modeling_estimation.html'
 <span class="n">result</span> <span class="o">=</span> <span class="n">sqlite_engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="SQL-Joins">SQL Joins<a class="anchor-link" href="#SQL-Joins">&#182;</a></h2>
@@ -652,12 +677,14 @@ next_page: '/ch/10/modeling_estimation.html'
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql_expr</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">SELECT *</span>
@@ -666,7 +693,7 @@ next_page: '/ch/10/modeling_estimation.html'
 <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -827,7 +854,7 @@ next_page: '/ch/10/modeling_estimation.html'
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This operation is often called a <em>Cartesian product</em>: each row in the first table is paired with every row in the second table. Notice that many rows contain cat colors that are not matched properly with their names. The additional <code>WHERE</code>  clause in the implicit join filters out rows that do not have matching <code>cat_id</code> values.</p>
@@ -929,12 +956,14 @@ next_page: '/ch/10/modeling_estimation.html'
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell"
   
->
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Joining three tables</span>
 
@@ -947,7 +976,7 @@ next_page: '/ch/10/modeling_estimation.html'
 <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql_expr</span><span class="p">,</span> <span class="n">sqlite_engine</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1013,7 +1042,7 @@ next_page: '/ch/10/modeling_estimation.html'
 </div>
 </div>
 
-</div>
+  </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>We have covered the four main types of SQL joins: inner, full, left, and right joins. We use all four joins to combine information in separate relations, and each join differs only in how it handles non-matching rows in the input tables.</p>

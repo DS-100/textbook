@@ -12,10 +12,10 @@ const runWhenDOMLoaded = cb => {
   if (document.readyState != 'loading') {
     cb()
   } else if (document.addEventListener) {
-    document.addEventListener('DOMContentLoaded', run)
+    document.addEventListener('DOMContentLoaded', cb)
   } else {
     document.attachEvent('onreadystatechange', function() {
-      if (document.readyState == 'complete') run()
+      if (document.readyState == 'complete') cb()
     })
   }
 }
