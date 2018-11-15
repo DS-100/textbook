@@ -6,7 +6,7 @@ next_page: '/about_this_book.html'
 
 # Principles and Techniques of Data Science
 
-**By [Sam Lau][sam], [Deb Nolan][deb], and [Joey Gonzalez][joey].**
+**By [Sam Lau][sam], [Joey Gonzalez][joey], and [Deb Nolan][deb].**
 
 This is the textbook for
 [Data 100, the Principles and Techniques of Data Science course at UC Berkeley][ds100].
