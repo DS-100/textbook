@@ -192,4 +192,4 @@ if __name__ == '__main__':
     url_map = read_url_map()
 
     convert_notebooks_to_html_partial(notebooks, url_map)
-    # convert_notebooks_to_markdown(notebooks)
+    convert_notebooks_to_markdown(notebooks)
