@@ -1,5 +1,5 @@
 """
-Exports a single function, `read_url_map(yaml_path)` that reads _data/toc.yml
+Exports a function `read_url_map(yaml_path)` that reads _data/toc.yml
 and returns a mapping from each URL to its previous and next URLs in the
 textbook. The ordered dictionary looks like:
 
@@ -15,7 +15,7 @@ import yaml
 import toolz.curried as t
 from itertools import chain
 
-__all__ = ['read_url_map']
+__all__ = ['read_url_map', 'read_redirects']
 
 # YAML file containing textbook table of contents
 TOC_PATH = '_data/toc.yml'
@@ -39,6 +39,27 @@ def read_url_map(yaml_path=TOC_PATH) -> dict:
         _sliding_three,
         t.map(_adj_pages),
         t.merge(),
+    )
+
+
+def read_redirects(yaml_path=TOC_PATH) -> dict:
+    """
+    Generates redirect mapping of old URL to new URL:
+
+    {
+        'ch/04/cleaning_intro.html': 'ch/05/cleaning_intro.html',
+        ...
+    }
+    """
+    with open(yaml_path) as f:
+        data = yaml.load(f)
+
+    return t.pipe(
+        data,
+        t.map(_get_redirects),
+        t.filter(t.identity),
+        t.concat,
+        _merge_redirects,
     )
 
 
@@ -73,15 +94,26 @@ def _not_internal_link(entry):
     return not entry.get('url', '').startswith('/')
 
 
+def _get_redirects(entry):
+    return entry.get('redirects', False)
+
+
+def _merge_redirects(redirects):
+    def _merge_redirect(mapping, redirect):
+        return t.assoc(mapping, redirect['from'], redirect['to'])
+
+    return t.reduce(_merge_redirect, redirects, {})
+
+
 def _flatten_sections(entry):
     sections = entry.get('sections', [])
     return [t.dissoc(entry, 'sections')] + sections
 
 
 def _sliding_three(entries):
-    return ([(None, entries[0], entries[1])] +
-            list(t.sliding_window(3, entries)) +
-            [(entries[-2], entries[-1], None)])
+    return ([(None, entries[0], entries[1])] + list(
+        t.sliding_window(3, entries)
+    ) + [(entries[-2], entries[-1], None)])
 
 
 wrap_url = "'{}'".format
@@ -99,4 +131,4 @@ def _adj_pages(triplet):
 
 if __name__ == '__main__':
     from pprint import pprint
-    pprint(read_url_list())
+    pprint(read_redirects())
