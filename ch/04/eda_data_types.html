@@ -1,0 +1,817 @@
+---
+prev_page: '/ch/04/eda_intro.html'
+next_page: '/ch/05/cleaning_intro.html'
+---
+
+{% raw %}
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/04/eda_data_types.ipynb">Open on DataHub</a>
+    </div>
+    
+
+
+
+
+
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/04&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
+
+    <span class="n">row_arg</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">nrows</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">nrows</span> <span class="k">else</span> <span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">col_arg</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">ncols</span><span class="p">)</span>
+               <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">ncols</span> <span class="k">else</span> <span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    
+    <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">row_arg</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">col_arg</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">babies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/babies23.data&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;\s+&#39;</span><span class="p">)</span>
+<span class="n">babies_small</span> <span class="o">=</span> <span class="n">babies</span><span class="p">[[</span><span class="s1">&#39;wt&#39;</span><span class="p">,</span> <span class="s1">&#39;race&#39;</span><span class="p">,</span> <span class="s1">&#39;ed&#39;</span><span class="p">]]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Data-Types">Data Types<a class="anchor-link" href="#Data-Types">&#182;</a></h2><p>We often begin exploratory data analysis by examining the types of data that occur in a table. Although there are multiple ways of categorizing data types, in this book we discuss three broad types of data:</p>
+<ol>
+<li><strong>Nominal data</strong>, which represents categories that do not have a natural ordering. For example: names of people, beverage titles, and zip codes.</li>
+<li><strong>Ordinal data</strong>, which represents ordered categories. For example: T-shirt sizes (small, medium, large), Likert-scale responses (disagree, neutral, agree), and level of education (high school, college, graduate school).</li>
+<li><strong>Numerical data</strong>, which represents amounts or quantities. For example: heights, prices, and distances.</li>
+</ol>
+<p>We refer to these types as <strong>statistical data types</strong>, or simply <strong>data types</strong>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>pandas</code> assigns each column of a DataFrame a <strong>computational data type</strong> that represents how the data are stored in the computer's memory. It is essential to remember that the statistical data type can differ from the computational data type.</p>
+<p>For example, consider the table below which records weights of babies at birth, race of the mother, and educational level of the mother.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">babies_small</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>wt</th>
+      <th>race</th>
+      <th>ed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>120</td>
+      <td>8</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>113</td>
+      <td>0</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>128</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1233</th>
+      <td>130</td>
+      <td>1</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1234</th>
+      <td>125</td>
+      <td>0</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1235</th>
+      <td>117</td>
+      <td>0</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+<p>1236 rows × 3 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Every column of thie DataFrame has a numeric computational data type. In this case, the <code>int64</code> type signifies that each column contains integers.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">babies_small</span><span class="o">.</span><span class="n">dtypes</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>wt      int64
+race    int64
+ed      int64
+dtype: object</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>However, it would be foolish to work with all three columns as if they have a numeric statistical data type. In order to understand the dataset's data types, we almost always need to consult the dataset's <strong>data dictionary</strong>. A data dictionary is a document included with the data that describes what each column in the data records. For example, the data dictionary for this dataset states the following:</p>
+
+<pre><code>wt -  birth weight in ounces (999 unknown)
+race - mother's race 0-5=white 6=mex 7=black 8=asian 9=mixed 99=unknown
+ed - mother's education 0= less than 8th grade, 
+   1 = 8th -12th grade - did not graduate, 
+   2= HS graduate--no other schooling , 3= HS+trade,
+   4=HS+some college 5= College graduate, 6&amp;7 Trade school HS unclear, 9=unknown</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Although the <code>wt</code>, <code>race</code>, and <code>ed</code> columns are stored as integers in <code>pandas</code>, the <code>race</code> column contains nominal data and <code>ed</code> contains ordinal data.</p>
+<p>In fact, we must exercise caution even with the <code>wt</code> column. Computing the average birth weight by taking the average of the <code>wt</code> column will not give an accurate result because unknown values are recorded as <code>999</code>. If left as is, the unknown values will cause our average to be higher than it should be.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>The Importance of Data Types</strong></p>
+<p>Data types guide further data analysis by specifying the operations, visualizations, and models we can apply to values in the data. For example, differences between numerical data are meaningful while differences between ordinal data are not. This means that for the <code>babies_small</code> DataFrame the average baby birth weight has meaning but not the "average" educational level.</p>
+<p><code>pandas</code> will not complain if we attempt to compute the mean of the values in the educational level column:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Don&#39;t use this value in actual data analysis</span>
+<span class="n">babies_small</span><span class="p">[</span><span class="s1">&#39;ed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>2.9215210355987056</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This quantity, however, provides little useful information. We could have easily replaced the values in the <code>ed</code> column with their string descriptions — for example, we can replace <code>0</code>'s with <code>'less than 8th grade'</code>, <code>1</code>'s with <code>'8th-12th grade'</code>, and so on. We would not say that the "average" of these strings contains much value. We would not say the same with the average of the numeric values either.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Although the value differences of ordinal data are not meaningful, the direction of the difference has meaning. For example, we could say a mother with <code>ed=5</code> (college graduate) has a greater education level than a mother with <code>ed=2</code> (high school graduate).</p>
+<p>Nominal data, in comparison, do not provide meaning in the direction of the differences. A mother with <code>race=6</code> (Mexican) and a mother with <code>race=7</code> (Black) simply have different races.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example:-Infant-Health">Example: Infant Health<a class="anchor-link" href="#Example:-Infant-Health">&#182;</a></h3>
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">babies</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>pluralty</th>
+      <th>outcome</th>
+      <th>date</th>
+      <th>...</th>
+      <th>inc</th>
+      <th>smoke</th>
+      <th>time</th>
+      <th>number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>15</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1411</td>
+      <td>...</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1499</td>
+      <td>...</td>
+      <td>4</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>58</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1576</td>
+      <td>...</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1233</th>
+      <td>9213</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1672</td>
+      <td>...</td>
+      <td>3</td>
+      <td>1</td>
+      <td>1</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1234</th>
+      <td>9229</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1680</td>
+      <td>...</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1235</th>
+      <td>9263</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1668</td>
+      <td>...</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>1236 rows × 23 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/SFBusinesses/inspections.csv&#39;</span><span class="p">)</span>
+<span class="n">scores</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>score</th>
+      <th>date</th>
+      <th>type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>94</td>
+      <td>20160513</td>
+      <td>routine</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19</td>
+      <td>94</td>
+      <td>20171211</td>
+      <td>routine</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24</td>
+      <td>98</td>
+      <td>20171101</td>
+      <td>routine</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>14219</th>
+      <td>94142</td>
+      <td>100</td>
+      <td>20171220</td>
+      <td>routine</td>
+    </tr>
+    <tr>
+      <th>14220</th>
+      <td>94189</td>
+      <td>96</td>
+      <td>20171130</td>
+      <td>routine</td>
+    </tr>
+    <tr>
+      <th>14221</th>
+      <td>94231</td>
+      <td>85</td>
+      <td>20171214</td>
+      <td>routine</td>
+    </tr>
+  </tbody>
+</table>
+<p>14222 rows × 4 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">housing</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/SFHousing.csv&#39;</span><span class="p">)</span>
+<span class="n">housing</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Unnamed: 0</th>
+      <th>county</th>
+      <th>city</th>
+      <th>zip</th>
+      <th>...</th>
+      <th>lat</th>
+      <th>quality</th>
+      <th>match</th>
+      <th>wk</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Alameda County</td>
+      <td>Alameda</td>
+      <td>94501.0</td>
+      <td>...</td>
+      <td>37.76</td>
+      <td>gpsvisualizer</td>
+      <td>Exact</td>
+      <td>2003-04-21</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alameda County</td>
+      <td>Alameda</td>
+      <td>94501.0</td>
+      <td>...</td>
+      <td>37.76</td>
+      <td>QUALITY_ADDRESS_RANGE_INTERPOLATION</td>
+      <td>Exact</td>
+      <td>2003-04-21</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Alameda County</td>
+      <td>Alameda</td>
+      <td>94501.0</td>
+      <td>...</td>
+      <td>37.77</td>
+      <td>QUALITY_ADDRESS_RANGE_INTERPOLATION</td>
+      <td>Exact</td>
+      <td>2003-04-21</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>281503</th>
+      <td>348191</td>
+      <td>Sonoma County</td>
+      <td>Sonoma</td>
+      <td>95476.0</td>
+      <td>...</td>
+      <td>38.28</td>
+      <td>QUALITY_CITY_CENTROID</td>
+      <td>Exact</td>
+      <td>2006-05-29</td>
+    </tr>
+    <tr>
+      <th>281504</th>
+      <td>348192</td>
+      <td>Sonoma County</td>
+      <td>Windsor</td>
+      <td>95492.0</td>
+      <td>...</td>
+      <td>38.55</td>
+      <td>QUALITY_EXACT_PARCEL_CENTROID</td>
+      <td>Relaxed; Soundex</td>
+      <td>2006-05-29</td>
+    </tr>
+    <tr>
+      <th>281505</th>
+      <td>348193</td>
+      <td>Sonoma County</td>
+      <td>Windsor</td>
+      <td>95492.0</td>
+      <td>...</td>
+      <td>38.54</td>
+      <td>QUALITY_CITY_CENTROID</td>
+      <td>Exact</td>
+      <td>2006-05-29</td>
+    </tr>
+  </tbody>
+</table>
+<p>281506 rows × 16 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+
+
+</div>
+
+{% endraw %}
