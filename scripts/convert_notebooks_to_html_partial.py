@@ -25,7 +25,7 @@ import nbformat
 from nbinteract import InteractExporter
 from traitlets.config import Config
 
-from read_url_map import read_url_map
+from read_url_map import read_url_map, read_redirects
 
 # The HTML file needs to start with Jekyll front-matter and wrapped in a raw
 # tag so that Jekyll won't process double curly braces in the HTML
@@ -47,6 +47,26 @@ next_page: {next_page}
     {html}
 </div>
 
+{{% endraw %}}
+""".strip()
+
+# HTML file for redirects
+redirect_wrapper = """
+---
+---
+
+{{% raw %}}
+<script>
+  (function redirect() {{
+    if (window.Turbolinks === undefined) {{
+      setTimeout(redirect, 100)
+      return
+    }}
+
+    Turbolinks.visit("/{redirect_url}")
+  }})()
+
+</script>
 {{% endraw %}}
 """.strip()
 
@@ -124,8 +144,8 @@ def convert_notebooks_to_html_partial(notebook_paths, url_map):
         if outfile_path not in url_map:
             print(
                 '[Warning]: {} not found in _data/toc.yml. This page will '
-                'not appear in the textbook table of contents.'
-                .format(outfile_path)
+                'not appear in the textbook table of contents.'.
+                format(outfile_path)
             )
         prev_page = url_map.get(outfile_path, {}).get('prev', 'false')
         next_page = url_map.get(outfile_path, {}).get('next', 'false')
@@ -172,6 +192,18 @@ def _preamble_cell(path):
     return nbformat.v4.new_code_cell(source=code)
 
 
+def add_redirect_links(redirects):
+    """
+    Creates stub HTML files for redirects between URLs using the `redirects`
+    key from toc.yml.
+    """
+    for orig, to in redirects.items():
+        html = redirect_wrapper.format(redirect_url=to)
+        with open(orig, 'w', encoding='utf-8') as f:
+            f.write(html)
+        print(f'Redirect from {orig} to {to} written.')
+
+
 def convert_notebooks_to_markdown(notebook_paths):
     """
     Since notebooks are difficult to use for code reviewing, this converts each
@@ -189,7 +221,6 @@ if __name__ == '__main__':
     os.makedirs(NOTEBOOK_HTML_DIR, exist_ok=True)
     os.makedirs(NOTEBOOK_IMAGE_DIR, exist_ok=True)
 
-    url_map = read_url_map()
-
-    convert_notebooks_to_html_partial(notebooks, url_map)
+    convert_notebooks_to_html_partial(notebooks, read_url_map())
+    add_redirect_links(read_redirects())
     convert_notebooks_to_markdown(notebooks)
