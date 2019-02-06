@@ -1,0 +1,472 @@
+---
+prev_page: '/ch/05/cleaning_structure.html'
+next_page: '/ch/05/cleaning_scope.html'
+---
+
+{% raw %}
+
+<div id="ipython-notebook">
+    <div class="buttons">
+        <button class="interact-button js-nbinteract-widget">
+            Show Widgets
+        </button>
+        <a class="interact-button" href="http://data100.datahub.berkeley.edu/user-redirect/git-pull?repo=https://github.com/DS-100/textbook&subPath=notebooks/05/cleaning_granularity.ipynb">Open on DataHub</a>
+    </div>
+    
+
+
+
+
+
+
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="c1"># Clear previously defined variables</span>
+<span class="o">%</span><span class="k">reset</span> -f
+
+<span class="c1"># Set directory for data loading to work properly</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/notebooks/05&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Granularity">Granularity<a class="anchor-link" href="#Granularity">&#182;</a></h2><p>The granularity of your data is what each record in your data represents. For example, in the Calls dataset each record represents a single case of a police call.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">calls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/calls.csv&#39;</span><span class="p">)</span>
+<span class="n">calls</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CASENO</th>
+      <th>OFFENSE</th>
+      <th>CVLEGEND</th>
+      <th>BLKADDR</th>
+      <th>EVENTDTTM</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Day</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17091420</td>
+      <td>BURGLARY AUTO</td>
+      <td>BURGLARY - VEHICLE</td>
+      <td>2500 LE CONTE AVE</td>
+      <td>2017-07-23 06:00:00</td>
+      <td>37.876965</td>
+      <td>-122.260544</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>17038302</td>
+      <td>BURGLARY AUTO</td>
+      <td>BURGLARY - VEHICLE</td>
+      <td>BOWDITCH STREET &amp; CHANNING WAY</td>
+      <td>2017-07-02 22:00:00</td>
+      <td>37.867209</td>
+      <td>-122.256554</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>17049346</td>
+      <td>THEFT MISD. (UNDER $950)</td>
+      <td>LARCENY</td>
+      <td>2900 CHANNING WAY</td>
+      <td>2017-08-20 23:20:00</td>
+      <td>37.867948</td>
+      <td>-122.250664</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>17091319</td>
+      <td>THEFT MISD. (UNDER $950)</td>
+      <td>LARCENY</td>
+      <td>2100 RUSSELL ST</td>
+      <td>2017-07-09 04:15:00</td>
+      <td>37.856719</td>
+      <td>-122.266672</td>
+      <td>Sunday</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>17044238</td>
+      <td>DISTURBANCE</td>
+      <td>DISORDERLY CONDUCT</td>
+      <td>TELEGRAPH AVENUE &amp; DURANT AVE</td>
+      <td>2017-07-30 01:16:00</td>
+      <td>37.867816</td>
+      <td>-122.258994</td>
+      <td>Sunday</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the Stops dataset, each record represents a single incident of a police stop.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">stops</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/stops.csv&#39;</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">stops</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Incident Number</th>
+      <th>Call Date/Time</th>
+      <th>Location</th>
+      <th>Incident Type</th>
+      <th>Dispositions</th>
+      <th>Location - Latitude</th>
+      <th>Location - Longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2015-00004825</td>
+      <td>2015-01-26 00:10:00</td>
+      <td>SAN PABLO AVE / MARIN AVE</td>
+      <td>T</td>
+      <td>M</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2015-00004829</td>
+      <td>2015-01-26 00:50:00</td>
+      <td>SAN PABLO AVE / CHANNING WAY</td>
+      <td>T</td>
+      <td>M</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2015-00004831</td>
+      <td>2015-01-26 01:03:00</td>
+      <td>UNIVERSITY AVE / NINTH ST</td>
+      <td>T</td>
+      <td>M</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2015-00004848</td>
+      <td>2015-01-26 07:16:00</td>
+      <td>2000 BLOCK BERKELEY WAY</td>
+      <td>1194</td>
+      <td>BM4ICN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2015-00004849</td>
+      <td>2015-01-26 07:43:00</td>
+      <td>1700 BLOCK SAN PABLO AVE</td>
+      <td>1194</td>
+      <td>BM4ICN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On the other hand, we could have received the Stops data in the following format:</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="nbinteract-hide_in
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="p">(</span><span class="n">stops</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">stops</span><span class="p">[</span><span class="s1">&#39;Call Date/Time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;Num Incidents&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Num Incidents</th>
+    </tr>
+    <tr>
+      <th>Call Date/Time</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2015-01-26</th>
+      <td>46</td>
+    </tr>
+    <tr>
+      <th>2015-01-27</th>
+      <td>57</td>
+    </tr>
+    <tr>
+      <th>2015-01-28</th>
+      <td>56</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2017-04-28</th>
+      <td>82</td>
+    </tr>
+    <tr>
+      <th>2017-04-29</th>
+      <td>86</td>
+    </tr>
+    <tr>
+      <th>2017-04-30</th>
+      <td>59</td>
+    </tr>
+  </tbody>
+</table>
+<p>825 rows × 1 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this case, each record in the table corresponds to a single date instead of a single incident. We would describe this table as having a coarser granularity than the one above. It's important to know the granularity of your data because it determines what kind of analyses you can perform. Generally speaking, too fine of a granularity is better than too coarse; while we can use grouping and pivoting to change a fine granularity to a coarse one, we have few tools to go from coarse to fine.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Granularity-Checklist">Granularity Checklist<a class="anchor-link" href="#Granularity-Checklist">&#182;</a></h2><p>You should have answers to the following questions after looking at the granularity of your datasets. We will answer them for the Calls and Stops datasets.</p>
+<p><strong>What does a record represent?</strong></p>
+<p>In the Calls dataset, each record represents a single case of a police call. In the Stops dataset, each record represents a single incident of a police stop.</p>
+<p><strong>Do all records capture granularity at the same level? (Sometimes a table will contain summary rows.)</strong></p>
+<p>Yes, for both Calls and Stops datasets.</p>
+<p><strong>If the data were aggregated, how was the aggregation performed? Sampling and averaging are are common aggregations.</strong></p>
+<p>No aggregations were performed as far as we can tell for the datasets. We do keep in mind that in both datasets, the location is entered as a block location instead of a specific address.</p>
+<p><strong>What kinds of aggregations can we perform on the data?</strong></p>
+<p>For example, it's often useful to aggregate individual people to demographic groups or individual events to totals across time.</p>
+<p>In this case, we can aggregate across various granularities of date or time. For example, we can find the most common hour of day for incidents with aggregation. We might also be able to aggregate across event locations to find the regions of Berkeley with the most incidents.</p>
+
+</div>
+</div>
+</div>
+
+
+</div>
+
+{% endraw %}
