@@ -80,8 +80,8 @@ def read_url_list(yaml_path=TOC_PATH) -> list:
 
     return t.pipe(
         data,
-        t.remove(_not_internal_link),
         flatmap(_flatten_sections),
+        t.filter(_is_internal_link),
         t.map(t.get('url')),
         list,
     )
@@ -90,8 +90,8 @@ def read_url_list(yaml_path=TOC_PATH) -> list:
 flatmap = t.curry(lambda f, items: chain.from_iterable(map(f, items)))
 
 
-def _not_internal_link(entry):
-    return not entry.get('url', '').startswith('/')
+def _is_internal_link(entry):
+    return entry.get('url', '').startswith('/')
 
 
 def _get_redirects(entry):
@@ -131,4 +131,4 @@ def _adj_pages(triplet):
 
 if __name__ == '__main__':
     from pprint import pprint
-    pprint(read_redirects())
+    pprint(read_url_list())
