@@ -12,3 +12,8 @@ Through exploratory data analysis we seek to deeply understand our data. Maintai
 1. The data types of columns and the granularity of rows in the dataset.
 1. The distributions of quantitative data and measures of center and spread.
 1. Relationships between quantities in the dataset.
+
+
+```python
+
+```
