@@ -1,0 +1,676 @@
+---
+redirect_from:
+  - "/ch/05/cleaning-structure"
+interact_link: content/ch/05/cleaning_structure.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Structure and Joins
+prev_page:
+  url: /ch/05/cleaning_stops.html
+  title: |-
+    Cleaning the Stops Dataset
+next_page:
+  url: /ch/05/cleaning_granularity.html
+  title: |-
+    Granularity
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+
+<span class="k">def</span> <span class="nf">display_two</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Displays two DFs side-by-side.&#39;&#39;&#39;</span>
+    <span class="n">display</span><span class="p">(</span>
+        <span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;div style=&quot;display: flex;&quot;&gt;&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
+                 <span class="s1">&#39;&lt;div style=&quot;width: 20px;&quot;&gt;&lt;/div&gt;&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
+             <span class="s1">&#39;&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df1</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">(),</span> <span class="n">df2</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()))</span>
+    <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Structure">Structure<a class="anchor-link" href="#Structure"> </a></h2><p>The structure of a dataset refers to the "shape" of the data files. At a basic level, this refers to the format that the data are entered in. For example, we saw that the Calls dataset is a comma-separated values file:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>head data/Berkeley_PD_-_Calls_for_Service.csv
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CASENO,OFFENSE,EVENTDT,EVENTTM,CVLEGEND,CVDOW,InDbDate,Block_Location,BLKADDR,City,State
+17091420,BURGLARY AUTO,07/23/2017 12:00:00 AM,06:00,BURGLARY - VEHICLE,0,08/29/2017 08:28:05 AM,&#34;2500 LE CONTE AVE
+Berkeley, CA
+(37.876965, -122.260544)&#34;,2500 LE CONTE AVE,Berkeley,CA
+17020462,THEFT FROM PERSON,04/13/2017 12:00:00 AM,08:45,LARCENY,4,08/29/2017 08:28:00 AM,&#34;2200 SHATTUCK AVE
+Berkeley, CA
+(37.869363, -122.268028)&#34;,2200 SHATTUCK AVE,Berkeley,CA
+17050275,BURGLARY AUTO,08/24/2017 12:00:00 AM,18:30,BURGLARY - VEHICLE,4,08/29/2017 08:28:06 AM,&#34;200 UNIVERSITY AVE
+Berkeley, CA
+(37.865491, -122.310065)&#34;,200 UNIVERSITY AVE,Berkeley,CA
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The Stops dataset, on the other hand, is a JSON (JavaScript Object Notation) file.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Show first and last 5 lines of file</span>
+<span class="o">!</span>head -n <span class="m">5</span> data/stops.json
+<span class="o">!</span><span class="nb">echo</span> <span class="s1">&#39;...&#39;</span>
+<span class="o">!</span>tail -n <span class="m">5</span> data/stops.json
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{
+  &#34;meta&#34; : {
+    &#34;view&#34; : {
+      &#34;id&#34; : &#34;6e9j-pj9p&#34;,
+      &#34;name&#34; : &#34;Berkeley PD - Stop Data&#34;,
+...
+, [ 31079, &#34;C2B606ED-7872-4B0B-BC9B-4EF45149F34B&#34;, 31079, 1496269085, &#34;932858&#34;, 1496269085, &#34;932858&#34;, null, &#34;2017-00024245&#34;, &#34;2017-04-30T22:59:26&#34;, &#34; UNIVERSITY AVE/6TH ST&#34;, &#34;T&#34;, &#34;BM2TWN; &#34;, null, null ]
+, [ 31080, &#34;8FADF18D-7FE9-441D-8709-7BFEABDACA7A&#34;, 31080, 1496269085, &#34;932858&#34;, 1496269085, &#34;932858&#34;, null, &#34;2017-00024250&#34;, &#34;2017-04-30T23:19:27&#34;, &#34; UNIVERSITY AVE /  WEST ST&#34;, &#34;T&#34;, &#34;HM4TCS; &#34;, &#34;37.8698757000001&#34;, &#34;-122.286550846&#34; ]
+, [ 31081, &#34;F60BD2A4-8C47-4BE7-B1C6-4934BE9DF838&#34;, 31081, 1496269085, &#34;932858&#34;, 1496269085, &#34;932858&#34;, null, &#34;2017-00024254&#34;, &#34;2017-04-30T23:38:34&#34;, &#34; CHANNING WAY /  BOWDITCH ST&#34;, &#34;1194&#34;, &#34;AR; &#34;, &#34;37.867207539&#34;, &#34;-122.256529377&#34; ]
+ ]
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Of course, there are many other types of data formats. Here is a list of the most common formats:</p>
+<ul>
+<li>Comma-Separated Values (CSV) and Tab-Separated Values (TSV). These files contain tabular data delimited by either a comma for CSV or a tab character (<code>\t</code>) for TSV. These files are typically easy to work with because the data are entered in a similar format to DataFrames.</li>
+<li>JavaScript Object Notation (JSON). These files contain data in a nested dictionary format. Typically we have to read in the entire file as a Python dict and then figure out how to extract fields for a DataFrame from the dict.</li>
+<li><p>eXtensible Markup Language (XML) or HyperText Markup Language (HTML). These files also contain data in a nested format, for example:</p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+  <span class="nt">&lt;note&gt;</span>
+    <span class="nt">&lt;to&gt;</span>Tove<span class="nt">&lt;/to&gt;</span>
+    <span class="nt">&lt;from&gt;</span>Jani<span class="nt">&lt;/from&gt;</span>
+    <span class="nt">&lt;heading&gt;</span>Reminder<span class="nt">&lt;/heading&gt;</span>
+    <span class="nt">&lt;body&gt;</span>Don&#39;t forget me this weekend!<span class="nt">&lt;/body&gt;</span>
+  <span class="nt">&lt;/note&gt;</span>
+</pre></div>
+<p>In a later chapter we will use XPath to extract data from these types of files.</p>
+</li>
+<li><p>Log data. Many applications will output some data as they run in an unstructured text format, for example:</p>
+
+<pre><code>  2005-03-23 23:47:11,663 - sa - INFO - creating an instance of aux_module.Aux
+  2005-03-23 23:47:11,665 - sa.aux.Aux - INFO - creating an instance of Aux
+  2005-03-23 23:47:11,665 - sa - INFO - created an instance of aux_module.Aux
+  2005-03-23 23:47:11,668 - sa - INFO - calling aux_module.Aux.do_something
+  2005-03-23 23:47:11,668 - sa.aux.Aux - INFO - doing something</code></pre>
+<p>In a later chapter we will use Regular Expressions to extract data from these types of files.</p>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Joins">Joins<a class="anchor-link" href="#Joins"> </a></h2><p>Data will often be split across multiple tables. For example, one table can describe some people's personal information while another will contain their emails:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">people</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[[</span><span class="s2">&quot;Joey&quot;</span><span class="p">,</span>      <span class="s2">&quot;blue&quot;</span><span class="p">,</span>    <span class="mi">42</span><span class="p">,</span>  <span class="s2">&quot;M&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Weiwei&quot;</span><span class="p">,</span>    <span class="s2">&quot;blue&quot;</span><span class="p">,</span>    <span class="mi">50</span><span class="p">,</span>  <span class="s2">&quot;F&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Joey&quot;</span><span class="p">,</span>      <span class="s2">&quot;green&quot;</span><span class="p">,</span>    <span class="mi">8</span><span class="p">,</span>  <span class="s2">&quot;M&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Karina&quot;</span><span class="p">,</span>    <span class="s2">&quot;green&quot;</span><span class="p">,</span>    <span class="mi">7</span><span class="p">,</span>  <span class="s2">&quot;F&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Nhi&quot;</span><span class="p">,</span>       <span class="s2">&quot;blue&quot;</span><span class="p">,</span>     <span class="mi">3</span><span class="p">,</span>  <span class="s2">&quot;F&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Sam&quot;</span><span class="p">,</span>       <span class="s2">&quot;pink&quot;</span><span class="p">,</span>   <span class="o">-</span><span class="mi">42</span><span class="p">,</span>  <span class="s2">&quot;M&quot;</span><span class="p">]],</span> 
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Color&quot;</span><span class="p">,</span> <span class="s2">&quot;Number&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">])</span>
+
+<span class="n">people</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Color</th>
+      <th>Number</th>
+      <th>Sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Joey</td>
+      <td>blue</td>
+      <td>42</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Weiwei</td>
+      <td>blue</td>
+      <td>50</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Joey</td>
+      <td>green</td>
+      <td>8</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Karina</td>
+      <td>green</td>
+      <td>7</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Nhi</td>
+      <td>blue</td>
+      <td>3</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Sam</td>
+      <td>pink</td>
+      <td>-42</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[[</span><span class="s2">&quot;Deb&quot;</span><span class="p">,</span>  <span class="s2">&quot;deborah_nolan@berkeley.edu&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Sam&quot;</span><span class="p">,</span>  <span class="s2">&quot;samlau95@berkeley.edu&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;doe@nope.com&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Joey&quot;</span><span class="p">,</span> <span class="s2">&quot;jegonzal@cs.berkeley.edu&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Weiwei&quot;</span><span class="p">,</span> <span class="s2">&quot;weiwzhang@berkeley.edu&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Weiwei&quot;</span><span class="p">,</span> <span class="s2">&quot;weiwzhang+123@berkeley.edu&quot;</span><span class="p">],</span>
+     <span class="p">[</span><span class="s2">&quot;Karina&quot;</span><span class="p">,</span> <span class="s2">&quot;kgoot@berkeley.edu&quot;</span><span class="p">]],</span> 
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;User Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Email&quot;</span><span class="p">])</span>
+
+<span class="n">email</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>User Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Deb</td>
+      <td>deborah_nolan@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Sam</td>
+      <td>samlau95@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>John</td>
+      <td>doe@nope.com</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Joey</td>
+      <td>jegonzal@cs.berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Weiwei</td>
+      <td>weiwzhang@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Weiwei</td>
+      <td>weiwzhang+123@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Karina</td>
+      <td>kgoot@berkeley.edu</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To match up each person with his or her email, we can join the two tables on the columns that contain the usernames. We must then decide what to do about people that appear in one table but not the other. For example, Fernando appears in the <code>people</code> table but not the <code>email</code> table. We have several types of joins for each strategy of matching missing values. One of the more common joins is the <em>inner join</em>, where any row that doesn't have a match is dropped in the final result:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Fernando, Nhi, Deb, and John don&#39;t appear</span>
+<span class="n">people</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;User Name&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Color</th>
+      <th>Number</th>
+      <th>Sex</th>
+      <th>User Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Joey</td>
+      <td>blue</td>
+      <td>42</td>
+      <td>M</td>
+      <td>Joey</td>
+      <td>jegonzal@cs.berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Joey</td>
+      <td>green</td>
+      <td>8</td>
+      <td>M</td>
+      <td>Joey</td>
+      <td>jegonzal@cs.berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Weiwei</td>
+      <td>blue</td>
+      <td>50</td>
+      <td>F</td>
+      <td>Weiwei</td>
+      <td>weiwzhang@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Weiwei</td>
+      <td>blue</td>
+      <td>50</td>
+      <td>F</td>
+      <td>Weiwei</td>
+      <td>weiwzhang+123@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Karina</td>
+      <td>green</td>
+      <td>7</td>
+      <td>F</td>
+      <td>Karina</td>
+      <td>kgoot@berkeley.edu</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Sam</td>
+      <td>pink</td>
+      <td>-42</td>
+      <td>M</td>
+      <td>Sam</td>
+      <td>samlau95@berkeley.edu</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are four basic joins that we use most often: inner, full (sometimes called "outer"), left, and right joins. Below is a diagram to show the difference between these types of joins.</p>
+<p><img src="https://github.com/DS-100/textbook/raw/master/assets/joins.png" alt="joins"></p>
+<p>Use the dropdown menu below to show the result of the four different types of joins on the <code>people</code> and <code>email</code> tables. Notice which rows contain NaN values for outer, left, and right joins.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="k">def</span> <span class="nf">join_demo</span><span class="p">(</span><span class="n">join_type</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;people and email tables:&#39;</span><span class="p">))</span>
+    <span class="n">display_two</span><span class="p">(</span><span class="n">people</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;br&gt;&#39;</span><span class="p">))</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;Joined table:&#39;</span><span class="p">))</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">people</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">join_type</span><span class="p">,</span>
+                         <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;User Name&#39;</span><span class="p">))</span>
+    
+<span class="n">interact</span><span class="p">(</span><span class="n">join_demo</span><span class="p">,</span> <span class="n">join_type</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">]);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+
+ 
+ 
+<div id="1675e81e-8b4b-4454-b5dc-120ec128af71"></div>
+<div class="output_subarea output_widget_view ">
+<script type="text/javascript">
+var element = $('#1675e81e-8b4b-4454-b5dc-120ec128af71');
+</script>
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "fc559a063274479b83eece58b915c4da", "version_major": 2, "version_minor": 0}
+</script>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Structure-Checklist">Structure Checklist<a class="anchor-link" href="#Structure-Checklist"> </a></h2><p>You should have answers to the following questions after looking at the structure of your datasets. We will answer them for the Calls and Stops datasets.</p>
+<p><strong>Are the data in a standard format or encoding?</strong></p>
+<p>Standard formats include:</p>
+<ul>
+<li>Tabular data: CSV, TSV, Excel, SQL</li>
+<li>Nested data: JSON, XML</li>
+</ul>
+<p>The Calls dataset came in the CSV format while the Stops dataset came in the JSON format.</p>
+<p><strong>Are the data organized in records (e.g. rows)? If not, can we define records by parsing the data?</strong></p>
+<p>The Calls dataset came in rows; we extracted records from the Stops dataset.</p>
+<p><strong>Are the data nested? If so, can we reasonably unnest the data?</strong></p>
+<p>The Calls dataset wasn't nested; we didn't have to work too hard to unnest data from the Stops dataset.</p>
+<p><strong>Do the data reference other data? If so, can we join the data?</strong></p>
+<p>The Calls dataset references the day of week table. Joining those two tables gives us the day of week for each incident in the dataset. The Stops dataset had no obvious references.</p>
+<p><strong>What are the fields (e.g. columns) in each record? What is the type of each column?</strong></p>
+<p>The fields for the Calls and Stops datasets are described in the Data Cleaning sections for each dataset.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+ 
+
