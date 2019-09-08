@@ -5,27 +5,15 @@
  * [2] Sidebar toggling
  * [3] Sidebar scroll preserving
  * [4] Keyboard navigation
- * [5] nbinteract
+ * [5] Right sidebar scroll highlighting / navbar show
  */
-
-const runWhenDOMLoaded = cb => {
-  if (document.readyState != 'loading') {
-    cb()
-  } else if (document.addEventListener) {
-    document.addEventListener('DOMContentLoaded', cb)
-  } else {
-    document.attachEvent('onreadystatechange', function() {
-      if (document.readyState == 'complete') cb()
-    })
-  }
-}
 
 const togglerId = 'js-sidebar-toggle'
 const textbookId = 'js-textbook'
 const togglerActiveClass = 'is-active'
 const textbookActiveClass = 'js-show-sidebar'
-
 const mathRenderedClass = 'js-mathjax-rendered'
+const icon_path = document.location.origin + `${site_basename}assets`;
 
 const getToggler = () => document.getElementById(togglerId)
 const getTextbook = () => document.getElementById(textbookId)
@@ -63,7 +51,7 @@ const toggleSidebar = () => {
  * _sass/inuitcss/tools/_tools.mq.scss
  *
  */
-const autoCloseSidebarBreakpoint = 740
+const autoCloseSidebarBreakpoint = 769
 
 // Set up event listener for sidebar toggle button
 const sidebarButtonHandler = () => {
@@ -86,8 +74,7 @@ const sidebarButtonHandler = () => {
   if (window.innerWidth < autoCloseSidebarBreakpoint) toggleSidebar()
 }
 
-runWhenDOMLoaded(sidebarButtonHandler)
-document.addEventListener('turbolinks:load', sidebarButtonHandler)
+initFunction(sidebarButtonHandler);
 
 /**
  * [3] Preserve sidebar scroll when navigating between pages
@@ -109,8 +96,8 @@ document.addEventListener('turbolinks:load', () => {
 const focusPage = () => {
   document.querySelector('.c-textbook__page').focus()
 }
-runWhenDOMLoaded(focusPage)
-document.addEventListener('turbolinks:load', focusPage)
+
+initFunction(focusPage);
 
 /**
  * [4] Use left and right arrow keys to navigate forward and backwards.
@@ -120,7 +107,7 @@ const RIGHT_ARROW_KEYCODE = 39
 
 const getPrevUrl = () => document.getElementById('js-page__nav__prev').href
 const getNextUrl = () => document.getElementById('js-page__nav__next').href
-document.addEventListener('keydown', event => {
+const initPageNav = (event) => {
   const keycode = event.which
 
   if (keycode === LEFT_ARROW_KEYCODE) {
@@ -128,33 +115,80 @@ document.addEventListener('keydown', event => {
   } else if (keycode === RIGHT_ARROW_KEYCODE) {
     Turbolinks.visit(getNextUrl())
   }
-})
+};
+
+var keyboardListener = false;
+const initListener = () => {
+  if (keyboardListener === false) {
+    document.addEventListener('keydown', initPageNav)
+    keyboardListener = true;
+  }
+}
+initFunction(initListener);
 
 /**
- * [5] Set up nbinteract to render widgets on page load
+ * [5] Scrolling functions:
+ *   * Right sidebar scroll highlighting
+ *   * Top navbar hiding for scrolling
  */
 
-let interact
+var didScroll;
 
-const setupNbinteract = () => {
-  // If NbInteract hasn't loaded, wait one second and try again
-  if (window.NbInteract === undefined) {
-    setTimeout(setupNbinteract, 1000)
-    return
+initScrollFunc = function() {
+  var content = document.querySelector('.c-textbook__page');
+  var topbar = document.getElementById("top-navbar");
+  var prevScrollpos = content.scrollTop; // Initializing
+
+  scrollFunc = function() {
+    // This is the function that does all the stuff when scrolling happens
+
+    var position = content.scrollTop; // Because we use this differently for sidebar
+
+    // Decide to show the navbar
+    var currentScrollPos = content.scrollTop;
+    var delta = 10;
+    var scrollDiff = prevScrollpos - currentScrollPos;
+    if (scrollDiff >= delta) {
+      // If we scrolled down, consider showing the menu
+      topbar.classList.remove("hidetop")
+    } else if (Math.abs(scrollDiff) >= delta) {
+      // If we scrolled up, consider hiding the menu
+      topbar.classList.add("hidetop")
+    } else {
+      // Do nothing because we didn't scroll enough
+    }
+    prevScrollpos = currentScrollPos;
+
+    // Highlight the right sidebar section
+    position = position + (window.innerHeight / 4);  // + Manual offset
+
+    content.querySelectorAll('h2, h3').forEach((header, index) => {
+        if (header.offsetParent.classList.contains('jb_cell')) {
+          // If we're a page made from a notebook, there will be a parent called jb_cell
+          var target = header.offsetParent.offsetTop;
+        } else {
+          var target = header.offsetTop;
+        }
+
+        var id = header.id;
+        if (position >= target) {
+          var query = 'ul.toc__menu a[href="#' + id + '"]';
+          document.querySelectorAll('ul.toc__menu li').forEach((item) => {item.classList.remove('active')});
+          document.querySelectorAll(query).forEach((item) => {item.parentElement.classList.add('active')});
+      }
+    });
   }
 
-  if (interact === undefined) {
-    console.log('Initializing nbinteract...')
-    interact = new window.NbInteract({
-      baseUrl: 'https://mybinder.org',
-      spec: 'DS-100/textbook/master',
-      provider: 'gh',
-    })
-    window.interact = interact
-  }
-
-  interact.prepare()
+  // Our event listener just sets "yep, I scrolled" to true.
+  // The interval function will set it to false after it runs.
+  content.addEventListener('scroll', () => {didScroll = true;});
+  scrollWait = 250;
+  setInterval(() => {
+    if (didScroll) {
+      scrollFunc();
+      didScroll = false;
+    }
+  }, scrollWait)
 }
 
-runWhenDOMLoaded(setupNbinteract)
-document.addEventListener('turbolinks:load', setupNbinteract)
+initFunction(initScrollFunc);
