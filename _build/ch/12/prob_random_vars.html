@@ -1,0 +1,437 @@
+---
+redirect_from:
+  - "/ch/12/prob-random-vars"
+interact_link: content/ch/12/prob_random_vars.ipynb
+kernel_name: python3
+has_widgets: false
+title: |-
+  Random Variables
+prev_page:
+  url: /ch/12/prob_and_gen.html
+  title: |-
+    Probability and Generalization
+next_page:
+  url: /ch/12/prob_exp_var.html
+  title: |-
+    Expectation and Variance
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Random-Variables">Random Variables<a class="anchor-link" href="#Random-Variables"> </a></h2><p>Almost all real-world phenomena contain some degree of randomness, making data generation and collection inherently random processes. Since we fit our models on these data, our models also contain randomness. To represent these random processes mathematically, we use random variables.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A <strong>random variable</strong> is an algebraic variable that represents a <strong>numerical value determined by a probabilistic event</strong>. In this book, we will always use capital letters (not Greek letters) like $ X $ or $ Y $ to denote a random variable. Although random variables can represent either discrete (e.g. the number of males in a sample of ten people) or continuous quantities (e.g. the average temperature in Los Angeles), we will only use discrete random variables for the purposes of this textbook.</p>
+<p>We must always specify what a given random variable represents. For example, we may write that the random variable $ X $ represents the number of heads in 10 coin flips. The definition of a random variable determines the values it can take on. In this example, $ X $ may only take on values between $ 0 $ and $ 10 $ inclusive.</p>
+<p>We must also be able to determine the probability that the random variable takes on each of its possible values. For example, the probability that $ X = 0 $ is written as $ P(X = 0) = (0.5)^{10} $ and we can likewise calculate the probability that $ X $ is any value in $ \{ 0, 1, \ldots, 10 \} $.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Probability-Mass-Functions">Probability Mass Functions<a class="anchor-link" href="#Probability-Mass-Functions"> </a></h3><p>The <strong>probability mass function (PMF)</strong> or the <strong>distribution</strong> of a random variable $X$ provides the probability that $X$ takes on each of its possible values. If we let $\mathbb{X}$ be the set of values that $X$ can take on and $x$ be a particular value in $\mathbb{X}$, the PMF of $X$ must satisfy the following rules:</p>
+$$
+1) \sum_{x \in \mathbb{X}} P(X = x) = 1
+$$$$
+2) \text{ For all } x \in \mathbb{X}, 0 \leq P(X = x) \leq 1
+$$<p>The first rule states that the probabilities for all possible values of $ X $ sum to $ 1 $.</p>
+<p>The second rule states that each individual probability for a given value of $ X $ must be between $ 0 $ and $ 1 $.</p>
+<p>Suppose we let $ X $ represent the result of one roll from a fair six-sided die. We know that $ X \in \{1, 2, 3, 4, 5, 6\} $ and that $ P(X = 1) = P(X = 2) = \ldots = P(X = 6) = \frac{1}{6} $. We can plot the PMF of $ X $ as a probability distribution:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+
+<span class="k">def</span> <span class="nf">plot_pmf</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">rv_name</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">mec</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$P(X = x)$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PMF of $X$&#39;</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">xk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">pk</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="n">plot_pmf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\frac</span><span class="si">{1}{6}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\frac</span><span class="si">{2}{6}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\frac</span><span class="si">{3}{6}</span><span class="s1">$&#39;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s1">&#39;$\frac</span><span class="si">{4}{6}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\frac</span><span class="si">{5}{6}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">));</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../../images/ch/12/prob_random_vars_6_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Joint-Distributions">Joint Distributions<a class="anchor-link" href="#Joint-Distributions"> </a></h3><p>The notion of PMFs for single random variables extends naturally to joint distributions for multiple random variables. In particular, the <strong>joint distribution</strong> of two or more random variables yields the probability that these random variables simultaneously take on a specific set of values.</p>
+<p>For example, let the random variable $ X $ represent the number of heads in 10 coin flips, and let $ Y $ represent the number of tails in the same set of 10 coin flips. We can note that:</p>
+$$P(X=0, Y=10) = P(X=10, Y=0) = (0.5)^{10}$$<p>Meanwhile $P(X=6, Y=6) = 0$ since we cannot possibly have 6 heads and 6 tails in 10 coin flips.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Marginal-Distributions">Marginal Distributions<a class="anchor-link" href="#Marginal-Distributions"> </a></h4><p>Sometimes, we start with the joint distribution for two random variables $X$ and $Y$ but want to find the distribution for $X$ alone. This distribution is called the <strong>marginal distribution</strong>. To find the probability that $X$ takes on a particular value, we must consider all possible values of $Y$ (denoted by $\mathbb{Y}$) that can simultaneously happen with $X$ and sum over all of these joint probabilities:</p>
+$$
+\begin{aligned}
+\sum_{y \in \mathbb{Y}} P(X=x, Y=y) &amp;= P(X=x)
+\end{aligned}
+$$<p>We can prove this identity as follows:</p>
+$$
+\begin{aligned}
+\sum_{y \in \mathbb{Y}} P(X=x, Y=y) &amp;= \sum_{y \in \mathbb{Y}} P(X=x) \times P(Y=y \; \vert \; X=x)\\
+&amp;= P(X=x) \times \sum_{y \in \mathbb{Y}} P(Y=y \; \vert \; X=x)\\
+&amp;= P(X=x) \times 1 \\
+&amp;= P(X=x)
+\end{aligned}
+$$<p>In the last line of this proof, we treated $Y \; \vert \; X = x$ as a random variable with some unknown PMF. This is important since we used the property that the probabilities in a PMF sum to $1$, which means that $\sum_{y\in \mathbb{Y}} P(Y = y \; \vert \; X = x) = 1$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Independent-Random-Variables">Independent Random Variables<a class="anchor-link" href="#Independent-Random-Variables"> </a></h4><p>Like events, two random variables can be dependent or independent. Any two random variables are independent if and only if knowing the outcome of one variable does not alter the probability of observing any outcomes of the other variable.</p>
+<p>For example, suppose we flip a coin ten times and let $ X $ be the number of heads and $ Y $ be the number of tails. Clearly, $ X $ and $ Y $ are dependent variables since knowing that $ X = 0 $ means that $ Y $ must equal $ 10 $. If we did not observe the value of $ X $, $ Y $ can take on any value between $ 0 $ and $ 10 $ with non-zero probability.</p>
+<p>We might instead conduct two sets of ten flips. If $ X $ is the number of heads in the first set of flips and $ Y $ is the number of heads in the second set, $ X $ and $ Y $ are independent since the outcomes of the first set of ten flips do not affect the outcomes of the second set.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="An-Example-with-Ages">An Example with Ages<a class="anchor-link" href="#An-Example-with-Ages"> </a></h3><p>Suppose we have a small dataset of four people:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell tag_hide_input">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># HIDDEN</span>
+<span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:[</span><span class="s2">&quot;Carol&quot;</span><span class="p">,</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span><span class="s2">&quot;John&quot;</span><span class="p">,</span><span class="s2">&quot;Dave&quot;</span><span class="p">],</span> <span class="s1">&#39;Age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">52</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">50</span><span class="p">]}</span>
+<span class="n">people</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">people</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Carol</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Bob</td>
+      <td>52</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>John</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Dave</td>
+      <td>50</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Suppose we sample two people from this dataset with replacement. If the random variable $ Z $ represents the difference between the ages of the first and second persons in the sample, what is the PMF of $ Z $?</p>
+<p>To approach this problem, we define two new random variables. We define $ X $ as the age of the first person and $ Y $ as the age of the second. Then, $ Z = X - Y $. Then, we find the joint probability distribution of $ X $ and $ Y $: the probability of each value that $ X $ and $ Y $ can take on simultaneously. In this case, note that $ X $ and $ Y $ are independent and identically distributed; the two random variables represent two independent draws from the same dataset, and the first draw has no influence on the second. For example, the probability that $ X = 51 $ and $ Y = 50 $ is $ P(X = 51, Y = 50) = \frac{1}{4} \cdot \frac{2}{4} = \frac{2}{16} $. In a similar way, we get:</p>
+<table>
+  <tr>
+    <th></th>
+    <th>$Y=50$</th>
+    <th>$Y=51$</th>
+    <th>$Y=52$</th>
+  </tr>
+  <tr>
+    <td>$X=50$</td>
+    <td>4/16</td>
+    <td>2/16</td>
+    <td>2/16</td>
+  </tr>
+  <tr>
+    <td>$X=51$</td>
+    <td>2/16</td>
+    <td>1/16</td>
+    <td>1/16</td>
+  </tr>
+  <tr>
+    <td>$X=52$</td>
+    <td>2/16</td>
+    <td>1/16</td>
+    <td>1/16</td>
+  </tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let us now consider the case in which we sample two people from the same dataset as above but without replacement. As before, we define $X$ as the age of the first person and $Y$ as the age of the second, and $Z = X - Y$. However, now $X$ and $Y$ are not independent; for example, if we know $X = 51$, then $Y \neq 51$. We find the joint distribution of $X$ and $Y$ as follows:</p>
+<table>
+  <tr>
+    <th></th>
+    <th>$Y=50$</th>
+    <th>$Y=51$</th>
+    <th>$Y=52$</th>
+  </tr>
+  <tr>
+    <td>$X=50$</td>
+    <td>2/12</td>
+    <td>2/12</td>
+    <td>2/12</td>
+  </tr>
+  <tr>
+    <td>$X=51$</td>
+    <td>2/12</td>
+    <td>0</td>
+    <td>1/12</td>
+  </tr>
+  <tr>
+    <td>$X=52$</td>
+    <td>2/12</td>
+    <td>1/12</td>
+    <td>0</td>
+  </tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also find the marginal distribution of $Y$ from the table.</p>
+$$
+\begin{aligned}
+P(Y = 50) &amp;= P(Y = 50, X = 50) + P(Y = 50, X = 51) + P(Y = 50, X = 52) \\
+&amp;= \frac{2}{12} + \frac{2}{12} + \frac{2}{12} \\
+&amp;= \frac{1}{2} \\
+P(Y = 51) &amp;= \frac{2}{12} + 0 + \frac{1}{12} = \frac{1}{4} \\
+P(Y = 52) &amp;= \frac{2}{12} + \frac{1}{12} + 0 = \frac{1}{4}
+\end{aligned}
+$$<p>Notice that we summed each column of the joint distribution table above. One can imagine computing the sum of each column and writing the result in the margin below the table; this is the origin of the term marginal distribution.</p>
+<p>You should also notice that $ X $ and $ Y $ are not independent when we sample without replacement. If $ X = 52 $, for example, $ Y \neq 52 $. Nonetheless, $X$ and $Y$ still have the same marginal distribution.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary"> </a></h2><p>In this section, we introduce random variables, mathematical variables that take on values according to a random process. These outcomes must be defined completely and precisely—each outcome must have a well-defined probability of occurrence. Random variables are useful for representing many random phenomena, including the process of data collection.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+ 
+
