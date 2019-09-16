@@ -126,11 +126,16 @@ def fix_image_paths(output_filename=OUTPUT_FILENAME):
     Replaces absolute image URLs with links to localhost so that ebook-convert
     can locate them.
     """
-    check_call([
-        'sed', '-i', "",
-        "'s#/notebooks-images#http://localhost:4000/notebooks-images#g'",
-        output_filename
-    ])
+#    check_call([
+#        'sed', '-i', "",
+#        "'s#/notebooks-images#http://localhost:4000/notebooks-images#g'",
+#        output_filename
+#    ])
+    with open(output_filename) as f:
+        newText=f.read().replace('/notebooks-images', 'http://localhost:4000/notebooks-images')
+
+    with open(output_filename, "w") as f:
+        f.write(newText)
 
 
 if __name__ == '__main__':
