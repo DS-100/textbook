@@ -1,5 +1,7 @@
 .PHONY: help build clean
 
+CONTENT = content/_config.yml content/_toc.yml content/*.md content/ch
+
 HTML_DIR = content/_build/html
 
 help:
@@ -12,7 +14,7 @@ build: ## Builds book html
 # Install fswatch first: https://github.com/emcrisostomo/fswatch
 watch: ## Rebuilds book when files change (needs fswatch installed)
 	@echo Watching content/ch for changes...
-	fswatch -0 content/ch --one-per-batch | xargs -0 -n 1 -I {} $(MAKE) build
+	fswatch -0 $(CONTENT) --one-per-batch | xargs -0 -n 1 -I {} $(MAKE) build
 
 server: ## Starts python server that serves html
 	mkdir -p $(HTML_DIR)
