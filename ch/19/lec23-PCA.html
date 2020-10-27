@@ -1,0 +1,4154 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lec 23: PCA &#8212; Principles and Techniques of Data Science</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.2d2078699c18a0efb88233928e1cf6ed.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.be0a4a0c39cd630af62a2fcf693f3f06.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  
+  <h1 class="site-logo" id="site-title">Principles and Techniques of Data Science</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <p class="caption">
+ <span class="caption-text">
+  Frontmatter
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../prereqs.html">
+   Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notation.html">
+   Notation
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Chapters
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../01/lifecycle_intro.html">
+   1. The Data Science Lifecycle
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../02/design_intro.html">
+   2. Data Design
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../03/pandas_intro.html">
+   3. Working with Tabular Data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../04/eda_intro.html">
+   4. Exploratory Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../05/cleaning_intro.html">
+   5. Data Cleaning
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../06/viz_intro.html">
+   6. Data Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../07/web_intro.html">
+   7. Web Technologies
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../08/text_intro.html">
+   8. Working with Text
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../09/sql_intro.html">
+   9. Relational Databases and SQL
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../10/modeling_intro.html">
+   10. Modeling and Estimation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../11/gradient_descent.html">
+   11. Gradient Descent and Numerical Optimization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../12/prob_and_gen.html">
+   12. Probability and Generalization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../13/linear_models.html">
+   13. Linear Models
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../14/feature_engineering.html">
+   14. Feature Engineering
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../15/bias_intro.html">
+   15. The Bias-Variance Tradeoff
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../16/reg_intro.html">
+   16. Regularization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../17/classification_intro.html">
+   17. Classification
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../18/hyp_intro.html">
+   18. Statistical Inference
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="pca_intro.html">
+   19. Dimensionality Reduction and PCA
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Appendices
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../20/vector_space_review.html">
+   Vector Space Review
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../21/ref_intro.html">
+   Reference Tables
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../22/contributors.html">
+   Contributors
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/ch/19/lec23-PCA.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/ch/19/lec23-PCA.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rank-1-approximation-of-2d-data-data-centering">
+   Rank 1 Approximation of 2D Data, Data Centering
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#interpreting-principal-components">
+     Interpreting Principal Components
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pca-vs-linear-regression">
+   PCA vs. Linear Regression
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#principal-components-and-singular-values">
+   Principal Components and Singular Values
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#singular-values-and-variance">
+     Singular Values and Variance
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#practical-pca">
+   Practical PCA
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#election-data">
+   Election Data
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#let-s-look-at-only-people-who-have-voted-more-than-15-times-lately">
+     Let’s look at only people who have voted more than 15 times lately
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exploring-v-t">
+   Exploring
+   <span class="math notranslate nohighlight">
+    \(V^T\)
+   </span>
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="lec-23-pca">
+<h1>Lec 23: PCA<a class="headerlink" href="#lec-23-pca" title="Permalink to this headline">¶</a></h1>
+<p><strong>by Josh Hug (Fall 2019)</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23</span><span class="p">)</span> <span class="c1">#kallisti</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_rank_k_approximation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">u</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">])</span> <span class="o">@</span> <span class="n">vt</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">,</span> <span class="p">:],</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="rank-1-approximation-of-2d-data-data-centering">
+<h2>Rank 1 Approximation of 2D Data, Data Centering<a class="headerlink" href="#rank-1-approximation-of-2d-data-data-centering" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Downloads from https://www.gapminder.org/data/</span>
+<span class="n">cm_path</span> <span class="o">=</span> <span class="s1">&#39;child_mortality_0_5_year_olds_dying_per_1000_born.csv&#39;</span>
+<span class="n">fe_path</span> <span class="o">=</span> <span class="s1">&#39;children_per_woman_total_fertility.csv&#39;</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">cm_path</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;country&#39;</span><span class="p">)[</span><span class="s1">&#39;2017&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">/</span><span class="mi">10</span>
+<span class="n">fe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fe_path</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;country&#39;</span><span class="p">)[</span><span class="s1">&#39;2017&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">child_data</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">fe</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">child_data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">]</span>
+<span class="n">child_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>6.820</td>
+      <td>4.48</td>
+    </tr>
+    <tr>
+      <th>Albania</th>
+      <td>1.330</td>
+      <td>1.71</td>
+    </tr>
+    <tr>
+      <th>Algeria</th>
+      <td>2.390</td>
+      <td>2.71</td>
+    </tr>
+    <tr>
+      <th>Angola</th>
+      <td>8.310</td>
+      <td>5.62</td>
+    </tr>
+    <tr>
+      <th>Antigua and Barbuda</th>
+      <td>0.816</td>
+      <td>2.04</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">scatter14</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>    
+    
+<span class="n">scatter14</span><span class="p">(</span><span class="n">child_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_5_0.png" src="../../_images/lec23-PCA_5_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fed0f8399d0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/lec23-PCA_6_1.png" src="../../_images/lec23-PCA_6_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">child_data_reconstructed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">u</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">@</span> <span class="n">vt</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mortality&quot;</span><span class="p">,</span> <span class="s2">&quot;fertility&quot;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">child_data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>As we’d expect, the product of <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma\)</span>, and <span class="math notranslate nohighlight">\(V^T\)</span> recovers the original data perfectly.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">child_data_reconstructed</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>6.820</td>
+      <td>4.48</td>
+    </tr>
+    <tr>
+      <th>Albania</th>
+      <td>1.330</td>
+      <td>1.71</td>
+    </tr>
+    <tr>
+      <th>Algeria</th>
+      <td>2.390</td>
+      <td>2.71</td>
+    </tr>
+    <tr>
+      <th>Angola</th>
+      <td>8.310</td>
+      <td>5.62</td>
+    </tr>
+    <tr>
+      <th>Antigua and Barbuda</th>
+      <td>0.816</td>
+      <td>2.04</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fed0f88cb90&gt;
+</pre></div>
+</div>
+<img alt="../../_images/lec23-PCA_11_1.png" src="../../_images/lec23-PCA_11_1.png" />
+</div>
+</div>
+<p>What happens if we throw away a column of <span class="math notranslate nohighlight">\(U\)</span>, a singular value from <span class="math notranslate nohighlight">\(\Sigma\)</span>, and a row from <span class="math notranslate nohighlight">\(V^T\)</span>? In this case we end up with the “rank 1 approximation” of the data.</p>
+<p>Looking at the data, we see that it does a surprisingly good job.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#child_data_rank_1_approximation = pd.DataFrame(u[:, :-1] @ np.diag(s[:-1]) @ vt[:-1, :], columns = [&quot;mortality&quot;, &quot;fertility&quot;], index=child_data.index)</span>
+
+<span class="n">child_data_rank_1_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">child_data_rank_1_approximation</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>6.694067</td>
+      <td>4.660869</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.697627</td>
+      <td>1.182004</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2.880467</td>
+      <td>2.005579</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>8.232160</td>
+      <td>5.731795</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.506198</td>
+      <td>1.048719</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>By plotting the data in a 2D space, we can see what’s going on. We’re simply getting the original data projected on to some 1 dimensional subspace.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data_rank_1_approximation</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fed0df8b590&gt;
+</pre></div>
+</div>
+<img alt="../../_images/lec23-PCA_15_1.png" src="../../_images/lec23-PCA_15_1.png" />
+</div>
+</div>
+<p>There’s one significant issue with our projection, which we can see by plotting both the original data and our reconstruction on the same axis. The issue is that the projection goes through the origin but our data has a non-zero y-intercept.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data_rank_1_approximation</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fed0def9050&gt;
+</pre></div>
+</div>
+<img alt="../../_images/lec23-PCA_17_1.png" src="../../_images/lec23-PCA_17_1.png" />
+</div>
+</div>
+<p>While this y-intercept misalignment isn’t terrible here, it can be really bad. For example, consider the 2D dataset below (from our body measurements dataset from the previous lecture).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#http://jse.amstat.org/datasets/fat.txt</span>
+<span class="n">body_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span><span class="s2">&quot;fat.dat.txt&quot;</span><span class="p">,</span> <span class="n">colspecs</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">29</span><span class="p">),</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+                                             <span class="p">(</span><span class="mi">39</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">53</span><span class="p">),</span> <span class="p">(</span><span class="mi">57</span><span class="p">,</span> <span class="mi">61</span><span class="p">),</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">69</span><span class="p">),</span>
+                                             <span class="p">(</span><span class="mi">73</span><span class="p">,</span> <span class="mi">77</span><span class="p">),</span> <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">85</span><span class="p">),</span> <span class="p">(</span><span class="mi">88</span><span class="p">,</span> <span class="mi">93</span><span class="p">),</span> <span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="mi">101</span><span class="p">),</span>
+                                             <span class="p">(</span><span class="mi">105</span><span class="p">,</span> <span class="mi">109</span><span class="p">),</span> <span class="p">(</span><span class="mi">113</span><span class="p">,</span> <span class="mi">117</span><span class="p">),</span> <span class="p">(</span><span class="mi">121</span><span class="p">,</span> <span class="mi">125</span><span class="p">),</span> <span class="p">(</span><span class="mi">129</span><span class="p">,</span> <span class="mi">133</span><span class="p">),</span>
+                                             <span class="p">(</span><span class="mi">137</span><span class="p">,</span> <span class="mi">141</span><span class="p">),</span> <span class="p">(</span><span class="mi">145</span><span class="p">,</span> <span class="mi">149</span><span class="p">)],</span> 
+                  
+                  
+                  <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;% brozek fat&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">% s</span><span class="s2">iri fat&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> 
+                                       <span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="s2">&quot;adiposity&quot;</span><span class="p">,</span> <span class="s2">&quot;fat free weight&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;neck&quot;</span><span class="p">,</span> <span class="s2">&quot;chest&quot;</span><span class="p">,</span> <span class="s2">&quot;abdomen&quot;</span><span class="p">,</span> <span class="s2">&quot;hip&quot;</span><span class="p">,</span> <span class="s2">&quot;thigh&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;knee&quot;</span><span class="p">,</span> <span class="s2">&quot;ankle&quot;</span><span class="p">,</span> <span class="s2">&quot;bicep&quot;</span><span class="p">,</span> <span class="s2">&quot;forearm&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;wrist&quot;</span><span class="p">])</span>
+<span class="c1">#body_data = body_data.drop(41) #drop the weird record</span>
+<span class="n">body_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>% brozek fat</th>
+      <th>% siri fat</th>
+      <th>density</th>
+      <th>age</th>
+      <th>weight</th>
+      <th>height</th>
+      <th>adiposity</th>
+      <th>fat free weight</th>
+      <th>neck</th>
+      <th>chest</th>
+      <th>abdomen</th>
+      <th>hip</th>
+      <th>thigh</th>
+      <th>knee</th>
+      <th>ankle</th>
+      <th>bicep</th>
+      <th>forearm</th>
+      <th>wrist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>12.6</td>
+      <td>12.3</td>
+      <td>1.0708</td>
+      <td>23</td>
+      <td>154.25</td>
+      <td>67.75</td>
+      <td>23.7</td>
+      <td>134.9</td>
+      <td>36.2</td>
+      <td>93.1</td>
+      <td>85.2</td>
+      <td>94.5</td>
+      <td>59.0</td>
+      <td>37.3</td>
+      <td>21.9</td>
+      <td>32.0</td>
+      <td>27.4</td>
+      <td>17.1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>6.9</td>
+      <td>6.1</td>
+      <td>1.0853</td>
+      <td>22</td>
+      <td>173.25</td>
+      <td>72.25</td>
+      <td>23.4</td>
+      <td>161.3</td>
+      <td>38.5</td>
+      <td>93.6</td>
+      <td>83.0</td>
+      <td>98.7</td>
+      <td>58.7</td>
+      <td>37.3</td>
+      <td>23.4</td>
+      <td>30.5</td>
+      <td>28.9</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24.6</td>
+      <td>25.3</td>
+      <td>1.0414</td>
+      <td>22</td>
+      <td>154.00</td>
+      <td>66.25</td>
+      <td>24.7</td>
+      <td>116.0</td>
+      <td>34.0</td>
+      <td>95.8</td>
+      <td>87.9</td>
+      <td>99.2</td>
+      <td>59.6</td>
+      <td>38.9</td>
+      <td>24.0</td>
+      <td>28.8</td>
+      <td>25.2</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10.9</td>
+      <td>10.4</td>
+      <td>1.0751</td>
+      <td>26</td>
+      <td>184.75</td>
+      <td>72.25</td>
+      <td>24.9</td>
+      <td>164.7</td>
+      <td>37.4</td>
+      <td>101.8</td>
+      <td>86.4</td>
+      <td>101.2</td>
+      <td>60.1</td>
+      <td>37.3</td>
+      <td>22.8</td>
+      <td>32.4</td>
+      <td>29.4</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>27.8</td>
+      <td>28.7</td>
+      <td>1.0340</td>
+      <td>24</td>
+      <td>184.25</td>
+      <td>71.25</td>
+      <td>25.6</td>
+      <td>133.1</td>
+      <td>34.4</td>
+      <td>97.3</td>
+      <td>100.0</td>
+      <td>101.9</td>
+      <td>63.2</td>
+      <td>42.2</td>
+      <td>24.0</td>
+      <td>32.2</td>
+      <td>27.7</td>
+      <td>17.7</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">density_and_abdomen</span> <span class="o">=</span> <span class="n">body_data</span><span class="p">[[</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;abdomen&quot;</span><span class="p">]]</span>
+<span class="n">density_and_abdomen</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>density</th>
+      <th>abdomen</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0708</td>
+      <td>85.2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0853</td>
+      <td>83.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0414</td>
+      <td>87.9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0751</td>
+      <td>86.4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0340</td>
+      <td>100.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>If we look at the data, the rank 1 approximation looks at least vaguely sane from the table.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">density_and_abdomen_rank_1_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">density_and_abdomen</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">density_and_abdomen_rank_1_approximation</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>density</th>
+      <th>abdomen</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.957134</td>
+      <td>85.201277</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.932425</td>
+      <td>83.001717</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.987458</td>
+      <td>87.900606</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.970613</td>
+      <td>86.401174</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.123369</td>
+      <td>99.998996</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>But if we plot on 2D axes, we’ll see that things are very wrong.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;abdomen&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">body_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fed0de82f10&gt;
+</pre></div>
+</div>
+<img alt="../../_images/lec23-PCA_24_1.png" src="../../_images/lec23-PCA_24_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">density_and_abdomen_rank_1_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">density_and_abdomen</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;abdomen&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">body_data</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;abdomen&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">density_and_abdomen_rank_1_approximation</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_25_0.png" src="../../_images/lec23-PCA_25_0.png" />
+</div>
+</div>
+<p>Since the subspace that we’re projecting on to is off and to the right, we end up with a bizarre result where our rank 1 approximation believes that density increases with abdomen size, even though the data shows the opposite.</p>
+<p>To fix this issue, we should always start the SVD process by zero-centering our data. That is, for each column, we should subtract the mean of that column.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">density_and_abdomen</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>density     1.055574
+abdomen    92.555952
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">density_and_abdomen_centered</span> <span class="o">=</span> <span class="n">density_and_abdomen</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">density_and_abdomen</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">density_and_abdomen_centered</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>density</th>
+      <th>abdomen</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.015226</td>
+      <td>-7.355952</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.029726</td>
+      <td>-9.555952</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.014174</td>
+      <td>-4.655952</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.019526</td>
+      <td>-6.155952</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-0.021574</td>
+      <td>7.444048</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Now when we do the approximation, things work much better.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">density_and_abdomen_centered_rank_1_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">density_and_abdomen_centered</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;abdomen&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">density_and_abdomen_centered</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;abdomen&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">density_and_abdomen_centered_rank_1_approximation</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_31_0.png" src="../../_images/lec23-PCA_31_0.png" />
+</div>
+</div>
+<div class="section" id="interpreting-principal-components">
+<h3>Interpreting Principal Components<a class="headerlink" href="#interpreting-principal-components" title="Permalink to this headline">¶</a></h3>
+<p>Let’s revisit our child mortality and maternal fertility data from before.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">child_data</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;mortality&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span> <span class="s2">&quot;fertility&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_34_0.png" src="../../_images/lec23-PCA_34_0.png" />
+</div>
+</div>
+<p>Since we’re going to be doing SVD, let’s make sure to center our data first.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mortality    3.034590
+fertility    2.775956
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">child_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">child_data_centered</span> <span class="o">=</span> <span class="n">child_data</span> <span class="o">-</span> <span class="n">child_means</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">child_data_centered</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;mortality&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span> <span class="s2">&quot;fertility&quot;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+<span class="c1"># plt.gcf().savefig(&quot;mortality_fertility_centered.png&quot;, dpi=300, bbox_inches=&quot;tight&quot;)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_37_0.png" src="../../_images/lec23-PCA_37_0.png" />
+</div>
+</div>
+<p>Tie in with the manual computation slides.</p>
+</div>
+</div>
+<div class="section" id="pca-vs-linear-regression">
+<h2>PCA vs. Linear Regression<a class="headerlink" href="#pca-vs-linear-regression" title="Permalink to this headline">¶</a></h2>
+<p>Now we’ll finally turn to trying to understand what the principle components and the low rank approximations actually mean!</p>
+<p>Returning to our child mortality data from before, if we zero-center the child data, we see get back a better result. Note that we have to add back in the mean of each column to get things back into the right units.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">child_data_centered</span> <span class="o">=</span> <span class="n">child_data</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">child_data_rank_1_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">child_data_centered</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">means</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data_rank_1_approximation</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;rank 1 approx&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_43_0.png" src="../../_images/lec23-PCA_43_0.png" />
+</div>
+</div>
+<p>We can also give our rank 1 approximation as a line, showing the 1D subspace (in black) that our data is being projected onto.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data_rank_1_approximation</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;rank 1 approx&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_45_0.png" src="../../_images/lec23-PCA_45_0.png" />
+</div>
+</div>
+<p>This plot probably brings to mind linear regression from Data 8. But PCA is NOT the same thing linear regression. Let’s plot the regression lines for this data for comparison. Recall that the regression line gives us, e.g. the best possible linear prediction of the fertility given the mortality.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">child_data</span><span class="p">[</span><span class="s1">&#39;mortality&#39;</span><span class="p">],</span> <span class="n">child_data</span><span class="p">[</span><span class="s1">&#39;fertility&#39;</span><span class="p">]</span>
+<span class="n">slope_x</span><span class="p">,</span> <span class="n">intercept_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># simple linear regression</span>
+
+<span class="n">scatter14</span><span class="p">(</span><span class="n">child_data</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slope_x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">intercept_x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">child_data</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;mortality&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;fertility&#39;</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">tx</span><span class="p">,</span> <span class="n">tx</span><span class="p">],</span> <span class="p">[</span><span class="n">slope_x</span> <span class="o">*</span> <span class="n">tx</span> <span class="o">+</span> <span class="n">intercept_x</span><span class="p">,</span> <span class="n">ty</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;predicted fertility&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_47_0.png" src="../../_images/lec23-PCA_47_0.png" />
+</div>
+</div>
+<p>In the plot above, the green regression line given minimizes the sum of the squared errors, given as red vertical lines.</p>
+<p>We could also do the opposite thing, and try to predict fertility from mortality.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">child_data</span><span class="p">[</span><span class="s1">&#39;mortality&#39;</span><span class="p">],</span> <span class="n">child_data</span><span class="p">[</span><span class="s1">&#39;fertility&#39;</span><span class="p">]</span>
+<span class="n">slope_y</span><span class="p">,</span> <span class="n">intercept_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># simple linear regression</span>
+
+<span class="n">scatter14</span><span class="p">(</span><span class="n">child_data</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">slope_y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">intercept_y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;purple&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">child_data</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;mortality&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;fertility&#39;</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">tx</span><span class="p">,</span> <span class="n">slope_y</span> <span class="o">*</span> <span class="n">ty</span> <span class="o">+</span> <span class="n">intercept_y</span><span class="p">],</span> <span class="p">[</span><span class="n">ty</span><span class="p">,</span> <span class="n">ty</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;predicted mortality&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_50_0.png" src="../../_images/lec23-PCA_50_0.png" />
+</div>
+</div>
+<p>In the plot above, the green regression line given minimizes the sum of the squared errors, given as red horizontal lines.</p>
+<p>Plotting the two regression lines and the 1D subspace chosen by PCA, we see that all 3 are distinct!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data_rank_1_approximation</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slope_x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">intercept_x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">slope_y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">intercept_y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;purple&#39;</span><span class="p">);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;rank 1 approx&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted fertility&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted mortality&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_53_0.png" src="../../_images/lec23-PCA_53_0.png" />
+</div>
+</div>
+<p>Given that the green line minimizes the “vertical error” and the purple line minimizes the “horizontal error”. You might wonder what the black line minimizes. It turns out, it minimizes the “diagonal” error, i.e. the error in the direction perpendicular to itself.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data_rank_1_approximation</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slope_x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">intercept_x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">slope_y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">intercept_y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;purple&#39;</span><span class="p">);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="s1">&#39;fertility&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">child_data</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tdata</span> <span class="ow">in</span> <span class="n">child_data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">tx</span> <span class="o">=</span> <span class="n">tdata</span><span class="p">[</span><span class="s2">&quot;mortality&quot;</span><span class="p">]</span>
+    <span class="n">ty</span> <span class="o">=</span> <span class="n">tdata</span><span class="p">[</span><span class="s2">&quot;fertility&quot;</span><span class="p">]</span>
+    <span class="n">tx_projected</span> <span class="o">=</span> <span class="n">child_data_rank_1_approximation</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">ty_projected</span> <span class="o">=</span> <span class="n">child_data_rank_1_approximation</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">tx</span><span class="p">,</span> <span class="n">tx_projected</span><span class="p">],</span> <span class="p">[</span><span class="n">ty</span><span class="p">,</span> <span class="n">ty_projected</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;rank 1 approx&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted fertility&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted mortality&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_55_0.png" src="../../_images/lec23-PCA_55_0.png" />
+</div>
+</div>
+<p>The function in the following cell makes it easy to make similar plots for whatever dataset you might be interested in.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_x_regression_y_regression_1d_approximation</span><span class="p">(</span><span class="n">data</span><span class="p">):</span> 
+    <span class="n">xname</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">yname</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">xname</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">yname</span><span class="p">]</span>
+    <span class="n">slope_x</span><span class="p">,</span> <span class="n">intercept_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># simple linear regression</span>
+    
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">xname</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">yname</span><span class="p">]</span>
+    <span class="n">slope_y</span><span class="p">,</span> <span class="n">intercept_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># simple linear regression</span>
+    
+    <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">rank_1_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">means</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">means</span>
+    
+    <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">rank_1_approximation</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slope_x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">intercept_x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">slope_y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">intercept_y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;purple&#39;</span><span class="p">);</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">xname</span><span class="p">,</span> <span class="n">yname</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    
+   
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tdata</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">tx</span> <span class="o">=</span> <span class="n">tdata</span><span class="p">[</span><span class="n">xname</span><span class="p">]</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="n">tdata</span><span class="p">[</span><span class="n">yname</span><span class="p">]</span>
+        
+        <span class="n">tx_projected</span> <span class="o">=</span> <span class="n">rank_1_approximation</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">ty_projected</span> <span class="o">=</span> <span class="n">rank_1_approximation</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">tx</span><span class="p">,</span> <span class="n">tx_projected</span><span class="p">],</span> <span class="p">[</span><span class="n">ty</span><span class="p">,</span> <span class="n">ty_projected</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span> 
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;1D PCA Subspace&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted &#39;</span> <span class="o">+</span> <span class="n">xname</span><span class="p">,</span> <span class="s1">&#39;predicted &#39;</span> <span class="o">+</span> <span class="n">yname</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_x_regression_y_regression_1d_approximation</span><span class="p">(</span><span class="n">body_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="mi">41</span><span class="p">)[[</span><span class="s2">&quot;adiposity&quot;</span><span class="p">,</span> <span class="s2">&quot;bicep&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_58_0.png" src="../../_images/lec23-PCA_58_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="principal-components-and-singular-values">
+<h2>Principal Components and Singular Values<a class="headerlink" href="#principal-components-and-singular-values" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="singular-values-and-variance">
+<h3>Singular Values and Variance<a class="headerlink" href="#singular-values-and-variance" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rectangle</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;rectangle_data.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rectangle_centered</span> <span class="o">=</span> <span class="n">rectangle</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rectangle</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">rectangle_centered</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>width          7.6891
+height         5.3475
+area         338.7316
+perimeter     50.7904
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">rectangle_centered</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>402.5586000000002
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">rectangle_centered</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-0.1339099 ,  0.00592996,  0.03473374, -0.14290163],
+       [ 0.08635418, -0.07951453,  0.01494809,  0.73679984],
+       [ 0.11776646, -0.12896256,  0.08577428, -0.06410577],
+       [-0.02727392,  0.1831771 ,  0.01089507, -0.03781763],
+       [-0.258806  , -0.09429499,  0.09027015, -0.0466119 ]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1.97388075e+02, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00],
+       [0.00000000e+00, 2.74346257e+01, 0.00000000e+00, 0.00000000e+00],
+       [0.00000000e+00, 0.00000000e+00, 2.32626119e+01, 0.00000000e+00],
+       [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 8.37988302e-15]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">rectangle_centered</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([3.89620522e+02, 7.52658687e+00, 5.41149115e+00, 7.02224394e-31])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">rectangle_centered</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>402.55859999999984
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="practical-pca">
+<h2>Practical PCA<a class="headerlink" href="#practical-pca" title="Permalink to this headline">¶</a></h2>
+<p>Let’s now step back and try to use PCA on our body measurement and congressional voting datasets.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>% brozek fat</th>
+      <th>% siri fat</th>
+      <th>density</th>
+      <th>age</th>
+      <th>weight</th>
+      <th>height</th>
+      <th>adiposity</th>
+      <th>fat free weight</th>
+      <th>neck</th>
+      <th>chest</th>
+      <th>abdomen</th>
+      <th>hip</th>
+      <th>thigh</th>
+      <th>knee</th>
+      <th>ankle</th>
+      <th>bicep</th>
+      <th>forearm</th>
+      <th>wrist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>12.6</td>
+      <td>12.3</td>
+      <td>1.0708</td>
+      <td>23</td>
+      <td>154.25</td>
+      <td>67.75</td>
+      <td>23.7</td>
+      <td>134.9</td>
+      <td>36.2</td>
+      <td>93.1</td>
+      <td>85.2</td>
+      <td>94.5</td>
+      <td>59.0</td>
+      <td>37.3</td>
+      <td>21.9</td>
+      <td>32.0</td>
+      <td>27.4</td>
+      <td>17.1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>6.9</td>
+      <td>6.1</td>
+      <td>1.0853</td>
+      <td>22</td>
+      <td>173.25</td>
+      <td>72.25</td>
+      <td>23.4</td>
+      <td>161.3</td>
+      <td>38.5</td>
+      <td>93.6</td>
+      <td>83.0</td>
+      <td>98.7</td>
+      <td>58.7</td>
+      <td>37.3</td>
+      <td>23.4</td>
+      <td>30.5</td>
+      <td>28.9</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24.6</td>
+      <td>25.3</td>
+      <td>1.0414</td>
+      <td>22</td>
+      <td>154.00</td>
+      <td>66.25</td>
+      <td>24.7</td>
+      <td>116.0</td>
+      <td>34.0</td>
+      <td>95.8</td>
+      <td>87.9</td>
+      <td>99.2</td>
+      <td>59.6</td>
+      <td>38.9</td>
+      <td>24.0</td>
+      <td>28.8</td>
+      <td>25.2</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10.9</td>
+      <td>10.4</td>
+      <td>1.0751</td>
+      <td>26</td>
+      <td>184.75</td>
+      <td>72.25</td>
+      <td>24.9</td>
+      <td>164.7</td>
+      <td>37.4</td>
+      <td>101.8</td>
+      <td>86.4</td>
+      <td>101.2</td>
+      <td>60.1</td>
+      <td>37.3</td>
+      <td>22.8</td>
+      <td>32.4</td>
+      <td>29.4</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>27.8</td>
+      <td>28.7</td>
+      <td>1.0340</td>
+      <td>24</td>
+      <td>184.25</td>
+      <td>71.25</td>
+      <td>25.6</td>
+      <td>133.1</td>
+      <td>34.4</td>
+      <td>97.3</td>
+      <td>100.0</td>
+      <td>101.9</td>
+      <td>63.2</td>
+      <td>42.2</td>
+      <td>24.0</td>
+      <td>32.2</td>
+      <td>27.7</td>
+      <td>17.7</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that some of our singular values capture more variance than others.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([5.02052705e+03, 2.62085056e+02, 2.54543432e+02, 1.41812428e+02,
+       5.98783810e+01, 5.29106976e+01, 4.16567900e+01, 3.12823306e+01,
+       2.60271725e+01, 2.44919558e+01, 2.21128215e+01, 2.05280695e+01,
+       1.86667123e+01, 1.67184654e+01, 1.24277631e+01, 7.79276210e+00,
+       1.97067950e+00, 2.72193414e-01])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or we can compute the fraction of the variance captured by each principal component. The result seems shocking at first, as our data appears to be effectively rank 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.99, 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>This seems absurd, as clearly there are several variables that we expect to be show significant variation independent of each other, e.g. weight, height, and age. If this happens to you, it’s probably because you forgot to center your data!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_data_centered</span> <span class="o">=</span> <span class="n">body_data</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">body_data_centered</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>% brozek fat</th>
+      <th>% siri fat</th>
+      <th>density</th>
+      <th>age</th>
+      <th>weight</th>
+      <th>height</th>
+      <th>adiposity</th>
+      <th>fat free weight</th>
+      <th>neck</th>
+      <th>chest</th>
+      <th>abdomen</th>
+      <th>hip</th>
+      <th>thigh</th>
+      <th>knee</th>
+      <th>ankle</th>
+      <th>bicep</th>
+      <th>forearm</th>
+      <th>wrist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-6.338492</td>
+      <td>-6.850794</td>
+      <td>0.015226</td>
+      <td>-21.884921</td>
+      <td>-24.674405</td>
+      <td>-2.39881</td>
+      <td>-1.736905</td>
+      <td>-8.813889</td>
+      <td>-1.792063</td>
+      <td>-7.724206</td>
+      <td>-7.355952</td>
+      <td>-5.404762</td>
+      <td>-0.405952</td>
+      <td>-1.290476</td>
+      <td>-1.202381</td>
+      <td>-0.273413</td>
+      <td>-1.263889</td>
+      <td>-1.129762</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-12.038492</td>
+      <td>-13.050794</td>
+      <td>0.029726</td>
+      <td>-22.884921</td>
+      <td>-5.674405</td>
+      <td>2.10119</td>
+      <td>-2.036905</td>
+      <td>17.586111</td>
+      <td>0.507937</td>
+      <td>-7.224206</td>
+      <td>-9.555952</td>
+      <td>-1.204762</td>
+      <td>-0.705952</td>
+      <td>-1.290476</td>
+      <td>0.297619</td>
+      <td>-1.773413</td>
+      <td>0.236111</td>
+      <td>-0.029762</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5.661508</td>
+      <td>6.149206</td>
+      <td>-0.014174</td>
+      <td>-22.884921</td>
+      <td>-24.924405</td>
+      <td>-3.89881</td>
+      <td>-0.736905</td>
+      <td>-27.713889</td>
+      <td>-3.992063</td>
+      <td>-5.024206</td>
+      <td>-4.655952</td>
+      <td>-0.704762</td>
+      <td>0.194048</td>
+      <td>0.309524</td>
+      <td>0.897619</td>
+      <td>-3.473413</td>
+      <td>-3.463889</td>
+      <td>-1.629762</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-8.038492</td>
+      <td>-8.750794</td>
+      <td>0.019526</td>
+      <td>-18.884921</td>
+      <td>5.825595</td>
+      <td>2.10119</td>
+      <td>-0.536905</td>
+      <td>20.986111</td>
+      <td>-0.592063</td>
+      <td>0.975794</td>
+      <td>-6.155952</td>
+      <td>1.295238</td>
+      <td>0.694048</td>
+      <td>-1.290476</td>
+      <td>-0.302381</td>
+      <td>0.126587</td>
+      <td>0.736111</td>
+      <td>-0.029762</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8.861508</td>
+      <td>9.549206</td>
+      <td>-0.021574</td>
+      <td>-20.884921</td>
+      <td>5.325595</td>
+      <td>1.10119</td>
+      <td>0.163095</td>
+      <td>-10.613889</td>
+      <td>-3.592063</td>
+      <td>-3.524206</td>
+      <td>7.444048</td>
+      <td>1.995238</td>
+      <td>3.794048</td>
+      <td>3.609524</td>
+      <td>0.897619</td>
+      <td>-0.073413</td>
+      <td>-0.963889</td>
+      <td>-0.529762</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">body_data_centered</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This time, we see that the top singular value is no longer as dominant.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([5.86347268e+02, 2.61819089e+02, 1.67113835e+02, 5.99708077e+01,
+       5.33302486e+01, 4.22415004e+01, 3.48011060e+01, 2.92855997e+01,
+       2.55426169e+01, 2.39181665e+01, 2.08396531e+01, 2.04736098e+01,
+       1.85404097e+01, 1.62788697e+01, 1.23779482e+01, 7.72010337e+00,
+       1.95363897e+00, 4.48706065e-02])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Looking now at the fraction of the variance captured by each principal component, we see that the top 2 or 3 principal components capture quite a lot of the variance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.76, 0.15, 0.06, 0.01, 0.01, 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can also show this in the form of what is usually called a “scree plot”.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_86_0.png" src="../../_images/lec23-PCA_86_0.png" />
+</div>
+</div>
+<p>Thus, we expect that if we were to do a rank 3 approximation, we should get back data that’s pretty close to where we started, as just those 3 dimensions capture 97% of the variance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_data_rank_3_approximation</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">body_data_centered</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span>  <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">body_data_rank_3_approximation</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>% brozek fat</th>
+      <th>% siri fat</th>
+      <th>density</th>
+      <th>age</th>
+      <th>weight</th>
+      <th>height</th>
+      <th>adiposity</th>
+      <th>fat free weight</th>
+      <th>neck</th>
+      <th>chest</th>
+      <th>abdomen</th>
+      <th>hip</th>
+      <th>thigh</th>
+      <th>knee</th>
+      <th>ankle</th>
+      <th>bicep</th>
+      <th>forearm</th>
+      <th>wrist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>13.732084</td>
+      <td>13.499443</td>
+      <td>1.067647</td>
+      <td>23.406671</td>
+      <td>155.524219</td>
+      <td>69.685017</td>
+      <td>22.382014</td>
+      <td>134.660313</td>
+      <td>35.750451</td>
+      <td>92.404761</td>
+      <td>81.663261</td>
+      <td>95.367676</td>
+      <td>57.832005</td>
+      <td>36.807149</td>
+      <td>22.471102</td>
+      <td>30.513755</td>
+      <td>27.871398</td>
+      <td>17.221299</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>6.949481</td>
+      <td>6.177696</td>
+      <td>1.084653</td>
+      <td>22.136786</td>
+      <td>173.262498</td>
+      <td>72.818426</td>
+      <td>22.848506</td>
+      <td>161.108343</td>
+      <td>37.281215</td>
+      <td>94.764794</td>
+      <td>81.952662</td>
+      <td>98.256188</td>
+      <td>59.629903</td>
+      <td>38.251464</td>
+      <td>23.494178</td>
+      <td>31.990484</td>
+      <td>28.799694</td>
+      <td>18.014750</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24.388640</td>
+      <td>24.995400</td>
+      <td>1.041272</td>
+      <td>22.012988</td>
+      <td>155.515375</td>
+      <td>66.961498</td>
+      <td>24.013328</td>
+      <td>115.107332</td>
+      <td>35.327536</td>
+      <td>94.623409</td>
+      <td>87.487254</td>
+      <td>96.824325</td>
+      <td>59.191562</td>
+      <td>36.564650</td>
+      <td>22.049234</td>
+      <td>30.526265</td>
+      <td>27.727128</td>
+      <td>16.734867</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10.535884</td>
+      <td>10.053321</td>
+      <td>1.076052</td>
+      <td>26.287526</td>
+      <td>185.315285</td>
+      <td>72.840641</td>
+      <td>24.486712</td>
+      <td>164.078362</td>
+      <td>38.187196</td>
+      <td>98.649630</td>
+      <td>87.304458</td>
+      <td>101.045858</td>
+      <td>61.263963</td>
+      <td>39.095345</td>
+      <td>23.826619</td>
+      <td>32.953935</td>
+      <td>29.261160</td>
+      <td>18.327856</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>27.324362</td>
+      <td>28.164091</td>
+      <td>1.034484</td>
+      <td>23.983222</td>
+      <td>184.352508</td>
+      <td>68.475540</td>
+      <td>26.973751</td>
+      <td>132.523943</td>
+      <td>37.446408</td>
+      <td>101.921954</td>
+      <td>96.240973</td>
+      <td>103.147363</td>
+      <td>63.286670</td>
+      <td>38.642499</td>
+      <td>23.123048</td>
+      <td>32.896046</td>
+      <td>28.991277</td>
+      <td>17.530191</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>% brozek fat</th>
+      <th>% siri fat</th>
+      <th>density</th>
+      <th>age</th>
+      <th>weight</th>
+      <th>height</th>
+      <th>adiposity</th>
+      <th>fat free weight</th>
+      <th>neck</th>
+      <th>chest</th>
+      <th>abdomen</th>
+      <th>hip</th>
+      <th>thigh</th>
+      <th>knee</th>
+      <th>ankle</th>
+      <th>bicep</th>
+      <th>forearm</th>
+      <th>wrist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>12.6</td>
+      <td>12.3</td>
+      <td>1.0708</td>
+      <td>23</td>
+      <td>154.25</td>
+      <td>67.75</td>
+      <td>23.7</td>
+      <td>134.9</td>
+      <td>36.2</td>
+      <td>93.1</td>
+      <td>85.2</td>
+      <td>94.5</td>
+      <td>59.0</td>
+      <td>37.3</td>
+      <td>21.9</td>
+      <td>32.0</td>
+      <td>27.4</td>
+      <td>17.1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>6.9</td>
+      <td>6.1</td>
+      <td>1.0853</td>
+      <td>22</td>
+      <td>173.25</td>
+      <td>72.25</td>
+      <td>23.4</td>
+      <td>161.3</td>
+      <td>38.5</td>
+      <td>93.6</td>
+      <td>83.0</td>
+      <td>98.7</td>
+      <td>58.7</td>
+      <td>37.3</td>
+      <td>23.4</td>
+      <td>30.5</td>
+      <td>28.9</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24.6</td>
+      <td>25.3</td>
+      <td>1.0414</td>
+      <td>22</td>
+      <td>154.00</td>
+      <td>66.25</td>
+      <td>24.7</td>
+      <td>116.0</td>
+      <td>34.0</td>
+      <td>95.8</td>
+      <td>87.9</td>
+      <td>99.2</td>
+      <td>59.6</td>
+      <td>38.9</td>
+      <td>24.0</td>
+      <td>28.8</td>
+      <td>25.2</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10.9</td>
+      <td>10.4</td>
+      <td>1.0751</td>
+      <td>26</td>
+      <td>184.75</td>
+      <td>72.25</td>
+      <td>24.9</td>
+      <td>164.7</td>
+      <td>37.4</td>
+      <td>101.8</td>
+      <td>86.4</td>
+      <td>101.2</td>
+      <td>60.1</td>
+      <td>37.3</td>
+      <td>22.8</td>
+      <td>32.4</td>
+      <td>29.4</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>27.8</td>
+      <td>28.7</td>
+      <td>1.0340</td>
+      <td>24</td>
+      <td>184.25</td>
+      <td>71.25</td>
+      <td>25.6</td>
+      <td>133.1</td>
+      <td>34.4</td>
+      <td>97.3</td>
+      <td>100.0</td>
+      <td>101.9</td>
+      <td>63.2</td>
+      <td>42.2</td>
+      <td>24.0</td>
+      <td>32.2</td>
+      <td>27.7</td>
+      <td>17.7</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>One very interesting thing we can do is try to plot the principal components themselves. In this case, let’s plot only the first two.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">body_data_centered</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">pcs</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">s</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_91_0.png" src="../../_images/lec23-PCA_91_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>38
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">38</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>% brozek fat        33.8000
+% siri fat          35.2000
+density              1.0202
+age                 46.0000
+weight             363.1500
+height              72.2500
+adiposity           48.9000
+fat free weight    240.5000
+neck                51.2000
+chest              136.2000
+abdomen            148.1000
+hip                147.7000
+thigh               87.3000
+knee                49.1000
+ankle               29.6000
+bicep               45.0000
+forearm             29.0000
+wrist               21.4000
+Name: 38, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="election-data">
+<h2>Election Data<a class="headerlink" href="#election-data" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ds100_utils</span> <span class="kn">import</span> <span class="n">fetch_and_cache</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+
+<span class="n">base_url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/unitedstates/congress-legislators/raw/master/&#39;</span>
+<span class="n">legislators_path</span> <span class="o">=</span> <span class="s1">&#39;legislators-current.yaml&#39;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">fetch_and_cache</span><span class="p">(</span><span class="n">base_url</span> <span class="o">+</span> <span class="n">legislators_path</span><span class="p">,</span> <span class="n">legislators_path</span><span class="p">)</span>
+<span class="n">legislators_data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">to_date</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">legs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;leg_id&#39;</span><span class="p">,</span> <span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;chamber&#39;</span><span class="p">,</span> <span class="s1">&#39;party&#39;</span><span class="p">,</span> <span class="s1">&#39;birthday&#39;</span><span class="p">],</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">][</span><span class="s1">&#39;bioguide&#39;</span><span class="p">],</span> 
+           <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="s1">&#39;first&#39;</span><span class="p">],</span>
+           <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="s1">&#39;last&#39;</span><span class="p">],</span>
+           <span class="n">x</span><span class="p">[</span><span class="s1">&#39;bio&#39;</span><span class="p">][</span><span class="s1">&#39;gender&#39;</span><span class="p">],</span>
+           <span class="n">x</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;state&#39;</span><span class="p">],</span>
+           <span class="n">x</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
+           <span class="n">x</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;party&#39;</span><span class="p">],</span>
+           <span class="n">to_date</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;bio&#39;</span><span class="p">][</span><span class="s1">&#39;birthday&#39;</span><span class="p">])]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">legislators_data</span><span class="p">])</span>
+
+<span class="n">legs</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading... Done!
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/srv/conda/envs/data100/lib/python3.7/site-packages/ipykernel_launcher.py:9: YAMLLoadWarning: calling yaml.load() without Loader=... is deprecated, as the default Loader is unsafe. Please read https://msg.pyyaml.org/load for full details.
+  if __name__ == &#39;__main__&#39;:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>leg_id</th>
+      <th>first</th>
+      <th>last</th>
+      <th>gender</th>
+      <th>state</th>
+      <th>chamber</th>
+      <th>party</th>
+      <th>birthday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>B000944</td>
+      <td>Sherrod</td>
+      <td>Brown</td>
+      <td>M</td>
+      <td>OH</td>
+      <td>sen</td>
+      <td>Democrat</td>
+      <td>1952-11-09</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>C000127</td>
+      <td>Maria</td>
+      <td>Cantwell</td>
+      <td>F</td>
+      <td>WA</td>
+      <td>sen</td>
+      <td>Democrat</td>
+      <td>1958-10-13</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C000141</td>
+      <td>Benjamin</td>
+      <td>Cardin</td>
+      <td>M</td>
+      <td>MD</td>
+      <td>sen</td>
+      <td>Democrat</td>
+      <td>1943-10-05</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># February 2019 House of Representatives roll call votes</span>
+<span class="c1"># Downloaded using https://github.com/eyeseast/propublica-congress</span>
+<span class="n">votes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;votes.csv&#39;</span><span class="p">)</span>
+<span class="n">votes</span> <span class="o">=</span> <span class="n">votes</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s2">&quot;roll call&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">})</span> 
+<span class="n">votes</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chamber</th>
+      <th>session</th>
+      <th>roll call</th>
+      <th>member</th>
+      <th>vote</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000374</td>
+      <td>Not Voting</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000370</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000055</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000371</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000372</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">was_yes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Yes&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    
+<span class="n">vote_pivot</span> <span class="o">=</span> <span class="n">votes</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> 
+                                <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;roll call&#39;</span><span class="p">,</span> 
+                                <span class="n">values</span><span class="o">=</span><span class="s1">&#39;vote&#39;</span><span class="p">,</span> 
+                                <span class="n">aggfunc</span><span class="o">=</span><span class="n">was_yes</span><span class="p">,</span> 
+                                <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vote_pivot</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">vote_pivot</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>    
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(441, 41)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>roll call</th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>519</th>
+      <th>520</th>
+      <th>521</th>
+      <th>522</th>
+      <th>523</th>
+      <th>524</th>
+      <th>...</th>
+      <th>546</th>
+      <th>547</th>
+      <th>548</th>
+      <th>549</th>
+      <th>550</th>
+      <th>551</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>A000370</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>A000371</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 41 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote_pivot_centered</span> <span class="o">=</span> <span class="n">vote_pivot</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vote_pivot</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">vote_pivot_centered</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>roll call</th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>519</th>
+      <th>520</th>
+      <th>521</th>
+      <th>522</th>
+      <th>523</th>
+      <th>524</th>
+      <th>...</th>
+      <th>546</th>
+      <th>547</th>
+      <th>548</th>
+      <th>549</th>
+      <th>550</th>
+      <th>551</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>0.129252</td>
+      <td>-0.668934</td>
+      <td>-0.526077</td>
+      <td>-0.52381</td>
+      <td>0.049887</td>
+      <td>0.587302</td>
+      <td>-0.562358</td>
+      <td>0.634921</td>
+      <td>0.594104</td>
+      <td>0.560091</td>
+      <td>...</td>
+      <td>-0.521542</td>
+      <td>-0.526077</td>
+      <td>0.045351</td>
+      <td>-0.521542</td>
+      <td>-0.519274</td>
+      <td>0.54195</td>
+      <td>-0.521542</td>
+      <td>-0.535147</td>
+      <td>0.086168</td>
+      <td>-0.503401</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>-0.870748</td>
+      <td>-0.668934</td>
+      <td>-0.526077</td>
+      <td>-0.52381</td>
+      <td>-0.950113</td>
+      <td>-0.412698</td>
+      <td>-0.562358</td>
+      <td>-0.365079</td>
+      <td>-0.405896</td>
+      <td>-0.439909</td>
+      <td>...</td>
+      <td>-0.521542</td>
+      <td>0.473923</td>
+      <td>0.045351</td>
+      <td>0.478458</td>
+      <td>0.480726</td>
+      <td>-0.45805</td>
+      <td>0.478458</td>
+      <td>0.464853</td>
+      <td>-0.913832</td>
+      <td>0.496599</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>0.129252</td>
+      <td>0.331066</td>
+      <td>-0.526077</td>
+      <td>-0.52381</td>
+      <td>0.049887</td>
+      <td>0.587302</td>
+      <td>-0.562358</td>
+      <td>0.634921</td>
+      <td>0.594104</td>
+      <td>0.560091</td>
+      <td>...</td>
+      <td>-0.521542</td>
+      <td>-0.526077</td>
+      <td>0.045351</td>
+      <td>-0.521542</td>
+      <td>-0.519274</td>
+      <td>0.54195</td>
+      <td>-0.521542</td>
+      <td>-0.535147</td>
+      <td>0.086168</td>
+      <td>-0.503401</td>
+    </tr>
+    <tr>
+      <th>A000370</th>
+      <td>0.129252</td>
+      <td>0.331066</td>
+      <td>0.473923</td>
+      <td>0.47619</td>
+      <td>0.049887</td>
+      <td>-0.412698</td>
+      <td>0.437642</td>
+      <td>-0.365079</td>
+      <td>-0.405896</td>
+      <td>-0.439909</td>
+      <td>...</td>
+      <td>0.478458</td>
+      <td>0.473923</td>
+      <td>0.045351</td>
+      <td>0.478458</td>
+      <td>0.480726</td>
+      <td>-0.45805</td>
+      <td>0.478458</td>
+      <td>0.464853</td>
+      <td>0.086168</td>
+      <td>0.496599</td>
+    </tr>
+    <tr>
+      <th>A000371</th>
+      <td>0.129252</td>
+      <td>0.331066</td>
+      <td>0.473923</td>
+      <td>0.47619</td>
+      <td>0.049887</td>
+      <td>-0.412698</td>
+      <td>0.437642</td>
+      <td>-0.365079</td>
+      <td>-0.405896</td>
+      <td>-0.439909</td>
+      <td>...</td>
+      <td>0.478458</td>
+      <td>0.473923</td>
+      <td>0.045351</td>
+      <td>0.478458</td>
+      <td>0.480726</td>
+      <td>-0.45805</td>
+      <td>0.478458</td>
+      <td>0.464853</td>
+      <td>0.086168</td>
+      <td>0.496599</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 41 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">vote_pivot_centered</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.8 , 0.05, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01,
+       0.01, 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fed0cb69ed0&gt;]
+</pre></div>
+</div>
+<img alt="../../_images/lec23-PCA_101_1.png" src="../../_images/lec23-PCA_101_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pcs</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">s</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_102_0.png" src="../../_images/lec23-PCA_102_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;member&#39;</span><span class="p">:</span> <span class="n">vote_pivot</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="s1">&#39;pc1&#39;</span><span class="p">:</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;pc2&#39;</span><span class="p">:</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">})</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">legs</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;leg_id&#39;</span><span class="p">)</span>
+
+<span class="n">vote2d</span><span class="p">[</span><span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc1&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;party&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Democrat      228
+Republican      1
+Name: party, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#top right only</span>
+<span class="n">vote2d</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;pc2 &gt; -2 and pc1 &gt; 0&#39;</span><span class="p">)[</span><span class="s1">&#39;party&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Republican    191
+Name: party, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;pc1&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;pc2&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;party&quot;</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_105_0.png" src="../../_images/lec23-PCA_105_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc1_jittered&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vote2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc2_jittered&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vote2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;pc1_jittered&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;pc2_jittered&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;party&quot;</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_107_0.png" src="../../_images/lec23-PCA_107_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>member</th>
+      <th>pc1</th>
+      <th>pc2</th>
+      <th>leg_id</th>
+      <th>first</th>
+      <th>last</th>
+      <th>gender</th>
+      <th>state</th>
+      <th>chamber</th>
+      <th>party</th>
+      <th>birthday</th>
+      <th>pc1_jittered</th>
+      <th>pc2_jittered</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A000055</td>
+      <td>3.061356</td>
+      <td>0.364191</td>
+      <td>A000055</td>
+      <td>Robert</td>
+      <td>Aderholt</td>
+      <td>M</td>
+      <td>AL</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1965-07-22</td>
+      <td>3.144862</td>
+      <td>0.443475</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A000367</td>
+      <td>0.188870</td>
+      <td>-2.433565</td>
+      <td>A000367</td>
+      <td>Justin</td>
+      <td>Amash</td>
+      <td>M</td>
+      <td>MI</td>
+      <td>rep</td>
+      <td>Libertarian</td>
+      <td>1980-04-18</td>
+      <td>0.309763</td>
+      <td>-2.479743</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A000369</td>
+      <td>2.844370</td>
+      <td>0.821619</td>
+      <td>A000369</td>
+      <td>Mark</td>
+      <td>Amodei</td>
+      <td>M</td>
+      <td>NV</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1958-06-12</td>
+      <td>2.898607</td>
+      <td>0.865165</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A000370</td>
+      <td>-2.607536</td>
+      <td>0.127977</td>
+      <td>A000370</td>
+      <td>Alma</td>
+      <td>Adams</td>
+      <td>F</td>
+      <td>NC</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1946-05-27</td>
+      <td>-2.536420</td>
+      <td>0.026142</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>A000371</td>
+      <td>-2.607536</td>
+      <td>0.127977</td>
+      <td>A000371</td>
+      <td>Pete</td>
+      <td>Aguilar</td>
+      <td>M</td>
+      <td>CA</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1979-06-19</td>
+      <td>-2.650458</td>
+      <td>0.040515</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span><span class="p">[</span><span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc1&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;party&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Republican     196
+Democrat         7
+Libertarian      1
+Name: party, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span><span class="p">[</span><span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc2&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>member</th>
+      <th>pc1</th>
+      <th>pc2</th>
+      <th>leg_id</th>
+      <th>first</th>
+      <th>last</th>
+      <th>gender</th>
+      <th>state</th>
+      <th>chamber</th>
+      <th>party</th>
+      <th>birthday</th>
+      <th>pc1_jittered</th>
+      <th>pc2_jittered</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>A000367</td>
+      <td>0.188870</td>
+      <td>-2.433565</td>
+      <td>A000367</td>
+      <td>Justin</td>
+      <td>Amash</td>
+      <td>M</td>
+      <td>MI</td>
+      <td>rep</td>
+      <td>Libertarian</td>
+      <td>1980-04-18</td>
+      <td>0.309763</td>
+      <td>-2.479743</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>A000374</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>A000374</td>
+      <td>Ralph</td>
+      <td>Abraham</td>
+      <td>M</td>
+      <td>LA</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1954-09-16</td>
+      <td>1.193667</td>
+      <td>-3.661740</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>B001311</td>
+      <td>1.695651</td>
+      <td>-2.093912</td>
+      <td>B001311</td>
+      <td>Dan</td>
+      <td>Bishop</td>
+      <td>M</td>
+      <td>NC</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1964-07-01</td>
+      <td>1.903562</td>
+      <td>-2.000946</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>C000537</td>
+      <td>0.699636</td>
+      <td>-3.394179</td>
+      <td>C000537</td>
+      <td>James</td>
+      <td>Clyburn</td>
+      <td>M</td>
+      <td>SC</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1940-07-21</td>
+      <td>0.643172</td>
+      <td>-3.368755</td>
+    </tr>
+    <tr>
+      <th>68</th>
+      <td>C001087</td>
+      <td>2.755060</td>
+      <td>-1.378193</td>
+      <td>C001087</td>
+      <td>Eric</td>
+      <td>Crawford</td>
+      <td>M</td>
+      <td>AR</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1966-01-22</td>
+      <td>2.794060</td>
+      <td>-1.158624</td>
+    </tr>
+    <tr>
+      <th>149</th>
+      <td>G000582</td>
+      <td>2.262007</td>
+      <td>-2.632452</td>
+      <td>G000582</td>
+      <td>Jenniffer</td>
+      <td>González-Colón</td>
+      <td>F</td>
+      <td>PR</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1976-08-05</td>
+      <td>2.274945</td>
+      <td>-2.772818</td>
+    </tr>
+    <tr>
+      <th>177</th>
+      <td>H001077</td>
+      <td>2.509474</td>
+      <td>-1.349023</td>
+      <td>H001077</td>
+      <td>Clay</td>
+      <td>Higgins</td>
+      <td>M</td>
+      <td>LA</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1961-08-24</td>
+      <td>2.537679</td>
+      <td>-1.335292</td>
+    </tr>
+    <tr>
+      <th>193</th>
+      <td>J000299</td>
+      <td>2.908823</td>
+      <td>-1.094618</td>
+      <td>J000299</td>
+      <td>Mike</td>
+      <td>Johnson</td>
+      <td>M</td>
+      <td>LA</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1972-01-30</td>
+      <td>2.915334</td>
+      <td>-0.954357</td>
+    </tr>
+    <tr>
+      <th>267</th>
+      <td>M001200</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>M001200</td>
+      <td>A.</td>
+      <td>McEachin</td>
+      <td>M</td>
+      <td>VA</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1961-10-10</td>
+      <td>1.193625</td>
+      <td>-3.550412</td>
+    </tr>
+    <tr>
+      <th>277</th>
+      <td>M001210</td>
+      <td>1.695651</td>
+      <td>-2.093912</td>
+      <td>M001210</td>
+      <td>Gregory</td>
+      <td>Murphy</td>
+      <td>M</td>
+      <td>NC</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1963-03-05</td>
+      <td>1.659583</td>
+      <td>-2.030497</td>
+    </tr>
+    <tr>
+      <th>280</th>
+      <td>N000147</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>N000147</td>
+      <td>Eleanor</td>
+      <td>Norton</td>
+      <td>F</td>
+      <td>DC</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1937-06-13</td>
+      <td>1.112855</td>
+      <td>-3.444707</td>
+    </tr>
+    <tr>
+      <th>293</th>
+      <td>P000197</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>P000197</td>
+      <td>Nancy</td>
+      <td>Pelosi</td>
+      <td>F</td>
+      <td>CA</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1940-03-26</td>
+      <td>1.428091</td>
+      <td>-3.444876</td>
+    </tr>
+    <tr>
+      <th>305</th>
+      <td>P000610</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>P000610</td>
+      <td>Stacey</td>
+      <td>Plaskett</td>
+      <td>F</td>
+      <td>VI</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1966-05-13</td>
+      <td>1.246601</td>
+      <td>-3.506800</td>
+    </tr>
+    <tr>
+      <th>318</th>
+      <td>R000577</td>
+      <td>-2.069671</td>
+      <td>-1.344435</td>
+      <td>R000577</td>
+      <td>Tim</td>
+      <td>Ryan</td>
+      <td>M</td>
+      <td>OH</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1973-07-16</td>
+      <td>-1.971067</td>
+      <td>-1.216655</td>
+    </tr>
+    <tr>
+      <th>325</th>
+      <td>R000600</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>R000600</td>
+      <td>Aumua</td>
+      <td>Amata</td>
+      <td>F</td>
+      <td>AS</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1947-12-29</td>
+      <td>1.404409</td>
+      <td>-3.603394</td>
+    </tr>
+    <tr>
+      <th>354</th>
+      <td>S001177</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>S001177</td>
+      <td>Gregorio</td>
+      <td>Sablan</td>
+      <td>M</td>
+      <td>MP</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1955-01-19</td>
+      <td>1.284443</td>
+      <td>-3.540344</td>
+    </tr>
+    <tr>
+      <th>368</th>
+      <td>S001204</td>
+      <td>1.247134</td>
+      <td>-3.533196</td>
+      <td>S001204</td>
+      <td>Michael</td>
+      <td>San Nicolas</td>
+      <td>M</td>
+      <td>GU</td>
+      <td>rep</td>
+      <td>Democrat</td>
+      <td>1981-01-30</td>
+      <td>1.235569</td>
+      <td>-3.457230</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">votes</span><span class="p">[</span><span class="n">votes</span><span class="p">[</span><span class="s1">&#39;member&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vote2d</span><span class="p">[</span><span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc2&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;member&#39;</span><span class="p">])]</span>
+<span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="s1">&#39;vote&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>member   vote      
+A000367  No            31
+         Yes           10
+A000374  Not Voting    41
+B001311  No            17
+         Yes            7
+C000537  No             1
+         Not Voting    37
+         Yes            3
+C001087  No             6
+         Not Voting    23
+         Yes           12
+G000582  Not Voting     1
+         Yes            6
+H001077  No            14
+         Not Voting    15
+         Yes           12
+J000299  No            20
+         Not Voting     7
+         Yes           14
+M001200  Not Voting    41
+M001210  No            16
+         Not Voting     1
+         Yes            7
+N000147  No             6
+         Not Voting     1
+P000197  Speaker       41
+P000610  No             7
+R000577  No            11
+         Not Voting     8
+         Yes           22
+R000600  Not Voting     7
+S001177  No             7
+S001204  No             6
+         Not Voting     1
+dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">legs</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;leg_id == &#39;A000367&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>leg_id</th>
+      <th>first</th>
+      <th>last</th>
+      <th>gender</th>
+      <th>state</th>
+      <th>chamber</th>
+      <th>party</th>
+      <th>birthday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>33</th>
+      <td>A000367</td>
+      <td>Justin</td>
+      <td>Amash</td>
+      <td>M</td>
+      <td>MI</td>
+      <td>rep</td>
+      <td>Libertarian</td>
+      <td>1980-04-18</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="section" id="let-s-look-at-only-people-who-have-voted-more-than-15-times-lately">
+<h3>Let’s look at only people who have voted more than 15 times lately<a class="headerlink" href="#let-s-look-at-only-people-who-have-voted-more-than-15-times-lately" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">votes</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chamber</th>
+      <th>session</th>
+      <th>roll call</th>
+      <th>member</th>
+      <th>vote</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000374</td>
+      <td>Not Voting</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000370</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000055</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000371</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>House</td>
+      <td>1</td>
+      <td>555</td>
+      <td>A000372</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_yes_or_no_votes_per_member</span> <span class="o">=</span> <span class="n">votes</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;vote == &#39;Yes&#39; or vote == &#39;No&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">num_yes_or_no_votes_per_member</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>member
+A000055    40
+A000367    41
+A000369    41
+A000370    41
+A000371    41
+dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote_pivot_with_yes_no_count</span> <span class="o">=</span> <span class="n">vote_pivot</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">num_yes_or_no_votes_per_member</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(),</span> <span class="n">left_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">vote_pivot_with_yes_no_count</span> <span class="o">=</span> <span class="n">vote_pivot_with_yes_no_count</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;yes_no_count&#39;</span><span class="p">})</span>
+<span class="n">vote_pivot_with_yes_no_count</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>519</th>
+      <th>520</th>
+      <th>521</th>
+      <th>522</th>
+      <th>523</th>
+      <th>524</th>
+      <th>...</th>
+      <th>547</th>
+      <th>548</th>
+      <th>549</th>
+      <th>550</th>
+      <th>551</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+      <th>yes_no_count</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>41.0</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>41.0</td>
+    </tr>
+    <tr>
+      <th>A000370</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>41.0</td>
+    </tr>
+    <tr>
+      <th>A000371</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>41.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 42 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">regulars</span> <span class="o">=</span> <span class="n">vote_pivot_with_yes_no_count</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;yes_no_count &gt;= 30&#39;</span><span class="p">)</span>
+<span class="n">regulars</span> <span class="o">=</span> <span class="n">regulars</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;yes_no_count&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">regulars</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(425, 41)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">regulars_centered</span> <span class="o">=</span> <span class="n">regulars</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">regulars</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">regulars_centered</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>519</th>
+      <th>520</th>
+      <th>521</th>
+      <th>522</th>
+      <th>523</th>
+      <th>524</th>
+      <th>...</th>
+      <th>546</th>
+      <th>547</th>
+      <th>548</th>
+      <th>549</th>
+      <th>550</th>
+      <th>551</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>0.101176</td>
+      <td>-0.691765</td>
+      <td>-0.543529</td>
+      <td>-0.541176</td>
+      <td>0.023529</td>
+      <td>0.581176</td>
+      <td>-0.581176</td>
+      <td>0.625882</td>
+      <td>0.588235</td>
+      <td>0.550588</td>
+      <td>...</td>
+      <td>-0.541176</td>
+      <td>-0.545882</td>
+      <td>0.014118</td>
+      <td>-0.538824</td>
+      <td>-0.536471</td>
+      <td>0.529412</td>
+      <td>-0.538824</td>
+      <td>-0.555294</td>
+      <td>0.056471</td>
+      <td>-0.522353</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>-0.898824</td>
+      <td>-0.691765</td>
+      <td>-0.543529</td>
+      <td>-0.541176</td>
+      <td>-0.976471</td>
+      <td>-0.418824</td>
+      <td>-0.581176</td>
+      <td>-0.374118</td>
+      <td>-0.411765</td>
+      <td>-0.449412</td>
+      <td>...</td>
+      <td>-0.541176</td>
+      <td>0.454118</td>
+      <td>0.014118</td>
+      <td>0.461176</td>
+      <td>0.463529</td>
+      <td>-0.470588</td>
+      <td>0.461176</td>
+      <td>0.444706</td>
+      <td>-0.943529</td>
+      <td>0.477647</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>0.101176</td>
+      <td>0.308235</td>
+      <td>-0.543529</td>
+      <td>-0.541176</td>
+      <td>0.023529</td>
+      <td>0.581176</td>
+      <td>-0.581176</td>
+      <td>0.625882</td>
+      <td>0.588235</td>
+      <td>0.550588</td>
+      <td>...</td>
+      <td>-0.541176</td>
+      <td>-0.545882</td>
+      <td>0.014118</td>
+      <td>-0.538824</td>
+      <td>-0.536471</td>
+      <td>0.529412</td>
+      <td>-0.538824</td>
+      <td>-0.555294</td>
+      <td>0.056471</td>
+      <td>-0.522353</td>
+    </tr>
+    <tr>
+      <th>A000370</th>
+      <td>0.101176</td>
+      <td>0.308235</td>
+      <td>0.456471</td>
+      <td>0.458824</td>
+      <td>0.023529</td>
+      <td>-0.418824</td>
+      <td>0.418824</td>
+      <td>-0.374118</td>
+      <td>-0.411765</td>
+      <td>-0.449412</td>
+      <td>...</td>
+      <td>0.458824</td>
+      <td>0.454118</td>
+      <td>0.014118</td>
+      <td>0.461176</td>
+      <td>0.463529</td>
+      <td>-0.470588</td>
+      <td>0.461176</td>
+      <td>0.444706</td>
+      <td>0.056471</td>
+      <td>0.477647</td>
+    </tr>
+    <tr>
+      <th>A000371</th>
+      <td>0.101176</td>
+      <td>0.308235</td>
+      <td>0.456471</td>
+      <td>0.458824</td>
+      <td>0.023529</td>
+      <td>-0.418824</td>
+      <td>0.418824</td>
+      <td>-0.374118</td>
+      <td>-0.411765</td>
+      <td>-0.449412</td>
+      <td>...</td>
+      <td>0.458824</td>
+      <td>0.454118</td>
+      <td>0.014118</td>
+      <td>0.461176</td>
+      <td>0.463529</td>
+      <td>-0.470588</td>
+      <td>0.461176</td>
+      <td>0.444706</td>
+      <td>0.056471</td>
+      <td>0.477647</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 41 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">regulars_centered</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.84, 0.02, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01,
+       0.01, 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pcs</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">s</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_121_0.png" src="../../_images/lec23-PCA_121_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;member&#39;</span><span class="p">:</span> <span class="n">regulars_centered</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="s1">&#39;pc1&#39;</span><span class="p">:</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;pc2&#39;</span><span class="p">:</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">})</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">legs</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;leg_id&#39;</span><span class="p">)</span>
+
+<span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc1_jittered&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vote2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc2_jittered&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">[</span><span class="s1">&#39;pc2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vote2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;pc1_jittered&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;pc2_jittered&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;party&quot;</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_123_0.png" src="../../_images/lec23-PCA_123_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="exploring-v-t">
+<h2>Exploring <span class="math notranslate nohighlight">\(V^T\)</span><a class="headerlink" href="#exploring-v-t" title="Permalink to this headline">¶</a></h2>
+<p>We can also look at Vt directly to try to gain insight into why each component is as it is.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_votes</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">votes</span> <span class="o">=</span> <span class="n">regulars</span><span class="o">.</span><span class="n">columns</span>
+
+<span class="k">def</span> <span class="nf">plot_pc</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">vt</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+
+<span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">rc_context</span><span class="p">({</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">)}):</span>
+    <span class="n">plot_pc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">#   plot_pc(1)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/lec23-PCA_126_0.png" src="../../_images/lec23-PCA_126_0.png" />
+</div>
+</div>
+<p>Using SVD for PCA may lead to hard to interpret <span class="math notranslate nohighlight">\(V^T\)</span> matrices for two reasons:</p>
+<ol class="simple">
+<li><p>Each row tends to include many many attributes. What does it mean that the first PC is driven by this specific set of 30 votes?</p></li>
+<li><p>Later rows (i.e. less important PCs) will be driven more by the orthogonality constraint than the data itself.</p></li>
+</ol>
+<p>There are exist other methods for doing PCA, e.g. Sparse PCA, that will try to lead to an interpretable version of <span class="math notranslate nohighlight">\(V^T\)</span>.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/19"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+        
+            &copy; Copyright 2020.<br/>
+          <div class="extra_footer">
+            <p>
+License: CC BY-NC-ND 4.0
+</p>
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-113006011-1', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    
+  </body>
+</html>
