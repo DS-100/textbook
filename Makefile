@@ -21,3 +21,6 @@ server: ## Starts python server that serves html
 	cd $(HTML_DIR) && python -m http.server 8000
 
 serve: watch server ## Use -j2 flag to watch and serve content with one command
+
+clean:
+	rm -rf content/_build
