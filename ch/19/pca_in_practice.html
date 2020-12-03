@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>19.3. [In Progress] PCA in Practice &#8212; Principles and Techniques of Data Science</title>
+    <title>19.3. PCA in Practice &#8212; Principles and Techniques of Data Science</title>
     
   <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -634,7 +634,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     19.3. [In Progress] PCA in Practice
+     19.3. PCA in Practice
     </a>
    </li>
   </ul>
@@ -769,6 +769,44 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-is-pca-appropriate">
+   19.3.1. When is PCA appropriate?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#captured-variance-and-scree-plots">
+     19.3.1.1. Captured Variance and Scree Plots
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#case-study-legislator-votes">
+   19.3.2. Case Study: Legislator Votes
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#examining-the-first-principal-direction">
+     19.3.2.1. Examining the First Principal Direction
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   19.3.3. Summary
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
     </div>
 </div>
     <div id="main-content" class="row">
@@ -776,8 +814,669 @@
         
               <div>
                 
-  <div class="section" id="in-progress-pca-in-practice">
-<h1><span class="section-number">19.3. </span>[In Progress] PCA in Practice<a class="headerlink" href="#in-progress-pca-in-practice" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pca-in-practice">
+<h1><span class="section-number">19.3. </span>PCA in Practice<a class="headerlink" href="#pca-in-practice" title="Permalink to this headline">¶</a></h1>
+<p>PCA is used to search for patterns in high-dimensional data. In this section, we discuss when PCA is most appropriate for analysis and introduce captured variance and scree plots. Then, we apply PCA to the legislator voting data and interpret the plot of its principal components.</p>
+<div class="section" id="when-is-pca-appropriate">
+<h2><span class="section-number">19.3.1. </span>When is PCA appropriate?<a class="headerlink" href="#when-is-pca-appropriate" title="Permalink to this headline">¶</a></h2>
+<p>In Data 100, we primarily use PCA for exploratory data analysis: when we do not yet know what information the dataset captures or what we might use the data to predict. As a dimensionality reduction technique, PCA is useful primarily when our data contain many columns, <strong>and</strong> when we have reason to believe that the data are inherently low rank, that the patterns in the data can be summarized with a linear combination of columns.</p>
+<p>For example, the data table of legislator votes contains data for 41 bills:</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>...</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Y000062</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Y000065</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z000017</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>441 rows × 41 columns</p>
+</div></div></div>
+</div>
+<p>41 columns is too many to visualize directly. However, we expect that most voting tends to fall within party lines. Perhaps 20 bills in the table are strongly supported by the Democratic party, so Republican legislators will vote against these bills while Democratic legislators will vote for these bills. This knowledge suggests that the voting patterns of legislators might be clustered – a few combinations of bills can reveal party affiliations. This domain knowledge suggests that PCA is appropriate.</p>
+<div class="section" id="captured-variance-and-scree-plots">
+<h3><span class="section-number">19.3.1.1. </span>Captured Variance and Scree Plots<a class="headerlink" href="#captured-variance-and-scree-plots" title="Permalink to this headline">¶</a></h3>
+<p>We use PCA to calculate low-dimensional approximations for high-dimensional data. How accurate are these approximations? To answer this question, we create <strong>scree plots</strong> using the singular values of the data which describe the <strong>captured variance</strong> of each principal component.</p>
+<p>Recall that SVD takes a data matrix <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> and produces the matrix factorization <span class="math notranslate nohighlight">\(\mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top}\)</span>. We know that the matrix <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> contains the principal directions of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> and that the product <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> contains the principal components. Now we examine the values in <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span>.</p>
+<p>SVD requires that <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> is a diagonal matrix with elements arranged from largest to smallest. The diagonal elements of <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> are called the <strong>singular values</strong> of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>. Importantly, the relative magnitude of the singular values precisely represent the percent of variance captured by each principal component.</p>
+<p>As an example, we examine the singular values of the body measurement data in the <code class="docutils literal notranslate"><span class="pre">body_data</span></code> table.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>% brozek fat</th>
+      <th>% siri fat</th>
+      <th>density</th>
+      <th>age</th>
+      <th>...</th>
+      <th>ankle</th>
+      <th>bicep</th>
+      <th>forearm</th>
+      <th>wrist</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>12.6</td>
+      <td>12.3</td>
+      <td>1.07</td>
+      <td>23</td>
+      <td>...</td>
+      <td>21.9</td>
+      <td>32.0</td>
+      <td>27.4</td>
+      <td>17.1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>6.9</td>
+      <td>6.1</td>
+      <td>1.09</td>
+      <td>22</td>
+      <td>...</td>
+      <td>23.4</td>
+      <td>30.5</td>
+      <td>28.9</td>
+      <td>18.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24.6</td>
+      <td>25.3</td>
+      <td>1.04</td>
+      <td>22</td>
+      <td>...</td>
+      <td>24.0</td>
+      <td>28.8</td>
+      <td>25.2</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>249</th>
+      <td>28.3</td>
+      <td>29.3</td>
+      <td>1.03</td>
+      <td>72</td>
+      <td>...</td>
+      <td>21.5</td>
+      <td>31.3</td>
+      <td>27.2</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>250</th>
+      <td>25.3</td>
+      <td>26.0</td>
+      <td>1.04</td>
+      <td>72</td>
+      <td>...</td>
+      <td>22.7</td>
+      <td>30.5</td>
+      <td>29.4</td>
+      <td>19.8</td>
+    </tr>
+    <tr>
+      <th>251</th>
+      <td>30.7</td>
+      <td>31.9</td>
+      <td>1.03</td>
+      <td>74</td>
+      <td>...</td>
+      <td>24.6</td>
+      <td>33.7</td>
+      <td>30.0</td>
+      <td>20.9</td>
+    </tr>
+  </tbody>
+</table>
+<p>251 rows × 18 columns</p>
+</div></div></div>
+</div>
+<p>First, we center the data and apply SVD. We display the singular values in <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> (recall that the <code class="docutils literal notranslate"><span class="pre">svd</span></code> function produces a one-dimensional array rather than a matrix).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">svd</span>
+
+<span class="n">cntr_body</span> <span class="o">=</span> <span class="n">body_data</span> <span class="o">-</span> <span class="n">body_data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">cntr_body</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">s</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([585.57, 261.06, 166.31,  57.14,  48.16,  39.79,  31.71,  28.91,
+        24.23,  22.23,  20.51,  18.96,  17.01,  15.73,   7.72,   4.3 ,
+         1.95,   0.04])
+</pre></div>
+</div>
+</div>
+</div>
+<p>The original data has 18 columns, which result in 18 principal components (and 18 principal directions):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pcs</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">pcs</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(251, 18)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We often keep only the first two principal components to facilitate further visualization (e.g. scatter plot). How much information do we lose from this approximation? We can quantify this by squaring each element in <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span>, then dividing by the sum so all the elements sum to 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.76, 0.15, 0.06, 0.01, 0.01, 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ,
+       0.  , 0.  , 0.  , 0.  , 0.  , 0.  , 0.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>The values in this array contain the <strong>captured variance</strong> of each principal component. In this case, the first principal component captures 76% of the variance in the original data. If we keep the first two principal components, we retain 76% + 15% = 91% of the variance in the original data.</p>
+<p>A <strong>scree plot</strong> is a plot of the squared singular values and provides a visualization of the captured variance:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_16_0.png" src="../../_images/pca_in_practice_16_0.png" />
+</div>
+</div>
+<p>Like the numeric values, the scree plot suggests that most of the variance in the data can be captured with 2-3 principal components. For PCA, this usually means that a scatter plot of the first two principal dimensions preserves useful patterns in the data and gives us more confidence in proceeding with PCA.</p>
+<p>In contrast, consider the scree plot below which we created from randomly generated data:</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_18_0.png" src="../../_images/pca_in_practice_18_0.png" />
+</div>
+</div>
+<p>This plot says that <em>every</em> principal component captures a significant amount of variance. This sort of scree plot discourages the use of PCA; a two-dimensional approximation would likely lose useful patterns in the data.</p>
+</div>
+</div>
+<div class="section" id="case-study-legislator-votes">
+<h2><span class="section-number">19.3.2. </span>Case Study: Legislator Votes<a class="headerlink" href="#case-study-legislator-votes" title="Permalink to this headline">¶</a></h2>
+<p>Now we return to the legislator vote data, which contains the US House of Representative votes in September 2019. Our goal is to use PCA to reduce the data to two principal components, then use the scatter plot of the principal components to search for patterns in voting.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>...</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Y000062</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Y000065</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z000017</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>441 rows × 41 columns</p>
+</div></div></div>
+</div>
+<p>First, we perform SVD and examine the scree plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cntr_votes</span> <span class="o">=</span> <span class="n">df</span> <span class="o">-</span> <span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">cntr_votes</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_24_0.png" src="../../_images/pca_in_practice_24_0.png" />
+</div>
+</div>
+<p>This plot suggests that a two-dimensional projection from PCA will capture much of the original data’s variance. Indeed, we see that this projection captures 85% of the original variance:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 0.8 + 0.05 = 0.85 captured variance from 2 PCs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.8 , 0.05, 0.02, ..., 0.  , 0.  , 0.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>We compute the first two principal components, then use them to create a scatter plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pcs</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">pc1</span> <span class="o">=</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">pc2</span> <span class="o">=</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">pc1</span><span class="p">,</span> <span class="n">pc2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;PC1&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PC2&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_28_0.png" src="../../_images/pca_in_practice_28_0.png" />
+</div>
+</div>
+<p>How do we interpret this plot? First, we note that there are 441 points in the scatter plot, one for each legislator in the original dataset. The scatter plot reveals that there are roughly two clusters of legislators. Usefully, these clusters neatly capture party affiliations of the legislators!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">legs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;legislators.csv&#39;</span><span class="p">)</span>
+
+<span class="n">vote2d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;member&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="s1">&#39;pc1&#39;</span><span class="p">:</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;pc2&#39;</span><span class="p">:</span> <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">})</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">legs</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;leg_id&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">vote2d</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="s2">&quot;pc1&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;pc2&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;party&quot;</span><span class="p">,</span>
+                <span class="n">hue_order</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Democrat&#39;</span><span class="p">,</span> <span class="s1">&#39;Republican&#39;</span><span class="p">,</span> <span class="s1">&#39;Libertarian&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_30_0.png" src="../../_images/pca_in_practice_30_0.png" />
+</div>
+</div>
+<p>Note that PCA did not use the party affiliations for its approximation, only the votes. Even though no two legislators voted the exact same way, the votes within party members was similar enough to create two distinct clusters using PCA. In real-world scenarios, we might not know ahead of time that there are roughly two categories of people in the data. PCA is useful in these scenarios because it can alert us to patterns in data that we hadn’t considered before. For example, in this scenario we might also conclude that Democrat party members tend to vote more closely within party lines than Republican party members since the Democrat members cluster more tightly together in the scatter plot.</p>
+<div class="section" id="examining-the-first-principal-direction">
+<h3><span class="section-number">19.3.2.1. </span>Examining the First Principal Direction<a class="headerlink" href="#examining-the-first-principal-direction" title="Permalink to this headline">¶</a></h3>
+<p>We can also examine the principal directions themselves. The scatter plot of principal components suggest that the first principal direction captures party affiliation – smaller values in the first principal component correspond to Democratic party members while larger values correspond to Republican members.</p>
+<p>We can plot the magnitude of values in the first principal direction:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">votes</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">Vt</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_33_0.png" src="../../_images/pca_in_practice_33_0.png" />
+</div>
+</div>
+<p>For a point to have a large positive value in the first principal component, the legislator needed to vote for bills where the first principal direction contains positive values, and vote against bills where the direction contains negative values.</p>
+<p>This implies that we might label bills like 520, 522, and 523 as “Republican” bills and bills like 517 and 518 as “Democratic” bills. To verify this, we can inspect the votes of the legislators with the largest values in the first principal component:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vote2d</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;pc1&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>member</th>
+      <th>pc1</th>
+      <th>pc2</th>
+      <th>leg_id</th>
+      <th>...</th>
+      <th>state</th>
+      <th>chamber</th>
+      <th>party</th>
+      <th>birthday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>134</th>
+      <td>G000552</td>
+      <td>3.24</td>
+      <td>-0.70</td>
+      <td>G000552</td>
+      <td>...</td>
+      <td>TX</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1953-08-18</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>B001302</td>
+      <td>3.24</td>
+      <td>-0.70</td>
+      <td>B001302</td>
+      <td>...</td>
+      <td>AZ</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1958-11-07</td>
+    </tr>
+    <tr>
+      <th>334</th>
+      <td>R000614</td>
+      <td>3.23</td>
+      <td>-0.48</td>
+      <td>R000614</td>
+      <td>...</td>
+      <td>TX</td>
+      <td>rep</td>
+      <td>Republican</td>
+      <td>1972-08-07</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 11 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mem</span> <span class="o">=</span> <span class="s1">&#39;G000552&#39;</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mem</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_in_practice_36_0.png" src="../../_images/pca_in_practice_36_0.png" />
+</div>
+</div>
+<p>Indeed, this legislator voted for bills 520, 522, and 523; they also voted against bills 517 and 518.</p>
+</div>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">19.3.3. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>This chapter introduced the idea of dimensionality reduction which enables us to explore and analyze data that have many columns. We specifically introduced principal component analysis, one common and useful method for dimensionality reduction based on the singular value decomposition. We discussed the procedure for performing PCA, scenarios where PCA is appropriate, and how to use PCA to search for patterns in data.</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
