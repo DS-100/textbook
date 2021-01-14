@@ -27,3 +27,6 @@ serve: watch server ## Use -j2 flag to watch and serve content with one command
 
 clean:
 	rm -rf content/_build
+
+stage:
+	git push test sam-reordering:master
