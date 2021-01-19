@@ -13,6 +13,10 @@ license: [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
 International (CC BY-NC-ND
 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
+Note: The book is undergoing major updates to more closely follow current
+iterations of Data 100. Chapters have moved, and new chapters will be added.
+Content under construction is marked as \[In progress\].
+
 [sam]: http://www.samlau.me/
 [joey]: https://people.eecs.berkeley.edu/~jegonzal/
 [deb]: https://www.stat.berkeley.edu/~nolan/
