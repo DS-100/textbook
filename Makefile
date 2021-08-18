@@ -10,9 +10,8 @@ help:
 build: ## Builds book html
 	jupyter-book build content
 
-rebuild: ## Forces complete rebuild of book html
-	touch content/_toc.yml
-	jupyter-book build content
+rebuild: clean ## Forces complete rebuild of book html
+	$(MAKE) build
 
 # Install fswatch first: https://github.com/emcrisostomo/fswatch
 watch: ## Rebuilds book when files change (needs fswatch installed)
@@ -26,7 +25,7 @@ server: ## Starts python server that serves html
 serve: watch server ## Use -j2 flag to watch and serve content with one command
 
 clean:
-	rm -rf content/_build
+	jupyter-book clean content
 
 stage:
 	git push test sam-reordering:master
