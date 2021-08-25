@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
@@ -43,7 +43,7 @@
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
-    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
         const thebe_selector_input = "pre"
@@ -79,7 +79,7 @@
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <p class="caption">
  <span class="caption-text">
@@ -209,7 +209,7 @@
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="../05/sql_intro.html">
-   5. Relational Databases and SQL
+   5. Working with Relations using SQL
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
   <label for="toctree-checkbox-4">
@@ -947,11 +947,11 @@
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
             </div>
-            <nav id="bd-toc-nav">
+            <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#grouping">
-   6.2.1. Grouping
+  <a class="reference internal nav-link" href="#basic-group-aggregate">
+   6.2.1. Basic Group-Aggregate
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -960,13 +960,13 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#pivoting">
-   6.2.3. Pivoting
+  <a class="reference internal nav-link" href="#custom-aggregation-functions">
+   6.2.3. Custom Aggregation Functions
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#summary">
-   6.2.4. Summary
+  <a class="reference internal nav-link" href="#pivoting">
+   6.2.4. Pivoting
   </a>
  </li>
 </ul>
@@ -980,61 +980,31 @@
         
               <div>
                 
-  <div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="grouping-and-pivoting">
+  <div class="section" id="grouping-and-pivoting">
 <h1><span class="section-number">6.2. </span>Grouping and Pivoting<a class="headerlink" href="#grouping-and-pivoting" title="Permalink to this headline">¶</a></h1>
-<p>In this section, we will answer the question:</p>
-<p><strong>What were the most popular male and female names in each year?</strong></p>
-<p>Here’s the Baby Names dataset once again:</p>
+<p>This section introduces <em>grouping</em> and <em>pivoting</em>, two common operations for
+aggregating data.</p>
+<p>We’ll work with the baby names data, as introduced in the previous section:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;babynames.csv&#39;</span><span class="p">)</span>
-<span class="n">baby</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-<span class="c1"># the .head() method outputs the first five rows of the DataFrame</span>
+<span class="n">baby</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -1050,415 +1020,189 @@
   <tbody>
     <tr>
       <th>0</th>
-      <td>Mary</td>
-      <td>F</td>
-      <td>9217</td>
-      <td>1884</td>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Anna</td>
-      <td>F</td>
-      <td>3860</td>
-      <td>1884</td>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Emma</td>
-      <td>F</td>
-      <td>2587</td>
-      <td>1884</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Elizabeth</td>
-      <td>F</td>
-      <td>2549</td>
-      <td>1884</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Minnie</td>
-      <td>F</td>
-      <td>2243</td>
-      <td>1884</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p><strong>Breaking the Problem Down</strong></p>
-<p>We should first notice that the question in the previous section has similarities to this one; the question in the previous section restricts names to babies born in 2016 whereas this question asks for names in all years.</p>
-<p>We once again decompose this problem into simpler table manipulations.</p>
-<ol class="simple">
-<li><p>Group the <code class="docutils literal notranslate"><span class="pre">baby</span></code> DataFrame by ‘Year’ and ‘Sex’.</p></li>
-<li><p>For each group, compute the most popular name.</p></li>
-</ol>
-<p>Recognizing which operation is needed for each problem is sometimes tricky. Usually, a convoluted series of steps will signal to you that there might be a simpler way to express what you want. If we didn’t immediately recognize that we needed to group, for example, we might write steps like the following:</p>
-<ol class="simple">
-<li><p>Loop through each unique year.</p></li>
-<li><p>For each year, loop through each unique sex.</p></li>
-<li><p>For each unique year and sex, find the most common name.</p></li>
-</ol>
-<p>There is almost always a better alternative to looping over a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> DataFrame. <strong>In particular, looping over unique values of a DataFrame should usually be replaced with a group.</strong></p>
-<div class="section" id="grouping">
-<h2><span class="section-number">6.2.1. </span>Grouping<a class="headerlink" href="#grouping" title="Permalink to this headline">¶</a></h2>
-<p>To group in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>. we use the <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code> method.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pandas.core.groupby.DataFrameGroupBy object at 0x1a14e21f60&gt;
-</pre></div>
-</div>
-</div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">.groupby()</span></code> returns a strange-looking <code class="docutils literal notranslate"><span class="pre">DataFrameGroupBy</span></code> object. We can call <code class="docutils literal notranslate"><span class="pre">.agg()</span></code> on this object with an aggregation function in order to get a familiar output:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The aggregation function takes in a series of values for each group</span>
-<span class="c1"># and outputs a single value</span>
-<span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-<span class="c1"># Count up number of values for each year. This is equivalent to</span>
-<span class="c1"># counting the number of rows where each year appears.</span>
-<span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <th>Year</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1880</th>
-      <td>2000</td>
-      <td>2000</td>
-      <td>2000</td>
-    </tr>
-    <tr>
-      <th>1881</th>
-      <td>1935</td>
-      <td>1935</td>
-      <td>1935</td>
-    </tr>
-    <tr>
-      <th>1882</th>
-      <td>2127</td>
-      <td>2127</td>
-      <td>2127</td>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
     </tr>
     <tr>
       <th>...</th>
       <td>...</td>
       <td>...</td>
       <td>...</td>
+      <td>...</td>
     </tr>
     <tr>
-      <th>2014</th>
-      <td>33206</td>
-      <td>33206</td>
-      <td>33206</td>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
     </tr>
     <tr>
-      <th>2015</th>
-      <td>33063</td>
-      <td>33063</td>
-      <td>33063</td>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
     </tr>
     <tr>
-      <th>2016</th>
-      <td>32868</td>
-      <td>32868</td>
-      <td>32868</td>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
     </tr>
   </tbody>
 </table>
-<p>137 rows × 3 columns</p>
+<p>2020722 rows × 4 columns</p>
 </div></div></div>
 </div>
-<p>You might notice that the <code class="docutils literal notranslate"><span class="pre">length</span></code> function simply calls the <code class="docutils literal notranslate"><span class="pre">len</span></code> function, so we can simplify the code above.</p>
+<div class="section" id="basic-group-aggregate">
+<h2><span class="section-number">6.2.1. </span>Basic Group-Aggregate<a class="headerlink" href="#basic-group-aggregate" title="Permalink to this headline">¶</a></h2>
+<p>Say you want to find out the total number of babies born as recorded in this
+data. This is simply the sum of the <code class="docutils literal notranslate"><span class="pre">Count</span></code> column:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <th>Year</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1880</th>
-      <td>2000</td>
-      <td>2000</td>
-      <td>2000</td>
-    </tr>
-    <tr>
-      <th>1881</th>
-      <td>1935</td>
-      <td>1935</td>
-      <td>1935</td>
-    </tr>
-    <tr>
-      <th>1882</th>
-      <td>2127</td>
-      <td>2127</td>
-      <td>2127</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>2014</th>
-      <td>33206</td>
-      <td>33206</td>
-      <td>33206</td>
-    </tr>
-    <tr>
-      <th>2015</th>
-      <td>33063</td>
-      <td>33063</td>
-      <td>33063</td>
-    </tr>
-    <tr>
-      <th>2016</th>
-      <td>32868</td>
-      <td>32868</td>
-      <td>32868</td>
-    </tr>
-  </tbody>
-</table>
-<p>137 rows × 3 columns</p>
-</div></div></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>352554503
+</pre></div>
 </div>
-<p>The aggregation is applied to each column of the DataFrame, producing redundant information. We can restrict the output columns by slicing before grouping.</p>
+</div>
+</div>
+<p>But let’s say you want to know: are U.S. births trending upwards over time? To
+answer this question, you need to sum the <code class="docutils literal notranslate"><span class="pre">Count</span></code> column within each year. In
+other words, you need to split the data into groups based on <code class="docutils literal notranslate"><span class="pre">Year</span></code>, then
+sum up the <code class="docutils literal notranslate"><span class="pre">Count</span></code> values within each group.</p>
+<div class="figure align-default" id="groupby-births">
+<img alt="groupby-births" src="../../_images/groupby-births.svg" /><p class="caption"><span class="caption-number">Fig. 6.1 </span><span class="caption-text">A depiction of grouping then aggregating for example data.</span><a class="headerlink" href="#groupby-births" title="Permalink to this image">¶</a></p>
+</div>
+<p>We call this operation <strong>grouping</strong> followed by <strong>aggregating</strong>. In <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, you
+would write:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">year_rows</span> <span class="o">=</span> <span class="n">baby</span><span class="p">[[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
-<span class="n">year_rows</span>
-
-<span class="c1"># A further shorthand to accomplish the same result:</span>
-<span class="c1">#</span>
-<span class="c1"># year_counts = baby[[&#39;Year&#39;, &#39;Count&#39;]].groupby(&#39;Year&#39;).count()</span>
-<span class="c1">#</span>
-<span class="c1"># pandas has shorthands for common aggregation functions, including</span>
-<span class="c1"># count, sum, and mean.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <th>Year</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1880</th>
-      <td>2000</td>
-    </tr>
-    <tr>
-      <th>1881</th>
-      <td>1935</td>
-    </tr>
-    <tr>
-      <th>1882</th>
-      <td>2127</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>2014</th>
-      <td>33206</td>
-    </tr>
-    <tr>
-      <th>2015</th>
-      <td>33063</td>
-    </tr>
-    <tr>
-      <th>2016</th>
-      <td>32868</td>
-    </tr>
-  </tbody>
-</table>
-<p>137 rows × 1 columns</p>
-</div></div></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Year
+1880     194419
+1881     185772
+1882     213385
+         ...   
+2018    3487193
+2019    3437438
+2020    3287724
+Name: Count, Length: 141, dtype: int64
+</pre></div>
 </div>
-<p>Note that the index of the resulting DataFrame now contains the unique years, so we can slice subsets of years using <code class="docutils literal notranslate"><span class="pre">.loc</span></code> as before:</p>
+</div>
+</div>
+<p>Notice that the code is nearly the same as the non-grouped version, except that
+it starts with a call to <code class="docutils literal notranslate"><span class="pre">.groupby('Year')</span></code>.</p>
+<p>The result is a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> with the total babies born for each year in the
+data. Notice that the index of this series contains the unique <code class="docutils literal notranslate"><span class="pre">Year</span></code> values.
+Now you can plot the counts over time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Every twentieth year starting at 1880</span>
-<span class="n">year_rows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1880</span><span class="p">:</span><span class="mi">2016</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="p">:]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts_by_year</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">counts_by_year</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <th>Year</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1880</th>
-      <td>2000</td>
-    </tr>
-    <tr>
-      <th>1900</th>
-      <td>3730</td>
-    </tr>
-    <tr>
-      <th>1920</th>
-      <td>10755</td>
-    </tr>
-    <tr>
-      <th>1940</th>
-      <td>8961</td>
-    </tr>
-    <tr>
-      <th>1960</th>
-      <td>11924</td>
-    </tr>
-    <tr>
-      <th>1980</th>
-      <td>19440</td>
-    </tr>
-    <tr>
-      <th>2000</th>
-      <td>29764</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
+<img alt="../../_images/pandas_grouping_pivoting_10_0.png" src="../../_images/pandas_grouping_pivoting_10_0.png" />
+</div>
+</div>
+<p>What do you see in this plot? First, you might notice that there seem to be
+suspiciously few babies born before 1920. One likely explanation is that the
+Social Security Administration was created in 1935, so its data for prior
+births could be less complete.</p>
+<p>You might also notice the dip when World War II began in 1939, and the
+post-war Baby Boomer era from 1946-1964.</p>
+<p>Here’s the basic recipe for grouping in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">baby</span>                <span class="c1"># the dataframe</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>    <span class="c1"># columns to group</span>
+ <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>           <span class="c1"># columns to aggregate</span>
+ <span class="o">.</span><span class="n">sum</span><span class="p">()</span>              <span class="c1"># how to aggregate</span>
+<span class="p">)</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="grouping-on-multiple-columns">
 <h2><span class="section-number">6.2.2. </span>Grouping on Multiple Columns<a class="headerlink" href="#grouping-on-multiple-columns" title="Permalink to this headline">¶</a></h2>
-<p>As we’ve seen in Data 8, we can group on multiple columns to get groups based on unique pairs of values. To do this, pass in a list of column labels into <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code>.</p>
+<p>You can pass multiple columns into <code class="docutils literal notranslate"><span class="pre">.groupby</span></code> as a list to group by multiple
+columns at once. This is useful when you need to further subdivide your groups.
+For example, we can group by both year and sex to see how many male and female
+babies were born over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grouped_counts</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<span class="n">grouped_counts</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts_by_year_and_sex</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span> <span class="c1"># Arg to groupby needs to be a list</span>
+ <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">counts_by_year_and_sex</span> 
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Year  Sex
+1880  F        83929
+      M       110490
+1881  F        85034
+              ...   
+2019  M      1785527
+2020  F      1581301
+      M      1706423
+Name: Count, Length: 282, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice how the code closely follows the grouping recipe.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">counts_by_year_and_sex</span></code> series has what we call a multi-level index with
+two levels, one for each column that was grouped. It’s a bit easier to see if
+we convert the series to a dataframe:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The result only has one column</span>
+<span class="n">counts_by_year_and_sex</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -1478,16 +1222,16 @@
     <tr>
       <th rowspan="2" valign="top">1880</th>
       <th>F</th>
-      <td>90992</td>
+      <td>83929</td>
     </tr>
     <tr>
       <th>M</th>
-      <td>110491</td>
+      <td>110490</td>
     </tr>
     <tr>
       <th>1881</th>
       <th>F</th>
-      <td>91953</td>
+      <td>85034</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1495,223 +1239,320 @@
       <td>...</td>
     </tr>
     <tr>
-      <th>2015</th>
+      <th>2019</th>
       <th>M</th>
-      <td>1907211</td>
+      <td>1785527</td>
     </tr>
     <tr>
-      <th rowspan="2" valign="top">2016</th>
+      <th rowspan="2" valign="top">2020</th>
       <th>F</th>
-      <td>1756647</td>
+      <td>1581301</td>
     </tr>
     <tr>
       <th>M</th>
-      <td>1880674</td>
+      <td>1706423</td>
     </tr>
   </tbody>
 </table>
-<p>274 rows × 1 columns</p>
+<p>282 rows × 1 columns</p>
 </div></div></div>
 </div>
-<p>The code above computes the total number of babies born for each year and sex. Let’s now use grouping by multiple columns to compute the most popular names for each year and sex. Since the data are already sorted in descending order of Count for each year and sex, we can define an aggregation function that returns the first value in each series. (If the data weren’t sorted, we can call <code class="docutils literal notranslate"><span class="pre">sort_values()</span></code> first.)</p>
+<p>There are two levels to the index because we grouped by two columns. It can be
+a bit tricky to work with multilevel indices, so you can reset the index to go
+back to a dataframe with a single index.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The most popular name is simply the first one that appears in the series</span>
-<span class="k">def</span> <span class="nf">most_popular</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="n">baby_pop</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">most_popular</span><span class="p">)</span>
-<span class="n">baby_pop</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts_by_year_and_sex</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th></th>
-      <th>Name</th>
-      <th>Count</th>
-    </tr>
-    <tr>
       <th>Year</th>
       <th>Sex</th>
-      <th></th>
-      <th></th>
+      <th>Count</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th rowspan="2" valign="top">1880</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>7065</td>
+      <th>0</th>
+      <td>1880</td>
+      <td>F</td>
+      <td>83929</td>
     </tr>
     <tr>
-      <th>M</th>
-      <td>John</td>
-      <td>9655</td>
+      <th>1</th>
+      <td>1880</td>
+      <td>M</td>
+      <td>110490</td>
     </tr>
     <tr>
-      <th>1881</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>6919</td>
+      <th>2</th>
+      <td>1881</td>
+      <td>F</td>
+      <td>85034</td>
     </tr>
     <tr>
       <th>...</th>
-      <th>...</th>
       <td>...</td>
       <td>...</td>
+      <td>...</td>
     </tr>
     <tr>
-      <th>2015</th>
-      <th>M</th>
-      <td>Noah</td>
-      <td>19594</td>
+      <th>279</th>
+      <td>2019</td>
+      <td>M</td>
+      <td>1785527</td>
     </tr>
     <tr>
-      <th rowspan="2" valign="top">2016</th>
-      <th>F</th>
-      <td>Emma</td>
-      <td>19414</td>
+      <th>280</th>
+      <td>2020</td>
+      <td>F</td>
+      <td>1581301</td>
     </tr>
     <tr>
-      <th>M</th>
-      <td>Noah</td>
-      <td>19015</td>
+      <th>281</th>
+      <td>2020</td>
+      <td>M</td>
+      <td>1706423</td>
     </tr>
   </tbody>
 </table>
-<p>274 rows × 2 columns</p>
+<p>282 rows × 3 columns</p>
 </div></div></div>
 </div>
-<p>Notice that grouping by multiple columns results in multiple labels for each row. This is called a “multilevel index” and is tricky to work with. The important thing to know is that <code class="docutils literal notranslate"><span class="pre">.loc</span></code> takes in a tuple for the row index instead of a single value:</p>
+</div>
+<div class="section" id="custom-aggregation-functions">
+<h2><span class="section-number">6.2.3. </span>Custom Aggregation Functions<a class="headerlink" href="#custom-aggregation-functions" title="Permalink to this headline">¶</a></h2>
+<p>Have people become more creative with baby names over time? One way to measure
+this is to see whether the number of <em>unique</em> baby names per year has increased
+over time.</p>
+<p>After grouping, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> gives us flexible ways to aggregate the data. So far,
+you’ve seen how to use <code class="docutils literal notranslate"><span class="pre">.sum()</span></code> after grouping:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby_pop</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="mi">2000</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">),</span> <span class="s1">&#39;Name&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">baby</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="c1"># aggregate by summing</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Emily&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Year
+1880     194419
+1881     185772
+1882     213385
+         ...   
+2018    3487193
+2019    3437438
+2020    3287724
+Name: Count, Length: 141, dtype: int64
 </pre></div>
 </div>
 </div>
 </div>
-<p>But <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> behaves the same as usual since it uses indices instead of labels:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pandas</span></code> also supplies other aggregation functions, like <code class="docutils literal notranslate"><span class="pre">.mean()</span></code>, <code class="docutils literal notranslate"><span class="pre">.size()</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">.first()</span></code>. Here’s the same grouping using <code class="docutils literal notranslate"><span class="pre">.max()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby_pop</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">,</span> <span class="p">:]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">baby</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="c1"># aggregate by taking the max within each group</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th></th>
-      <th>Name</th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <th>Year</th>
-      <th>Sex</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="2" valign="top">1885</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>9128</td>
-    </tr>
-    <tr>
-      <th>M</th>
-      <td>John</td>
-      <td>8756</td>
-    </tr>
-    <tr>
-      <th rowspan="2" valign="top">1886</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>9889</td>
-    </tr>
-    <tr>
-      <th>M</th>
-      <td>John</td>
-      <td>9026</td>
-    </tr>
-    <tr>
-      <th>1887</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>9888</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Year
+1880     9655
+1881     8769
+1882     9557
+        ...  
+2018    19924
+2019    20555
+2020    19659
+Name: Count, Length: 141, dtype: int64
+</pre></div>
 </div>
+</div>
+</div>
+<p>But finding the number of unique values isn’t provided as a pre-built
+aggregation function. In these cases, you need to define and use a custom
+aggregation function. <code class="docutils literal notranslate"><span class="pre">pandas</span></code> lets you do this through <code class="docutils literal notranslate"><span class="pre">.agg(fn)</span></code>, where <code class="docutils literal notranslate"><span class="pre">fn</span></code>
+is a function that you define.</p>
+<p>So, start by defining a <code class="docutils literal notranslate"><span class="pre">count_unique</span></code> function that counts the number of
+unique values in a series. Then, pass that function into <code class="docutils literal notranslate"><span class="pre">.agg()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The input to this function is a Series containing a column within a group</span>
+<span class="k">def</span> <span class="nf">count_unique</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+<span class="n">unique_names_by_year</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">count_unique</span><span class="p">)</span> <span class="c1"># aggregate using the custom count_unique function</span>
+<span class="p">)</span>
+<span class="n">unique_names_by_year</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Year
+1880     1889
+1881     1829
+1882     2012
+        ...  
+2018    29619
+2019    29417
+2020    28613
+Name: Name, Length: 141, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unique_names_by_year</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pandas_grouping_pivoting_25_0.png" src="../../_images/pandas_grouping_pivoting_25_0.png" />
+</div>
+</div>
+<p>We see that the number of unique names has generally increased over time, even
+though the number of babies born has mostly stabilized since the 1960s.</p>
 </div>
 <div class="section" id="pivoting">
-<h2><span class="section-number">6.2.3. </span>Pivoting<a class="headerlink" href="#pivoting" title="Permalink to this headline">¶</a></h2>
-<p><strong>If you group by two columns, you can often use pivot to present your data in a more convenient format.</strong> Using a pivot lets you use one set of grouped labels as the columns of the resulting table.</p>
-<p>To pivot, use the <code class="docutils literal notranslate"><span class="pre">pd.pivot_table()</span></code> function.</p>
+<h2><span class="section-number">6.2.4. </span>Pivoting<a class="headerlink" href="#pivoting" title="Permalink to this headline">¶</a></h2>
+<p>Pivoting is essentially a convenient way to arrange the results of a group and
+aggregation when grouping with two columns. Earlier in this section we grouped
+the baby names data by year and sex:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts_by_year_and_sex</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span> 
+ <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">counts_by_year_and_sex</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Count</th>
+    </tr>
+    <tr>
+      <th>Year</th>
+      <th>Sex</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">1880</th>
+      <th>F</th>
+      <td>83929</td>
+    </tr>
+    <tr>
+      <th>M</th>
+      <td>110490</td>
+    </tr>
+    <tr>
+      <th>1881</th>
+      <th>F</th>
+      <td>85034</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019</th>
+      <th>M</th>
+      <td>1785527</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">2020</th>
+      <th>F</th>
+      <td>1581301</td>
+    </tr>
+    <tr>
+      <th>M</th>
+      <td>1706423</td>
+    </tr>
+  </tbody>
+</table>
+<p>282 rows × 1 columns</p>
+</div></div></div>
+</div>
+<p>This produces a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> with the counts. We can also imagine the same data
+with the <code class="docutils literal notranslate"><span class="pre">Sex</span></code> index level “pivoted” to the columns of a dataframe. It’s easier
+to see with an example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">baby</span><span class="p">,</span>
-               <span class="n">index</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span>         <span class="c1"># Index for rows</span>
-               <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span>        <span class="c1"># Columns</span>
-               <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span>        <span class="c1"># Values in table</span>
-               <span class="n">aggfunc</span><span class="o">=</span><span class="n">most_popular</span><span class="p">)</span> <span class="c1"># Aggregation function</span>
+               <span class="n">index</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span>     <span class="c1"># Index for rows</span>
+               <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span>    <span class="c1"># Columns</span>
+               <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span>   <span class="c1"># Values in table</span>
+               <span class="n">aggfunc</span><span class="o">=</span><span class="nb">sum</span><span class="p">)</span>      <span class="c1"># Aggregation function</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
     }
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
     }
 </style>
 <table border="1" class="dataframe">
@@ -1730,18 +1571,18 @@
   <tbody>
     <tr>
       <th>1880</th>
-      <td>Mary</td>
-      <td>John</td>
+      <td>83929</td>
+      <td>110490</td>
     </tr>
     <tr>
       <th>1881</th>
-      <td>Mary</td>
-      <td>John</td>
+      <td>85034</td>
+      <td>100738</td>
     </tr>
     <tr>
       <th>1882</th>
-      <td>Mary</td>
-      <td>John</td>
+      <td>99699</td>
+      <td>113686</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1749,133 +1590,28 @@
       <td>...</td>
     </tr>
     <tr>
-      <th>2014</th>
-      <td>Emma</td>
-      <td>Noah</td>
+      <th>2018</th>
+      <td>1676884</td>
+      <td>1810309</td>
     </tr>
     <tr>
-      <th>2015</th>
-      <td>Emma</td>
-      <td>Noah</td>
+      <th>2019</th>
+      <td>1651911</td>
+      <td>1785527</td>
     </tr>
     <tr>
-      <th>2016</th>
-      <td>Emma</td>
-      <td>Noah</td>
+      <th>2020</th>
+      <td>1581301</td>
+      <td>1706423</td>
     </tr>
   </tbody>
 </table>
-<p>137 rows × 2 columns</p>
+<p>141 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Compare this result to the <code class="docutils literal notranslate"><span class="pre">baby_pop</span></code> table that we computed using <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code>. We can see that the <code class="docutils literal notranslate"><span class="pre">Sex</span></code> index in <code class="docutils literal notranslate"><span class="pre">baby_pop</span></code> became the columns of the pivot table.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby_pop</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th></th>
-      <th>Name</th>
-      <th>Count</th>
-    </tr>
-    <tr>
-      <th>Year</th>
-      <th>Sex</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="2" valign="top">1880</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>7065</td>
-    </tr>
-    <tr>
-      <th>M</th>
-      <td>John</td>
-      <td>9655</td>
-    </tr>
-    <tr>
-      <th>1881</th>
-      <th>F</th>
-      <td>Mary</td>
-      <td>6919</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>2015</th>
-      <th>M</th>
-      <td>Noah</td>
-      <td>19594</td>
-    </tr>
-    <tr>
-      <th rowspan="2" valign="top">2016</th>
-      <th>F</th>
-      <td>Emma</td>
-      <td>19414</td>
-    </tr>
-    <tr>
-      <th>M</th>
-      <td>Noah</td>
-      <td>19015</td>
-    </tr>
-  </tbody>
-</table>
-<p>274 rows × 2 columns</p>
-</div></div></div>
-</div>
-</div>
-<div class="section" id="summary">
-<h2><span class="section-number">6.2.4. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>We now have the most popular baby names for each sex and year in our dataset and learned to express the following operations in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>:</p>
-<table class="colwidths-auto table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Operation</p></th>
-<th class="head"><p><code class="docutils literal notranslate"><span class="pre">pandas</span></code></p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Group</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">df.groupby(label)</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>Group by multiple columns</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">df.groupby([label1,</span> <span class="pre">label2])</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>Group and aggregate</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">df.groupby(label).agg(func)</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>Pivot</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">pd.pivot_table()</span></code></p></td>
-</tr>
-</tbody>
-</table>
+<p>Notice that the data values are identical, just arranged differently. Pivot
+tables are useful for quickly summarizing data using two attributes, and you’ll
+see them often in articles and papers.</p>
 </div>
 </div>
 
@@ -1902,12 +1638,32 @@
               </div>
               
         
-        <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="pandas_indexes.html" title="previous page"><span class="section-number">6.1. </span>DataFrames, Slicing, Filtering</a>
-    <a class='right-next' id="next-link" href="pandas_apply_strings_plotting.html" title="next page"><span class="section-number">6.3. </span>Apply, Strings, and Plotting</a>
 
-        </div>
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="pandas_indexes.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title"><span class="section-number">6.1. </span>DataFrames, Slicing, Filtering</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="pandas_apply_strings_plotting.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title"><span class="section-number">6.3. </span>Apply, Strings, and Plotting</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
         
         </div>
     </div>
