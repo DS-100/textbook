@@ -52,7 +52,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.3. Apply, Strings, and Plotting" href="pandas_apply_strings_plotting.html" />
+    <link rel="next" title="6.3. Joins" href="pandas_joins.html" />
     <link rel="prev" title="6.1. DataFrames, Slicing, Filtering" href="pandas_indexes.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -255,13 +255,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_apply_strings_plotting.html">
-     6.3. Apply, Strings, and Plotting
+    <a class="reference internal" href="pandas_joins.html">
+     6.3. Joins
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_joins.html">
-     6.4. [In progress] Joins
+    <a class="reference internal" href="pandas_apply_strings_plotting.html">
+     6.4. Apply, Strings, and Plotting
     </a>
    </li>
   </ul>
@@ -969,6 +969,11 @@
    6.2.4. Pivoting
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exercises">
+   6.2.5. Exercises
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -1141,8 +1146,8 @@ births could be less complete.</p>
 post-war Baby Boomer era from 1946-1964.</p>
 <p>Here’s the basic recipe for grouping in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">baby</span>                <span class="c1"># the dataframe</span>
- <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>    <span class="c1"># columns to group</span>
- <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>           <span class="c1"># columns to aggregate</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span>    <span class="c1"># column(s) to group</span>
+ <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>           <span class="c1"># column(s) to aggregate</span>
  <span class="o">.</span><span class="n">sum</span><span class="p">()</span>              <span class="c1"># how to aggregate</span>
 <span class="p">)</span>
 </pre></div>
@@ -1157,7 +1162,7 @@ babies were born over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts_by_year_and_sex</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span>
- <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span> <span class="c1"># Arg to groupby needs to be a list</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span> <span class="c1"># Arg to groupby is a list of column names</span>
  <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
  <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="p">)</span>
@@ -1532,11 +1537,13 @@ with the <code class="docutils literal notranslate"><span class="pre">Sex</span>
 to see with an example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">baby</span><span class="p">,</span>
-               <span class="n">index</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span>     <span class="c1"># Index for rows</span>
-               <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span>    <span class="c1"># Columns</span>
-               <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span>   <span class="c1"># Values in table</span>
-               <span class="n">aggfunc</span><span class="o">=</span><span class="nb">sum</span><span class="p">)</span>      <span class="c1"># Aggregation function</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mf_pivot</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
+    <span class="n">baby</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span>   <span class="c1"># Column to turn into new index</span>
+    <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span>  <span class="c1"># Column to turn into new columns</span>
+    <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="c1"># Column to aggregate for values</span>
+    <span class="n">aggfunc</span><span class="o">=</span><span class="nb">sum</span><span class="p">)</span>    <span class="c1"># Aggregation function</span>
+<span class="n">mf_pivot</span>
 </pre></div>
 </div>
 </div>
@@ -1609,9 +1616,75 @@ to see with an example:</p>
 <p>141 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Notice that the data values are identical, just arranged differently. Pivot
+<p>Notice that the data values are identical in the pivot table and the table
+produced with <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code>; the values are just arranged differently. Pivot
 tables are useful for quickly summarizing data using two attributes, and you’ll
 see them often in articles and papers.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">pd.DataFrame.plot()</span></code> function also happens to work well with pivot tables,
+since the function draws one line for each column of data in the table:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mf_pivot</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pandas_grouping_pivoting_32_0.svg" src="../../_images/pandas_grouping_pivoting_32_0.svg" /></div>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2><span class="section-number">6.2.5. </span>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>When plotting male and female baby names over time, you might notice that
+since 1950 there are generally more male babies. Is this trend reflected in
+the U.S. census data? Go to the Census website
+(<a class="reference external" href="https://data.census.gov/cedsci/">https://data.census.gov/cedsci/</a>) and check.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Find the five names with the highest standard deviation of yearly counts.
+What might a large standard deviation tell you about the popularity of these
+names over time?</p></li>
+</ul>
+<ul class="simple">
+<li><p>Find the five names with the highest <em>interquartile range</em> of yearly counts.
+The interquartile range is the 75th percentile minus the 25th percentile of
+the data. You may find the <code class="docutils literal notranslate"><span class="pre">pd.Series.quantile()</span></code> function useful (<a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.Series.quantile.html">link to
+documentation</a>). Are these names different than the names with the
+highest standard deviation? Why might this happen?</p></li>
+</ul>
+<ul>
+<li><p>We’ve shown this syntax for grouping:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This code also does the same thing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">])[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The second syntax passes a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> into <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code>. It’s a bit more
+verbose but also gives more flexibility. Why is this syntax more flexible?</p>
+<p>Hint: What does this code do?</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<ul>
+<li><p>Let’s say you want to find the most popular male and female baby name each
+year. You might write this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">baby</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">([[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">]])</span>
+ <span class="p">[[</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">]]</span>
+ <span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>But this code doesn’t produce the right result. Why?</p>
+<p>Now, write code to produce the most popular male and female name each year,
+along with its count. <em>Hint:</em> you can make use of the fact that within each
+year and birth sex, the names are sorted in descending order of popularity.</p>
+</li>
+</ul>
 </div>
 </div>
 
@@ -1654,10 +1727,10 @@ see them often in articles and papers.</p>
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="pandas_apply_strings_plotting.html" title="next page">
+        <a class="right-next" href="pandas_joins.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title"><span class="section-number">6.3. </span>Apply, Strings, and Plotting</p>
+                <p class="prevnext-title"><span class="section-number">6.3. </span>Joins</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
