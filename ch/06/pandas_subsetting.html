@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6.1. DataFrames, Slicing, Filtering &#8212; Principles and Techniques of Data Science</title>
+    <title>6.1. Subsetting &#8212; Principles and Techniques of Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -52,7 +52,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.2. Grouping and Pivoting" href="pandas_grouping_pivoting.html" />
+    <link rel="next" title="6.2. Aggregating" href="pandas_aggregating.html" />
     <link rel="prev" title="6. Working with Dataframes using pandas" href="pandas_intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -246,22 +246,32 @@
   <ul class="current">
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     6.1. DataFrames, Slicing, Filtering
+     6.1. Subsetting
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_grouping_pivoting.html">
-     6.2. Grouping and Pivoting
+    <a class="reference internal" href="pandas_aggregating.html">
+     6.2. Aggregating
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_joins.html">
-     6.3. Joins
+    <a class="reference internal" href="pandas_joining.html">
+     6.3. Joining
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_apply_strings.html">
-     6.4. Apply, String Methods
+    <a class="reference internal" href="pandas_transforming.html">
+     6.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pandas_other_reps.html">
+     6.5. How are Dataframes Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pandas_exercises.html">
+     6.6. Exercises
     </a>
    </li>
   </ul>
@@ -919,7 +929,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../../_sources/ch/06/pandas_indexes.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../../_sources/ch/06/pandas_subsetting.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -950,13 +960,13 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#dataframes-and-indices">
-   6.1.1. DataFrames and Indices
+  <a class="reference internal nav-link" href="#about-the-data">
+   6.1.1. About the Data
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#about-the-data">
-   6.1.2. About the Data
+  <a class="reference internal nav-link" href="#dataframes-and-indices">
+   6.1.2. DataFrames and Indices
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -974,11 +984,6 @@
    6.1.5. Example: How recently has Luna become a popular name?
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#exercises">
-   6.1.6. Exercises
-  </a>
- </li>
 </ul>
 
             </nav>
@@ -990,18 +995,24 @@
         
               <div>
                 
-  <div class="section" id="dataframes-slicing-filtering">
-<h1><span class="section-number">6.1. </span>DataFrames, Slicing, Filtering<a class="headerlink" href="#dataframes-slicing-filtering" title="Permalink to this headline">¶</a></h1>
-<p>This section introduces the main <code class="docutils literal notranslate"><span class="pre">pandas</span></code> data structures for working with data
-tables.</p>
+  <div class="section" id="subsetting">
+<h1><span class="section-number">6.1. </span>Subsetting<a class="headerlink" href="#subsetting" title="Permalink to this headline">¶</a></h1>
+<p>This section introduces operations for taking subsets of dataframes. When data
+scientists first read in a dataframe, they often want to subset the specific
+data that they plan to use. For example, a data scientist can <em>slice</em> out the
+ten relevant features from a dataframe with hundreds of columns. Or, they can
+<em>filter</em> a dataframe to remove rows with incomplete data. For the rest of this
+chapter, we’ll introduce dataframe operations using a dataframe of baby names.</p>
+<div class="section" id="about-the-data">
+<h2><span class="section-number">6.1.1. </span>About the Data<a class="headerlink" href="#about-the-data" title="Permalink to this headline">¶</a></h2>
 <p>There’s a 2021 New York Times article that talks about Prince Harry and
 Meghan’s unique choice for their new baby daughter’s name: Lilibet
-<span id="id1">[<a class="reference internal" href="../../references.html#id6">Williams, 2021</a>]</span>. The article has an interview with Pamela Redmond,
+<span id="id1">[<a class="reference internal" href="../../references.html#id9">Williams, 2021</a>]</span>. The article has an interview with Pamela Redmond,
 an expert on baby names, who talks about interesting trends in how people name
 their kids. For example, she says that names that start with the letter “L”
 have become very popular in recent years, while names that start with the
-letter “J” were popular in the 1970s and 1980s. Are these claims reflected in
-data? We can use <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to find out!</p>
+letter “J” were most popular in the 1970s and 1980s. Are these claims reflected
+in data? We can use <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to find out.</p>
 <p>First, import the package as <code class="docutils literal notranslate"><span class="pre">pd</span></code>, the canonical abbreviation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1100,35 +1111,14 @@ called <code class="docutils literal notranslate"><span class="pre">babynames.cs
 <p>2020722 rows × 4 columns</p>
 </div></div></div>
 </div>
-<div class="section" id="dataframes-and-indices">
-<h2><span class="section-number">6.1.1. </span>DataFrames and Indices<a class="headerlink" href="#dataframes-and-indices" title="Permalink to this headline">¶</a></h2>
-<p>Let’s pause here and explain what you’re looking at. A dataframe has rows and
-columns. Every row and column has a label:</p>
-<img alt="baby_labels" src="../../_images/baby_labels.svg" /><p>By default, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> assigns row labels as incrementing numbers starting from
-0. In this case, the data at the row labeled <code class="docutils literal notranslate"><span class="pre">0</span></code> and column labeled <code class="docutils literal notranslate"><span class="pre">Name</span></code> has
-the data <code class="docutils literal notranslate"><span class="pre">'Mary'</span></code>.</p>
-<p>Dataframes can also have strings as row labels. Here’s an example of a
-dataframe with US state mottos. Every row is labeled with the state.</p>
-<img alt="motto_labels" src="../../_images/motto_labels.svg" /><p>The row labels have a special name. We call them the <strong>index</strong> of a dataframe,
-and <code class="docutils literal notranslate"><span class="pre">pandas</span></code> stores the row labels in a special <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> object. We won’t
-discuss the <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> object since you don’t often have to manipulate the
-index itself. But you should remember that even though the index looks like a
-column of data, the index really represents row labels, not data. For instance,
-the dataframe of US state mottos has 4 columns of data, not 5, since the index
-doesn’t count as a column.</p>
-</div>
-<div class="section" id="about-the-data">
-<h2><span class="section-number">6.1.2. </span>About the Data<a class="headerlink" href="#about-the-data" title="Permalink to this headline">¶</a></h2>
 <p>The data in the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table comes from the US Social Security department,
 which records the baby name and birth sex for birth certificate purposes. They
-make the baby names data available on their website <a class="footnote-reference brackets" href="#babynamesdata" id="id2">1</a>, and we’ve
-loaded this data into the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table.</p>
-<p>When you start working with a dataset you should collect information about how
-the data were collected. In this case, the Social Security website also has a
-page that describes the data in more detail
+make the baby names data available on their website <span id="id2">[<a class="reference internal" href="../../references.html#id2">Department, 2021</a>]</span>.
+We’ve loaded this data into the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table.</p>
+<p>The Social Security website has a page that describes the data in more detail
 (<a class="reference external" href="https://www.ssa.gov/oact/babynames/background.html">link</a>). We won’t go
-in-depth in this chapter about the data’s limitations, but you should remember
-this quote from the website:</p>
+in-depth in this chapter about the data’s limitations, but we’ll point out
+this relevant quote from the website:</p>
 <blockquote>
 <div><p>All names are from Social Security card applications for births that occurred
 in the United States after 1879. Note that many people born before 1937 never
@@ -1139,12 +1129,37 @@ and again their names are not included in our data.</p>
 applications as of March 2021.</p>
 </div></blockquote>
 </div>
+<div class="section" id="dataframes-and-indices">
+<h2><span class="section-number">6.1.2. </span>DataFrames and Indices<a class="headerlink" href="#dataframes-and-indices" title="Permalink to this headline">¶</a></h2>
+<p>Let’s examine the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe in more detail. A dataframe has rows and
+columns. Every row and column has a label, as highlighted in
+<a class="reference internal" href="#fig-baby-labels"><span class="std std-numref">Fig. 6.1</span></a>.</p>
+<div class="figure align-default" id="fig-baby-labels">
+<img alt="baby-labels" src="../../_images/baby-labels.svg" /><p class="caption"><span class="caption-number">Fig. 6.1 </span><span class="caption-text">The <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe has labels for both rows and columns (boxed).</span><a class="headerlink" href="#fig-baby-labels" title="Permalink to this image">¶</a></p>
+</div>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> assigns row labels as incrementing numbers starting from
+0. In this case, the data at the row labeled <code class="docutils literal notranslate"><span class="pre">0</span></code> and column labeled <code class="docutils literal notranslate"><span class="pre">Name</span></code> has
+the data <code class="docutils literal notranslate"><span class="pre">'Liam'</span></code>.</p>
+<p>Dataframes can also have strings as row labels. <a class="reference internal" href="#fig-dog-labels"><span class="std std-numref">Fig. 6.2</span></a> shows
+a dataframe of dog data where the row labels are strings.</p>
+<div class="figure align-default" id="fig-dog-labels">
+<img alt="dog-labels" src="../../_images/dog-labels.svg" /><p class="caption"><span class="caption-number">Fig. 6.2 </span><span class="caption-text">Row labels in dataframes can also be strings. In this example, each row is
+labeled using the dog breed name.</span><a class="headerlink" href="#fig-dog-labels" title="Permalink to this image">¶</a></p>
+</div>
+<p>The row labels have a special name. We call them the <strong>index</strong> of a dataframe,
+and <code class="docutils literal notranslate"><span class="pre">pandas</span></code> stores the row labels in a special <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> object. We won’t
+discuss the <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> object since it’s not very common to manipulate the
+index itself. But, it’s important to remember that even though the index looks
+like a column of data, the index really represents row labels, not data. For
+instance, the dataframe of US state mottos has 4 columns of data, not 5, since
+the index doesn’t count as a column.</p>
+</div>
 <div class="section" id="slicing">
 <h2><span class="section-number">6.1.3. </span>Slicing<a class="headerlink" href="#slicing" title="Permalink to this headline">¶</a></h2>
-<p><em>Slicing</em> refers to taking rows or columns out of a dataframe. Think about
-slicing a tomato—you can go both vertially and horizontally. To take slices
-of a dataframe in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we use the <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> properties. Let’s
-start with <code class="docutils literal notranslate"><span class="pre">.loc</span></code>.</p>
+<p><em>Slicing</em> is an operation that creates a new dataframe by taking a subset of
+rows or columns out of another dataframe. Think about slicing a tomato—slices
+can go both vertially and horizontally. To take slices of a dataframe in
+<code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we use the <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> properties. Let’s start with <code class="docutils literal notranslate"><span class="pre">.loc</span></code>.</p>
 <p>Here’s the full <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1253,8 +1268,8 @@ start with <code class="docutils literal notranslate"><span class="pre">.loc</sp
 <p class="admonition-title">Warning</p>
 <p>Notice that <code class="docutils literal notranslate"><span class="pre">.loc</span></code> needs brackets; running <code class="docutils literal notranslate"><span class="pre">baby.loc(1,</span> <span class="pre">'Name')</span></code> will error.</p>
 </div>
-<p>To slice out multiple rows or column, use Python slice syntax instead of
-individual values:</p>
+<p>To slice out multiple rows or column, you can use Python slice syntax instead
+of individual values:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">:</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
@@ -1354,9 +1369,9 @@ object.</p>
 Essentially, a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> is two-dimensional—it has rows and columns and
 represents a table of data. A <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> is one-dimensional—it represents a
 list of data. <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> and <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> objects have many methods in
-common, but you’ll need to remember that they represent two different things.</p>
-<p>You’ll also often need to select out specific columns out of a dataframe. To do
-this, pass a list into <code class="docutils literal notranslate"><span class="pre">.loc</span></code>:</p>
+common, but they really represent two different things. Confusing the two can
+cause bugs and confusion.</p>
+<p>To select specific columns of a dataframe, pass a list into <code class="docutils literal notranslate"><span class="pre">.loc</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here&#39;s the original dataframe</span>
@@ -1613,11 +1628,12 @@ Name: Name, Length: 2020722, dtype: object
 <p>Slicing using <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> works similarly to <code class="docutils literal notranslate"><span class="pre">.loc</span></code>, except that <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> uses the
 <em>positions</em> of rows and columns rather than labels. It’s easiest to show the
 difference between <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> and <code class="docutils literal notranslate"><span class="pre">.loc</span></code> when the dataframe index has strings, so
-for demonstration purposes let’s look at a dataframe with state mottos:</p>
+for demonstration purposes let’s look at a dataframe with information on dog
+breeds:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mottos</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;mottos.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;State&#39;</span><span class="p">)</span>
-<span class="n">mottos</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dogs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;dogs.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;breed&#39;</span><span class="p">)</span>
+<span class="n">dogs</span>
 </pre></div>
 </div>
 </div>
@@ -1640,13 +1656,13 @@ for demonstration purposes let’s look at a dataframe with state mottos:</p>
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Motto</th>
-      <th>Translation</th>
-      <th>Language</th>
-      <th>Date Adopted</th>
+      <th>grooming</th>
+      <th>food_cost</th>
+      <th>kids</th>
+      <th>size</th>
     </tr>
     <tr>
-      <th>State</th>
+      <th>breed</th>
       <th></th>
       <th></th>
       <th></th>
@@ -1655,63 +1671,62 @@ for demonstration purposes let’s look at a dataframe with state mottos:</p>
   </thead>
   <tbody>
     <tr>
-      <th>Alabama</th>
-      <td>Audemus jura nostra defendere</td>
-      <td>We dare defend our rights!</td>
-      <td>Latin</td>
-      <td>1923</td>
+      <th>Labrador Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>high</td>
+      <td>medium</td>
     </tr>
     <tr>
-      <th>Alaska</th>
-      <td>North to the future</td>
-      <td>—</td>
-      <td>English</td>
-      <td>1967</td>
+      <th>German Shepherd</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>medium</td>
+      <td>large</td>
     </tr>
     <tr>
-      <th>Arizona</th>
-      <td>Ditat Deus</td>
-      <td>God enriches</td>
-      <td>Latin</td>
-      <td>1863</td>
+      <th>Beagle</th>
+      <td>daily</td>
+      <td>324.0</td>
+      <td>high</td>
+      <td>small</td>
     </tr>
     <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
+      <th>Golden Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>high</td>
+      <td>medium</td>
     </tr>
     <tr>
-      <th>West Virginia</th>
-      <td>Montani semper liberi</td>
-      <td>Mountaineers are always free</td>
-      <td>Latin</td>
-      <td>September 26, 1863</td>
+      <th>Yorkshire Terrier</th>
+      <td>daily</td>
+      <td>324.0</td>
+      <td>low</td>
+      <td>small</td>
     </tr>
     <tr>
-      <th>Wisconsin</th>
-      <td>Forward</td>
-      <td>—</td>
-      <td>English</td>
-      <td>1851</td>
+      <th>Bulldog</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>medium</td>
+      <td>medium</td>
     </tr>
     <tr>
-      <th>Wyoming</th>
-      <td>Equal Rights</td>
-      <td>—</td>
-      <td>English</td>
-      <td>1893</td>
+      <th>Boxer</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>high</td>
+      <td>medium</td>
     </tr>
   </tbody>
 </table>
-<p>50 rows × 4 columns</p>
 </div></div></div>
 </div>
 <p>To get the first three rows and first two columns by position, use <code class="docutils literal notranslate"><span class="pre">.iloc</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mottos</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dogs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1734,40 +1749,39 @@ for demonstration purposes let’s look at a dataframe with state mottos:</p>
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Motto</th>
-      <th>Translation</th>
+      <th>grooming</th>
+      <th>food_cost</th>
     </tr>
     <tr>
-      <th>State</th>
+      <th>breed</th>
       <th></th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>Alabama</th>
-      <td>Audemus jura nostra defendere</td>
-      <td>We dare defend our rights!</td>
+      <th>Labrador Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
     </tr>
     <tr>
-      <th>Alaska</th>
-      <td>North to the future</td>
-      <td>—</td>
+      <th>German Shepherd</th>
+      <td>weekly</td>
+      <td>466.0</td>
     </tr>
     <tr>
-      <th>Arizona</th>
-      <td>Ditat Deus</td>
-      <td>God enriches</td>
+      <th>Beagle</th>
+      <td>daily</td>
+      <td>324.0</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
-<p>The operation using <code class="docutils literal notranslate"><span class="pre">.loc</span></code> requires you to use the dataframe labels:</p>
+<p>The same operation using <code class="docutils literal notranslate"><span class="pre">.loc</span></code> requires you to use the dataframe labels:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get rows from Alabama to Arizona, and columns from Motto to Translation</span>
-<span class="n">mottos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Alabama&#39;</span><span class="p">:</span><span class="s1">&#39;Arizona&#39;</span><span class="p">,</span> <span class="s1">&#39;Motto&#39;</span><span class="p">:</span><span class="s1">&#39;Translation&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dogs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Labrador Retriever&#39;</span><span class="p">:</span><span class="s1">&#39;Beagle&#39;</span><span class="p">,</span> <span class="s1">&#39;grooming&#39;</span><span class="p">:</span><span class="s1">&#39;food_cost&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1790,30 +1804,30 @@ for demonstration purposes let’s look at a dataframe with state mottos:</p>
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Motto</th>
-      <th>Translation</th>
+      <th>grooming</th>
+      <th>food_cost</th>
     </tr>
     <tr>
-      <th>State</th>
+      <th>breed</th>
       <th></th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>Alabama</th>
-      <td>Audemus jura nostra defendere</td>
-      <td>We dare defend our rights!</td>
+      <th>Labrador Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
     </tr>
     <tr>
-      <th>Alaska</th>
-      <td>North to the future</td>
-      <td>—</td>
+      <th>German Shepherd</th>
+      <td>weekly</td>
+      <td>466.0</td>
     </tr>
     <tr>
-      <th>Arizona</th>
-      <td>Ditat Deus</td>
-      <td>God enriches</td>
+      <th>Beagle</th>
+      <td>daily</td>
+      <td>324.0</td>
     </tr>
   </tbody>
 </table>
@@ -1822,13 +1836,14 @@ for demonstration purposes let’s look at a dataframe with state mottos:</p>
 </div>
 <div class="section" id="filtering-rows">
 <h2><span class="section-number">6.1.4. </span>Filtering Rows<a class="headerlink" href="#filtering-rows" title="Permalink to this headline">¶</a></h2>
-<p>So far, you’ve seen how to use <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> to slice a dataframe using
-its labels. But what about when you want to take slices of a dataframe based on
-its data? For example, if you want to look at the most popular baby names in
-2020, then you need to <em>filter</em> rows and keep only rows where the <code class="docutils literal notranslate"><span class="pre">Year</span></code> is
-2020.</p>
-<p>To do this, you need to write a program to 1) check each value in the <code class="docutils literal notranslate"><span class="pre">Year</span></code>
-column to see if it’s equal to 1970, then 2) keep only those rows.</p>
+<p>So far, we’ve shown how to use <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> to slice a dataframe using
+labels and positions.</p>
+<p>However, data scientists often want to <em>filter</em> rows—they want to take
+subsets of rows using some criteria. Let’s say you want to find the most
+popular baby names in 2020. To do this, you can filter rows to keep only the
+rows where the <code class="docutils literal notranslate"><span class="pre">Year</span></code> is 2020.</p>
+<p>To filter, you can 1) check whether each value in the <code class="docutils literal notranslate"><span class="pre">Year</span></code>
+column is equal to 1970, then 2) keep only those rows.</p>
 <p>To compare each value in <code class="docutils literal notranslate"><span class="pre">Year</span></code>, slice out the column and make a boolean
 comparison. (This is similar to what you would do with a <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.)</p>
 <div class="cell docutils container">
@@ -2242,20 +2257,20 @@ in descending order.</p>
 <h2><span class="section-number">6.1.5. </span>Example: How recently has Luna become a popular name?<a class="headerlink" href="#example-how-recently-has-luna-become-a-popular-name" title="Permalink to this headline">¶</a></h2>
 <p>The New York Times article mentions that the name “Luna” was almost nonexistent
 before 2000 but has since grown to become a very popular name for girls. We can
-check this using slicing and filtering. When you approach a data manipulation
-task, start by breaking the problem down into steps. For example, you could
-think:</p>
+check this using slicing and filtering. When approaching a data manipulation
+task, we recommend you start by breaking the problem down into steps. For
+example, you could think:</p>
 <ol class="simple">
 <li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'Luna'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column.</p></li>
 <li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'F'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Sex</span></code> column.</p></li>
-<li><p>Select: keep the <code class="docutils literal notranslate"><span class="pre">Count</span></code> and <code class="docutils literal notranslate"><span class="pre">Year</span></code> columns.</p></li>
+<li><p>Slice: keep the <code class="docutils literal notranslate"><span class="pre">Count</span></code> and <code class="docutils literal notranslate"><span class="pre">Year</span></code> columns.</p></li>
 </ol>
 <p>Now, it’s a matter of translating each step into code.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">luna</span> <span class="o">=</span> <span class="n">baby</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Luna&#39;</span><span class="p">]</span>
-<span class="n">luna</span> <span class="o">=</span> <span class="n">luna</span><span class="p">[</span><span class="n">luna</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">]</span>
-<span class="n">luna</span> <span class="o">=</span> <span class="n">luna</span><span class="p">[[</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">luna</span> <span class="o">=</span> <span class="n">baby</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Luna&#39;</span><span class="p">]</span> <span class="c1"># [1]</span>
+<span class="n">luna</span> <span class="o">=</span> <span class="n">luna</span><span class="p">[</span><span class="n">luna</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">]</span>     <span class="c1"># [2]</span>
+<span class="n">luna</span> <span class="o">=</span> <span class="n">luna</span><span class="p">[[</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]]</span>      <span class="c1"># [3]</span>
 <span class="n">luna</span>
 </pre></div>
 </div>
@@ -2329,12 +2344,13 @@ since we talk more about plotting in the Visualization chapter. But for now,
 remember that you can use <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> on a dataframe to make a few simple plots.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">luna</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#         x-axis  y-axis</span>
+<span class="n">luna</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_indexes_51_0.svg" src="../../_images/pandas_indexes_51_0.svg" /></div>
+<img alt="../../_images/pandas_subsetting_52_0.svg" src="../../_images/pandas_subsetting_52_0.svg" /></div>
 </div>
 <p>It’s just as the article says. Luna wasn’t popular at all until the year 2000
 or so. Think about that—if someone tells you that their name is Luna, you can
@@ -2354,7 +2370,7 @@ them!</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_indexes_53_0.svg" src="../../_images/pandas_indexes_53_0.svg" /></div>
+<img alt="../../_images/pandas_subsetting_54_0.svg" src="../../_images/pandas_subsetting_54_0.svg" /></div>
 </div>
 <p>Why might the popularity have dropped so suddenly? Well, Siri happens to be the
 name of the voice assistant for Apple products and was introduced in 2011.
@@ -2370,70 +2386,8 @@ Let’s draw a line for the year 2011 and take a look…</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_indexes_55_0.svg" src="../../_images/pandas_indexes_55_0.svg" /></div>
+<img alt="../../_images/pandas_subsetting_56_0.svg" src="../../_images/pandas_subsetting_56_0.svg" /></div>
 </div>
-</div>
-<div class="section" id="exercises">
-<h2><span class="section-number">6.1.6. </span>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Duplicate the plot of Luna popularity over time but using your own first
-name. If you used that plot to make a guess at your age, what would you
-guess?</p></li>
-</ul>
-<ul>
-<li><p>In this section we talked about how to use <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> for slicing.
-We’ve also shown a few shorthands. For each of these shorthand code snippets,
-convert them to the equivalent code that uses <code class="docutils literal notranslate"><span class="pre">.loc</span></code> or <code class="docutils literal notranslate"><span class="pre">.iloc</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">]]</span>
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">]</span>
-</pre></div>
-</div>
-</li>
-</ul>
-<ul>
-<li><p>What’s the difference between running:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>and:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[[</span><span class="s1">&#39;Name&#39;</span><span class="p">]]</span>
-</pre></div>
-</div>
-<p>And, why does this code work:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[[</span><span class="s1">&#39;Name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>but this code errors?</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
-</li>
-</ul>
-<ul>
-<li><p>The first code snippet makes a dataframe with 6 rows, but the second makes a
-dataframe with 5 rows. Why?</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
-</pre></div>
-</div>
-</li>
-</ul>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="babynamesdata"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
-<dd><p>“Social Secuity Baby Names.” Accessed August 16, 2021. <a class="reference external" href="https://www.ssa.gov/oact/babynames/index.html">https://www.ssa.gov/oact/babynames/index.html</a>.</p>
-</dd>
-</dl>
 </div>
 </div>
 
@@ -2476,10 +2430,10 @@ dataframe with 5 rows. Why?</p>
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="pandas_grouping_pivoting.html" title="next page">
+        <a class="right-next" href="pandas_aggregating.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title"><span class="section-number">6.2. </span>Grouping and Pivoting</p>
+                <p class="prevnext-title"><span class="section-number">6.2. </span>Aggregating</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>

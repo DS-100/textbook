@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6.3. Joins &#8212; Principles and Techniques of Data Science</title>
+    <title>6.3. Joining &#8212; Principles and Techniques of Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -52,8 +52,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.4. Apply, String Methods" href="pandas_apply_strings.html" />
-    <link rel="prev" title="6.2. Grouping and Pivoting" href="pandas_grouping_pivoting.html" />
+    <link rel="next" title="6.4. Transforming" href="pandas_transforming.html" />
+    <link rel="prev" title="6.2. Aggregating" href="pandas_aggregating.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -245,23 +245,33 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_indexes.html">
-     6.1. DataFrames, Slicing, Filtering
+    <a class="reference internal" href="pandas_subsetting.html">
+     6.1. Subsetting
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_grouping_pivoting.html">
-     6.2. Grouping and Pivoting
+    <a class="reference internal" href="pandas_aggregating.html">
+     6.2. Aggregating
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     6.3. Joins
+     6.3. Joining
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="pandas_apply_strings.html">
-     6.4. Apply, String Methods
+    <a class="reference internal" href="pandas_transforming.html">
+     6.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pandas_other_reps.html">
+     6.5. How are Dataframes Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pandas_exercises.html">
+     6.6. Exercises
     </a>
    </li>
   </ul>
@@ -919,7 +929,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../../_sources/ch/06/pandas_joins.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../../_sources/ch/06/pandas_joining.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -964,11 +974,6 @@
    6.3.3. Example: Popularity of NYT Name Categories
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#exercises">
-   6.3.4. Exercises
-  </a>
- </li>
 </ul>
 
             </nav>
@@ -980,13 +985,16 @@
         
               <div>
                 
-  <div class="section" id="joins">
-<h1><span class="section-number">6.3. </span>Joins<a class="headerlink" href="#joins" title="Permalink to this headline">¶</a></h1>
-<p>This section introduces <em>joins</em> in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, a very useful operation for
-combining two or more dataframes together.</p>
+  <div class="section" id="joining">
+<h1><span class="section-number">6.3. </span>Joining<a class="headerlink" href="#joining" title="Permalink to this headline">¶</a></h1>
+<p>Data scientists very frequently want to <em>join</em> two or more dataframes together
+in order to connect data values across dataframes. For instance, an online
+bookstore might have one dataframe with the books each user has ordered and a
+second dataframe with the genres of each book. By joining the two dataframes
+together, the data scientist can see what genres each user prefers.</p>
 <p>We’ll continue looking at the baby names data. We’ll use joins to check some
 trends mentioned in the New York Times article about baby names
-<span id="id1">[<a class="reference internal" href="../../references.html#id6">Williams, 2021</a>]</span>. The article talks about how certain categories of
+<span id="id1">[<a class="reference internal" href="../../references.html#id9">Williams, 2021</a>]</span>. The article talks about how certain categories of
 names have become more or less popular over time. For instance, it mentions
 that mythological names like Julius and Cassius have become popular, while baby
 boomer names like Susan and Debbie have become less popular. How has the
@@ -1064,9 +1072,9 @@ dataframe:</p>
 <p>23 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>To see how popular the categories of names are, you need to join the
-<code class="docutils literal notranslate"><span class="pre">nyt</span></code> dataframe with the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe since the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table holds
-the actual name counts.</p>
+<p>To see how popular the categories of names are, you can join the <code class="docutils literal notranslate"><span class="pre">nyt</span></code>
+dataframe with the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe since the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table holds the actual
+name counts.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;babynames.csv&#39;</span><span class="p">)</span>
@@ -1287,7 +1295,7 @@ see what happens when we join tables together.</p>
 </table>
 </div></div></div>
 </div>
-<p>To join tables in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, use the <code class="docutils literal notranslate"><span class="pre">.merge()</span></code> method:</p>
+<p>To join tables in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we’ll use the <code class="docutils literal notranslate"><span class="pre">.merge()</span></code> method:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby_small</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">nyt_small</span><span class="p">,</span>
@@ -1361,9 +1369,9 @@ matching <code class="docutils literal notranslate"><span class="pre">category</
 <p>When we join two tables together, we tell <code class="docutils literal notranslate"><span class="pre">pandas</span></code> the column(s) from each
 table that we want to use to join (the <code class="docutils literal notranslate"><span class="pre">left_on</span></code> and <code class="docutils literal notranslate"><span class="pre">right_on</span></code> arguments).
 <code class="docutils literal notranslate"><span class="pre">pandas</span></code> matches rows together when the values in the joining columns match, as
-shown in <a class="reference internal" href="#fig-inner-join"><span class="std std-numref">Fig. 6.2</span></a>.</p>
+shown in <a class="reference internal" href="#fig-inner-join"><span class="std std-numref">Fig. 6.4</span></a>.</p>
 <div class="figure align-default" id="fig-inner-join">
-<img alt="inner-join" src="../../_images/inner-join.svg" /><p class="caption"><span class="caption-number">Fig. 6.2 </span><span class="caption-text">To join, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> matches rows using the values in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_name</span></code>
+<img alt="inner-join" src="../../_images/inner-join.svg" /><p class="caption"><span class="caption-number">Fig. 6.4 </span><span class="caption-text">To join, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> matches rows using the values in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_name</span></code>
 columns. For inner joins (the default), rows that don’t have matching values
 are dropped.</span><a class="headerlink" href="#fig-inner-join" title="Permalink to this image">¶</a></p>
 </div>
@@ -1380,9 +1388,9 @@ rows with a match in both tables stay in the final result.</p>
 entirely. There are other types of joins—left, right, and outer—that keep
 rows even when they don’t have a match.</p>
 <p>In a <em>left join</em>, rows in the left table without a match are kept in the final
-result, as shown in <a class="reference internal" href="#fig-left-join"><span class="std std-numref">Fig. 6.3</span></a>.</p>
+result, as shown in <a class="reference internal" href="#fig-left-join"><span class="std std-numref">Fig. 6.5</span></a>.</p>
 <div class="figure align-default" id="fig-left-join">
-<img alt="left-join" src="../../_images/left-join.svg" /><p class="caption"><span class="caption-number">Fig. 6.3 </span><span class="caption-text">In a left join, rows in the left table that don’t have matching values are kept.</span><a class="headerlink" href="#fig-left-join" title="Permalink to this image">¶</a></p>
+<img alt="left-join" src="../../_images/left-join.svg" /><p class="caption"><span class="caption-number">Fig. 6.5 </span><span class="caption-text">In a left join, rows in the left table that don’t have matching values are kept.</span><a class="headerlink" href="#fig-left-join" title="Permalink to this image">¶</a></p>
 </div>
 <p>To do a left join in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, use <code class="docutils literal notranslate"><span class="pre">how='left'</span></code> in the call to <code class="docutils literal notranslate"><span class="pre">.merge()</span></code>:</p>
 <div class="cell docutils container">
@@ -1915,7 +1923,7 @@ over time. To answer this question:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_joins_30_0.svg" src="../../_images/pandas_joins_30_0.svg" /></div>
+<img alt="../../_images/pandas_joining_30_0.svg" src="../../_images/pandas_joining_30_0.svg" /></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1928,15 +1936,14 @@ over time. To answer this question:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_joins_31_0.svg" src="../../_images/pandas_joins_31_0.svg" /></div>
+<img alt="../../_images/pandas_joining_31_0.svg" src="../../_images/pandas_joining_31_0.svg" /></div>
 </div>
 <p>As the NYT article claims, “baby boomer” names have become less popular after
 2000, while mythological names have become more popular.</p>
-<p>With a bit of extra plotting knowledge and the <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> package, you can plot
-the popularities of all the categories at once. We won’t explain this code
-since we cover <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> in more depth in the <a class="reference internal" href="../10/viz_intro.html#ch-viz"><span class="std std-ref">Data Visualization</span></a> chapter.
-Instead, look over the plots below and see whether they support the claims made
-in the New York Times article.</p>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> package, to the popularities of all the categories at
+once. We won’t explain this code since we cover <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> in more depth in the
+<a class="reference internal" href="../10/viz_intro.html#ch-viz"><span class="std std-ref">Data Visualization</span></a> chapter. Instead, look over the plots below and see whether they
+support the claims made in the New York Times article.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cate_counts</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span>
@@ -1950,205 +1957,7 @@ in the New York Times article.</p>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7fa57aeecfd0&gt;
 </pre></div>
 </div>
-<img alt="../../_images/pandas_joins_33_1.svg" src="../../_images/pandas_joins_33_1.svg" /></div>
-</div>
-</div>
-<div class="section" id="exercises">
-<h2><span class="section-number">6.3.4. </span>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Come up with a realistic data example where a data scientist would prefer an
-inner join to a left join, and an example where a data scientist would
-prefer a left join to an inner join.</p></li>
-</ul>
-<ul class="simple">
-<li><p>In this section, the <code class="docutils literal notranslate"><span class="pre">nyt</span></code> table doesn’t have any duplicate names. But a name
-could feasibly belong to multiple categories—for instance, <code class="docutils literal notranslate"><span class="pre">Elizabeth</span></code> is
-a name from the Bible and a name for royalty. Let’s say the <code class="docutils literal notranslate"><span class="pre">nyt</span></code> table lists
-a name once for each category it belongs to, e.g.:</p></li>
-</ul>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">multi_cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
-    <span class="p">[</span><span class="s1">&#39;Elizabeth&#39;</span><span class="p">,</span> <span class="s1">&#39;bible&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;Elizabeth&#39;</span><span class="p">,</span> <span class="s1">&#39;royal&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;Arjun&#39;</span><span class="p">,</span> <span class="s1">&#39;hindu&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;Arjun&#39;</span><span class="p">,</span> <span class="s1">&#39;mythological&#39;</span><span class="p">],</span>
-<span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">nyt_small</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-<span class="n">multi_cat</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>nyt_name</th>
-      <th>category</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Elizabeth</td>
-      <td>bible</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Elizabeth</td>
-      <td>royal</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Arjun</td>
-      <td>hindu</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Arjun</td>
-      <td>mythological</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>What happens when we join <code class="docutils literal notranslate"><span class="pre">baby</span></code> with this table? In general, what happens when
-there are <em>multiple rows</em> that match in both left and right tables?</p>
-<ul class="simple">
-<li><p>In a <em>self-join</em>, we take a table and join it with itself. For example, the
-<code class="docutils literal notranslate"><span class="pre">friends</span></code> table contains pairs of people who are friends with each other.</p></li>
-</ul>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">friends</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
-    <span class="p">[</span><span class="s1">&#39;Jim&#39;</span><span class="p">,</span> <span class="s1">&#39;Scott&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;Scott&#39;</span><span class="p">,</span> <span class="s1">&#39;Philip&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;Philip&#39;</span><span class="p">,</span> <span class="s1">&#39;Tricia&#39;</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;Philip&#39;</span><span class="p">,</span> <span class="s1">&#39;Ailie&#39;</span><span class="p">],</span>
-<span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">])</span>
-<span class="n">friends</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>self</th>
-      <th>other</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Jim</td>
-      <td>Scott</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Scott</td>
-      <td>Philip</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Philip</td>
-      <td>Tricia</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Philip</td>
-      <td>Ailie</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Why might a data scientist find the following self-join useful?</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">friends</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">friends</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;self&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>self_x</th>
-      <th>other_x</th>
-      <th>self_y</th>
-      <th>other_y</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Jim</td>
-      <td>Scott</td>
-      <td>Scott</td>
-      <td>Philip</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Scott</td>
-      <td>Philip</td>
-      <td>Philip</td>
-      <td>Tricia</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Scott</td>
-      <td>Philip</td>
-      <td>Philip</td>
-      <td>Ailie</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
+<img alt="../../_images/pandas_joining_33_1.svg" src="../../_images/pandas_joining_33_1.svg" /></div>
 </div>
 </div>
 </div>
@@ -2183,19 +1992,19 @@ there are <em>multiple rows</em> that match in both left and right tables?</p>
 <div class='prev-next-bottom'>
     
     <div id="prev">
-        <a class="left-prev" href="pandas_grouping_pivoting.html" title="previous page">
+        <a class="left-prev" href="pandas_aggregating.html" title="previous page">
             <i class="prevnext-label fas fa-angle-left"></i>
             <div class="prevnext-info">
                 <p class="prevnext-label">previous</p>
-                <p class="prevnext-title"><span class="section-number">6.2. </span>Grouping and Pivoting</p>
+                <p class="prevnext-title"><span class="section-number">6.2. </span>Aggregating</p>
             </div>
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="pandas_apply_strings.html" title="next page">
+        <a class="right-next" href="pandas_transforming.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title"><span class="section-number">6.4. </span>Apply, String Methods</p>
+                <p class="prevnext-title"><span class="section-number">6.4. </span>Transforming</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
