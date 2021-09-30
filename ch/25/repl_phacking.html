@@ -1,0 +1,1519 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>25.1. P-hacking &#8212; Principles and Techniques of Data Science</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="26. Dimensionality Reduction and PCA" href="../26/pca_intro.html" />
+    <link rel="prev" title="25. [In progress] Replicable Research" href="repl_intro.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Principles and Techniques of Data Science</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p class="caption">
+ <span class="caption-text">
+  Frontmatter
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../preface.html">
+   To the Reader
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../prereqs.html">
+   Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notation.html">
+   Notation
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  The Data Science Lifecycle
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../01/lifecycle_intro.html">
+   1. The Data Science Lifecycle
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_1.html">
+     1.1. The Students of Data 100
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_2.html">
+     1.2. Exploratory Data Analysis
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_3.html">
+     1.3. What’s in a Name?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../02/data_scope_intro.html">
+   2. Data Scope
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
+     2.1. Big Data Hubris
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_construct.html">
+     2.2. A Construct for Data Scope
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_accuracy.html">
+     2.3. Accuracy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_exercises.html">
+     2.4. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../03/theory_intro.html">
+   3. Theory for Data Design
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_sampling_variation.html">
+     3.1. Sampling Variation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_random_assignment.html">
+     3.2. Random Assignment
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_measurement_error.html">
+     3.3. Measurement Error
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_prob_dist.html">
+     3.4. Probability Distribution for a Statistic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_exercises.html">
+     3.5. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../04/modeling_intro.html">
+   4. Modeling and Estimation
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_simple.html">
+     4.1. Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_loss_functions.html">
+     4.2. Loss Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_abs_huber.html">
+     4.3. Absolute and Huber Loss
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../05/cycle_case_study_intro.html">
+   5. [In progress] Case Study
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Rectangular Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../06/pandas_intro.html">
+   6. Working With Dataframes Using pandas
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_subsetting.html">
+     6.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_aggregating.html">
+     6.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_joining.html">
+     6.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_transforming.html">
+     6.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_other_reps.html">
+     6.5. How are Dataframes Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_exercises.html">
+     6.6. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../07/sql_intro.html">
+   7. Working With Relations Using SQL
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_subsetting.html">
+     7.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_aggregating.html">
+     7.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_joining.html">
+     7.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_transforming.html">
+     7.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_other_reps.html">
+     7.5. How are Relations Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_exercises.html">
+     7.6. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Understanding The Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../08/repr_intro.html">
+   8. Data Representation
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/repr_structure.html">
+     8.1. Structure
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/repr_data_types.html">
+     8.2. Data Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/repr_granularity.html">
+     8.3. Granularity
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../09/quality_intro.html">
+   9. [In Progress] Data Quality
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../10/eda_intro.html">
+   10. [In Progress] Exploratory Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../11/viz_intro.html">
+   11. Data Visualization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_quantitative.html">
+     11.1. Visualizing Quantitative Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_qualitative.html">
+     11.2. Visualizing Qualitative Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_matplotlib.html">
+     11.3. Customizing Plots using
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       matplotlib
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_principles.html">
+     11.4. Visualization Principles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_principles_2.html">
+     11.5. Visualization Principles Continued
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_philosophy.html">
+     11.6. Philosophy for Data Visualization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../12/police_intro.html">
+   12. [In progress] Case Study: Berkeley Policing
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/police_calls.html">
+     12.1. Cleaning the Calls Dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/police_stops.html">
+     12.2. Cleaning The Stops Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Other Data Sources
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../13/text_intro.html">
+   13. Working with Text
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_strings.html">
+     13.1. Python String Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_regex.html">
+     13.2. Regular Expressions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_re.html">
+     13.3. Regex and Python
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../14/web_intro.html">
+   14. Web Technologies
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_http.html">
+     14.1. HTTP
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_rest.html">
+     14.2. [In Progress] REST
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_html.html">
+     14.3. [In Progress] XPath and HTML
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Linear Modeling
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../15/linear_models.html">
+   15. Linear Models
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_tips.html">
+     15.1. Predicting Tip Amounts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_fitting.html">
+     15.2. [In progress] Fitting a linear model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_inference.html">
+     15.3. [In progress] Inference for Linear Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_projection.html">
+     15.4. Least Squares — A Geometric Perspective
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../16/prob_and_gen.html">
+   16. Probability and Generalization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_random_vars.html">
+     16.1. Random Variables
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_exp_var.html">
+     16.2. Expectation and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_risk.html">
+     16.3. Risk
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../17/gradient_descent.html">
+   17. Gradient Descent and Numerical Optimization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_basics.html">
+     17.1. Loss Minimization Using a Program
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_descent_define.html">
+     17.2. Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_convexity.html">
+     17.3. Convexity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_stochastic.html">
+     17.4. Stochastic Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_lin_reg.html">
+     17.5. Fitting a Linear Model Using Gradient Descent
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../18/donkey_intro.html">
+   18. [In progress] Case Study: Donkey Dimensions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+  <label for="toctree-checkbox-15">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_analysis.html">
+     18.1. Linear Regression Case Study
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Multiple Linear Modeling
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../19/mult_intro.html">
+   19. [In progress] Multiple Linear Regression
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+  <label for="toctree-checkbox-16">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/mult_model.html">
+     19.1. Multiple Linear Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/mult_inference.html">
+     19.2. Inference for Multiple Linear Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../20/feature_engineering.html">
+   20. Feature Engineering
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+  <label for="toctree-checkbox-17">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/feature_one_hot.html">
+     20.1. The Walmart dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/feature_polynomial.html">
+     20.2. Predicting Ice Cream Ratings
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../21/bias_intro.html">
+   21. The Bias-Variance Tradeoff
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+  <label for="toctree-checkbox-18">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_risk.html">
+     21.1. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_modeling.html">
+     21.2. Model Bias and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_cv.html">
+     21.3. Cross-Validation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../22/reg_intro.html">
+   22. Regularization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+  <label for="toctree-checkbox-19">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_intuition.html">
+     22.1. Regularization Intuition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_ridge.html">
+     22.2. L2 Regularization: Ridge Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_lasso.html">
+     22.3. L1 Regularization: Lasso Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../23/mult_case_intro.html">
+   23. [In progress] Case Study: Multiple Linear Models
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Classification
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../24/classification_intro.html">
+   24. Classification
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/>
+  <label for="toctree-checkbox-20">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_prob.html">
+     24.1. Regression on Probabilities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_log_model.html">
+     24.2. The Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_cost.html">
+     24.3. A Loss Function for the Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_log_reg.html">
+     24.4. Using Logistic Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_cost_justification.html">
+     24.5. Approximating the Empirical Probability Distribution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_sgd.html">
+     24.6. Fitting a Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_sensitivity_specificity.html">
+     24.7. Evaluating Logistic Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_multiclass.html">
+     24.8. Multiclass Classification
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Replicability
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="repl_intro.html">
+   25. [In progress] Replicable Research
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/>
+  <label for="toctree-checkbox-21">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     25.1. P-hacking
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Extra Topics
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../26/pca_intro.html">
+   26. Dimensionality Reduction and PCA
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/>
+  <label for="toctree-checkbox-22">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_dims.html">
+     26.1. Dimensions of a Data Table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_svd.html">
+     26.2. PCA using the Singular Value Decomposition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_in_practice.html">
+     26.3. PCA in Practice
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../27/dtrees_intro.html">
+   27. [In progress] Decision Trees and Random Forests
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../28/clustering_intro.html">
+   28. [In progress] Clustering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Appendices
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a01/prob_review.html">
+   Probability Review
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a02/vector_space_review.html">
+   Vector Space Review
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a03/hyp_intro.html">
+   Statistical Inference Review
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/>
+  <label for="toctree-checkbox-23">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction.html">
+     Hypothesis Testing and Confidence Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction_part2.html">
+     Permutation Test
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a04/ref_intro.html">
+   Reference Tables
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/>
+  <label for="toctree-checkbox-24">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_pandas.html">
+     pandas
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_seaborn.html">
+     Seaborn
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_matplotlib.html">
+     matplotlib
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_sklearn.html">
+     scikit-learn
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a05/contributors.html">
+   Contributors
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../references.html">
+   References
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/ch/25/repl_phacking.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-hypothesis-testing">
+   25.1.1. Multiple Hypothesis Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-b-testing">
+   25.1.2. A/B Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#many-tests-for-one-phenomenon">
+   25.1.3. Many Tests for One Phenomenon
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#paul-the-octopus">
+     25.1.3.1. Paul the Octopus
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#p-hacking-is-just-the-tip-of-the-iceberg">
+   25.1.4. P-Hacking is just the tip of the iceberg
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="p-hacking">
+<h1><span class="section-number">25.1. </span>P-hacking<a class="headerlink" href="#p-hacking" title="Permalink to this headline">¶</a></h1>
+<p>As we discussed, a p-value or probability value is the chance, based on the model in the null hypothesis, that the test statistic is equal to the value that was observed in the data or is even further in the direction of the alternative. If a p-value is small, that means the tail beyond the observed statistic is small and so the observed statistic is far away from what the null predicts. This implies that the data support the alternative hypothesis better than they support the null. By convention, when we see that the p-value is below 0.05, the result is called statistically significant, and we reject the null hypothesis.</p>
+<p>There are dangers that present itself when the p-value is misused. <em>P-hacking</em> is the act of misusing data analysis to show that patterns in data are statistically significant, when in reality they are not. This is often done by performing multiple tests on data and only focusing on the tests that return results that are significant.</p>
+<p>In this section, we will go over a few examples of the dangers of p-values and p-hacking.</p>
+<div class="section" id="multiple-hypothesis-testing">
+<h2><span class="section-number">25.1.1. </span>Multiple Hypothesis Testing<a class="headerlink" href="#multiple-hypothesis-testing" title="Permalink to this headline">¶</a></h2>
+<p>One of the biggest dangers of blindly relying on the p-value to determine “statistical significance” comes when we are just trying to find the “sexiest” results that give us “good” p-values. This is commonly done when doing “food frequency questionairres,” or FFQs, to study eating habits’ correlation with other characteristics (diseases, weight, religion, etc).
+FiveThirtyEight, an online blog that focuses on opinion poll analysis among other things, made their own FFQ, and we can use their data to run our own analysis to find some silly results that can be considered “statistically significant.”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;raw_anonymized_data.csv&#39;</span><span class="p">)</span>
+<span class="c1"># Do some EDA on the data so that categorical values get changed to 1s and 0s</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Innie&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Outie&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># These are some of the columns that give us characteristics of FFQ-takers</span>
+<span class="n">characteristics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;right_hand&#39;</span><span class="p">,</span> <span class="s1">&#39;left_hand&#39;</span><span class="p">]</span>
+
+<span class="c1"># These are some of the columns that give us the quantities/frequencies of different food the FFQ-takers ate</span>
+<span class="n">ffq</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EGGROLLQUAN&#39;</span><span class="p">,</span> <span class="s1">&#39;SHELLFISHQUAN&#39;</span><span class="p">,</span> <span class="s1">&#39;COFFEEDRINKSFREQ&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We will look specifically whether people own cats, dogs, or what handedness they are.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">characteristics</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cat</th>
+      <th>dog</th>
+      <th>right_hand</th>
+      <th>left_hand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Additionally, we will look at how much shellfish, eggrolls, and coffee people consumed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">ffq</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>EGGROLLQUAN</th>
+      <th>SHELLFISHQUAN</th>
+      <th>COFFEEDRINKSFREQ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>3</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>So now we can calculate the p-value for every pair of characteristic and food frequency/quantity features.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">findpvalue</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">stat</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the p value between every characteristic and food frequency/quantity pair</span>
+<span class="n">pvalues</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characteristics</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ffq</span><span class="p">:</span>
+        <span class="n">pvalues</span><span class="p">[(</span><span class="n">c</span><span class="p">,</span><span class="n">f</span><span class="p">)]</span> <span class="o">=</span> <span class="n">findpvalue</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="n">pvalues</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(&#39;cat&#39;, &#39;EGGROLLQUAN&#39;): 0.69295273146288583,
+ (&#39;cat&#39;, &#39;SHELLFISHQUAN&#39;): 0.39907214094767007,
+ (&#39;cat&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.0016303467897390215,
+ (&#39;dog&#39;, &#39;EGGROLLQUAN&#39;): 2.8476184473490123e-05,
+ (&#39;dog&#39;, &#39;SHELLFISHQUAN&#39;): 0.14713568495622972,
+ (&#39;dog&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.3507350497291003,
+ (&#39;right_hand&#39;, &#39;EGGROLLQUAN&#39;): 0.20123440208411372,
+ (&#39;right_hand&#39;, &#39;SHELLFISHQUAN&#39;): 0.00020312599063263847,
+ (&#39;right_hand&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.48693234457564749,
+ (&#39;left_hand&#39;, &#39;EGGROLLQUAN&#39;): 0.75803051153936374,
+ (&#39;left_hand&#39;, &#39;SHELLFISHQUAN&#39;): 0.00035282554635466211,
+ (&#39;left_hand&#39;, &#39;COFFEEDRINKSFREQ&#39;): 0.1692235856830212}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our study finds that:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Eating/Drinking</p></th>
+<th class="head"><p>is linked to:</p></th>
+<th class="head"><p>P-value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Egg rolls</p></td>
+<td><p>Dog ownership</p></td>
+<td><p>&lt;0.0001</p></td>
+</tr>
+<tr class="row-odd"><td><p>Shellfish</p></td>
+<td><p>Right-handedness</p></td>
+<td><p>0.0002</p></td>
+</tr>
+<tr class="row-even"><td><p>Shellfish</p></td>
+<td><p>Left-handedness</p></td>
+<td><p>0.0004</p></td>
+</tr>
+<tr class="row-odd"><td><p>Coffee</p></td>
+<td><p>Cat ownership</p></td>
+<td><p>0.0016</p></td>
+</tr>
+</tbody>
+</table>
+<p>Clearly this is flawed! Aside from the fact that some of these correlations seem to make no sense, we also found that shellfish is linked to both right and left handedness! Because we blindly tested all columns against each other for statistical significance, we were able to just choose whatever pairs gave us “statistically significant” results. This shows the dangers of blindly following the p-value without a care for proper experimental design.</p>
+</div>
+<div class="section" id="a-b-testing">
+<h2><span class="section-number">25.1.2. </span>A/B Testing<a class="headerlink" href="#a-b-testing" title="Permalink to this headline">¶</a></h2>
+<p>A/B testing is a very simple concept. We measure a statistic in a normal, controlled environment (we’ll call this A), and then we compare that to the same statistic in an environment with <em>one</em> change. This form of testing is used frequently in marketing and ad research to compare the effectiveness of certain features of ads.</p>
+<p>Let’s say we are working for a company whose website lets users make their own custom videogames. The company has a free version, which lets users make very basic videogames, and a paid version, which gives users access to more advanced tools for making videogames. When a user has finished making a videogame via a free account, we send them to a landing page that gives them the option to sign up for a paid account. Our measured statistic in this case would be how many free users sign up for a paid account upon reaching this page. We can send half of our users one version of the page, which may have text explaining in detail the benefits of the paid account (this will be version A), and the other half of our users will get another version of the page, which may have a colorful graphic that explains some of the benefits of the paid account (this will be version B).</p>
+<p>There is a very specific reason why it’s called A/B testing, and not A/B/C/D… testing. That is because we can very easily run into problems if we try to test multiple versions at the same time.</p>
+<p>Let’s say that we have 15 different sign up pages (one is the control, in this case “A”), each with something different about them (one has a picture of a puppy, one has a quote from a customer, one has a graphic, etc.), and let’s say that in this case, none of our variations actually has an effect on user interaction (so we can use a Gaussian distribution with a mean of 0 and a std of 0.1).</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_pages</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">shuffled</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">shuffled</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+
+<span class="k">def</span> <span class="nf">permutedpvalue</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="p">[</span><span class="n">test_stat</span><span class="p">(</span><span class="o">*</span><span class="n">permute</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reps</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">obs</span> <span class="o">&gt;=</span> <span class="n">resampled</span><span class="p">)</span> <span class="o">/</span> <span class="n">reps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_pages</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="c1"># This will represent percentage of users that make a paid account from the landing page</span>
+<span class="c1"># Note that all pages have no effect, so they all just have a base 10% of interactions.</span>
+<span class="n">landing_pages</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pages</span><span class="p">)]</span>
+
+<span class="c1"># This will be our &quot;control&quot;</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Our test statistic will be the difference between the mean percentage </span>
+<span class="k">def</span> <span class="nf">test_stat</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+
+<span class="n">p_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_pages</span><span class="p">):</span>
+    <span class="c1"># We test against each of the non-control landing pages</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">landing_pages</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">p_val</span> <span class="o">=</span> <span class="n">permutedpvalue</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">p_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_val</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_vals</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.732, 0.668, 0.037, 0.245, 0.717, 0.256, 0.683, 0.654, 0.43, 0.503, 0.897, 0.868, 0.328, 0.044]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">p_vals</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">kde</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/repl_phacking_16_0.png" src="../../_images/repl_phacking_16_0.png" />
+</div>
+</div>
+<p>As we can see, more than one of these ads seems to have p-values less than 0.05, despite our knowing that there actually no difference between the pages. This is why we do single A/B testing with multiple trials, as opposed to multiple hypothesis testing with only single trials. It is too easy for a p-value to give us a false positive if we just try a bunch of times.</p>
+</div>
+<div class="section" id="many-tests-for-one-phenomenon">
+<h2><span class="section-number">25.1.3. </span>Many Tests for One Phenomenon<a class="headerlink" href="#many-tests-for-one-phenomenon" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes, multiple testing can happen by accident. If many researchers are investigating the same phenomenon at the same time, then it’s very possible that one of the researchers can end up with a lucky trial. That is exactly what happened during the 2010 World Cup.</p>
+<div class="section" id="paul-the-octopus">
+<h3><span class="section-number">25.1.3.1. </span>Paul the Octopus<a class="headerlink" href="#paul-the-octopus" title="Permalink to this headline">¶</a></h3>
+<p>Paul the Octopus was a common octopus who lived in a Sea Life Centre in Oberhausen, Germany. He is most well known for correctly guessing all seven soccer matches Germany played during the 2010 World Cup, as well as the final match, which was between Netherlands and Spain.</p>
+<p>Before a match was played, Paul’s owners would place two boxes in his tank containing food, each box labeled with a different flag of the opposing countries. Whichever box Paul chose to eat from first was considered his prediction for the outcome of the match.</p>
+<a class="reference internal image-reference" href="https://news.bbcimg.co.uk/media/images/49659000/jpg/_49659323_octopus.jpg"><img alt="https://news.bbcimg.co.uk/media/images/49659000/jpg/_49659323_octopus.jpg" src="https://news.bbcimg.co.uk/media/images/49659000/jpg/_49659323_octopus.jpg" style="width: 400px;" /></a>
+<p>So why was Paul so good at predicting the outcome of these matches? Was he actually psychic, or was he just lucky? We might ask what’s the chance he got all of the predictions correct, assuming he was just “guessing”?</p>
+<p>Paul correctly predicted 8 of the 2010 World Cup games, each time he had a 1/2 chance of making the correct prediction. The one way to get all 8 matches correct out of 8 is:
+$<span class="math notranslate nohighlight">\((1/2)^8 = 1/256\)</span>$</p>
+<p>So was he actually psychic? Or is there something more to uncover?</p>
+<p>Turns out, there were tons of animals (some of them in the same zoo as Paul!) doing the same thing, trying to guess the outcome of their respective home countries’ matches, including:</p>
+<ul class="simple">
+<li><p>Mani the Parakeet, from Singapore</p></li>
+<li><p>Leon the Porcupine, from Germany</p></li>
+<li><p>Petty the Pygmy Hippopotamus, from Germany</p></li>
+<li><p>Otto Armstrong the Octopus, from Germany</p></li>
+<li><p>Anton the Tamarin, from Germany</p></li>
+<li><p>Jimmy the Peruvian Guinea Pig, from Germany</p></li>
+<li><p>Xiaoge the Octopus, from China</p></li>
+<li><p>Pauline the Octopus, from the Netherlands</p></li>
+<li><p>Pino the Chimpanzee, from Estonia</p></li>
+<li><p>Apelsin the Red River Hog, from Estonia</p></li>
+<li><p>Harry the Crocodile, from Australia
+None of whom got them all right (although Mani the Parakeet got 7 matches out of 8 right).</p></li>
+</ul>
+<p>Some might argue that getting them all wrong would also be remarkable. So what are the chances that at least one of the 12 animals would get either all right or all wrong?</p>
+<p>We can use simple probability to figure this out. We have 12 trials (in this case, animals), where each independent trial has a <span class="math notranslate nohighlight">\(2*(1/2)^8 = 1/128\)</span> chance of getting all predictions right or wrong. So what is the probability of having <em>at least</em> one success? That’s <span class="math notranslate nohighlight">\(1 - P_{all \textrm{ }failures} = 1 - (127/128)^{12} = 1 - 0.910 = 0.090\)</span></p>
+<p>We have an 9% chance of getting an animal that will select all of the right predictions, and that’s not including all of the animals in the world that were also doing these “predictions.” That’s not that rare - it’s the dangers of multiple testing that caused this “phenomenon.” This one octopus out of many different animals in the world happened to have guessed all of the right predictions, and the popularity of the situation caused it to become magical.</p>
+<p>To those of you wondering if it really was luck, it has been shown that the species <em>Octopus vulgaris</em> is actually colorblind, and some believe that octopuses are drawn to horizontal shapes, hence Paul’s decision to choose Germany, except when playing against Spain and Serbia.</p>
+<p>In the end, we know that studies are more trustworthy when they are replicated. Data scientists should try to avoid cases like Paul the Octopus’s where there has only been one real case of the animal correctly predicting a bunch of World Cup matches in a row. Only when we see him doing that for multiple soccer tournaments should we start looking at the data.</p>
+</div>
+</div>
+<div class="section" id="p-hacking-is-just-the-tip-of-the-iceberg">
+<h2><span class="section-number">25.1.4. </span>P-Hacking is just the tip of the iceberg<a class="headerlink" href="#p-hacking-is-just-the-tip-of-the-iceberg" title="Permalink to this headline">¶</a></h2>
+<p>As it turns out, p-hacking isn’t the only thing data scientists and statisticians have to worry about when making sound inferences from data. There are many stages to the design and analysis of a successful study, as shown below (from Leek &amp; Peng’s <em>P values are just the tip of the iceberg</em>).</p>
+<img alt="https://www.nature.com/polopoly_fs/7.25671.1429983882!/image/P1.jpg_gen/derivatives/landscape_300/P1.jpg" src="https://www.nature.com/polopoly_fs/7.25671.1429983882!/image/P1.jpg_gen/derivatives/landscape_300/P1.jpg" />
+<p>As shown, the last step of the whole “data pipeline” is the calculation of an inferential statistic like the p-value, and having a rule applied to it (e.g. p &gt; 0.05). But there are many other decisions that are made beforehand, like experimental design or EDA, that can have much greater effects on the results - mistakes like simple rounding or measurement errors, choosing the wrong model, or not taking into account confounding factors can change everything. By changing the way data are cleaned, summarized, or modeled, we can achieve arbitrary levels of statistical significance.</p>
+<p>A simple example of this would be in the case of rolling a pair of dice and getting two 6s. If we were to take a null hypothesis that the dice are fair and not weighted, and take our test statistic to be the sum of the dice, we will find that the p-value of this outcome will be 1/36 or 0.028, and gives us statistically signficant results that the dice are fair. But obviously, a single roll is not nearly enough rolls to provide us with good evidence to say whether the results are statistically significant or not, and shows that blindly applying the p-value without properly designing a good experiment can result in bad results.</p>
+<p>In the end, what is most important is education on the subject of safe hypothesis testing, and making sure you don’t fall into the follies of poor statistical decisions.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/25"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+            
+
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="repl_intro.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title"><span class="section-number">25. </span>[In progress] Replicable Research</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="../26/pca_intro.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title"><span class="section-number">26. </span>Dimensionality Reduction and PCA</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
+        
+        </div>
+    </div>
+    <footer class="footer">
+    <div class="container">
+      <p>
+        
+          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+        
+            &copy; Copyright 2021.<br/>
+          <div class="extra_footer">
+            <p>
+License: CC BY-NC-ND 4.0
+</p>
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-113006011-1', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </body>
+</html>

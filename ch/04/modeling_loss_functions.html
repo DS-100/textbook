@@ -1,0 +1,1466 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4.2. Loss Functions &#8212; Principles and Techniques of Data Science</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="4.3. Absolute and Huber Loss" href="modeling_abs_huber.html" />
+    <link rel="prev" title="4.1. Models" href="modeling_simple.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Principles and Techniques of Data Science</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p class="caption">
+ <span class="caption-text">
+  Frontmatter
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../preface.html">
+   To the Reader
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../prereqs.html">
+   Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notation.html">
+   Notation
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  The Data Science Lifecycle
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../01/lifecycle_intro.html">
+   1. The Data Science Lifecycle
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_1.html">
+     1.1. The Students of Data 100
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_2.html">
+     1.2. Exploratory Data Analysis
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_3.html">
+     1.3. What’s in a Name?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../02/data_scope_intro.html">
+   2. Data Scope
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
+     2.1. Big Data Hubris
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_construct.html">
+     2.2. A Construct for Data Scope
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_accuracy.html">
+     2.3. Accuracy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_exercises.html">
+     2.4. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../03/theory_intro.html">
+   3. Theory for Data Design
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_sampling_variation.html">
+     3.1. Sampling Variation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_random_assignment.html">
+     3.2. Random Assignment
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_measurement_error.html">
+     3.3. Measurement Error
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_prob_dist.html">
+     3.4. Probability Distribution for a Statistic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_exercises.html">
+     3.5. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="modeling_intro.html">
+   4. Modeling and Estimation
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="modeling_simple.html">
+     4.1. Models
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     4.2. Loss Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="modeling_abs_huber.html">
+     4.3. Absolute and Huber Loss
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../05/cycle_case_study_intro.html">
+   5. [In progress] Case Study
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Rectangular Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../06/pandas_intro.html">
+   6. Working With Dataframes Using pandas
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_subsetting.html">
+     6.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_aggregating.html">
+     6.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_joining.html">
+     6.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_transforming.html">
+     6.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_other_reps.html">
+     6.5. How are Dataframes Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_exercises.html">
+     6.6. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../07/sql_intro.html">
+   7. Working With Relations Using SQL
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_subsetting.html">
+     7.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_aggregating.html">
+     7.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_joining.html">
+     7.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_transforming.html">
+     7.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_other_reps.html">
+     7.5. How are Relations Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_exercises.html">
+     7.6. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Understanding The Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../08/repr_intro.html">
+   8. Data Representation
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/repr_structure.html">
+     8.1. Structure
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/repr_data_types.html">
+     8.2. Data Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/repr_granularity.html">
+     8.3. Granularity
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../09/quality_intro.html">
+   9. [In Progress] Data Quality
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../10/eda_intro.html">
+   10. [In Progress] Exploratory Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../11/viz_intro.html">
+   11. Data Visualization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_quantitative.html">
+     11.1. Visualizing Quantitative Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_qualitative.html">
+     11.2. Visualizing Qualitative Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_matplotlib.html">
+     11.3. Customizing Plots using
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       matplotlib
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_principles.html">
+     11.4. Visualization Principles
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_principles_2.html">
+     11.5. Visualization Principles Continued
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_philosophy.html">
+     11.6. Philosophy for Data Visualization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../12/police_intro.html">
+   12. [In progress] Case Study: Berkeley Policing
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/police_calls.html">
+     12.1. Cleaning the Calls Dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/police_stops.html">
+     12.2. Cleaning The Stops Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Other Data Sources
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../13/text_intro.html">
+   13. Working with Text
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_strings.html">
+     13.1. Python String Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_regex.html">
+     13.2. Regular Expressions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_re.html">
+     13.3. Regex and Python
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../14/web_intro.html">
+   14. Web Technologies
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_http.html">
+     14.1. HTTP
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_rest.html">
+     14.2. [In Progress] REST
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_html.html">
+     14.3. [In Progress] XPath and HTML
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Linear Modeling
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../15/linear_models.html">
+   15. Linear Models
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_tips.html">
+     15.1. Predicting Tip Amounts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_fitting.html">
+     15.2. [In progress] Fitting a linear model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_inference.html">
+     15.3. [In progress] Inference for Linear Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_projection.html">
+     15.4. Least Squares — A Geometric Perspective
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../16/prob_and_gen.html">
+   16. Probability and Generalization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_random_vars.html">
+     16.1. Random Variables
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_exp_var.html">
+     16.2. Expectation and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_risk.html">
+     16.3. Risk
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../17/gradient_descent.html">
+   17. Gradient Descent and Numerical Optimization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_basics.html">
+     17.1. Loss Minimization Using a Program
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_descent_define.html">
+     17.2. Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_convexity.html">
+     17.3. Convexity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_stochastic.html">
+     17.4. Stochastic Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_lin_reg.html">
+     17.5. Fitting a Linear Model Using Gradient Descent
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../18/donkey_intro.html">
+   18. [In progress] Case Study: Donkey Dimensions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+  <label for="toctree-checkbox-15">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_analysis.html">
+     18.1. Linear Regression Case Study
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Multiple Linear Modeling
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../19/mult_intro.html">
+   19. [In progress] Multiple Linear Regression
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+  <label for="toctree-checkbox-16">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/mult_model.html">
+     19.1. Multiple Linear Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/mult_inference.html">
+     19.2. Inference for Multiple Linear Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../20/feature_engineering.html">
+   20. Feature Engineering
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+  <label for="toctree-checkbox-17">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/feature_one_hot.html">
+     20.1. The Walmart dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/feature_polynomial.html">
+     20.2. Predicting Ice Cream Ratings
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../21/bias_intro.html">
+   21. The Bias-Variance Tradeoff
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+  <label for="toctree-checkbox-18">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_risk.html">
+     21.1. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_modeling.html">
+     21.2. Model Bias and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_cv.html">
+     21.3. Cross-Validation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../22/reg_intro.html">
+   22. Regularization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+  <label for="toctree-checkbox-19">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_intuition.html">
+     22.1. Regularization Intuition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_ridge.html">
+     22.2. L2 Regularization: Ridge Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_lasso.html">
+     22.3. L1 Regularization: Lasso Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../23/mult_case_intro.html">
+   23. [In progress] Case Study: Multiple Linear Models
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Classification
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../24/classification_intro.html">
+   24. Classification
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/>
+  <label for="toctree-checkbox-20">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_prob.html">
+     24.1. Regression on Probabilities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_log_model.html">
+     24.2. The Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_cost.html">
+     24.3. A Loss Function for the Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_log_reg.html">
+     24.4. Using Logistic Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_cost_justification.html">
+     24.5. Approximating the Empirical Probability Distribution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_sgd.html">
+     24.6. Fitting a Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_sensitivity_specificity.html">
+     24.7. Evaluating Logistic Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_multiclass.html">
+     24.8. Multiclass Classification
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Replicability
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../25/repl_intro.html">
+   25. [In progress] Replicable Research
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/>
+  <label for="toctree-checkbox-21">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../25/repl_phacking.html">
+     25.1. P-hacking
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Extra Topics
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../26/pca_intro.html">
+   26. Dimensionality Reduction and PCA
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/>
+  <label for="toctree-checkbox-22">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_dims.html">
+     26.1. Dimensions of a Data Table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_svd.html">
+     26.2. PCA using the Singular Value Decomposition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_in_practice.html">
+     26.3. PCA in Practice
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../27/dtrees_intro.html">
+   27. [In progress] Decision Trees and Random Forests
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../28/clustering_intro.html">
+   28. [In progress] Clustering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Appendices
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a01/prob_review.html">
+   Probability Review
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a02/vector_space_review.html">
+   Vector Space Review
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a03/hyp_intro.html">
+   Statistical Inference Review
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/>
+  <label for="toctree-checkbox-23">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction.html">
+     Hypothesis Testing and Confidence Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction_part2.html">
+     Permutation Test
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a04/ref_intro.html">
+   Reference Tables
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/>
+  <label for="toctree-checkbox-24">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_pandas.html">
+     pandas
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_seaborn.html">
+     Seaborn
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_matplotlib.html">
+     matplotlib
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_sklearn.html">
+     scikit-learn
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a05/contributors.html">
+   Contributors
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../references.html">
+   References
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/ch/04/modeling_loss_functions.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#our-first-loss-function-mean-squared-error">
+   4.2.1. Our First Loss Function: Mean Squared Error
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-shorthand">
+   4.2.2. A Shorthand
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#minimizing-the-loss">
+     4.2.2.1. Minimizing the Loss
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-minimizing-value-of-the-mean-squared-error">
+   4.2.3. The Minimizing Value of the Mean Squared Error
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#back-to-the-original-dataset">
+   4.2.4. Back to the Original Dataset
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   4.2.5. Summary
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="loss-functions">
+<h1><span class="section-number">4.2. </span>Loss Functions<a class="headerlink" href="#loss-functions" title="Permalink to this headline">¶</a></h1>
+<p>Recall our assumptions thus far: we assume that there is a single population tip percentage <span class="math notranslate nohighlight">\( \theta^* \)</span>. Our model estimates this parameter; we use the variable <span class="math notranslate nohighlight">\( \theta \)</span> to denote our estimate. We would like to use the collected data on tips to determine the value that <span class="math notranslate nohighlight">\( \theta \)</span> should have,</p>
+<p>To precisely decide which value of <span class="math notranslate nohighlight">\( \theta \)</span> is best, we define a <strong>loss function</strong>. A loss function is a mathematical function that takes in an estimate <span class="math notranslate nohighlight">\( \theta \)</span> and the points in our dataset <span class="math notranslate nohighlight">\(y_1, y_2, \ldots, y_n\)</span>. It outputs a single number, the <strong>loss</strong>, that measures how well <span class="math notranslate nohighlight">\( \theta \)</span> fits our data. In mathematical notation, we want to create the function:</p>
+<div class="math notranslate nohighlight">
+\[ L(\theta, y_1, y_2, \ldots, y_n) =\ \ldots \]</div>
+<p>By convention, the loss function outputs lower values for preferable values of <span class="math notranslate nohighlight">\( \theta \)</span> and larger values for worse values of <span class="math notranslate nohighlight">\( \theta \)</span>. To fit our model, we select the value of <span class="math notranslate nohighlight">\( \theta \)</span> that produces a lower loss than all other choices of <span class="math notranslate nohighlight">\( \theta \)</span>—the <span class="math notranslate nohighlight">\( \theta \)</span> that <strong>minimizes the loss</strong>. We use the notation <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> to denote the value of <span class="math notranslate nohighlight">\( \theta \)</span> that minimizes a specified loss function.</p>
+<p>Consider once again two possible values of <span class="math notranslate nohighlight">\( \theta \)</span>: <span class="math notranslate nohighlight">\( \theta = 10 \)</span> and <span class="math notranslate nohighlight">\( \theta = 15 \)</span>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 10$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 15$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_3_0.png" src="../../_images/modeling_loss_functions_3_0.png" />
+</div>
+</div>
+<p>Since <span class="math notranslate nohighlight">\( \theta = 15 \)</span> falls closer to most of the points, our loss function should output a small value for <span class="math notranslate nohighlight">\( \theta = 15 \)</span> and a larger value for <span class="math notranslate nohighlight">\( \theta = 10 \)</span>.</p>
+<p>Let’s use this intuition to create a loss function.</p>
+<div class="section" id="our-first-loss-function-mean-squared-error">
+<h2><span class="section-number">4.2.1. </span>Our First Loss Function: Mean Squared Error<a class="headerlink" href="#our-first-loss-function-mean-squared-error" title="Permalink to this headline">¶</a></h2>
+<p>We would like our choice of <span class="math notranslate nohighlight">\( \theta \)</span> to fall close to the points in our dataset. Thus, we can define a loss function that outputs a larger value as <span class="math notranslate nohighlight">\( \theta \)</span> gets further away from the points in the dataset. We start with a simple loss function called the <em>mean squared error</em>. Here’s the idea:</p>
+<ol class="simple">
+<li><p>We select a value of <span class="math notranslate nohighlight">\( \theta \)</span>.</p></li>
+<li><p>For each value in our dataset, take the squared difference between the value and theta: <span class="math notranslate nohighlight">\( (y_i - \theta)^2 \)</span> . Squaring the difference in a simple way to convert negative differences into positive ones. We want to do this because if our point <span class="math notranslate nohighlight">\( y_i = 14 \)</span>, <span class="math notranslate nohighlight">\( \theta = 10 \)</span> and <span class="math notranslate nohighlight">\( \theta = 18 \)</span> are equally far away from the point and are thus equally “bad”.</p></li>
+<li><p>To compute the final loss, take the average of each of the individual squared differences.</p></li>
+</ol>
+<p>This gives us a final loss function of:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, y_1, y_2, \ldots, y_n)
+&amp;= \text{average}\left\{ (y_1 - \theta)^2, (y_2 - \theta)^2, \ldots, (y_n - \theta)^2 \right\} \\
+&amp;= \frac{1}{n} \left((y_1 - \theta)^2 + (y_2 - \theta)^2 + \ldots + (y_n - \theta)^2 \right) \\
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\end{aligned}
+\end{split}\]</div>
+<p>We can write a simple Python function to compute the loss:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see how this loss function behaves. Suppose we have a dataset only containing one point, <span class="math notranslate nohighlight">\( y_1 = 14 \)</span>. We can try different values of <span class="math notranslate nohighlight">\( \theta \)</span> and see what the loss function outputs for each value.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="n">xlims</span><span class="p">,</span> <span class="n">loss_fn</span><span class="o">=</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thetas</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">rugplot</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">rf</span><span class="s1">&#39;$ \theta = </span><span class="si">{</span><span class="n">theta</span><span class="si">}</span><span class="s1"> $&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loss = </span><span class="si">{</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">*</span><span class="n">xlims</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_9_0.png" src="../../_images/modeling_loss_functions_9_0.png" />
+</div>
+</div>
+<p>As we hoped, our loss is larger as <span class="math notranslate nohighlight">\( \theta \)</span> is further away from our data and is smallest when <span class="math notranslate nohighlight">\( \theta \)</span> falls exactly onto our data point. Let’s now see how our mean squared error behaves when we have five points instead of one. Our data this time are: <span class="math notranslate nohighlight">\( [11, 12, 15, 17, 18 ] \)</span>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span>
+           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">18.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_12_0.png" src="../../_images/modeling_loss_functions_12_0.png" />
+</div>
+</div>
+<p>Of the values of <span class="math notranslate nohighlight">\( \theta \)</span> we tried <span class="math notranslate nohighlight">\( \theta = 15 \)</span> has the lowest loss. However, a value of <span class="math notranslate nohighlight">\( \theta \)</span> in between 14 and 15 might have an even lower loss than <span class="math notranslate nohighlight">\( \theta = 15 \)</span>.</p>
+<p>The mean squared error seems to be doing its job by penalizing values of <span class="math notranslate nohighlight">\( \theta \)</span> that are far away from the center of the data. Let’s now see what the loss function outputs on the original dataset of tip percents. For reference, the original distribution of tip percents is plotted below:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_16_0.png" src="../../_images/modeling_loss_functions_16_0.png" />
+</div>
+</div>
+<p>Let’s try some values of <span class="math notranslate nohighlight">\( \theta \)</span>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">14.5</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+           <span class="n">y_vals</span><span class="o">=</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span>
+           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_18_0.png" src="../../_images/modeling_loss_functions_18_0.png" />
+</div>
+</div>
+<p>It looks like the best value of <span class="math notranslate nohighlight">\( \theta \)</span> that we’ve tried so far is 16.00, slightly above our original guess of 15% tip.</p>
+</div>
+<div class="section" id="a-shorthand">
+<h2><span class="section-number">4.2.2. </span>A Shorthand<a class="headerlink" href="#a-shorthand" title="Permalink to this headline">¶</a></h2>
+<p>We have defined our first loss function, the mean squared error (MSE). It computes high loss for values of <span class="math notranslate nohighlight">\( \theta \)</span> that are further away from the center of the data. Mathematically, this loss function is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, y_1, y_2, \ldots, y_n)
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\end{aligned}
+\end{split}\]</div>
+<p>The loss function will compute different losses whenever we change either <span class="math notranslate nohighlight">\( \theta \)</span> or <span class="math notranslate nohighlight">\( y_1, y_2, \ldots, y_n \)</span>. We’ve seen this happen when we tried different values of <span class="math notranslate nohighlight">\( \theta \)</span> and when we added new data points (changing <span class="math notranslate nohighlight">\( y_1, y_2, \ldots, y_n \)</span>).</p>
+<p>As a shorthand, we can define the vector <span class="math notranslate nohighlight">\( \textbf{y} = [ y_1, y_2, \ldots, y_n ] \)</span>. Then, we can write the MSE as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\end{aligned}
+\end{split}\]</div>
+<div class="section" id="minimizing-the-loss">
+<h3><span class="section-number">4.2.2.1. </span>Minimizing the Loss<a class="headerlink" href="#minimizing-the-loss" title="Permalink to this headline">¶</a></h3>
+<p>So far, we have found the best value of <span class="math notranslate nohighlight">\( \theta \)</span> by simply trying out a bunch of values and then picking the one with the least loss. Although this method works decently well, we can find a better method by using the properties of our loss function.</p>
+<p>For the following example, we use a dataset containing five points: <span class="math notranslate nohighlight">\( \textbf{y} = [ 11, 12, 15, 16, 17 ] \)</span>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">try_thetas</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span>
+           <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span>
+           <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">18.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_23_0.png" src="../../_images/modeling_loss_functions_23_0.png" />
+</div>
+</div>
+<p>In the plots above, we’ve used integer <span class="math notranslate nohighlight">\( \theta \)</span> values in between 12 and 17. When we change <span class="math notranslate nohighlight">\( \theta \)</span>, the loss seems to start high (at 10.92), decrease until <span class="math notranslate nohighlight">\( \theta = 15 \)</span>, then increase again. We can see that the loss changes as <span class="math notranslate nohighlight">\( \theta \)</span> changes, so let’s make a plot comparing the loss to <span class="math notranslate nohighlight">\( \theta \)</span> for each of the six <span class="math notranslate nohighlight">\( \theta \)</span>s we’ve tried.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">])</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $\bf</span><span class="si">{y}</span><span class="s1">$$ = [11, 12, 15, 17, 18] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_25_0.png" src="../../_images/modeling_loss_functions_25_0.png" />
+</div>
+</div>
+<p>The scatter plot shows the downward, then upward trend that we noticed before. We can try more values of <span class="math notranslate nohighlight">\( \theta \)</span> to see a complete curve that shows how the loss changes as <span class="math notranslate nohighlight">\( \theta \)</span> changes.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $\bf</span><span class="si">{y}</span><span class="s1">$$ = [11, 12, 15, 17, 18] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_27_0.png" src="../../_images/modeling_loss_functions_27_0.png" />
+</div>
+</div>
+<p>The plot above shows that in fact, <span class="math notranslate nohighlight">\( \theta = 15\)</span> was not the best choice; a <span class="math notranslate nohighlight">\( \theta \)</span> between 14 and 15 would have gotten a lower loss. We can use calculus to find that minimizing value of <span class="math notranslate nohighlight">\( \theta \)</span> exactly. At the minimum loss, the derivative of the loss function with respect to <span class="math notranslate nohighlight">\( \theta \)</span> is 0.</p>
+<p>First, we start with our loss function:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\end{aligned}
+\end{split}\]</div>
+<p>Next, we plug in our points <span class="math notranslate nohighlight">\( \textbf{y} = [11, 12, 15, 17, 18] \)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{5} \big((11 - \theta)^2 + (12 - \theta)^2 + (15 - \theta)^2 + (17 - \theta)^2 + (18 - \theta)^2 \big)\\
+\end{aligned}
+\end{split}\]</div>
+<p>To find the value of <span class="math notranslate nohighlight">\( \theta \)</span> that minimizes this function, we compute the derivative with respect to <span class="math notranslate nohighlight">\( \theta \)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{\partial}{\partial \theta} L(\theta, \textbf{y})
+&amp;= \frac{1}{5} \big(-2(11 - \theta) - 2(12 - \theta) - 2(15 - \theta) - 2(17 - \theta) -2(18 - \theta) \big)\\
+&amp;= \frac{1}{5} \big(10 \cdot \theta - 146 \big)\\
+\end{aligned}
+\end{split}\]</div>
+<p>Then, we find the value of <span class="math notranslate nohighlight">\( \theta \)</span> where the derivative is zero:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{1}{5} \big(10 \cdot \theta - 146 \big) &amp;= 0 \\
+10 \cdot \theta - 146 &amp;= 0 \\
+\theta &amp;= 14.6
+\end{aligned}
+\end{split}\]</div>
+<p>We’ve found the minimizing <span class="math notranslate nohighlight">\( \theta \)</span>, and as expected, it is between 14 and 15. We denote the <span class="math notranslate nohighlight">\( \theta \)</span> that minimizes the loss <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>. Thus, for the dataset <span class="math notranslate nohighlight">\( \textbf{y} = [11, 12, 15, 17, 18] \)</span> and the MSE loss function:</p>
+<div class="math notranslate nohighlight">
+\[ \hat{\theta} = 14.6 \]</div>
+<p>If we happen to compute the mean of the data values, we notice a curious equivalence:</p>
+<div class="math notranslate nohighlight">
+\[ \text{mean} (\textbf{y}) = \hat{\theta} = 14.6 \]</div>
+</div>
+</div>
+<div class="section" id="the-minimizing-value-of-the-mean-squared-error">
+<h2><span class="section-number">4.2.3. </span>The Minimizing Value of the Mean Squared Error<a class="headerlink" href="#the-minimizing-value-of-the-mean-squared-error" title="Permalink to this headline">¶</a></h2>
+<p>As it turns out, the equivalence above is no mere coincidence; the average of the data values <em>always</em> produces <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>, the <span class="math notranslate nohighlight">\( \theta \)</span> that minimizes the MSE loss.</p>
+<p>To show this, we take the derivative of our loss function once more. Instead of plugging in points, we leave the <span class="math notranslate nohighlight">\( y_i \)</span> terms intact to generalize to other datasets.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\frac{\partial}{\partial \theta} L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
+&amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
+\end{aligned}
+\end{split}\]</div>
+<p>Since we did not substitute in specific values for <span class="math notranslate nohighlight">\( y_i \)</span>, this equation can be used with any dataset with any number of points.</p>
+<p>Now, we set the derivative equal to zero and solve for <span class="math notranslate nohighlight">\( \theta \)</span> to find the minimizing value of <span class="math notranslate nohighlight">\( \theta \)</span> as before:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+-\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) &amp;= 0 \\
+\sum_{i = 1}^{n} (y_i - \theta) &amp;= 0 \\
+\sum_{i = 1}^{n} y_i - \sum_{i = 1}^{n} \theta &amp;= 0 \\
+\sum_{i = 1}^{n} \theta &amp;= \sum_{i = 1}^{n} y_i \\
+n \cdot \theta &amp;= y_1 + \ldots + y_n \\
+\theta &amp;= \frac{y_1 + \ldots + y_n}{n} \\
+\hat \theta = \theta &amp;= \text{mean} (\textbf{y})
+\end{aligned}
+\end{split}\]</div>
+<p>Lo and behold, we see that there is a single value of <span class="math notranslate nohighlight">\( \theta \)</span> that gives the smallest possible MSE no matter what the dataset is. For the mean squared error, we know that <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is the mean of the dataset values.</p>
+</div>
+<div class="section" id="back-to-the-original-dataset">
+<h2><span class="section-number">4.2.4. </span>Back to the Original Dataset<a class="headerlink" href="#back-to-the-original-dataset" title="Permalink to this headline">¶</a></h2>
+<p>We no longer have to test out different values of <span class="math notranslate nohighlight">\( \theta \)</span> as we did before. We can compute the mean tip percentage in one go:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>16.080258172250463
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">16.08</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \hat \theta = 16.08$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of tip percent&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_loss_functions_39_0.png" src="../../_images/modeling_loss_functions_39_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">4.2.5. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>We have introduced a <strong>constant model</strong>, a model that outputs the same number for all entries in the dataset.</p>
+<p>A <strong>loss function</strong> <span class="math notranslate nohighlight">\( L(\theta, \textbf{y}) \)</span> measures how well a given value of <span class="math notranslate nohighlight">\( \theta \)</span> fits the data. In this section, we introduce the mean squared error loss function and showed that <span class="math notranslate nohighlight">\( \hat{\theta} = \text{mean}(\textbf{y}) \)</span> for the constant model.</p>
+<p>The steps we took in this section apply to many modeling scenarios:</p>
+<ol class="simple">
+<li><p>Select a model.</p></li>
+<li><p>Select a loss function.</p></li>
+<li><p>Fit the model by minimizing the loss.</p></li>
+</ol>
+<p>In this book, all of our modeling techniques expand upon one or more of these steps. We introduce new models (1), new loss functions (2), and new techniques for minimizing loss (3).</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/04"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+            
+
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="modeling_simple.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title"><span class="section-number">4.1. </span>Models</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="modeling_abs_huber.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title"><span class="section-number">4.3. </span>Absolute and Huber Loss</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
+        
+        </div>
+    </div>
+    <footer class="footer">
+    <div class="container">
+      <p>
+        
+          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+        
+            &copy; Copyright 2021.<br/>
+          <div class="extra_footer">
+            <p>
+License: CC BY-NC-ND 4.0
+</p>
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-113006011-1', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </body>
+</html>
