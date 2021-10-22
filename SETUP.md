@@ -27,7 +27,7 @@ command-line tools installed:
    folder for the book files, and run:
 
    ```bash
-   git clone https://github.com/DS-100/textbook.git
+   git clone git@github.com:DS-100/textbook.git
    cd textbook # Navigates into the book folder
    ```
 
