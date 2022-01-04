@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1110,7 +1120,315 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Visualizing Quantitative Data</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#histograms">
+   11.1.1. Histograms
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#box-plots">
+   11.1.2. Box plots
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#brief-aside-on-using-seaborn">
+   11.1.3. Brief Aside on Using Seaborn
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scatter-plots">
+   11.1.4. Scatter Plots
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="mi">8</span><span class="p">]</span>
+    <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="mi">5</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="visualizing-quantitative-data">
+<h1><span class="section-number">11.1. </span>Visualizing Quantitative Data<a class="headerlink" href="#visualizing-quantitative-data" title="Permalink to this headline">¶</a></h1>
+<p>We generally use different types of charts to visualize quantitative (numerical) data and qualitative (ordinal or nominal) data.</p>
+<p>For quantitative data, we most often use histograms, box plots, and scatter plots.</p>
+<p>We can use the <a class="reference external" href="http://seaborn.pydata.org/">seaborn plotting library</a> to create these plots in Python. We will use a dataset containing information about passengers aboard the Titanic.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import seaborn and apply its plotting styles</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_interactive docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the dataset and drop N/A values to make plot function calls simpler</span>
+<span class="n">ti</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;titanic&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># This table is too large to fit onto a page so we&#39;ll output sliders to</span>
+<span class="c1"># pan through different sections.</span>
+<span class="n">df_interact</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "50b5511f04d74e96a0d018558d71394f", "version_major": 2, "version_minor": 0}
+</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(182 rows, 15 columns) total
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="histograms">
+<h2><span class="section-number">11.1.1. </span>Histograms<a class="headerlink" href="#histograms" title="Permalink to this headline">¶</a></h2>
+<p>We can see that the dataset contains one row for every passenger. Each row includes the age of the passenger and the amount the passenger paid for a ticket. Let’s visualize the ages using a histogram. We can use seaborn’s <code class="docutils literal notranslate"><span class="pre">distplot</span></code> function:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adding a semi-colon at the end tells Jupyter not to output the</span>
+<span class="c1"># usual &lt;matplotlib.axes._subplots.AxesSubplot&gt; line</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_7_0.png" src="../../_images/viz_quantitative_7_0.png" />
+</div>
+</div>
+<p>By default, seaborn’s <code class="docutils literal notranslate"><span class="pre">distplot</span></code> function will output a smoothed curve that roughly fits the distribution. We can also add a rugplot which marks each individual point on the x-axis:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_9_0.png" src="../../_images/viz_quantitative_9_0.png" />
+</div>
+</div>
+<p>We can also plot the distribution itself. Adjusting the number of bins shows that there were a number of children on board.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">kde</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_11_0.png" src="../../_images/viz_quantitative_11_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="box-plots">
+<h2><span class="section-number">11.1.2. </span>Box plots<a class="headerlink" href="#box-plots" title="Permalink to this headline">¶</a></h2>
+<p>Box plots are a convenient way to see where most of the data lie. Typically, we use the 25th and 75th percentiles of the data as the start and endpoints of the box and draw a line within the box for the 50th percentile (the median). We draw two “whiskers” that extend to show the the remaining data except outliers, which are marked as individual points outside the whiskers.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_13_0.png" src="../../_images/viz_quantitative_13_0.png" />
+</div>
+</div>
+<p>We typically use the Inter-Quartile Range (IQR) to determine which points are considered outliers for the box plot. The IQR is the difference between the 75th percentile of the data and the 25th percentile.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;fare&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">75</span><span class="p">])</span>
+<span class="n">iqr</span> <span class="o">=</span> <span class="n">upper</span> <span class="o">-</span> <span class="n">lower</span>
+<span class="n">iqr</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>60.299999999999997
+</pre></div>
+</div>
+</div>
+</div>
+<p>Values greater than 1.5 <span class="math notranslate nohighlight">\(\times\)</span> IQR above the 75th percentile and less than 1.5 <span class="math notranslate nohighlight">\(\times\)</span> IQR below the 25th percentile are considered outliers and we can see them marked indivdiually on the boxplot above:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">upper_cutoff</span> <span class="o">=</span> <span class="n">upper</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span>
+<span class="n">lower_cutoff</span> <span class="o">=</span> <span class="n">lower</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span>
+<span class="n">upper_cutoff</span><span class="p">,</span> <span class="n">lower_cutoff</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(180.44999999999999, -60.749999999999986)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Although histograms show the entire distribution at once, box plots are often easier to understand when we split the data by different categories. For example, we can make one box plot for each passenger type:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_19_0.png" src="../../_images/viz_quantitative_19_0.png" />
+</div>
+</div>
+<p>The separate box plots are much easier to understand than the overlaid histogram below which plots the same data:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">ti</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;who&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;woman&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">ti</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;who&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;man&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">ti</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ti</span><span class="p">[</span><span class="s1">&#39;who&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;child&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_21_0.png" src="../../_images/viz_quantitative_21_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="brief-aside-on-using-seaborn">
+<h2><span class="section-number">11.1.3. </span>Brief Aside on Using Seaborn<a class="headerlink" href="#brief-aside-on-using-seaborn" title="Permalink to this headline">¶</a></h2>
+<p>You may have noticed that the <code class="docutils literal notranslate"><span class="pre">boxplot</span></code> call to make separate box plots for the <code class="docutils literal notranslate"><span class="pre">who</span></code> column was simpler than the equivalent code to make an overlaid histogram. Although <code class="docutils literal notranslate"><span class="pre">sns.distplot</span></code> takes in an array or Series of data, most other seaborn functions allow you to pass in a DataFrame and specify which column to plot on the x and y axes. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plots the `fare` column of the `ti` DF on the x-axis</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When the column is categorical (the <code class="docutils literal notranslate"><span class="pre">'who'</span></code> column contained <code class="docutils literal notranslate"><span class="pre">'woman'</span></code>, <code class="docutils literal notranslate"><span class="pre">'man'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'child'</span></code>), seaborn will automatically split the data by category before plotting. This means we don’t have to filter out each category ourselves like we did for <code class="docutils literal notranslate"><span class="pre">sns.distplot</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fare (numerical) on the x-axis,</span>
+<span class="c1"># who (nominal) on the y-axis</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_23_0.png" src="../../_images/viz_quantitative_23_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="scatter-plots">
+<h2><span class="section-number">11.1.4. </span>Scatter Plots<a class="headerlink" href="#scatter-plots" title="Permalink to this headline">¶</a></h2>
+<p>Scatter plots are used to compare two quantitative variables. We can compare the <code class="docutils literal notranslate"><span class="pre">age</span></code> and <code class="docutils literal notranslate"><span class="pre">fare</span></code> columns of our Titanic dataset using a scatter plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_25_0.png" src="../../_images/viz_quantitative_25_0.png" />
+</div>
+</div>
+<p>By default seaborn will also fit a regression line to our scatterplot and bootstrap the scatterplot to create a 95% confidence interval around the regression line shown as the light blue shading around the line above. In this case, the regression line doesn’t seem to fit the scatter plot very well so we can turn off the regression.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">,</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_27_0.png" src="../../_images/viz_quantitative_27_0.png" />
+</div>
+</div>
+<p>We can color the points using a categorical variable. Let’s use the <code class="docutils literal notranslate"><span class="pre">who</span></code> column once more:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ti</span><span class="p">,</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_quantitative_29_0.png" src="../../_images/viz_quantitative_29_0.png" />
+</div>
+</div>
+<p>From this plot we can see that all passengers below the age of 18 or so were marked as <code class="docutils literal notranslate"><span class="pre">child</span></code>. There doesn’t seem to be a noticable split between male and female passenger fares, although the two most expensive tickets were purchased by males.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/11"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1402,21 +1720,19 @@
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

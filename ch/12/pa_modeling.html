@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1134,7 +1144,1074 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Creating a Model to Correct PurpleAir Measurements</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-in-the-data">
+   12.4.1. Loading in the Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#our-modeling-procedure">
+   12.4.2. Our Modeling Procedure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-1-a-simple-constant-model">
+   12.4.3. Model 1: A Simple Constant Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-2-adjusting-purpleair-by-a-constant">
+   12.4.4. Model 2: Adjusting PurpleAir by a Constant
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#why-did-model-2-perform-worse">
+     12.4.4.1. Why Did Model 2 Perform Worse?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-3-simple-linear-regression">
+   12.4.5. Model 3: Simple Linear Regression
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#using-a-linear-model-for-calibration">
+     12.4.5.1. Using a Linear Model for Calibration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-4-incorporating-relative-humidity">
+   12.4.6. Model 4: Incorporating Relative Humidity
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="creating-a-model-to-correct-purpleair-measurements">
+<span id="ch-pa-modeling"></span><h1><span class="section-number">12.4. </span>Creating a Model to Correct PurpleAir Measurements<a class="headerlink" href="#creating-a-model-to-correct-purpleair-measurements" title="Permalink to this headline">¶</a></h1>
+<p>Now that we’ve matched together PM2.5 readings from AQS and PurpleAir sensors,
+we’re ready for the final step of the analysis: creating a model that
+calibrates PurpleAir measurements.
+Barkjohn’s original analysis fits many models to the data in order to find
+the most appropriate one.
+In this section, we’ll start by fitting several simpler models
+using the techniques from the <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-ref">Modeling and Estimation</span></a> chapter.
+Then, we’ll fit a few models from Barkjohn’s analysis, including the final
+model they chose for real-world use.
+Since the final model uses methods that we introduce later in the book,
+we won’t explain the technical details very deeply here—we
+instead encourage you to revisit this section after reading the
+<a class="reference internal" href="../15/linear_models.html#ch-linear-models"><span class="std std-ref">Linear Models</span></a> and <a class="reference internal" href="../19/mult_intro.html#ch-mult-intro"><span class="std std-ref">[In progress] Multiple Linear Regression</span></a> chapters.</p>
+<div class="section" id="loading-in-the-data">
+<h2><span class="section-number">12.4.1. </span>Loading in the Data<a class="headerlink" href="#loading-in-the-data" title="Permalink to this headline">¶</a></h2>
+<p>Let’s begin by loading in the cleaned dataset of matched AQS and PurpleAir
+PM2.5 readings.
+We do some data processing as we load in the CSV file.
+Since this section focuses on modeling, we’ve left it as an exercise to
+understand what the code does.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">csv_file</span> <span class="o">=</span> <span class="s1">&#39;data/cleaned_purpleair_aqs/Full24hrdataset.csv&#39;</span>
+<span class="n">usecols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;PM25FM&#39;</span><span class="p">,</span> <span class="s1">&#39;PM25cf1&#39;</span><span class="p">,</span> <span class="s1">&#39;TempC&#39;</span><span class="p">,</span> <span class="s1">&#39;RH&#39;</span><span class="p">,</span> <span class="s1">&#39;Dewpoint&#39;</span><span class="p">]</span>
+<span class="n">full</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+<span class="n">full</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">,</span> <span class="s1">&#39;dew&#39;</span><span class="p">]</span>
+<span class="n">full</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>id</th>
+      <th>region</th>
+      <th>pm25aqs</th>
+      <th>pm25pa</th>
+      <th>temp</th>
+      <th>rh</th>
+      <th>dew</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2019-05-17</td>
+      <td>AK1</td>
+      <td>Alaska</td>
+      <td>6.7</td>
+      <td>8.62</td>
+      <td>18.03</td>
+      <td>38.56</td>
+      <td>3.63</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2019-05-18</td>
+      <td>AK1</td>
+      <td>Alaska</td>
+      <td>3.8</td>
+      <td>3.49</td>
+      <td>16.12</td>
+      <td>49.40</td>
+      <td>5.44</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2019-05-21</td>
+      <td>AK1</td>
+      <td>Alaska</td>
+      <td>4.0</td>
+      <td>3.80</td>
+      <td>19.90</td>
+      <td>29.97</td>
+      <td>1.73</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>12427</th>
+      <td>2019-02-20</td>
+      <td>WI6</td>
+      <td>North</td>
+      <td>15.6</td>
+      <td>25.30</td>
+      <td>1.71</td>
+      <td>65.78</td>
+      <td>-4.08</td>
+    </tr>
+    <tr>
+      <th>12428</th>
+      <td>2019-03-04</td>
+      <td>WI6</td>
+      <td>North</td>
+      <td>14.0</td>
+      <td>8.21</td>
+      <td>-14.38</td>
+      <td>48.21</td>
+      <td>-23.02</td>
+    </tr>
+    <tr>
+      <th>12429</th>
+      <td>2019-03-22</td>
+      <td>WI6</td>
+      <td>North</td>
+      <td>5.8</td>
+      <td>9.44</td>
+      <td>5.08</td>
+      <td>52.20</td>
+      <td>-4.02</td>
+    </tr>
+  </tbody>
+</table>
+<p>12246 rows × 8 columns</p>
+</div></div></div>
+</div>
+<p>We’ve included an explanation for each of the columns below.</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>date</p></td>
+<td><p>Date of the observation</p></td>
+</tr>
+<tr class="row-odd"><td><p>id</p></td>
+<td><p>A unique label for a site, formatted as the US state abbreviation with a number. (We performed data cleaning for site ID <code class="docutils literal notranslate"><span class="pre">CA1</span></code>.)</p></td>
+</tr>
+<tr class="row-even"><td><p>region</p></td>
+<td><p>The name of the region, which corresponds to a group of sites. (The <code class="docutils literal notranslate"><span class="pre">CA1</span></code> site is located in the <code class="docutils literal notranslate"><span class="pre">West</span></code> region.)</p></td>
+</tr>
+<tr class="row-odd"><td><p>pm25aqs</p></td>
+<td><p>The PM2.5 measurement from the AQS sensor.</p></td>
+</tr>
+<tr class="row-even"><td><p>pm25pa</p></td>
+<td><p>The PM2.5 measurement from the PurpleAir sensor.</p></td>
+</tr>
+<tr class="row-odd"><td><p>temp</p></td>
+<td><p>Temperature, in Celcius.</p></td>
+</tr>
+<tr class="row-even"><td><p>rh</p></td>
+<td><p>Relative humidity, ranging from 0 to 100%.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dew</p></td>
+<td><p>The dew point of the air. (Higher dew point means more moisture in the air.)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Before we start modeling, we want to understand the data.
+We’ll start by making some simple visualizations.
+First, we’ll make a plot of the weekly average AQS PM2.5 over time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="p">(</span><span class="n">full</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Weekly avg PM2.5 (AQS)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_9_0.png" src="../../_images/pa_modeling_9_0.png" />
+</div>
+</div>
+<p>We see that most PM2.5 values range between 5.0 and 15.0 µg m⁻³.</p>
+<p>Next, we’ll plot the distribution of both AQS and PurpleAir PM2.5 readings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_dist</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
+    <span class="c1"># We need to make sure the x- and y-axes have the same limits for both plots,</span>
+    <span class="c1"># or else the plots will be difficult to compare</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">,</span>
+            <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We need to make sure the x- and y-axes have the same limits for both plots,</span>
+<span class="c1"># or else the plots will be difficult to compare</span>
+<span class="n">plot_dist</span><span class="p">(</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">)</span>
+<span class="n">plot_dist</span><span class="p">(</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_12_0.png" src="../../_images/pa_modeling_12_0.png" />
+<img alt="../../_images/pa_modeling_12_1.png" src="../../_images/pa_modeling_12_1.png" />
+</div>
+</div>
+<p>We see that the distributions of PM2.5 readings are skewed to the right.</p>
+<p>Lastly, we’ll plot PurpleAir against AQS readings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_15_0.png" src="../../_images/pa_modeling_15_0.png" />
+</div>
+</div>
+<p>Before starting this analysis, we expected that PurpleAir measurements
+would generally overestimate the PM2.5.
+And indeed, this is reflected in the scatter plot.</p>
+</div>
+<div class="section" id="our-modeling-procedure">
+<h2><span class="section-number">12.4.2. </span>Our Modeling Procedure<a class="headerlink" href="#our-modeling-procedure" title="Permalink to this headline">¶</a></h2>
+<p>First, let’s go over our modeling goals.
+We want to create a model that predicts PM2.5 as
+accurately as possible.
+To do this, our model can make use of the PurpleAir measurements, as well as
+the other variables in the data, such as the ambient temperature and relative
+humidity.</p>
+<p>Here, we treat the AQS measurements as the true PM2.5 values.
+The AQS measurements are taken from carefully calibrated instruments and are
+actively used by the US government for decision-making, so we have reason to
+trust that the AQS PM2.5 values are accurate.</p>
+<p>We plan to fit and compare several models on the data.
+To do so, we first randomly split the data in <code class="docutils literal notranslate"><span class="pre">full</span></code> into a
+training and testing set.
+For all of our models, we’ll fit the model on the training set and report
+the root mean squared error (RMSE) on the test set.
+Intuitively, the held-out test set mimics new measurements
+that the model “doesn’t see” while we fit it.
+This means that we can treat the test set error as an
+estimator for the model’s real-world performance.</p>
+<p>We’ll set aside 1000 observations aside for the test set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">full</span><span class="p">)</span>
+<span class="n">test_n</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="c1"># Shuffle the row labels</span>
+<span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Split the data</span>
+<span class="n">test</span>  <span class="o">=</span> <span class="n">full</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[:</span><span class="n">test_n</span><span class="p">]]</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">full</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[</span><span class="n">test_n</span><span class="p">:]]</span>
+<span class="n">train</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>id</th>
+      <th>region</th>
+      <th>pm25aqs</th>
+      <th>pm25pa</th>
+      <th>temp</th>
+      <th>rh</th>
+      <th>dew</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2685</th>
+      <td>2019-04-25</td>
+      <td>CA2</td>
+      <td>West</td>
+      <td>7.17</td>
+      <td>8.06</td>
+      <td>22.99</td>
+      <td>48.33</td>
+      <td>11.46</td>
+    </tr>
+    <tr>
+      <th>10214</th>
+      <td>2018-08-30</td>
+      <td>NC4</td>
+      <td>Southeast</td>
+      <td>12.60</td>
+      <td>23.13</td>
+      <td>33.01</td>
+      <td>46.22</td>
+      <td>19.98</td>
+    </tr>
+    <tr>
+      <th>10516</th>
+      <td>2019-08-14</td>
+      <td>VT1</td>
+      <td>North</td>
+      <td>6.78</td>
+      <td>8.70</td>
+      <td>25.44</td>
+      <td>49.25</td>
+      <td>14.01</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5402</th>
+      <td>2019-10-10</td>
+      <td>GA1</td>
+      <td>Southeast</td>
+      <td>6.70</td>
+      <td>11.99</td>
+      <td>23.52</td>
+      <td>60.24</td>
+      <td>15.35</td>
+    </tr>
+    <tr>
+      <th>861</th>
+      <td>2019-01-31</td>
+      <td>AZ1</td>
+      <td>Central Southwest</td>
+      <td>9.40</td>
+      <td>10.98</td>
+      <td>20.90</td>
+      <td>29.33</td>
+      <td>2.31</td>
+    </tr>
+    <tr>
+      <th>7282</th>
+      <td>2018-08-10</td>
+      <td>IA2</td>
+      <td>North</td>
+      <td>18.67</td>
+      <td>43.22</td>
+      <td>29.60</td>
+      <td>50.17</td>
+      <td>18.15</td>
+    </tr>
+  </tbody>
+</table>
+<p>11246 rows × 8 columns</p>
+</div></div></div>
+</div>
+<p>We also plan to evaluate each model’s predictions on the test set,
+so we’ll define a function to compute the RMSE of a set of predictions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">predictions</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">test</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">predictions</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="model-1-a-simple-constant-model">
+<h2><span class="section-number">12.4.3. </span>Model 1: A Simple Constant Model<a class="headerlink" href="#model-1-a-simple-constant-model" title="Permalink to this headline">¶</a></h2>
+<p>Now, let’s fit our first model—a constant model like the ones we
+worked with in the previous <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-ref">Modeling and Estimation</span></a> chapter.
+Constant models only predict one number.
+That is, our model <span class="math notranslate nohighlight">\( f_{\theta}(x) \)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\theta}(x) = {\theta}
+\end{aligned}
+\]</div>
+<p>For example, if we set <span class="math notranslate nohighlight">\( \theta = 5.5 \)</span>, then the model would predict
+that the AQS PM2.5 reading is always 5.5.</p>
+<p>In our previous discussion of the constant model, we found that we minimize
+the mean squared error when we set <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> to the mean of the
+response variable.
+In this case, we set <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> to the mean AQS PM2.5 value, and
+our model is simply:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_\hat{\theta}(x) = \text{mean(aqs)}
+\end{aligned}
+\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_1</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;f(x) = θ&#39;&#39;&#39;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">predict</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we can fit the model on the training set and check its accuracy on the
+test set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predict</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+<span class="n">rmse</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">test</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.446107182896083
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ve found that this simple model has a loss of 5.45 µg m⁻³.
+Intuitively, this means that the model will usually be around 5.45 µg m⁻³
+away from the actual AQS measurement.
+We can see this when we mark the mean on the distribution
+of AQS readings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">plot_dist</span><span class="p">(</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">);</span>
+<span class="c1"># Most points are within 5.36 µg m⁻³ away from the mean</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_33_0.png" src="../../_images/pa_modeling_33_0.png" />
+</div>
+</div>
+<p>This model is too simple to use in practice—it performs especially badly
+when PM2.5 values are high, which is exactly where we care about model
+accuracy the most!
+Still, this serves as a useful baseline for future models and demonstrates
+our modeling procedure.</p>
+</div>
+<div class="section" id="model-2-adjusting-purpleair-by-a-constant">
+<h2><span class="section-number">12.4.4. </span>Model 2: Adjusting PurpleAir by a Constant<a class="headerlink" href="#model-2-adjusting-purpleair-by-a-constant" title="Permalink to this headline">¶</a></h2>
+<p>Let’s fit a constant again, but with a twist: we’ll fit a model
+that adjusts PurpleAir measurements by a constant rather than simply
+outputting the average AQS measurement.
+Our model is:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\theta}(x_i) = \text{PA}_i + \theta
+\end{aligned}
+\]</div>
+<p>In this model, <span class="math notranslate nohighlight">\( \text{PA}_i \)</span> represents the PurpleAir measurement
+for a row <span class="math notranslate nohighlight">\( x_i \)</span> in the data, and <span class="math notranslate nohighlight">\( \theta \)</span> is a constant we once again
+need to fit.</p>
+<p>We want to minimize the mean squared loss.
+Let <span class="math notranslate nohighlight">\( \text{AQS}_i \)</span> denote the AQS reading for row <span class="math notranslate nohighlight">\( x_i \)</span> of the data.
+Then, the mean squared loss is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta) &amp;= \frac{1}{n} \sum_i (\text{AQS}_i - f_{\theta}(x_i))^2 \\
+&amp;= \frac{1}{n} \sum_i (\text{AQS}_i - (\text{PA}_i + \theta))^2
+\end{aligned}
+\end{split}\]</div>
+<p>To minimize the loss, we can derive that
+<span class="math notranslate nohighlight">\( \hat{\theta} = \frac{1}{n} \sum_i(\text{AQS}_i - \text{PA}_i) \)</span>.
+In other words, <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is the mean difference between
+AQS and PurpleAir readings.
+We’ve left the derivation as an exercise for the reader.
+After fitting on the training data, we have <span class="math notranslate nohighlight">\( \hat{\theta} = -4.86 \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-4.859246747707521
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this, we can implement our second model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_2</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;f(x) = PA + θ&#39;&#39;&#39;</span>
+    <span class="n">mean_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">mean_diff</span>
+    
+    <span class="k">return</span> <span class="n">predict</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To compare our models, we’ve written a small helper function called
+<code class="docutils literal notranslate"><span class="pre">model_results</span></code> that outputs the models and their RMSE on the test set.
+We’ll call this function to compare the results of the two models we’ve
+defined thus far.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_results</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>rmse</th>
+    </tr>
+    <tr>
+      <th>model</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>f(x) = θ</th>
+      <td>5.45</td>
+    </tr>
+    <tr>
+      <th>f(x) = PA + θ</th>
+      <td>7.33</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="section" id="why-did-model-2-perform-worse">
+<h3><span class="section-number">12.4.4.1. </span>Why Did Model 2 Perform Worse?<a class="headerlink" href="#why-did-model-2-perform-worse" title="Permalink to this headline">¶</a></h3>
+<p>Surprisingly, the second model has a worse RMSE than the first.
+Why did this happen?
+One way to diagnose these models is to subtract the model’s
+predictions from the actual observed AQS values.
+These differences are called the <em>residuals</em>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="n">predict</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">test</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">predict</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s plot the residuals for both models and compare.</p>
+<div class="cell tag_hide-cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_residuals</span><span class="p">(</span><span class="n">models</span><span class="p">):</span>
+    <span class="n">model_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+    <span class="n">resids</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">test</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">resid</span><span class="o">=</span><span class="n">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">))</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">],</span>
+        <span class="n">keys</span><span class="o">=</span><span class="n">model_names</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">resids</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;resid&#39;</span><span class="p">,</span>
+                    <span class="n">col</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                    <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">**</span><span class="n">k</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">))</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">set_xlabels</span><span class="p">(</span><span class="s1">&#39;PA&#39;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">set_ylabels</span><span class="p">(</span><span class="s1">&#39;residuals&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_residuals</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_52_0.png" src="../../_images/pa_modeling_52_0.png" />
+</div>
+</div>
+<p>Note that a residual of 0 means that the model correctly predicted
+the PM2.5. A positive residual means the model underestimated PM2.5, and
+a negative residual means the model overestimated PM2.5.</p>
+<p>We see that both models perform poorly at higher PM2.5 measurements.
+Model 1, the simple constant model, tends to underestimate PM2.5.
+Likewise, Model 2, the model that adjusts PurpleAir by a constant, tends
+to overestimate PM2.5.</p>
+<p>We saw earlier in this section that PurpleAir sensors tend to overestimate
+PM2.5.
+However, subtracting a constant value doesn’t seem to do enough to
+correct PurpleAir readings.</p>
+<p>Next, we’ll fit linear models on the data.
+In this book, we cover linear models
+in later chapters (Chapters <a class="reference internal" href="../15/linear_models.html#ch-linear-models"><span class="std std-numref">15</span></a> and
+<a class="reference internal" href="../19/mult_intro.html#ch-mult-intro"><span class="std std-numref">19</span></a>).
+However, we include linear models in this section in order to match
+Barkjohn’s analysis, and to produce the final model that is currently
+in real-world use.</p>
+</div>
+</div>
+<div class="section" id="model-3-simple-linear-regression">
+<h2><span class="section-number">12.4.5. </span>Model 3: Simple Linear Regression<a class="headerlink" href="#model-3-simple-linear-regression" title="Permalink to this headline">¶</a></h2>
+<p>Making a scatter plot of PurpleAir and AQS measurements shows that a linear
+model can be appropriate:</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_57_0.png" src="../../_images/pa_modeling_57_0.png" />
+</div>
+</div>
+<p>By eyeballing this plot, we might guess that
+the PurpleAir PM2.5 is about twice as high as the actual PM2.5.
+This idea is encapsulated in the simple linear model:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\theta}(x_i) = \theta_0 + \theta_1 \text{PA}_i
+\end{aligned}
+\]</div>
+<p>To predict the PM2.5, this model multiplies the PurpleAir measurements
+by <span class="math notranslate nohighlight">\( \theta_1 \)</span>, then adds a constant <span class="math notranslate nohighlight">\( \theta_0 \)</span>.</p>
+<div class="section" id="using-a-linear-model-for-calibration">
+<h3><span class="section-number">12.4.5.1. </span>Using a Linear Model for Calibration<a class="headerlink" href="#using-a-linear-model-for-calibration" title="Permalink to this headline">¶</a></h3>
+<p>This is a <strong>calibration</strong> scenario.
+We have PurpleAir sensors which we want to calibrate to match AQS sensors.
+Then, we can adjust the PurpleAir readings using the correction we get
+from calibration.</p>
+<p>This is a two-step procedure:</p>
+<ol class="simple">
+<li><p>Fit a calibration model that uses AQS measurements to predict PurpleAir measurements.</p></li>
+<li><p><em>Invert</em> the model to find <span class="math notranslate nohighlight">\( \hat \theta_1 \)</span> and <span class="math notranslate nohighlight">\( \hat \theta_0 \)</span>.</p></li>
+</ol>
+<p>In other words, we’ll fit this model first:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\text{predicted } \text{PA}_i = b + m \cdot \text{AQS}_i
+\end{aligned}
+\]</div>
+<p>Then, we invert this model:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\text{PA}_i &amp;= \hat b + \hat m \cdot \text{AQS}_i \\
+\text{PA}_i - \hat b &amp;= \hat m \cdot \text{AQS}_i \\
+\text{AQS}_i &amp;= \frac{1}{\hat m} \text{PA}_i - \frac{\hat b}{\hat m}
+\end{aligned}
+\end{split}\]</div>
+<p>Which gives <span class="math notranslate nohighlight">\( \hat \theta_1 = \frac{1}{\hat m} \)</span> and
+<span class="math notranslate nohighlight">\( \hat \theta_0 = - \frac{\hat b}{\hat m} \)</span></p>
+<div class="admonition-why-invert-the-model admonition">
+<p class="admonition-title">Why invert the model?</p>
+<p>This procedure might seem a bit roundabout.
+Why not fit a linear model for <span class="math notranslate nohighlight">\( f_{\theta}(x) \)</span>
+that uses PurpleAir to predict AQS directly?
+This would get <span class="math notranslate nohighlight">\( \hat \theta_1 \)</span> and <span class="math notranslate nohighlight">\( \hat \theta_0 \)</span> without
+needing to invert anything.</p>
+<p>Intuitively, linear models assume that the explanatory variable, or the variable
+we put on the x-axis, has no error.
+Linear models also assume that all the error occurs when we measure the response
+variable, or the variable we put on the y-axis.
+Thus, during calibration we treat the AQS measurements as the x-axis variable
+since these measurements have relatively little error.
+This allows us to model the error in PurpleAir measurements.
+If we fit <span class="math notranslate nohighlight">\( f_{\theta}(x) \)</span> directly, we’ll say the opposite:
+that the measurement error happens in the AQS readings rather than PurpleAir
+readings.</p>
+<p>As a simpler example, let’s say we’re calibrating a weight scale.
+We could do this by first placing known weights—say 1 kg, 5 kg,
+and 10 kg—onto the scale, and seeing what the scale reports.
+Analogously, the AQS measurements are the known quantities, and we check
+what the PurpleAir sensors report.</p>
+<p>For a more rigorous treatment of statistical calibration,
+see <span id="id1">[<a class="reference internal" href="../../references.html#id28">Osborne, 1991</a>]</span>.</p>
+</div>
+<p>Now, let’s define the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="k">def</span> <span class="nf">model_3</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;f(x) = θ₀ + θ₁PA&#39;&#39;&#39;</span>
+    <span class="c1"># Fit calibration model using sklearn</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]],</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span>
+    
+    <span class="c1"># Invert model</span>
+    <span class="n">theta_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">m</span>
+    <span class="n">theta_0</span> <span class="o">=</span> <span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">m</span>
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">theta_0</span> <span class="o">+</span> <span class="n">theta_1</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">predict</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_results</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>rmse</th>
+    </tr>
+    <tr>
+      <th>model</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>f(x) = θ</th>
+      <td>5.45</td>
+    </tr>
+    <tr>
+      <th>f(x) = PA + θ</th>
+      <td>7.33</td>
+    </tr>
+    <tr>
+      <th>f(x) = θ₀ + θ₁PA</th>
+      <td>2.96</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see that the linear model performs considerably better than the
+other models we’ve done.
+This is reflected in the residuals:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_residuals</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_74_0.png" src="../../_images/pa_modeling_74_0.png" />
+</div>
+</div>
+<p>Happily, the residuals of the linear model shows that it still performs
+relatively well even when PM2.5 is high.</p>
+<p>Under this model, <span class="math notranslate nohighlight">\( \hat \theta_1 = 0.52 \)</span> and <span class="math notranslate nohighlight">\( \hat \theta_0 = 1.54 \)</span>, so our
+fitted model predicts:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\hat \theta}(x) = 1.54 + 0.52 \text{PA}
+\end{aligned}
+\]</div>
+</div>
+</div>
+<div class="section" id="model-4-incorporating-relative-humidity">
+<h2><span class="section-number">12.4.6. </span>Model 4: Incorporating Relative Humidity<a class="headerlink" href="#model-4-incorporating-relative-humidity" title="Permalink to this headline">¶</a></h2>
+<p>The final model that Barkjohn selected was a linear model that also incorporated
+the relative humidity:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\theta}(x_i) = \theta_0 + \theta_1 \text{PA}_i + \theta_2 \text{RH}_i
+\end{aligned}
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\( \text{PA}_i \)</span> and <span class="math notranslate nohighlight">\( \text{RH}_i \)</span> refer to the PurpleAir PM2.5 and the
+relative humidity for row <span class="math notranslate nohighlight">\( x_i \)</span> of the data.
+This is an example of a multivariable linear regression model—it uses
+more than one variable to make predictions.</p>
+<p>As before, we’ll fit the calibration model first:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\text{predicted } \text{PA}_i = b + m_1 \cdot \text{AQS}_i + m_2 \cdot \text{RH}_i
+\end{aligned}
+\]</div>
+<p>Then, we invert the calibration model to find the prediction model:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\text{PA}_i &amp;= \hat b + \hat m_1 \cdot \text{AQS}_i + \hat m_2 \cdot \text{RH}_i \\
+\text{AQS}_i &amp;= - \frac{\hat b}{\hat m_1} + \frac{1}{\hat m_1} \text{PA}_i
+    - \frac{\hat m_2}{\hat m_1} \text{RH}_i
+\end{aligned}
+\end{split}\]</div>
+<p>Which gives <span class="math notranslate nohighlight">\( \hat \theta_0 = -\frac{\hat b}{\hat m_1} \)</span>,
+<span class="math notranslate nohighlight">\( \hat \theta_1 = \frac{1}{\hat m_1} \)</span>, and
+<span class="math notranslate nohighlight">\( \hat \theta_2 = - \frac{\hat m_2}{\hat m_1} \)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_4</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;f(x) = θ₀ + θ₁PA + θ₂RH&#39;&#39;&#39;</span>
+    <span class="c1"># Fit calibration model using sklearn</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]],</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">],</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span>
+    
+    <span class="c1"># Invert to find parameters</span>
+    <span class="n">theta_0</span> <span class="o">=</span> <span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">m1</span>
+    <span class="n">theta_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">m1</span>
+    <span class="n">theta_2</span> <span class="o">=</span> <span class="o">-</span> <span class="n">m2</span> <span class="o">/</span> <span class="n">m1</span>
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">theta_0</span> <span class="o">+</span> <span class="n">theta_1</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">theta_2</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;rh&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;rh&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">m2</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">m1</span>
+    <span class="k">return</span> <span class="n">predict</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_results</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_3</span><span class="p">,</span> <span class="n">model_4</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>rmse</th>
+    </tr>
+    <tr>
+      <th>model</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>f(x) = θ</th>
+      <td>5.45</td>
+    </tr>
+    <tr>
+      <th>f(x) = PA + θ</th>
+      <td>7.33</td>
+    </tr>
+    <tr>
+      <th>f(x) = θ₀ + θ₁PA</th>
+      <td>2.96</td>
+    </tr>
+    <tr>
+      <th>f(x) = θ₀ + θ₁PA + θ₂RH</th>
+      <td>2.58</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see that out of the four models, the model that incorporates PurpleAir and
+relative humidity performs the best.
+This is also reflected in its residual plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_residuals</span><span class="p">([</span><span class="n">model_3</span><span class="p">,</span> <span class="n">model_4</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_modeling_88_0.png" src="../../_images/pa_modeling_88_0.png" />
+</div>
+</div>
+<p>From the residual plot, we can see that Model 4’s residuals are generally
+closer to 0.
+Model 4’s residuals trend downward less than Model 3’s, indicating a better
+model fit.</p>
+<p>After fitting the model, we have:
+<span class="math notranslate nohighlight">\( \hat \theta_0 = 5.77 \)</span>, <span class="math notranslate nohighlight">\( \hat \theta_1 = 0.524 \)</span>, and
+<span class="math notranslate nohighlight">\( \hat \theta_2 = -0.0860 \)</span>
+so our fitted model predicts:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\hat \theta}(x) = 5.77 + 0.524 \cdot \text{PA} - 0.086 \cdot \text{RH}
+\end{aligned}
+\]</div>
+<p>And thus, we’ve achieved our goal:
+we have a model to correct PurpleAir PM2.5 measurements!
+From our analysis, this model achieves a test set error of 2.58 µg m⁻³,
+which is a useful improvement over our baseline models.
+If the model can maintain this error rate for real-world data,
+it should be practically useful—for instance, a “moderate” PM2.5 level
+corresponds to 12-35 µg m⁻³, while a “unhealthy for sensitive groups”
+PM2.5 level corresponds to 35-55 µg m⁻³ <span id="id2">[<a class="reference internal" href="../../references.html#id27">EPA, 2016</a>]</span>.
+Our residual plot shows that applying our correction to PurpleAir sensors
+makes most measurements within 5 µg m⁻³ away from the true PM2.5,
+so we can reasonably recommend using PurpleAir sensors to report air quality.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/12"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -2161,21 +3238,19 @@ so we can reasonably recommend using PurpleAir sensors to report air quality.</p
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

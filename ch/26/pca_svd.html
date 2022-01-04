@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1122,7 +1132,1058 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>PCA using the Singular Value Decomposition</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-singular-value-decomposition">
+   26.2.1. The Singular Value Decomposition
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#computing-the-svd-in-python">
+     26.2.1.1. Computing the SVD in Python
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#principal-directions">
+   26.2.2. Principal Directions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#principal-component-analysis">
+   26.2.3. Principal Component Analysis
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rank-k-approximation">
+   26.2.4. Rank-k Approximation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   26.2.5. Summary
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="pca-using-the-singular-value-decomposition">
+<h1><span class="section-number">26.2. </span>PCA using the Singular Value Decomposition<a class="headerlink" href="#pca-using-the-singular-value-decomposition" title="Permalink to this headline">¶</a></h1>
+<p>This section introduces the <strong>singular value decomposition (SVD)</strong>, a tool from linear algebra that computes the principal components of a matrix. We use SVD as a step in <strong>principal component analysis (PCA)</strong>.</p>
+<p>Why are linear algebra techniques useful for data analysis? Here’s one analogy. We use basic algebraic operators like addition and multiplication to summarize one-dimensional data. For example, we can compute the mean and standard deviation of the heights of Data 100 students, a one-dimensional dataset. Linear algebra provides us with matrix operators which generalize algebraic operations to multidimensional data. For instance, we can view matrix multiplication as a more general version of scalar multiplication. Linear algebra operators allow us to summarize and analyze multidimensional data.</p>
+<p>In data analysis, we often examine data tables using both the domain of interest and linear algebra techniques. For example, we can say that every row of this data table contains the votes of a single congressperson.</p>
+<div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>515</th>
+      <th>516</th>
+      <th>517</th>
+      <th>518</th>
+      <th>...</th>
+      <th>552</th>
+      <th>553</th>
+      <th>554</th>
+      <th>555</th>
+    </tr>
+    <tr>
+      <th>member</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>A000055</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>A000367</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>A000369</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Y000062</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Y000065</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z000017</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>441 rows × 41 columns</p>
+</div></div></div>
+</div>
+<p>This view allows us to answer questions like: “Were there any bills that were unanimously voted for?”.</p>
+<p>But we can also view this same table as a 441 x 41 matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf X = \begin{bmatrix}
+1 &amp; 0 &amp; \cdots &amp; 1 &amp; 0 \\
+0 &amp; 0 &amp; \cdots &amp; 0 &amp; 1 \\
+  &amp;   &amp; \vdots &amp;   &amp;   \\
+0 &amp; 0 &amp; \cdots &amp; 1 &amp; 0 \\
+1 &amp; 1 &amp; \cdots &amp; 1 &amp; 0 \\
+\end{bmatrix}
+\end{split}\]</div>
+<p>Viewing data as a matrix gives us access to the rich library of tools from linear algebra, including the SVD. This allows us to answer another set of questions, such as: “What patterns of voting emerge from all the votes?”</p>
+<div class="section" id="the-singular-value-decomposition">
+<h2><span class="section-number">26.2.1. </span>The Singular Value Decomposition<a class="headerlink" href="#the-singular-value-decomposition" title="Permalink to this headline">¶</a></h2>
+<p>The singular value decomposition expresses any <span class="math notranslate nohighlight">\( n \times d \)</span> matrix <span class="math notranslate nohighlight">\( \mathbf X \)</span> as a product of three matrices <span class="math notranslate nohighlight">\( \mathbf U \)</span>, <span class="math notranslate nohighlight">\( \mathbf \Sigma \)</span>, and <span class="math notranslate nohighlight">\( \mathbf V \)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\mathbf{X} &amp;= \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top}
+\end{aligned}
+\]</div>
+<p>There are restrictions on <span class="math notranslate nohighlight">\( \mathbf U \)</span>, <span class="math notranslate nohighlight">\( \mathbf \Sigma \)</span>, and <span class="math notranslate nohighlight">\( \mathbf V \)</span>:</p>
+<ol class="simple">
+<li><p><span class="math notranslate nohighlight">\( \mathbf U \)</span> has dimensions <span class="math notranslate nohighlight">\( n \times n \)</span>, <span class="math notranslate nohighlight">\( \mathbf \Sigma \)</span> has dimensions <span class="math notranslate nohighlight">\( n \times d \)</span>, and <span class="math notranslate nohighlight">\( \mathbf V \)</span> has dimensions <span class="math notranslate nohighlight">\( d \times d \)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\( \mathbf U \)</span> and <span class="math notranslate nohighlight">\( \mathbf V \)</span> are orthogonal matrices. That is, <span class="math notranslate nohighlight">\( \mathbf U^\top \mathbf U = \mathbf I \)</span> and <span class="math notranslate nohighlight">\( \mathbf V^\top \mathbf V = \mathbf I \)</span>. This also implies that all columns of <span class="math notranslate nohighlight">\( \mathbf{U} \)</span> and <span class="math notranslate nohighlight">\( \mathbf{V} \)</span> have magnitude 1 and are mutually orthogonal.</p></li>
+<li><p><span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> is a diagonal matrix. That is, all elements in <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> are 0 unless they lie on the diagonal. In addition, the diagonal elements in <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> are arranged from biggest to smallest.</p></li>
+</ol>
+<p>As a simple example, if we have:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbf{X} = \begin{bmatrix}
+1 &amp; 0 \\
+0 &amp; 4 \\
+0 &amp; 0 \\
+\end{bmatrix}
+\end{aligned}
+\end{split}\]</div>
+<p>The SVD of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbf{X}
+&amp;= \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \\
+&amp;= \begin{bmatrix}
+0 &amp; 1 &amp; 0 \\
+1 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+4 &amp; 0 \\
+0 &amp; 1 \\
+0 &amp; 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+0 &amp; 1 \\
+1 &amp; 0 \\
+\end{bmatrix}
+\end{aligned}
+\end{split}\]</div>
+<p>We can check that this decomposition reproduces <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">])</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">])</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">])</span>
+
+<span class="n">U</span> <span class="o">@</span> <span class="n">S</span> <span class="o">@</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1, 0],
+       [0, 4],
+       [0, 0]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can also check that the matrices <span class="math notranslate nohighlight">\( \mathbf U \)</span>, <span class="math notranslate nohighlight">\( \mathbf \Sigma \)</span>, and <span class="math notranslate nohighlight">\( \mathbf V \)</span> fulfill the requirements of the SVD.</p>
+<p>First: <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> has dimensions <span class="math notranslate nohighlight">\( 3 \times 2 \)</span>. <span class="math notranslate nohighlight">\( \mathbf U \)</span> has dimensions <span class="math notranslate nohighlight">\( 3 \times 3 \)</span>, <span class="math notranslate nohighlight">\( \mathbf \Sigma \)</span> has dimensions <span class="math notranslate nohighlight">\( 3 \times 2 \)</span>, and <span class="math notranslate nohighlight">\( \mathbf V \)</span> has dimensions <span class="math notranslate nohighlight">\( 2 \times 2 \)</span>.</p>
+<p>Second: <span class="math notranslate nohighlight">\( \mathbf U \)</span> and <span class="math notranslate nohighlight">\( \mathbf V \)</span> are orthogonal matrices:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span> <span class="o">@</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1, 0, 0],
+       [0, 1, 0],
+       [0, 0, 1]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">V</span> <span class="o">@</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1, 0],
+       [0, 1]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Third: <span class="math notranslate nohighlight">\( \mathbf \Sigma \)</span> is diagonal, and its diagonal elements are arranged from greatest to least.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[4, 0],
+       [0, 1],
+       [0, 0]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="computing-the-svd-in-python">
+<h3><span class="section-number">26.2.1.1. </span>Computing the SVD in Python<a class="headerlink" href="#computing-the-svd-in-python" title="Permalink to this headline">¶</a></h3>
+<p>To compute the SVD in Python, we use the <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code> function:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">svd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="p">])</span>
+<span class="n">svd</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(array([[0., 1., 0.],
+        [1., 0., 0.],
+        [0., 0., 1.]]),
+ array([4., 1.]),
+ array([[0., 1.],
+        [1., 0.]]))
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code> returns a tuple of three arrays corresponding to <span class="math notranslate nohighlight">\( \mathbf{U} \)</span>, <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span>, and <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>. Notice that the <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> value is one-dimensional numpy array rather than a diagonal matrix, which can cause problems recreating <span class="math notranslate nohighlight">\(\mathbf{X}\)</span> using the return values of <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code>. For convenience, we often use <code class="docutils literal notranslate"><span class="pre">full_matrices=False</span></code> in our call to <code class="docutils literal notranslate"><span class="pre">np.linalg.svd</span></code>, which reduces the dimensions of <span class="math notranslate nohighlight">\( \mathbf{U} \)</span> or <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> to match the dimensions of <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">svd</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(array([[0., 1.],
+        [1., 0.],
+        [0., 0.]]),
+ array([4., 1.]),
+ array([[0., 1.],
+        [1., 0.]]))
+</pre></div>
+</div>
+</div>
+</div>
+<p>This allows us to use <code class="docutils literal notranslate"><span class="pre">np.diag</span></code> to create the diagonal matrix <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span> and reproduce the original <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1., 0.],
+       [0., 4.],
+       [0., 0.]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>This takes advantage of the fact that an all-zero row in a matrix multiplication can be removed, in this case:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbf{X}
+&amp;= \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \\
+&amp;= \begin{bmatrix}
+0 &amp; 1 &amp; 0 \\
+1 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+4 &amp; 0 \\
+0 &amp; 1 \\
+0 &amp; 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+0 &amp; 1 \\
+1 &amp; 0 \\
+\end{bmatrix} \\
+&amp;=
+\begin{bmatrix}
+0 &amp; 1 \\
+1 &amp; 0 \\
+0 &amp; 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+4 &amp; 0 \\
+0 &amp; 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+0 &amp; 1 \\
+1 &amp; 0 \\
+\end{bmatrix}
+\end{aligned}
+\end{split}\]</div>
+<p>Note that we select this example for simplicity. As we will soon see, for real datasets the elements of <span class="math notranslate nohighlight">\( \mathbf{U} \)</span>, <span class="math notranslate nohighlight">\( \mathbf{\Sigma} \)</span>, and <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> are rarely integers.</p>
+</div>
+</div>
+<div class="section" id="principal-directions">
+<h2><span class="section-number">26.2.2. </span>Principal Directions<a class="headerlink" href="#principal-directions" title="Permalink to this headline">¶</a></h2>
+<p>SVD takes a data matrix <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> and produces the matrix factorization <span class="math notranslate nohighlight">\(\mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top}\)</span>. This factorization has useful properties that we use to perform dimensionality reduction.</p>
+<p>First, we examine <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>. The rows of <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> (or equivalently the columns of the untransposed <span class="math notranslate nohighlight">\( \mathbf{V} \)</span>) contain the <strong>principal directions</strong> for the matrix <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>. Consider the following dataset of country-level child mortality and fertility:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">child_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;child_data.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;country&#39;</span><span class="p">)</span>
+<span class="n">child_data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>6.82</td>
+      <td>4.48</td>
+    </tr>
+    <tr>
+      <th>Albania</th>
+      <td>1.33</td>
+      <td>1.71</td>
+    </tr>
+    <tr>
+      <th>Algeria</th>
+      <td>2.39</td>
+      <td>2.71</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Yemen</th>
+      <td>5.30</td>
+      <td>3.89</td>
+    </tr>
+    <tr>
+      <th>Zambia</th>
+      <td>6.16</td>
+      <td>4.93</td>
+    </tr>
+    <tr>
+      <th>Zimbabwe</th>
+      <td>5.68</td>
+      <td>3.68</td>
+    </tr>
+  </tbody>
+</table>
+<p>183 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>To examine the principal directions of this data matrix, we first <strong>center</strong> the data by subtracting the mean of each column.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cntr_child</span> <span class="o">=</span> <span class="n">child_data</span> <span class="o">-</span> <span class="n">child_data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cntr_child</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>3.79</td>
+      <td>1.70</td>
+    </tr>
+    <tr>
+      <th>Albania</th>
+      <td>-1.70</td>
+      <td>-1.07</td>
+    </tr>
+    <tr>
+      <th>Algeria</th>
+      <td>-0.64</td>
+      <td>-0.07</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Yemen</th>
+      <td>2.27</td>
+      <td>1.11</td>
+    </tr>
+    <tr>
+      <th>Zambia</th>
+      <td>3.13</td>
+      <td>2.15</td>
+    </tr>
+    <tr>
+      <th>Zimbabwe</th>
+      <td>2.65</td>
+      <td>0.90</td>
+    </tr>
+  </tbody>
+</table>
+<p>183 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Then, we compute the SVD and display the values in <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">cntr_child</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">Vt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-0.93, -0.37],
+       [-0.37,  0.93]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>We plot the rows of <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> as vectors on top of a scatter plot of the original data (we scaled the vectors for presentation). The first row of <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> is drawn in red, and the second in purple.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cntr_child</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;mortality&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;fertility&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span> <span class="o">*</span> <span class="n">Vt</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">3</span> <span class="o">*</span> <span class="n">Vt</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">Vt</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">Vt</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_svd_35_0.png" src="../../_images/pca_svd_35_0.png" />
+</div>
+</div>
+<p>Observe that the principal directions of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>, or the rows of <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>, seem to align themselves with the direction that the data vary. This is no coincidence: the principal directions of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> are precisely the orthogonal directions where <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> has the greatest variance.</p>
+<p>As another example, we plot the principal directions for a dataset of human abdomen and density measurements. Again, the first principal direction is drawn in red and the second in purple.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/pca_svd_38_0.png" src="../../_images/pca_svd_38_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="principal-component-analysis">
+<h2><span class="section-number">26.2.3. </span>Principal Component Analysis<a class="headerlink" href="#principal-component-analysis" title="Permalink to this headline">¶</a></h2>
+<p>We can use principal directions to sketch a procedure for dimensionality reduction. First, we find the principal directions of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> by centering <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>, then using the SVD. If <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> has 100 dimensions, this will produce 100 principal directions. Next, we decide how many dimensions we want to reduce to; a common choice is 2. To reduce to 2 dimensions, we keep the first two principal directions and throw out the other 98. Finally, we project the data onto the first two directions. This is <strong>principal component analysis (PCA)</strong>, a method for dimensionality reduction.</p>
+<p>To illustrate PCA, we will reduce the mortality/fertility dataset from two dimensions to one dimension. The data is loaded in the <code class="docutils literal notranslate"><span class="pre">child_data</span></code> DataFrame:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">child_data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>6.82</td>
+      <td>4.48</td>
+    </tr>
+    <tr>
+      <th>Albania</th>
+      <td>1.33</td>
+      <td>1.71</td>
+    </tr>
+    <tr>
+      <th>Algeria</th>
+      <td>2.39</td>
+      <td>2.71</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Yemen</th>
+      <td>5.30</td>
+      <td>3.89</td>
+    </tr>
+    <tr>
+      <th>Zambia</th>
+      <td>6.16</td>
+      <td>4.93</td>
+    </tr>
+    <tr>
+      <th>Zimbabwe</th>
+      <td>5.68</td>
+      <td>3.68</td>
+    </tr>
+  </tbody>
+</table>
+<p>183 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>As before, we center <code class="docutils literal notranslate"><span class="pre">child_data</span></code> by subtracting each column by its column mean.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cntr_child</span> <span class="o">=</span> <span class="n">child_data</span> <span class="o">-</span> <span class="n">child_data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cntr_child</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>3.79</td>
+      <td>1.70</td>
+    </tr>
+    <tr>
+      <th>Albania</th>
+      <td>-1.70</td>
+      <td>-1.07</td>
+    </tr>
+    <tr>
+      <th>Algeria</th>
+      <td>-0.64</td>
+      <td>-0.07</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Yemen</th>
+      <td>2.27</td>
+      <td>1.11</td>
+    </tr>
+    <tr>
+      <th>Zambia</th>
+      <td>3.13</td>
+      <td>2.15</td>
+    </tr>
+    <tr>
+      <th>Zimbabwe</th>
+      <td>2.65</td>
+      <td>0.90</td>
+    </tr>
+  </tbody>
+</table>
+<p>183 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Next, we find the SVD of this data:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">cntr_child</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(array([[-0.1 ,  0.02],
+        [ 0.05, -0.04],
+        [ 0.01,  0.02],
+        ...,
+        [-0.06,  0.02],
+        [-0.09,  0.1 ],
+        [-0.06, -0.02]]),
+ array([43.48,  8.2 ]),
+ array([[-0.93, -0.37],
+        [-0.37,  0.93]]))
+</pre></div>
+</div>
+</div>
+</div>
+<p>Recall that SVD computes <span class="math notranslate nohighlight">\(\mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top}\)</span>, and the matrix <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> contains the two principal directions of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>. To remove a direction, we simply drop the last row from <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Vt</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-0.93, -0.37]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we project the original data points <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> onto the single principal direction. Since the SVD enforces that principal directions in <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> have magnitude one, this a simply a matrix multiplication <span class="math notranslate nohighlight">\( \mathbf{X} \mathbf{V} \)</span>, after removing a direction from <span class="math notranslate nohighlight">\( \mathbf{V} \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">@</span> <span class="n">Vt</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-4.15],
+       [ 1.98],
+       [ 0.62],
+       ...,
+       [-2.52],
+       [-3.7 ],
+       [-2.79]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>We have successfully performed PCA to reduce <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> from 2 dimensions to 1. Dimensionality reduction attempts to summarize the data with fewer dimensions while preserving patterns in the data. One way to verify this is to check that points that appear together in the two-dimensional data (scatter plot) also appear together one-dimensional data (rug plot).</p>
+<p><img alt="pca_svd_one_vs_two.png" src="../../_images/pca_svd_one_vs_two.png" /></p>
+<p>In practice, we use a simpler method to compute the reduced dimension <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> which arises from the following equivalence:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbf{X} &amp;= \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \\
+\mathbf{X} \mathbf{V} &amp;= \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \mathbf{V} &amp; \text{Right-multiply by $ \mathbf{V} $} \\
+\mathbf{X} \mathbf{V} &amp;= \mathbf{U} \mathbf{\Sigma} &amp; \text{Since $ \mathbf{V^\top} \mathbf{V} = \mathbf{I} $} \\
+\end{aligned}
+\end{split}\]</div>
+<p>This means that instead of removing rows from <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span> and then computing <span class="math notranslate nohighlight">\( \mathbf{X} \mathbf{V} \)</span> , we can compute <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> and then remove columns until we achieve our desired dimensionality. For this reason, we call the columns of <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> the <strong>principal components</strong> of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>.</p>
+<p>To reduce <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> from 2 to 1 dimension, we can compute the principal components:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pcs</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+<span class="n">pcs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-4.15,  0.19],
+       [ 1.98, -0.36],
+       [ 0.62,  0.18],
+       ...,
+       [-2.52,  0.2 ],
+       [-3.7 ,  0.85],
+       [-2.79, -0.13]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then drop the rightmost column:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pcs</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-4.15],
+       [ 1.98],
+       [ 0.62],
+       ...,
+       [-2.52],
+       [-3.7 ],
+       [-2.79]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that this produces the same result as right multiplying <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> with a truncated <span class="math notranslate nohighlight">\( \mathbf{V} \)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">@</span> <span class="n">Vt</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[-4.15],
+       [ 1.98],
+       [ 0.62],
+       ...,
+       [-2.52],
+       [-3.7 ],
+       [-2.79]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this, we can describe the final procedure for PCA. To reduce an <span class="math notranslate nohighlight">\( n \times d \)</span> matrix <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> to <span class="math notranslate nohighlight">\( k \)</span> dimensions (where <span class="math notranslate nohighlight">\( k &lt; d \)</span>), we perform the following steps:</p>
+<ol class="simple">
+<li><p>Center <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> .</p></li>
+<li><p>Use the SVD to find <span class="math notranslate nohighlight">\( \mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \)</span> .</p></li>
+<li><p>Compute the principal components <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> .</p></li>
+<li><p>Keep the first <span class="math notranslate nohighlight">\( k \)</span> columns of <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> .</p></li>
+</ol>
+</div>
+<div class="section" id="rank-k-approximation">
+<h2><span class="section-number">26.2.4. </span>Rank-k Approximation<a class="headerlink" href="#rank-k-approximation" title="Permalink to this headline">¶</a></h2>
+<p>We can also use PCA to construct a <strong>rank-k approximation</strong> of <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>, which produces a rank <span class="math notranslate nohighlight">\( k \)</span> matrix with the same dimensions as <span class="math notranslate nohighlight">\( \mathbf{X} \)</span>. The rank-k appromixation projects the points in <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> onto the top <span class="math notranslate nohighlight">\( k \)</span> principal directions. The procedure is similar to that of PCA:</p>
+<ol class="simple">
+<li><p>Center <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> .</p></li>
+<li><p>Use the SVD to find <span class="math notranslate nohighlight">\( \mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \)</span> .</p></li>
+<li><p>Keep the first <span class="math notranslate nohighlight">\( k \)</span> columns of <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> , and the first <span class="math notranslate nohighlight">\( k \)</span> rows of <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\( \mathbf{X} \approx \mathbf{U} \mathbf{\Sigma} \mathbf{V^\top} \)</span> with the reduced <span class="math notranslate nohighlight">\( \mathbf{U} \mathbf{\Sigma} \)</span> and <span class="math notranslate nohighlight">\( \mathbf{V^\top} \)</span>.</p></li>
+</ol>
+<p>The function below provides an implementation:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_rank_k_approximation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">centered</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">centered</span><span class="p">,</span> <span class="n">full_matrices</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">approx</span> <span class="o">=</span> <span class="p">(</span><span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">))[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">@</span> <span class="n">Vt</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">approx</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>As an example, we will compute the rank-1 approximation of the mortality/fertility data:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rank_1</span> <span class="o">=</span> <span class="n">compute_rank_k_approximation</span><span class="p">(</span><span class="n">child_data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">rank_1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mortality</th>
+      <th>fertility</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.86</td>
+      <td>1.53</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-1.84</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.58</td>
+      <td>-0.23</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>180</th>
+      <td>2.34</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <th>181</th>
+      <td>3.44</td>
+      <td>1.36</td>
+    </tr>
+    <tr>
+      <th>182</th>
+      <td>2.60</td>
+      <td>1.03</td>
+    </tr>
+  </tbody>
+</table>
+<p>183 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>We plot the original data in blue and the rank-1 approximation in orange:</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fa88197fd90&gt;
+</pre></div>
+</div>
+<img alt="../../_images/pca_svd_65_1.png" src="../../_images/pca_svd_65_1.png" />
+</div>
+</div>
+<p>Observe that the rank-1 approximation projects each point in <span class="math notranslate nohighlight">\( \mathbf{X} \)</span> along the direction of the first principal direction.</p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">26.2.5. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>This section introduces the singular value decomposition and uses the SVD to perform principal components analysis for dimensionality reduction.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/26"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -2145,21 +3206,19 @@
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

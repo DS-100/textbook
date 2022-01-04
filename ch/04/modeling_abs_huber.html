@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1129,7 +1139,405 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Absolute and Huber Loss</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mean-absolute-error">
+   4.3.1. Mean Absolute Error
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#comparing-mse-and-mae">
+     4.3.1.1. Comparing MSE and MAE
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#outliers">
+   4.3.2. Outliers
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#minimizing-the-mae">
+   4.3.3. Minimizing the MAE
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mse-and-mae-comparison">
+   4.3.4. MSE and MAE Comparison
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-huber-loss">
+     4.3.4.1. The Huber Loss
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   4.3.5. Summary
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="absolute-and-huber-loss">
+<h1><span class="section-number">4.3. </span>Absolute and Huber Loss<a class="headerlink" href="#absolute-and-huber-loss" title="Permalink to this headline">¶</a></h1>
+<p>To fit a model, we select a loss function and select the model parameters that minimize the loss. In the previous section, we introduced the mean squared error (MSE) loss function:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
+\end{aligned}
+\end{split}\]</div>
+<p>We used a constant model that predicts the same number <span class="math notranslate nohighlight">\( \theta \)</span> for all entries in the dataset. When we fit this model using the MSE loss, we found that <span class="math notranslate nohighlight">\( \hat{\theta} = \text{mean} (\textbf{y}) \)</span>. On the tips dataset, we found that a fitted constant model will predict <span class="math notranslate nohighlight">\( 16.08\% \)</span> since <span class="math notranslate nohighlight">\( 16.08\% \)</span> is the mean of the tip percents.</p>
+<p>In this section, we introduce two new loss functions, the <strong>mean absolute error</strong> loss function and the <strong>Huber</strong> loss function.</p>
+<div class="section" id="mean-absolute-error">
+<h2><span class="section-number">4.3.1. </span>Mean Absolute Error<a class="headerlink" href="#mean-absolute-error" title="Permalink to this headline">¶</a></h2>
+<p>Now, we will keep our model the same but switch to a different loss function: the mean absolute error (MAE). Instead taking the squared difference for each point and our prediction, this loss function takes the absolute difference:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n} |y_i - \theta| \\
+\end{aligned}
+\end{split}\]</div>
+<div class="section" id="comparing-mse-and-mae">
+<h3><span class="section-number">4.3.1.1. </span>Comparing MSE and MAE<a class="headerlink" href="#comparing-mse-and-mae" title="Permalink to this headline">¶</a></h3>
+<p>To get a better sense of how the MSE and MAE compare, let’s compare their losses on different datasets. First, we’ll use our dataset of one point: <span class="math notranslate nohighlight">\( \textbf{y} = [14] \)</span>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">compare_mse_abs</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+                <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_7_0.png" src="../../_images/modeling_abs_huber_7_0.png" />
+</div>
+</div>
+<p>We see that the MSE is usually higher than the MAE since the error is squared. Let’s see what happens when have five points: <span class="math notranslate nohighlight">\( \textbf{y} = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] \)</span></p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">compare_mse_abs</span><span class="p">(</span><span class="n">thetas</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span>
+                <span class="n">y_vals</span><span class="o">=</span><span class="p">[</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">],</span>
+                <span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_9_0.png" src="../../_images/modeling_abs_huber_9_0.png" />
+</div>
+</div>
+<p>Remember that the actual loss values themselves are not very interesting to us; they are only useful for comparing different values of <span class="math notranslate nohighlight">\( \theta \)</span>. Once we choose a loss function, we will look for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>, the <span class="math notranslate nohighlight">\( \theta \)</span> that produces the least loss. Thus, we are interested in whether the loss functions produce different <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>.</p>
+<p>So far, the two loss functions seem to agree on <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>. If we look a bit closer, however, we will start to see some differences. We first take the losses and plot them against <span class="math notranslate nohighlight">\( \theta \)</span> for each of the six <span class="math notranslate nohighlight">\( \theta \)</span> values we tried.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">])</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
+<span class="n">mse_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+<span class="n">abs_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">abs_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">mse_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MSE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">abs_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MAE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $ \bf</span><span class="si">{y}</span><span class="s1">$$= [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_11_0.png" src="../../_images/modeling_abs_huber_11_0.png" />
+</div>
+</div>
+<p>Then, we compute more values of <span class="math notranslate nohighlight">\( \theta \)</span> so that the curve is smooth:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
+<span class="n">mse_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+<span class="n">abs_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">abs_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">mse_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MSE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">abs_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MAE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $ \bf</span><span class="si">{y}</span><span class="s1">$$ = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_13_0.png" src="../../_images/modeling_abs_huber_13_0.png" />
+</div>
+</div>
+<p>Then, we zoom into the region between 1.5 and 5 on the y-axis to see the difference in minima more clearly. We’ve marked the minima with dotted lines.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">17.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">12.8</span><span class="p">,</span> <span class="mf">14.9</span><span class="p">,</span> <span class="mf">16.3</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">])</span>
+<span class="n">mse_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+<span class="n">abs_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">abs_loss</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">mse_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MSE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">abs_losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MAE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_vals</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum MSE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y_vals</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum MAE&#39;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Loss vs. $ \theta $ when $ \bf</span><span class="si">{y}</span><span class="s1">$$ = [ 12.1, 12.8, 14.9, 16.3, 17.2 ] $&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $ Values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_15_0.png" src="../../_images/modeling_abs_huber_15_0.png" />
+</div>
+</div>
+<p>We’ve found empirically that the MSE and MAE can produce different <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> for the same dataset. A closer analysis reveals when they will differ and more importantly, why they differ.</p>
+</div>
+</div>
+<div class="section" id="outliers">
+<h2><span class="section-number">4.3.2. </span>Outliers<a class="headerlink" href="#outliers" title="Permalink to this headline">¶</a></h2>
+<p>One difference that we can see in the plots of loss vs. <span class="math notranslate nohighlight">\( \theta \)</span> above lies in the shape of the loss curves. Plotting the MSE results in a parabolic curve resulting from the squared term in the loss function.</p>
+<p>Plotting the MAE, on the other hand, results in what looks like a connected series of lines. This makes sense when we consider that the absolute value function is linear, so taking the average of many absolute value functions should produce a semi-linear function.</p>
+<p>Since the MSE has a squared error term, it will be more sensitive to outliers. If <span class="math notranslate nohighlight">\( \theta = 10 \)</span> and a point lies at 110, that point’s error term for MSE will be <span class="math notranslate nohighlight">\( (10 - 110)^2 = 10000 \)</span> whereas in the MAE, that point’s error term will be <span class="math notranslate nohighlight">\( |10 - 110| = 100 \)</span>. We can illustrate this by taking a set of three points <span class="math notranslate nohighlight">\( \textbf{y} = [ 12, 13, 14 ] \)</span> and plotting the loss vs. <span class="math notranslate nohighlight">\( \theta \)</span> curves for MSE and MAE.</p>
+<p>We’ve shown the curves for <span class="math notranslate nohighlight">\( y_3 = 14 \)</span> and <span class="math notranslate nohighlight">\( y_3 = 25 \)</span> below.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">compare_mse_abs_curves</span><span class="p">(</span><span class="n">y3</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_21_0.png" src="../../_images/modeling_abs_huber_21_0.png" />
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">compare_mse_abs_curves</span><span class="p">(</span><span class="n">y3</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_22_0.png" src="../../_images/modeling_abs_huber_22_0.png" />
+</div>
+</div>
+<p>As we move the point further away from the rest of the data, the MSE curve moves with it. When <span class="math notranslate nohighlight">\( y_3 = 14 \)</span>, both MSE and MAE have <span class="math notranslate nohighlight">\( \hat{\theta} = 13 \)</span>. However, when <span class="math notranslate nohighlight">\( y_3 = 25 \)</span>, the MSE loss produces <span class="math notranslate nohighlight">\( \hat{\theta} = 16.7 \)</span> while the MAE produces <span class="math notranslate nohighlight">\( \hat{\theta} = 13 \)</span>, unchanged from before.</p>
+</div>
+<div class="section" id="minimizing-the-mae">
+<h2><span class="section-number">4.3.3. </span>Minimizing the MAE<a class="headerlink" href="#minimizing-the-mae" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a qualitative sense of how the MSE and MAE differ, we can minimize the MAE to make this difference more precise. As before, we will take the derivative of the loss function with respect to <span class="math notranslate nohighlight">\( \theta \)</span> and set it equal to zero.</p>
+<p>This time, however, we have to deal with the fact that the absolute function is not always differentiable. When <span class="math notranslate nohighlight">\( x &gt; 0 \)</span>, <span class="math notranslate nohighlight">\( \frac{\partial}{\partial x} |x| = 1 \)</span>. When <span class="math notranslate nohighlight">\( x &lt; 0 \)</span>, <span class="math notranslate nohighlight">\( \frac{\partial}{\partial x} |x| = -1 \)</span>. Although <span class="math notranslate nohighlight">\( |x| \)</span> is not technicaly differentiable at <span class="math notranslate nohighlight">\( x = 0 \)</span>, we will set <span class="math notranslate nohighlight">\( \frac{\partial}{\partial x} |x| = 0 \)</span> so that the equations are easier to work with.</p>
+<p>Recall that the equation for the MAE is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y})
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}|y_i - \theta|\\
+&amp;= \frac{1}{n} \left( \sum_{y_i &lt; \theta}|y_i - \theta| + \sum_{y_i = \theta}|y_i - \theta| + \sum_{y_i &gt; \theta}|y_i - \theta| \right)\\
+\end{aligned}
+\end{split}\]</div>
+<p>In the line above, we’ve split up the summation into three separate summations: one that has one term for each <span class="math notranslate nohighlight">\( y_i &lt; \theta \)</span>, one for <span class="math notranslate nohighlight">\( y_i = \theta \)</span>, and one for <span class="math notranslate nohighlight">\( y_i &gt; \theta \)</span>. Why make the summation seemingly more complicated? If we know that <span class="math notranslate nohighlight">\( y_i &lt; \theta \)</span> we also know that <span class="math notranslate nohighlight">\( |y_i - \theta| &lt; 0 \)</span> and thus <span class="math notranslate nohighlight">\( \frac{\partial}{\partial \theta} |y_i - \theta| = -1 \)</span> from before. A similar logic holds for each term above to make taking the derivative much easier.</p>
+<p>Now, we take the derivative with respect to <span class="math notranslate nohighlight">\( \theta \)</span> and set it equal to zero:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{1}{n} \left( \sum_{y_i &lt; \theta}(-1) + \sum_{y_i = \theta}(0) + \sum_{y_i &gt; \theta}(1) \right) &amp;= 0 \\
+\sum_{y_i &lt; \theta}(-1) + \sum_{y_i &gt; \theta}(1) &amp;= 0 \\
+-\sum_{y_i &lt; \theta}(1) + \sum_{y_i &gt; \theta}(1) &amp;= 0 \\
+\sum_{y_i &lt; \theta}(1) &amp;= \sum_{y_i &gt; \theta}(1) \\
+\end{aligned}
+\end{split}\]</div>
+<p>What does the result above mean? On the left hand side, we have one term for each data point less than <span class="math notranslate nohighlight">\( \theta \)</span>. On the right, we have one for each data point greater than <span class="math notranslate nohighlight">\( \theta \)</span>. Then, in order to satisfy the equation we need to pick a value for <span class="math notranslate nohighlight">\( \theta \)</span> that has the same number of smaller and larger points. This is the definition for the <em>median</em> of a set of numbers. Thus, the minimizing value of <span class="math notranslate nohighlight">\( \theta \)</span> for the MAE is <span class="math notranslate nohighlight">\( \hat \theta = \text{median} (\textbf{y}) \)</span>.</p>
+<p>When we have an odd number of points, the median is simply the middle point when the points are arranged in sorted order. We can see that in the example below with five points, the loss is minimized when <span class="math notranslate nohighlight">\( \theta \)</span> lies at the median:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">points_and_loss</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">loss_fn</span><span class="o">=</span><span class="n">abs_loss</span><span class="p">):</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">abs_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">]</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">rugplot</span><span class="p">(</span><span class="n">y_vals</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">*</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Points&#39;</span><span class="p">)</span>
+    
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">abs_losses</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">*</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$ \theta $&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">)</span>
+<span class="n">points_and_loss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]),</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_26_0.png" src="../../_images/modeling_abs_huber_26_0.png" />
+</div>
+</div>
+<p>However, when we have an even number of points, the loss is minimized when <span class="math notranslate nohighlight">\( \theta \)</span> is any value in between the two central points.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">points_and_loss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]),</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_28_0.png" src="../../_images/modeling_abs_huber_28_0.png" />
+</div>
+</div>
+<p>This is not the case when we use the MSE:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">points_and_loss</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]),</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">mse_loss</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_30_0.png" src="../../_images/modeling_abs_huber_30_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="mse-and-mae-comparison">
+<h2><span class="section-number">4.3.4. </span>MSE and MAE Comparison<a class="headerlink" href="#mse-and-mae-comparison" title="Permalink to this headline">¶</a></h2>
+<p>Our investigation and the derivation above show that the MSE is easier to differentiate but is more sensitive to outliers than the MAE. For the MSE, <span class="math notranslate nohighlight">\( \hat{\theta} = \text{mean}(\textbf{y}) \)</span>, while for the MAE <span class="math notranslate nohighlight">\( \hat{\theta} = \text{median}(\textbf{y}) \)</span>. Notice that the median is less affected by outliers than the mean. This phenomenon arises from our construction of the two loss functions.</p>
+<p>We have also seen that the MSE has a unique <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>, whereas the mean absolute value can multiple possible <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> values when there are an even number of data points.</p>
+<div class="section" id="the-huber-loss">
+<h3><span class="section-number">4.3.4.1. </span>The Huber Loss<a class="headerlink" href="#the-huber-loss" title="Permalink to this headline">¶</a></h3>
+<p>A third loss function called the Huber loss combines both the MSE and MAE to create a loss function that is differentiable <em>and</em> robust to outliers. The Huber loss accomplishes this by behaving like the MSE function for <span class="math notranslate nohighlight">\(\theta\)</span> values close to the minimum and switching to the absolute loss for <span class="math notranslate nohighlight">\(\theta\)</span> values far from the minimum.</p>
+<p>As usual, we create a loss function by taking the mean of the Huber losses for each point in our dataset.</p>
+<p>Let’s see what the Huber loss function outputs for a dataset of <span class="math notranslate nohighlight">\( \textbf{y} = [14] \)</span> as we vary <span class="math notranslate nohighlight">\( \theta \)</span>:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">huber_loss</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">y_obs</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">est</span> <span class="o">-</span> <span class="n">y_obs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">,</span> 
+                    <span class="p">(</span><span class="n">est</span> <span class="o">-</span> <span class="n">y_obs</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+                    <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">huber_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">14</span><span class="p">]),</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Huber Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">14</span><span class="p">]),</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="n">colors</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observation&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Choice for $\theta$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;huber_loss.pdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_33_0.png" src="../../_images/modeling_abs_huber_33_0.png" />
+</div>
+</div>
+<p>We can see that the Huber loss is smooth, unlike the MAE. The Huber loss also increases at a linear rate, unlike the quadratic rate of the mean squared loss.</p>
+<p>The Huber loss does have a drawback, however. Notice that it transitions from the MSE to the MAE once <span class="math notranslate nohighlight">\( \theta \)</span> gets far enough from the point. We can tweak this “far enough” to get different loss curves. For example, we can make it transition once <span class="math notranslate nohighlight">\( \theta \)</span> is just one unit away from the observation:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">huber_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">14</span><span class="p">]),</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Huber Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">14</span><span class="p">]),</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="n">colors</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observation&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Choice for $\theta$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;huber_loss.pdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_35_0.png" src="../../_images/modeling_abs_huber_35_0.png" />
+</div>
+</div>
+<p>Or we can make it transition when <span class="math notranslate nohighlight">\( \theta \)</span> is ten units away from the observation:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">huber_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">14</span><span class="p">]),</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Huber Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">14</span><span class="p">]),</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="n">colors</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observation&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Choice for $\theta$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;huber_loss.pdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/modeling_abs_huber_37_0.png" src="../../_images/modeling_abs_huber_37_0.png" />
+</div>
+</div>
+<p>This choice results in a different loss curve and can thus result in different values of <span class="math notranslate nohighlight">\( \hat \theta \)</span>. If we want to use the Huber loss function, we have the additional task of setting this transition point to a suitable value.</p>
+<p>The Huber loss function is defined mathematically as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L_\alpha(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
+    \frac{1}{2}(y_i - \theta)^2 &amp;  | y_i - \theta | \le \alpha \\
+    \alpha ( |y_i - \theta| - \frac{1}{2}\alpha ) &amp; \text{otherwise}
+\end{cases}
+\end{split}\]</div>
+<p>It is more complex than the previous loss functions because it combines both MSE and MAE. The additional parameter <span class="math notranslate nohighlight">\( \alpha \)</span> sets the point where the Huber loss transitions from the MSE to the absolute loss.</p>
+<p>Attempting to take the derivative of the Huber loss function is tedious and does not result in an elegant result like the MSE and MAE. Instead, we can use a computational method called gradient descent to find minimizing value of <span class="math notranslate nohighlight">\( \theta \)</span>, which we’ll introduce later in the book.</p>
+</div>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">4.3.5. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we introduce two loss functions: the mean absolute error and the Huber loss functions. We show for a constant model fitted using the MAE, <span class="math notranslate nohighlight">\( \hat{\theta} = \text{median}(\textbf{y}) \)</span>.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/04"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1492,21 +1900,19 @@ L_\alpha(\theta, \textbf{y}) = \frac{1}{n} \sum_{i=1}^n \begin{cases}
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

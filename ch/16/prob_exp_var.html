@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1129,7 +1139,423 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Expectation and Variance</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#expectation">
+   16.2.1. Expectation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#linearity-of-expectation">
+     16.2.1.1. Linearity of Expectation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#variance">
+   16.2.2. Variance
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#covariance">
+     16.2.2.1. Covariance
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bernoulli-random-variables">
+   16.2.3. Bernoulli Random Variables
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sample-means">
+   16.2.4. Sample Means
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   16.2.5. Summary
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="expectation-and-variance">
+<h1><span class="section-number">16.2. </span>Expectation and Variance<a class="headerlink" href="#expectation-and-variance" title="Permalink to this headline">¶</a></h1>
+<p>Although a random variable is completely described by its probability mass function (PMF), we often use <strong>expectation</strong> and <strong>variance</strong> to describe the variable’s long-run average and spread. These two values have unique mathematical properties that hold particular importance for data science—for example, we can show that an estimation is accurate in the long term by showing that its expected value is equal to the population parameter. We proceed by defining expectation and variance, introducing their most useful mathematical properties, and conclude with a brief application to estimation.</p>
+<div class="section" id="expectation">
+<h2><span class="section-number">16.2.1. </span>Expectation<a class="headerlink" href="#expectation" title="Permalink to this headline">¶</a></h2>
+<p>We are often interested in the long-run average of a random variable because it gives us a sense of the center of the variable’s distribution. We call this long-run average the <strong>expected value</strong>, or the <strong>expectation</strong> of a random variable. The expected value of a random variable <span class="math notranslate nohighlight">\( X \)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E}[X] = \sum_{x\in \mathbb{X}} x \cdot P(X = x)\]</div>
+<p>For example, if <span class="math notranslate nohighlight">\( X \)</span> represents the roll of a single fair six-sided die,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[X]
+&amp;= 1 \cdot P(X = 1) + 2 \cdot P(X = 2) + \ldots + 6 \cdot P(X = 6) \\
+&amp;= 1 \cdot \frac{1}{6} + 2 \cdot \frac{1}{6} + \ldots + 6 \cdot \frac{1}{6} \\
+&amp;= 3.5
+\end{aligned}
+\end{split}\]</div>
+<p>Notice that the expected value of <span class="math notranslate nohighlight">\( X \)</span> does not have to be a possible value of <span class="math notranslate nohighlight">\( X \)</span>. Although <span class="math notranslate nohighlight">\( \mathbb{E}[X] = 3.5 \)</span>, <span class="math notranslate nohighlight">\( X \)</span> cannot actually take on the value <span class="math notranslate nohighlight">\( 3.5 \)</span>.</p>
+<p><strong>Example:</strong> Recall our dataset from the previous section:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:[</span><span class="s2">&quot;Carol&quot;</span><span class="p">,</span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span><span class="s2">&quot;John&quot;</span><span class="p">,</span><span class="s2">&quot;Dave&quot;</span><span class="p">],</span> <span class="s1">&#39;Age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">52</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">50</span><span class="p">]}</span>
+<span class="n">people</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">people</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Carol</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Bob</td>
+      <td>52</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>John</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Dave</td>
+      <td>50</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We pick one person from this dataset uniformly at random. Let <span class="math notranslate nohighlight">\( Y \)</span> be a random variable representing the age of this person. Then:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[Y]
+&amp;= 50 \cdot P(Y = 50) + 51 \cdot P(Y = 51) + 52 \cdot P(Y = 52) \\
+&amp;= 50 \cdot \frac{2}{4} + 51 \cdot \frac{1}{4} + 52 \cdot \frac{1}{4} \\
+&amp;= 50.75
+\end{aligned}
+\end{split}\]</div>
+<p><strong>Example:</strong> Suppose we sample two people from the dataset with replacement. If the random variable <span class="math notranslate nohighlight">\( Z \)</span> represents the difference between the ages of the first and second persons in the sample, what is  <span class="math notranslate nohighlight">\( \mathbb{E}[Z] \)</span>?</p>
+<p>As in the previous section, we define <span class="math notranslate nohighlight">\(X\)</span> as the age of the first person and <span class="math notranslate nohighlight">\(Y\)</span> as the age of the second such that <span class="math notranslate nohighlight">\(Z = X - Y\)</span>. From the joint distribution of <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> given in the previous section, we can find the PMF for <span class="math notranslate nohighlight">\( Z \)</span>. For example, <span class="math notranslate nohighlight">\( P(Z = 1) = P(X = 51, Y = 50) + P(X = 52, Y = 51) = \frac{3}{16} \)</span>. Thus,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[Z]
+&amp;= (-2) \cdot P(Z = -2) + (-1) \cdot P(Z = -1) + \ldots + (2) \cdot P(Z = 2) \\
+&amp;= (-2) \cdot \frac{2}{16} + (-1) \cdot \frac{3}{16}+ \ldots + (2) \cdot \frac{2}{16} \\
+&amp;= 0
+\end{aligned}
+\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\( \mathbb{E}[Z] = 0 \)</span>, we expect that in the long run the difference between the ages of the people in a sample of size 2 will be 0.</p>
+<div class="section" id="linearity-of-expectation">
+<h3><span class="section-number">16.2.1.1. </span>Linearity of Expectation<a class="headerlink" href="#linearity-of-expectation" title="Permalink to this headline">¶</a></h3>
+<p>When working with linear combinations of random variables as we did above, we can often make good use of the <strong>linearity of expectation</strong> instead of tediously calculating each joint probability individually.</p>
+<p>The linearity of expectation states that:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[X + Y] &amp;= \mathbb{E}[X] + \mathbb{E}[Y] \\
+\end{aligned}
+\end{split}\]</div>
+<p>From this statement we may also derive:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[cX] &amp;= c\mathbb{E}[X] \\
+\end{aligned}
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are random variables, and <span class="math notranslate nohighlight">\(c\)</span> is a constant.</p>
+<p>In words, the expectation of a sum of any two random variables is equal to the sum of the expectations of the variables.</p>
+<p>In the previous example, we saw that <span class="math notranslate nohighlight">\( Z = X - Y \)</span>. Thus,  <span class="math notranslate nohighlight">\( \mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y] \)</span>.</p>
+<p>Now we can calculate <span class="math notranslate nohighlight">\( \mathbb{E}[X] \)</span> and  <span class="math notranslate nohighlight">\( \mathbb{E}[Y] \)</span> separately from each other. Since <span class="math notranslate nohighlight">\( \mathbb{E}[X] = \mathbb{E}[Y] = 50.75 \)</span>, <span class="math notranslate nohighlight">\( \mathbb{E}[Z] = 50.75 - 50.75 = 0 \)</span>.</p>
+<p>The linearity of expectation holds even if <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( Y \)</span> are dependent on each other! As an example, let us again consider the case in which we sample two people from our small dataset in the previous section without replacement. As before, we define <span class="math notranslate nohighlight">\(X\)</span> as the age of the first person and <span class="math notranslate nohighlight">\(Y\)</span> as the age of the second, and <span class="math notranslate nohighlight">\(Z = X - Y\)</span>. Clearly, <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are not independent—knowing <span class="math notranslate nohighlight">\( X = 52 \)</span>, for example, means that <span class="math notranslate nohighlight">\( Y \neq 52 \)</span>.</p>
+<p>From the joint distribution of <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> given in the previous section, we can find <span class="math notranslate nohighlight">\(\mathbb{E}[Z]\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[Z]
+&amp;= (-2) \cdot P(Z = -2) + (-1) \cdot P(Z = -1) + \ldots + (2) \cdot P(Z = 2) \\
+&amp;= (-2) \cdot \frac{2}{12} + (-1) \cdot \frac{3}{12}+ \ldots + (2) \cdot \frac{2}{12} \\
+&amp;= 0
+\end{aligned}
+\end{split}\]</div>
+<p>A simpler way to compute this expectation is to use the linearity of expectation. Even though <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> dependent, <span class="math notranslate nohighlight">\(\mathbb{E}[Z] = \mathbb{E}[X - Y] = \mathbb{E}[X] - \mathbb{E}[Y]\)</span>. Recall from the previous section that <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> have the same PMF even though we are sampling without replacement, which means that <span class="math notranslate nohighlight">\(\mathbb{E}[X] = \mathbb{E}[Y] = 50.75\)</span>. Hence as in the first scenario, <span class="math notranslate nohighlight">\(\mathbb{E}[Z] = 0\)</span>.</p>
+<p>Note that the linearity of expectation only holds for linear combinations of random variables. For example, <span class="math notranslate nohighlight">\( \mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y] \)</span> is not a linear combination of <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( Y \)</span>. In this case, <span class="math notranslate nohighlight">\( \mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y] \)</span> is true in general only for independent random variables.</p>
+</div>
+</div>
+<div class="section" id="variance">
+<h2><span class="section-number">16.2.2. </span>Variance<a class="headerlink" href="#variance" title="Permalink to this headline">¶</a></h2>
+<p>The variance of a random variable is a numerical description of the variable’s spread. For a random variable <span class="math notranslate nohighlight">\( X \)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Var(X) &amp;= \mathbb{E}[(X - \mathbb{E}[X])^2] \\
+\end{aligned}
+\end{split}\]</div>
+<p>The above formula states that the variance of <span class="math notranslate nohighlight">\( X \)</span> is the average squared distance from <span class="math notranslate nohighlight">\( X \)</span>‘s expected value.</p>
+<p>With some algebraic manipulation that we omit for brevity, we may also equivalently write:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Var(X) &amp;= \mathbb{E}[X^2] - \mathbb{E}[X]^2 \\
+\end{aligned}
+\end{split}\]</div>
+<p>Consider the following two random variables <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( Y \)</span> with the following probability distributions:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_pmf</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">rv_name</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="n">val_name</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">prob_denom</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">mec</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;$</span><span class="si">{</span><span class="n">val_name</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;$P(</span><span class="si">{</span><span class="n">rv_name</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">val_name</span><span class="si">}</span><span class="s1">)$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">prob_denom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+               <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">]</span>
+               <span class="o">+</span> <span class="p">[</span><span class="sa">rf</span><span class="s1">&#39;$\frac</span><span class="se">{{</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="se">}}{{</span><span class="si">{</span><span class="n">prob_denom</span><span class="si">}</span><span class="se">}}</span><span class="s1">$&#39;</span>
+                  <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">prob_denom</span><span class="p">)]</span>
+               <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;PMF of $</span><span class="si">{</span><span class="n">rv_name</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_pmf</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plot_pmf</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span> <span class="n">rv_name</span><span class="o">=</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="n">val_name</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/prob_exp_var_13_0.png" src="../../_images/prob_exp_var_13_0.png" />
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\( X \)</span> takes on values -1 and 1 with probability <span class="math notranslate nohighlight">\( \frac{1}{2} \)</span> each. <span class="math notranslate nohighlight">\( Y \)</span> takes on values -2, -1, 1, and 2 with probability <span class="math notranslate nohighlight">\( \frac{1}{4} \)</span> each. We find that <span class="math notranslate nohighlight">\( \mathbb{E}[X] = \mathbb{E}[Y] = 0 \)</span>. Since <span class="math notranslate nohighlight">\( Y \)</span>‘s distribution has a higher spread than <span class="math notranslate nohighlight">\( X \)</span>‘s, we expect that <span class="math notranslate nohighlight">\( Var(Y) \)</span> is larger than <span class="math notranslate nohighlight">\( Var(X) \)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Var(X)
+&amp;= \mathbb{E}[X^2] - \mathbb{E}[X]^2 \\
+&amp;= \mathbb{E}[X^2] - 0^2 \\
+&amp;= \mathbb{E}[X^2] \\
+&amp;= (-1)^2 P(X = -1) + (1)^2 P(X = 1) \\
+&amp;= 1 \cdot 0.5 + 1 \cdot 0.5 \\
+&amp;= 1 \\\\
+Var(Y)
+&amp;= \mathbb{E}[Y^2] - \mathbb{E}[Y]^2 \\
+&amp;= \mathbb{E}[Y^2] - 0^2 \\
+&amp;= \mathbb{E}[Y^2] \\
+&amp;= (-2)^2 P(Y = -2) + (-1)^2 P(Y = -1) + (1)^2 P(Y = 1) + (2)^2 P(Y = 2) \\
+&amp;= 4 \cdot 0.25 + 1 \cdot 0.25 + 1 \cdot 0.25 + 4 \cdot 0.25\\
+&amp;= 2.5
+\end{aligned}
+\end{split}\]</div>
+<p>As expected, the variance of <span class="math notranslate nohighlight">\( Y \)</span> is greater than the variance of <span class="math notranslate nohighlight">\( X \)</span>.</p>
+<p>The variance has a useful property to simplify some calculations. If <span class="math notranslate nohighlight">\( X \)</span> is a random variable:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+Var(aX + b) &amp;= a^2 Var(X)
+\end{aligned}
+\]</div>
+<p>If two random variables <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( Y \)</span> are independent:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+Var(X + Y) = Var(X) + Var(Y)
+\end{aligned}
+\]</div>
+<p>Note that the linearity of expectation holds for any <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( Y \)</span> even if they are dependent. However, <span class="math notranslate nohighlight">\( Var(X + Y) = Var(X) + Var(Y) \)</span> holds only when <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( Y \)</span> are <strong>independent</strong>.</p>
+<div class="section" id="covariance">
+<h3><span class="section-number">16.2.2.1. </span>Covariance<a class="headerlink" href="#covariance" title="Permalink to this headline">¶</a></h3>
+<p>The covariance of two random variables <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> is defined as:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+Cov(X, Y) &amp;= \mathbb{E}[(X - \mathbb{E}[X])(Y - \mathbb{E}[Y])]
+\end{aligned}
+\]</div>
+<p>Again, we can perform some algebraic manipulation to obtain:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+Cov(X, Y) = \mathbb{E}[XY] - \mathbb{E}[X]\mathbb{E}[Y]
+\end{aligned}
+\]</div>
+<p>Note that although the variance of a single random variable must be non-negative, the covariance of two random variables can be negative. In fact, the covariance helps measure the correlation between two random variables; the sign of the covariance helps us determine whether two random variables are positively or negatively correlated. If two random variables <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are independent, then <span class="math notranslate nohighlight">\(Cov(X, Y) = 0\)</span>, and <span class="math notranslate nohighlight">\(\mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y]\)</span>.</p>
+</div>
+</div>
+<div class="section" id="bernoulli-random-variables">
+<h2><span class="section-number">16.2.3. </span>Bernoulli Random Variables<a class="headerlink" href="#bernoulli-random-variables" title="Permalink to this headline">¶</a></h2>
+<p>Suppose we want to use a random variable <span class="math notranslate nohighlight">\(X\)</span> to a simulate a biased coin with <span class="math notranslate nohighlight">\(P(Heads) = p\)</span>. We can say that <span class="math notranslate nohighlight">\(X = 1\)</span> if the coin flip is heads, and <span class="math notranslate nohighlight">\(X = 0\)</span> if the coin flip is tails. Therefore, <span class="math notranslate nohighlight">\(P(X = 1) = p\)</span>, and <span class="math notranslate nohighlight">\(P(X = 0) = 1 - p\)</span>. This type of binary random variable is called a Bernoulli random variable; we can calculate its expected value and variance as follows:</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E}[X] = 1 \times p + 0 \times (1 - p) = p\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Var(X) &amp;= \mathbb{E}[X^2] - \mathbb{E}[X]^2 \\
+&amp;= 1^2 \times p + 0^2 \times (1 - p) - p^2 \\
+&amp;= p - p^2 \\
+&amp;= p(1 - p)
+\end{aligned}
+\end{split}\]</div>
+</div>
+<div class="section" id="sample-means">
+<h2><span class="section-number">16.2.4. </span>Sample Means<a class="headerlink" href="#sample-means" title="Permalink to this headline">¶</a></h2>
+<p>Suppose we possess a biased coin with <span class="math notranslate nohighlight">\(P(Heads) = p\)</span> and we would like to estimate <span class="math notranslate nohighlight">\( p \)</span>. We can flip the coin <span class="math notranslate nohighlight">\( n \)</span> times to collect a sample of flips and calculate the proportion of heads in our sample, <span class="math notranslate nohighlight">\( \hat p \)</span>. If we know that <span class="math notranslate nohighlight">\( \hat p \)</span> is often close to <span class="math notranslate nohighlight">\( p \)</span>, we can use <span class="math notranslate nohighlight">\( \hat p \)</span> as an <strong>estimator</strong> for <span class="math notranslate nohighlight">\( p \)</span>.</p>
+<p>Notice that <span class="math notranslate nohighlight">\( p \)</span> is <em>not</em> a random quantity; it is a fixed value based on the bias of the coin. <span class="math notranslate nohighlight">\( \hat p \)</span>, however, is a random quantity since it is generated from the random outcomes of flipping the coin. Thus, we can compute the expectation and variance of <span class="math notranslate nohighlight">\( \hat p \)</span> to precisely understand how well it estimates <span class="math notranslate nohighlight">\( p \)</span>.</p>
+<p>To compute <span class="math notranslate nohighlight">\( \mathbb{E}[\hat p] \)</span>, we will first define random variables for each flip in the sample. Let <span class="math notranslate nohighlight">\(X_i\)</span> be a Bernoulli random variable for the <span class="math notranslate nohighlight">\(i^{th}\)</span> coin flip. Then, we know that:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\hat p = \frac{X_1 + X_2 + \ldots + X_n}{n}
+\end{aligned}
+\]</div>
+<p>To calculate the expectation of <span class="math notranslate nohighlight">\( \hat p \)</span>, we can plug in the formula above and use the fact that <span class="math notranslate nohighlight">\( \mathbb{E}[X_i] = p \)</span> since <span class="math notranslate nohighlight">\( X_i \)</span> is a Bernoulli random variable.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[\hat p] 
+&amp;= \mathbb{E} \left[ \frac{X_1 + X_2 + \ldots + X_n}{n} \right] \\
+&amp;= \frac{1}{n} \mathbb{E}[X_1 + \ldots + X_n] \\
+&amp;= \frac{1}{n} \left( \mathbb{E}[X_1] +  \ldots + \mathbb{E}[X_n] \right) \\
+&amp;= \frac{1}{n} (p + \ldots + p) \\
+&amp;= \frac{1}{n} (np) \\
+\mathbb{E}[\hat p] &amp;= p
+\end{aligned}
+\end{split}\]</div>
+<p>We find that <span class="math notranslate nohighlight">\( \mathbb{E}[\hat p] = p \)</span>. In other words, with enough flips we expect our estimator <span class="math notranslate nohighlight">\( \hat p \)</span> to converge to the true coin bias <span class="math notranslate nohighlight">\( p \)</span>. We say that <span class="math notranslate nohighlight">\( \hat p \)</span> is an <strong>unbiased estimator</strong> of <span class="math notranslate nohighlight">\( p \)</span>.</p>
+<p>Next, we calculate the variance of <span class="math notranslate nohighlight">\( \hat p \)</span>. Since each flip is independent from the others, we know that <span class="math notranslate nohighlight">\( X_i \)</span> are independent. This allows us to use the linearity of variance.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Var(\hat p) &amp;= Var \left(\frac{1}{n} \sum_{i=1}^{n} X_i \right) \\
+&amp;= \frac{1}{n^2} \sum_{i=1}^{n}Var(X_i) \\
+&amp;= \frac{1}{n^2} \times np(1-p) \\
+Var(\hat p) &amp;= \frac{p(1-p)}{n}
+\end{aligned}
+\end{split}\]</div>
+<p>From the equivalence above, we see that the variance of our estimator decreases as we increase <span class="math notranslate nohighlight">\( n \)</span>, the number of flips in our sample. In other words, if we collect lots of data we can be more certain about our estimator’s value. This behavior is known as the law of large numbers.</p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">16.2.5. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>We use expectation and variance to provide simple descriptions of a random variable’s center and spread. These mathematical tools allow us to determine how well an quantity calculated from a sample estimates a quantity in the population.</p>
+<p>Minimizing a loss function creates a model that is accurate on its training data. Expectation and variance allow us to make general statements about the model’s accuracy on unseen data from the population.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/16"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1510,21 +1936,19 @@ Var(\hat p) &amp;= \frac{p(1-p)}{n}
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

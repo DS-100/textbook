@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1110,7 +1120,153 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Approximating the Empirical Probability Distribution</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#defining-average-kl-divergence">
+   24.5.1. Defining Average KL Divergence
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#deriving-cross-entropy-loss-from-kl-divergence">
+   24.5.2. Deriving Cross-Entropy Loss from KL Divergence
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#statistical-justification-for-cross-entropy-loss">
+   24.5.3. Statistical justification for Cross-Entropy Loss
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   24.5.4. Summary
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="approximating-the-empirical-probability-distribution">
+<h1><span class="section-number">24.5. </span>Approximating the Empirical Probability Distribution<a class="headerlink" href="#approximating-the-empirical-probability-distribution" title="Permalink to this headline">¶</a></h1>
+<p>In this section, we introduce <strong>KL divergence</strong> and demonstrate how minimizing average KL divergence in binary classification is equivalent to minimizing average cross-entropy loss.</p>
+<p>Since logistic regression outputs probabilities, a logistic model produces a certain type of probability distribution. Specifically, based on optimal parameters <span class="math notranslate nohighlight">\( \hat{\boldsymbol{\theta}} \)</span>, it estimates the probability that the label <span class="math notranslate nohighlight">\( y \)</span> is <span class="math notranslate nohighlight">\( 1 \)</span> for an example input <span class="math notranslate nohighlight">\( \textbf{x} \)</span>.</p>
+<p>For example, suppose that <span class="math notranslate nohighlight">\( x \)</span> is a scalar recording the forecasted chance of rain for the day and <span class="math notranslate nohighlight">\( y = 1 \)</span> means that Mr. Doe takes his umbrella with him to work. A logistic model with scalar parameter <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> predicts the probability that Mr. Doe takes his umbrella given a forecasted chance of rain: <span class="math notranslate nohighlight">\( \hat{P_\theta}(y = 1 | x) \)</span>.</p>
+<p>Collecting data on Mr. Doe’s umbrella usage provides us with a method of constructing an empirical probability distribution <span class="math notranslate nohighlight">\( P(y = 1 | x) \)</span>. For example, if there were five days where the chance of rain <span class="math notranslate nohighlight">\( x = 0.60 \)</span> and Mr. Doe only took his umbrella to work once, <span class="math notranslate nohighlight">\( P(y = 1 | x = 0.60) = 0.20 \)</span>. We can compute a similar probability distribution for each value of <span class="math notranslate nohighlight">\( x \)</span> that appears in our data. Naturally, after fitting a logistic model we would like the distribution predicted by the model to be as close as possible to the empirical distribution from the dataset. That is, for all values of <span class="math notranslate nohighlight">\( x \)</span> that appear in our data, we want:</p>
+<div class="math notranslate nohighlight">
+\[ \hat{P_\theta}(y = 1 | x) \approx P(y = 1 | x) \]</div>
+<p>One commonly used metric to determine the “closeness” of two probability distributions is the Kullback–Leibler divergence, or KL divergence, which has its roots in information theory.</p>
+<div class="section" id="defining-average-kl-divergence">
+<h2><span class="section-number">24.5.1. </span>Defining Average KL Divergence<a class="headerlink" href="#defining-average-kl-divergence" title="Permalink to this headline">¶</a></h2>
+<p>KL divergence quantifies the difference between the probability distribution <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span> computed by our logistic model with parameters <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span> and the actual distribution <span class="math notranslate nohighlight">\( P \)</span> based on the dataset. Intuitively, it calculates how imprecisely the logistic model estimates the distribution of labels in data.</p>
+<p>The KL divergence for binary classification between two distributions <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span> for a single data point <span class="math notranslate nohighlight">\((\textbf{x}, y)\)</span> is given by:</p>
+<div class="math notranslate nohighlight">
+\[D(P || \hat{P_\boldsymbol{\theta}}) = P(y = 0 | \textbf{x}) \ln \left(\frac{P(y = 0 | \textbf{x})}{\hat{P_\boldsymbol{\theta}}(y = 0 | \textbf{x})}\right) + P(y = 1 | \textbf{x}) \ln \left(\frac{P(y = 1 | \textbf{x})}{\hat{P_\boldsymbol{\theta}}(y = 1 | \textbf{x})}\right)\]</div>
+<p>KL divergence is not symmetric, i.e., the divergence of <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span> from <span class="math notranslate nohighlight">\(P\)</span> is not the same as the divergence of <span class="math notranslate nohighlight">\(P\)</span> from <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span>: $<span class="math notranslate nohighlight">\(D(P || \hat{P_\boldsymbol{\theta}}) \neq D(\hat{P_\boldsymbol{\theta}} || P)\)</span>$</p>
+<p>Since our goal is to use <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span> to approximate <span class="math notranslate nohighlight">\(P\)</span>, we are concerned with <span class="math notranslate nohighlight">\( D(P || \hat{P_\boldsymbol{\theta}}) \)</span>.</p>
+<p>The best <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> values, which we denote as <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\theta}}\)</span>, minimize the average KL divergence of the entire dataset of <span class="math notranslate nohighlight">\(n\)</span> points:</p>
+<div class="math notranslate nohighlight">
+\[ \text{Average KL Divergence} = \frac{1}{n} \sum_{i=1}^{n} \left(P(y_i = 0 | \textbf{X}_i) \ln \left(\frac{P(y_i = 0 | \textbf{X}_i)}{\hat{P_\boldsymbol{\theta}}(y_i = 0 | \textbf{X}_i)}\right) + P(y_i = 1 | \textbf{X}_i) \ln \left(\frac{P(y_i = 1 | \textbf{X}_i)}{\hat{P_\boldsymbol{\theta}}(y_i = 1 | \textbf{X}_i)}\right)\right)\]</div>
+<div class="math notranslate nohighlight">
+\[ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\boldsymbol{\theta}}} (\text{Average KL Divergence}) \]</div>
+<p>In the above equation, the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> data point is represented as (<span class="math notranslate nohighlight">\( \textbf{X}_i \)</span>, <span class="math notranslate nohighlight">\( y_i \)</span>) where <span class="math notranslate nohighlight">\( \textbf{X}_i \)</span> is the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> row of the <span class="math notranslate nohighlight">\(n \times p\)</span> data matrix <span class="math notranslate nohighlight">\(\textbf{X}\)</span> and <span class="math notranslate nohighlight">\( y_i \)</span> is the observed outcome.</p>
+<p>KL divergence does not penalize mismatch for rare events with respect to <span class="math notranslate nohighlight">\(P\)</span>. If the model predicts a high probability for an event that is actually rare, then both <span class="math notranslate nohighlight">\(P(k)\)</span> and <span class="math notranslate nohighlight">\(\ln \left(\frac{P(k)}{\hat{P_\boldsymbol{\theta}}(k)}\right)\)</span> are low so the divergence is also low. However, if the model predicts a low probability for an event that is actually common, then the divergence is high. We can deduce that a logistic model that accurately predicts common events has a lower divergence from <span class="math notranslate nohighlight">\(P\)</span> than does a model that accurately predicts rare events but varies widely on common events.</p>
+</div>
+<div class="section" id="deriving-cross-entropy-loss-from-kl-divergence">
+<h2><span class="section-number">24.5.2. </span>Deriving Cross-Entropy Loss from KL Divergence<a class="headerlink" href="#deriving-cross-entropy-loss-from-kl-divergence" title="Permalink to this headline">¶</a></h2>
+<p>The structure of the above average KL divergence equation contains some surface similarities with cross-entropy loss. We will now show with some algebraic manipulation that minimizing average KL divergence is in fact equivalent to minimizing average cross-entropy loss.</p>
+<p>Using properties of logarithms, we can rewrite the weighted log ratio:
+$<span class="math notranslate nohighlight">\(P(y_i = k | \textbf{X}_i) \ln \left(\frac{P(y_i = k | \textbf{X}_i)}{\hat{P_\boldsymbol{\theta}}(y_i = k | \textbf{X}_i)}\right) = P(y_i = k | \textbf{X}_i) \ln P(y_i = k | \textbf{X}_i) - P(y_i = k | \textbf{X}_i) \ln \hat{P_\boldsymbol{\theta}}(y_i = k | \textbf{X}_i)\)</span>$</p>
+<p>Note that since the first term doesn’t depend on <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>, it doesn’t affect <span class="math notranslate nohighlight">\(\displaystyle\arg \min_{\substack{\boldsymbol{\theta}}}\)</span> and can be removed from the equation. The resulting expression is the cross-entropy loss of the model <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[ \text{Average Cross-Entropy Loss} = \frac{1}{n} \sum_{i=1}^{n} - P(y_i = 0 | \textbf{X}_i) \ln \hat{P_\theta}(y_i = 0 | \textbf{X}_i) - P(y_i = 1 | \textbf{X}_i) \ln \hat{P_\theta}(y_i = 1 | \textbf{X}_i)\]</div>
+<div class="math notranslate nohighlight">
+\[ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\theta}} (\text{Average Cross-Entropy Loss}) \]</div>
+<p>Since the label <span class="math notranslate nohighlight">\(y_i\)</span> is a known value, the probability that <span class="math notranslate nohighlight">\(y_i = 1\)</span>, <span class="math notranslate nohighlight">\(P(y_i = 1 | \textbf{X}_i)\)</span>, is equal to <span class="math notranslate nohighlight">\(y_i\)</span> and <span class="math notranslate nohighlight">\(P(y_i = 0 | \textbf{X}_i)\)</span> is equal to <span class="math notranslate nohighlight">\(1 - y_i\)</span>. The model’s probability distribution <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span> is given by the output of the sigmoid function discussed in the previous two sections. After making these substitutions, we arrive at the average cross-entropy loss equation:</p>
+<div class="math notranslate nohighlight">
+\[ \text{Average Cross-Entropy Loss} = \frac{1}{n} \sum_i \left(- y_i \ln (f_\hat{\boldsymbol{\theta}}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\hat{\boldsymbol{\theta}}(\textbf{X}_i) \right) \]</div>
+<div class="math notranslate nohighlight">
+\[ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\theta}} (\text{Average Cross-Entropy Loss}) \]</div>
+</div>
+<div class="section" id="statistical-justification-for-cross-entropy-loss">
+<h2><span class="section-number">24.5.3. </span>Statistical justification for Cross-Entropy Loss<a class="headerlink" href="#statistical-justification-for-cross-entropy-loss" title="Permalink to this headline">¶</a></h2>
+<p>The cross-entropy loss also has fundamental underpinnings in statistics. Since the logistic regression model predicts probabilities, given a particular logistic model we can ask, “What is the probability that this model produced the set of observed outcomes <span class="math notranslate nohighlight">\( \textbf{y} \)</span>?” We might naturally adjust the parameters of our model until the probability of drawing our dataset from the model is as high as possible. Although we will not prove it in this section, this procedure is equivalent to minimizing the cross-entropy loss—this is the <em>maximum likelihood</em> statistical justification for the cross-entropy loss.</p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">24.5.4. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Average KL divergence can be interpreted as the average log difference between the two distributions <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(\hat{P_\boldsymbol{\theta}}\)</span> weighted by <span class="math notranslate nohighlight">\(P\)</span>. Minimizing average KL divergence also minimizes average cross-entropy loss. We can reduce the divergence of logistic regression models by selecting parameters that accurately classify commonly occurring data.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/24"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1240,21 +1396,19 @@ $<span class="math notranslate nohighlight">\(P(y_i = k | \textbf{X}_i) \ln \lef
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

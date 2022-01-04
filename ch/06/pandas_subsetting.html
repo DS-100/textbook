@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -294,8 +294,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -336,8 +341,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1057,7 +1067,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1075,7 +1085,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1107,13 +1117,1506 @@
    6.1.5. Example: How recently has Luna become a popular name?
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#takeaways">
+   6.1.6. Takeaways
+  </a>
+ </li>
 </ul>
 
             </nav>
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Subsetting</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#about-the-data">
+   6.1.1. About the Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dataframes-and-indices">
+   6.1.2. DataFrames and Indices
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#slicing">
+   6.1.3. Slicing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#filtering-rows">
+   6.1.4. Filtering Rows
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-how-recently-has-luna-become-a-popular-name">
+   6.1.5. Example: How recently has Luna become a popular name?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#takeaways">
+   6.1.6. Takeaways
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="subsetting">
+<h1><span class="section-number">6.1. </span>Subsetting<a class="headerlink" href="#subsetting" title="Permalink to this headline">¶</a></h1>
+<p>This section introduces operations for taking subsets of dataframes. When data
+scientists first read in a dataframe, they often want to subset the specific
+data that they plan to use. For example, a data scientist can <em>slice</em> out the
+ten relevant features from a dataframe with hundreds of columns. Or, they can
+<em>filter</em> a dataframe to remove rows with incomplete data. For the rest of this
+chapter, we’ll introduce dataframe operations using a dataframe of baby names.</p>
+<div class="section" id="about-the-data">
+<h2><span class="section-number">6.1.1. </span>About the Data<a class="headerlink" href="#about-the-data" title="Permalink to this headline">¶</a></h2>
+<p>There’s a 2021 New York Times article that talks about Prince Harry and
+Meghan’s unique choice for their new baby daughter’s name: Lilibet
+<span id="id1">[<a class="reference internal" href="../../references.html#id9">Williams, 2021</a>]</span>. The article has an interview with Pamela Redmond,
+an expert on baby names, who talks about interesting trends in how people name
+their kids. For example, she says that names that start with the letter “L”
+have become very popular in recent years, while names that start with the
+letter “J” were most popular in the 1970s and 1980s. Are these claims reflected
+in data? We can use <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to find out.</p>
+<p>First, import the package as <code class="docutils literal notranslate"><span class="pre">pd</span></code>, the canonical abbreviation:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We have a dataset of baby names stored in a comma-separated values (CSV) file
+called <code class="docutils literal notranslate"><span class="pre">babynames.csv</span></code>. Use the <code class="docutils literal notranslate"><span class="pre">pd.read_csv</span></code> function to read the file as a
+<code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;babynames.csv&#39;</span><span class="p">)</span>
+<span class="n">baby</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+  </tbody>
+</table>
+<p>2020722 rows × 4 columns</p>
+</div></div></div>
+</div>
+<p>The data in the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table comes from the US Social Security department,
+which records the baby name and birth sex for birth certificate purposes. They
+make the baby names data available on their website <span id="id2">[<a class="reference internal" href="../../references.html#id2">Department, 2021</a>]</span>.
+We’ve loaded this data into the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table.</p>
+<p>The Social Security website has a page that describes the data in more detail
+(<a class="reference external" href="https://www.ssa.gov/oact/babynames/background.html">link</a>). We won’t go
+in-depth in this chapter about the data’s limitations, but we’ll point out
+this relevant quote from the website:</p>
+<blockquote>
+<div><p>All names are from Social Security card applications for births that occurred
+in the United States after 1879. Note that many people born before 1937 never
+applied for a Social Security card, so their names are not included in our
+data. For others who did apply, our records may not show the place of birth,
+and again their names are not included in our data.</p>
+<p>All data are from a 100% sample of our records on Social Security card
+applications as of March 2021.</p>
+</div></blockquote>
+</div>
+<div class="section" id="dataframes-and-indices">
+<h2><span class="section-number">6.1.2. </span>DataFrames and Indices<a class="headerlink" href="#dataframes-and-indices" title="Permalink to this headline">¶</a></h2>
+<p>Let’s examine the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe in more detail. A dataframe has rows and
+columns. Every row and column has a label, as highlighted in
+<a class="reference internal" href="#fig-baby-labels"><span class="std std-numref">Fig. 6.1</span></a>.</p>
+<div class="figure align-default" id="fig-baby-labels">
+<img alt="baby-labels" src="../../_images/baby-labels.svg" /><p class="caption"><span class="caption-number">Fig. 6.1 </span><span class="caption-text">The <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe has labels for both rows and columns (boxed).</span><a class="headerlink" href="#fig-baby-labels" title="Permalink to this image">¶</a></p>
+</div>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> assigns row labels as incrementing numbers starting from
+0. In this case, the data at the row labeled <code class="docutils literal notranslate"><span class="pre">0</span></code> and column labeled <code class="docutils literal notranslate"><span class="pre">Name</span></code> has
+the data <code class="docutils literal notranslate"><span class="pre">'Liam'</span></code>.</p>
+<p>Dataframes can also have strings as row labels. <a class="reference internal" href="#fig-dog-labels"><span class="std std-numref">Fig. 6.2</span></a> shows
+a dataframe of dog data where the row labels are strings.</p>
+<div class="figure align-default" id="fig-dog-labels">
+<img alt="dog-labels" src="../../_images/dog-labels.svg" /><p class="caption"><span class="caption-number">Fig. 6.2 </span><span class="caption-text">Row labels in dataframes can also be strings. In this example, each row is
+labeled using the dog breed name.</span><a class="headerlink" href="#fig-dog-labels" title="Permalink to this image">¶</a></p>
+</div>
+<p>The row labels have a special name. We call them the <strong>index</strong> of a dataframe,
+and <code class="docutils literal notranslate"><span class="pre">pandas</span></code> stores the row labels in a special <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> object. We won’t
+discuss the <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code> object since it’s not very common to manipulate the
+index itself. But, it’s important to remember that even though the index looks
+like a column of data, the index really represents row labels, not data. For
+instance, the dataframe of dog breeds has 4 columns of data, not 5, since
+the index doesn’t count as a column.</p>
+</div>
+<div class="section" id="slicing">
+<h2><span class="section-number">6.1.3. </span>Slicing<a class="headerlink" href="#slicing" title="Permalink to this headline">¶</a></h2>
+<p><em>Slicing</em> is an operation that creates a new dataframe by taking a subset of
+rows or columns out of another dataframe. Think about slicing a tomato—slices
+can go both vertially and horizontally. To take slices of a dataframe in
+<code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we use the <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> properties. Let’s start with <code class="docutils literal notranslate"><span class="pre">.loc</span></code>.</p>
+<p>Here’s the full <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+  </tbody>
+</table>
+<p>2020722 rows × 4 columns</p>
+</div></div></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">.loc</span></code> lets you select rows and columns using their labels. For example, to get the data in the row labeled <code class="docutils literal notranslate"><span class="pre">1</span></code> and column labeled <code class="docutils literal notranslate"><span class="pre">Name</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#        The first argument is the row label</span>
+<span class="c1">#        ↓</span>
+<span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">]</span>
+<span class="c1">#            ↑</span>
+<span class="c1">#            The second argument is the column label</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Noah&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">.loc</span></code> needs brackets; running <code class="docutils literal notranslate"><span class="pre">baby.loc(1,</span> <span class="pre">'Name')</span></code> will error.</p>
+</div>
+<p>To slice out multiple rows or column, you can use Python slice syntax instead
+of individual values:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">:</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Elijah</td>
+      <td>M</td>
+      <td>13034</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>To get an entire column of data, pass an empty slice as the first argument:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0          19659
+1          18252
+2          14147
+           ...  
+2020719        5
+2020720        5
+2020721        5
+Name: Count, Length: 2020722, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that the output of this doesn’t look like a dataframe, and it’s not.
+Selecting out a single row or column of a dataframe produces a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code>
+object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Count&#39;</span><span class="p">]</span>
+<span class="n">counts</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Series&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>What’s the difference between a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> and <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> object?
+Essentially, a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> is two-dimensional—it has rows and columns and
+represents a table of data. A <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> is one-dimensional—it represents a
+list of data. <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> and <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> objects have many methods in
+common, but they really represent two different things. Confusing the two can
+cause bugs and confusion.</p>
+<p>To select specific columns of a dataframe, pass a list into <code class="docutils literal notranslate"><span class="pre">.loc</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here&#39;s the original dataframe</span>
+<span class="n">baby</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+  </tbody>
+</table>
+<p>2020722 rows × 4 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># And here&#39;s the dataframe with only Name and Year columns</span>
+<span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]]</span>
+<span class="c1">#           └──────┬───────┘</span>
+<span class="c1">#         list of column labels</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>1880</td>
+    </tr>
+  </tbody>
+</table>
+<p>2020722 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Selecting columns is very common, so there’s a shorthand.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Shorthand for baby.loc[:, &#39;Name&#39;]</span>
+<span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0            Liam
+1            Noah
+2          Oliver
+            ...  
+2020719    Verona
+2020720    Vertie
+2020721     Wilma
+Name: Name, Length: 2020722, dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Shorthand for baby.loc[:, [&#39;Name&#39;, &#39;Count&#39;]]</span>
+<span class="n">baby</span><span class="p">[[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>19659</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>18252</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>14147</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+<p>2020722 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Slicing using <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> works similarly to <code class="docutils literal notranslate"><span class="pre">.loc</span></code>, except that <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> uses the
+<em>positions</em> of rows and columns rather than labels. It’s easiest to show the
+difference between <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> and <code class="docutils literal notranslate"><span class="pre">.loc</span></code> when the dataframe index has strings, so
+for demonstration purposes let’s look at a dataframe with information on dog
+breeds:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dogs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;dogs.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;breed&#39;</span><span class="p">)</span>
+<span class="n">dogs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>grooming</th>
+      <th>food_cost</th>
+      <th>kids</th>
+      <th>size</th>
+    </tr>
+    <tr>
+      <th>breed</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Labrador Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>high</td>
+      <td>medium</td>
+    </tr>
+    <tr>
+      <th>German Shepherd</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>medium</td>
+      <td>large</td>
+    </tr>
+    <tr>
+      <th>Beagle</th>
+      <td>daily</td>
+      <td>324.0</td>
+      <td>high</td>
+      <td>small</td>
+    </tr>
+    <tr>
+      <th>Golden Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>high</td>
+      <td>medium</td>
+    </tr>
+    <tr>
+      <th>Yorkshire Terrier</th>
+      <td>daily</td>
+      <td>324.0</td>
+      <td>low</td>
+      <td>small</td>
+    </tr>
+    <tr>
+      <th>Bulldog</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>medium</td>
+      <td>medium</td>
+    </tr>
+    <tr>
+      <th>Boxer</th>
+      <td>weekly</td>
+      <td>466.0</td>
+      <td>high</td>
+      <td>medium</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>To get the first three rows and first two columns by position, use <code class="docutils literal notranslate"><span class="pre">.iloc</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dogs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>grooming</th>
+      <th>food_cost</th>
+    </tr>
+    <tr>
+      <th>breed</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Labrador Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
+    </tr>
+    <tr>
+      <th>German Shepherd</th>
+      <td>weekly</td>
+      <td>466.0</td>
+    </tr>
+    <tr>
+      <th>Beagle</th>
+      <td>daily</td>
+      <td>324.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The same operation using <code class="docutils literal notranslate"><span class="pre">.loc</span></code> requires you to use the dataframe labels:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dogs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Labrador Retriever&#39;</span><span class="p">:</span><span class="s1">&#39;Beagle&#39;</span><span class="p">,</span> <span class="s1">&#39;grooming&#39;</span><span class="p">:</span><span class="s1">&#39;food_cost&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>grooming</th>
+      <th>food_cost</th>
+    </tr>
+    <tr>
+      <th>breed</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Labrador Retriever</th>
+      <td>weekly</td>
+      <td>466.0</td>
+    </tr>
+    <tr>
+      <th>German Shepherd</th>
+      <td>weekly</td>
+      <td>466.0</td>
+    </tr>
+    <tr>
+      <th>Beagle</th>
+      <td>daily</td>
+      <td>324.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Next, we’ll look at filtering rows.</p>
+</div>
+<div class="section" id="filtering-rows">
+<h2><span class="section-number">6.1.4. </span>Filtering Rows<a class="headerlink" href="#filtering-rows" title="Permalink to this headline">¶</a></h2>
+<p>So far, we’ve shown how to use <code class="docutils literal notranslate"><span class="pre">.loc</span></code> and <code class="docutils literal notranslate"><span class="pre">.iloc</span></code> to slice a dataframe using
+labels and positions.</p>
+<p>However, data scientists often want to <em>filter</em> rows—they want to take
+subsets of rows using some criteria. Let’s say you want to find the most
+popular baby names in 2020. To do this, you can filter rows to keep only the
+rows where the <code class="docutils literal notranslate"><span class="pre">Year</span></code> is 2020.</p>
+<p>To filter, you can 1) check whether each value in the <code class="docutils literal notranslate"><span class="pre">Year</span></code>
+column is equal to 1970, then 2) keep only those rows.</p>
+<p>To compare each value in <code class="docutils literal notranslate"><span class="pre">Year</span></code>, slice out the column and make a boolean
+comparison.
+(This is similar to what you would do with a <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here&#39;s the dataframe for reference</span>
+<span class="n">baby</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2020719</th>
+      <td>Verona</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020720</th>
+      <td>Vertie</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+    <tr>
+      <th>2020721</th>
+      <td>Wilma</td>
+      <td>F</td>
+      <td>5</td>
+      <td>1880</td>
+    </tr>
+  </tbody>
+</table>
+<p>2020722 rows × 4 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a Series with the Year data</span>
+<span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0          2020
+1          2020
+2          2020
+           ... 
+2020719    1880
+2020720    1880
+2020721    1880
+Name: Year, Length: 2020722, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare with 2020</span>
+<span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2020</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0           True
+1           True
+2           True
+           ...  
+2020719    False
+2020720    False
+2020721    False
+Name: Year, Length: 2020722, dtype: bool
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that a boolean comparison on a Series gives a Series of booleans. This
+is nearly equivalent to writing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">is_2020</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]:</span>
+    <span class="n">is_2020</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="mi">2020</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>But the boolean comparison is easier to write and much faster to execute than a
+<code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
+<p>Now, we tell <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to keep only the rows where the comparison evaluated to <code class="docutils literal notranslate"><span class="pre">True</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Passing a Series of booleans into .loc only keeps rows where the Series has</span>
+<span class="c1"># a True value.</span>
+<span class="c1">#        ↓</span>
+<span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2020</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>31267</th>
+      <td>Zylynn</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>31268</th>
+      <td>Zynique</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>31269</th>
+      <td>Zynlee</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2020</td>
+    </tr>
+  </tbody>
+</table>
+<p>31270 rows × 4 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filtering has a shorthand. This computes the same table as the snippet above</span>
+<span class="c1"># without using .loc</span>
+<span class="n">baby</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2020</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>31267</th>
+      <td>Zylynn</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>31268</th>
+      <td>Zynique</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>31269</th>
+      <td>Zynlee</td>
+      <td>F</td>
+      <td>5</td>
+      <td>2020</td>
+    </tr>
+  </tbody>
+</table>
+<p>31270 rows × 4 columns</p>
+</div></div></div>
+</div>
+<p>Finally, to find the most common names in 2020, sort the dataframe by <code class="docutils literal notranslate"><span class="pre">Count</span></code>
+in descending order.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># When you have a long expression, you can wrap it in parentheses, then add</span>
+<span class="c1"># line breaks to make it more readable.</span>
+<span class="p">(</span><span class="n">baby</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2020</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="c1"># take the first seven rows</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Liam</td>
+      <td>M</td>
+      <td>19659</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Noah</td>
+      <td>M</td>
+      <td>18252</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>13911</th>
+      <td>Emma</td>
+      <td>F</td>
+      <td>15581</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Oliver</td>
+      <td>M</td>
+      <td>14147</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>13912</th>
+      <td>Ava</td>
+      <td>F</td>
+      <td>13084</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Elijah</td>
+      <td>M</td>
+      <td>13034</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>13913</th>
+      <td>Charlotte</td>
+      <td>F</td>
+      <td>13003</td>
+      <td>2020</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see that Liam, Noah, and Emma were the most popular baby names in 2020.</p>
+</div>
+<div class="section" id="example-how-recently-has-luna-become-a-popular-name">
+<h2><span class="section-number">6.1.5. </span>Example: How recently has Luna become a popular name?<a class="headerlink" href="#example-how-recently-has-luna-become-a-popular-name" title="Permalink to this headline">¶</a></h2>
+<p>The New York Times article mentions that the name “Luna” was almost nonexistent
+before 2000 but has since grown to become a very popular name for girls.
+When did Luna become popular?
+We can
+check this using slicing and filtering. When approaching a data manipulation
+task, we recommend breaking the problem down into smaller steps. For
+example, we could think:</p>
+<ol class="simple">
+<li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'Luna'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column.</p></li>
+<li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'F'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Sex</span></code> column.</p></li>
+<li><p>Slice: keep the <code class="docutils literal notranslate"><span class="pre">Count</span></code> and <code class="docutils literal notranslate"><span class="pre">Year</span></code> columns.</p></li>
+</ol>
+<p>Now, it’s a matter of translating each step into code.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">luna</span> <span class="o">=</span> <span class="n">baby</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Luna&#39;</span><span class="p">]</span> <span class="c1"># [1]</span>
+<span class="n">luna</span> <span class="o">=</span> <span class="n">luna</span><span class="p">[</span><span class="n">luna</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">]</span>     <span class="c1"># [2]</span>
+<span class="n">luna</span> <span class="o">=</span> <span class="n">luna</span><span class="p">[[</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]]</span>      <span class="c1"># [3]</span>
+<span class="n">luna</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Count</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>13923</th>
+      <td>7770</td>
+      <td>2020</td>
+    </tr>
+    <tr>
+      <th>45366</th>
+      <td>7772</td>
+      <td>2019</td>
+    </tr>
+    <tr>
+      <th>77393</th>
+      <td>6929</td>
+      <td>2018</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2014083</th>
+      <td>17</td>
+      <td>1883</td>
+    </tr>
+    <tr>
+      <th>2018187</th>
+      <td>18</td>
+      <td>1881</td>
+    </tr>
+    <tr>
+      <th>2020223</th>
+      <td>15</td>
+      <td>1880</td>
+    </tr>
+  </tbody>
+</table>
+<p>128 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pandas</span></code> has some plotting functionality. We won’t go in-depth in plotting here
+since we talk more about plotting in the Visualization chapter. But for now,
+remember that you can use <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> on a dataframe to make a few simple plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#         x-axis  y-axis</span>
+<span class="n">luna</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pandas_subsetting_54_0.png" src="../../_images/pandas_subsetting_54_0.png" />
+</div>
+</div>
+<p>It’s just as the article says. Luna wasn’t popular at all until the year 2000
+or so. Think about that—if someone tells you that their name is Luna, you can
+take a pretty good guess at their age even without any other information about
+them!</p>
+<p>Just for fun, here’s the same plot for the name Siri.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using .query is similar to using .loc with a boolean series. query() has more</span>
+<span class="c1"># restrictions on what kinds of filtering you can do but can be convenient as a</span>
+<span class="c1"># shorthand. </span>
+<span class="p">(</span><span class="n">baby</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;Name == &quot;Siri&quot;&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;Sex == &quot;F&quot;&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pandas_subsetting_56_0.png" src="../../_images/pandas_subsetting_56_0.png" />
+</div>
+</div>
+<p>Why might the popularity have dropped so suddenly after 2010?
+Well, Siri happens to be the
+name of Apple’s voice assistant and was introduced in 2011.
+Let’s draw a line for the year 2011 and take a look…</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">baby</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;Name == &quot;Siri&quot;&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;Sex == &quot;F&quot;&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pandas_subsetting_58_0.png" src="../../_images/pandas_subsetting_58_0.png" />
+</div>
+</div>
+<p>It looks like parents don’t want their kids to be confused when other
+people say “Hey Siri” to their phones.</p>
+</div>
+<div class="section" id="takeaways">
+<h2><span class="section-number">6.1.6. </span>Takeaways<a class="headerlink" href="#takeaways" title="Permalink to this headline">¶</a></h2>
+<p>This section introduces dataframes in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>.
+We’ve covered the common ways that data scientists subset dataframes—slicing
+with labels and filtering using a boolean condition.
+In the next section, we explain how to aggregate rows together.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/06"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1586,8 +3089,7 @@ cause bugs and confusion.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># And here&#39;s the dataframe with only Name and Year columns</span>
 <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]]</span>
-<span class="c1">#           └-------┬------┘</span>
-<span class="c1">#                   |</span>
+<span class="c1">#           └──────┬───────┘</span>
 <span class="c1">#         list of column labels</span>
 </pre></div>
 </div>
@@ -1956,6 +3458,7 @@ breeds:</p>
 </table>
 </div></div></div>
 </div>
+<p>Next, we’ll look at filtering rows.</p>
 </div>
 <div class="section" id="filtering-rows">
 <h2><span class="section-number">6.1.4. </span>Filtering Rows<a class="headerlink" href="#filtering-rows" title="Permalink to this headline">¶</a></h2>
@@ -1968,7 +3471,8 @@ rows where the <code class="docutils literal notranslate"><span class="pre">Year
 <p>To filter, you can 1) check whether each value in the <code class="docutils literal notranslate"><span class="pre">Year</span></code>
 column is equal to 1970, then 2) keep only those rows.</p>
 <p>To compare each value in <code class="docutils literal notranslate"><span class="pre">Year</span></code>, slice out the column and make a boolean
-comparison. (This is similar to what you would do with a <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.)</p>
+comparison.
+(This is similar to what you would do with a <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here&#39;s the dataframe for reference</span>
@@ -2375,14 +3879,17 @@ in descending order.</p>
 </table>
 </div></div></div>
 </div>
+<p>We see that Liam, Noah, and Emma were the most popular baby names in 2020.</p>
 </div>
 <div class="section" id="example-how-recently-has-luna-become-a-popular-name">
 <h2><span class="section-number">6.1.5. </span>Example: How recently has Luna become a popular name?<a class="headerlink" href="#example-how-recently-has-luna-become-a-popular-name" title="Permalink to this headline">¶</a></h2>
 <p>The New York Times article mentions that the name “Luna” was almost nonexistent
-before 2000 but has since grown to become a very popular name for girls. We can
+before 2000 but has since grown to become a very popular name for girls.
+When did Luna become popular?
+We can
 check this using slicing and filtering. When approaching a data manipulation
-task, we recommend you start by breaking the problem down into steps. For
-example, you could think:</p>
+task, we recommend breaking the problem down into smaller steps. For
+example, we could think:</p>
 <ol class="simple">
 <li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'Luna'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column.</p></li>
 <li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'F'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Sex</span></code> column.</p></li>
@@ -2473,7 +3980,7 @@ remember that you can use <code class="docutils literal notranslate"><span class
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_subsetting_52_0.png" src="../../_images/pandas_subsetting_52_0.png" />
+<img alt="../../_images/pandas_subsetting_54_0.png" src="../../_images/pandas_subsetting_54_0.png" />
 </div>
 </div>
 <p>It’s just as the article says. Luna wasn’t popular at all until the year 2000
@@ -2494,11 +4001,12 @@ them!</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_subsetting_54_0.png" src="../../_images/pandas_subsetting_54_0.png" />
+<img alt="../../_images/pandas_subsetting_56_0.png" src="../../_images/pandas_subsetting_56_0.png" />
 </div>
 </div>
-<p>Why might the popularity have dropped so suddenly? Well, Siri happens to be the
-name of the voice assistant for Apple products and was introduced in 2011.
+<p>Why might the popularity have dropped so suddenly after 2010?
+Well, Siri happens to be the
+name of Apple’s voice assistant and was introduced in 2011.
 Let’s draw a line for the year 2011 and take a look…</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2511,9 +4019,18 @@ Let’s draw a line for the year 2011 and take a look…</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_subsetting_56_0.png" src="../../_images/pandas_subsetting_56_0.png" />
+<img alt="../../_images/pandas_subsetting_58_0.png" src="../../_images/pandas_subsetting_58_0.png" />
 </div>
 </div>
+<p>It looks like parents don’t want their kids to be confused when other
+people say “Hey Siri” to their phones.</p>
+</div>
+<div class="section" id="takeaways">
+<h2><span class="section-number">6.1.6. </span>Takeaways<a class="headerlink" href="#takeaways" title="Permalink to this headline">¶</a></h2>
+<p>This section introduces dataframes in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>.
+We’ve covered the common ways that data scientists subset dataframes—slicing
+with labels and filtering using a boolean condition.
+In the next section, we explain how to aggregate rows together.</p>
 </div>
 </div>
 
@@ -2561,21 +4078,19 @@ Let’s draw a line for the year 2011 and take a look…</p>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

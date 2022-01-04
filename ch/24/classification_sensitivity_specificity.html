@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1120,7 +1130,576 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Evaluating Logistic Models</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sensitivity">
+   24.7.1. Sensitivity
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specificity">
+   24.7.2. Specificity
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#classification-threshold">
+   24.7.3. Classification Threshold
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#roc-curves">
+   24.7.4. ROC Curves
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#auc">
+   24.7.5. AUC
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   24.7.6. Summary
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="kn">import</span> <span class="n">DictVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+
+<span class="n">emails</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;selected_emails.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">words_in_texts</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        words (list-like): words to find</span>
+<span class="sd">        texts (Series): strings to search in</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        NumPy array of 0s and 1s with shape (n, p) where n is the</span>
+<span class="sd">        number of texts and p is the number of words.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">indicator_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">texts</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># YOUR CODE HERE</span>
+    <span class="k">return</span> <span class="n">indicator_array</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="evaluating-logistic-models">
+<h1><span class="section-number">24.7. </span>Evaluating Logistic Models<a class="headerlink" href="#evaluating-logistic-models" title="Permalink to this headline">¶</a></h1>
+<p>Although we used the classification accuracy to evaluate our logistic model in previous sections, using the accuracy alone has some serious flaws that we explore in this section. To address these issues, we introduce a more useful metric to evaluate classifier performance: the <strong>Area Under Curve (AUC)</strong> metric.</p>
+<p>Suppose we have a dataset of 1000 emails that are labeled as spam or ham (not spam) and our goal is to build a classifier that distinguishes future spam emails from ham emails. The data is contained in the <code class="docutils literal notranslate"><span class="pre">emails</span></code> DataFrame displayed below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">emails</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>body</th>
+      <th>spam</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>\n Hi Folks,\n \n I've been trying to set a bu...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Hah.  I guess she doesn't want everyone to kno...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>This article from NYTimes.com \n has been sent...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>997</th>
+      <td>&lt;html&gt;\n &lt;head&gt;\n     &lt;meta http-equiv="Conten...</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>998</th>
+      <td>&lt;html&gt;\n &lt;head&gt;\n &lt;/head&gt;\n &lt;body&gt;\n \n &lt;cente...</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>999</th>
+      <td>\n &lt;html&gt;\n \n &lt;head&gt;\n &lt;meta http-equiv=3D"Co...</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>1000 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Each row contains the body of an email in the <code class="docutils literal notranslate"><span class="pre">body</span></code> column and a spam indicator in the <code class="docutils literal notranslate"><span class="pre">spam</span></code> column, which is <code class="docutils literal notranslate"><span class="pre">0</span></code> if the email is ham or <code class="docutils literal notranslate"><span class="pre">1</span></code> if it is spam.</p>
+<p>Let’s compare the performance of three different classifiers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ham_only</span></code>: labels every email as ham.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spam_only</span></code>: labels every email as spam.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">words_list_model</span></code>: predicts ‘ham’ or ‘spam’ based on the presence of certain words in the body of an email.</p></li>
+</ul>
+<p>Suppose we have a list of words <code class="docutils literal notranslate"><span class="pre">words_list</span></code> that we believe are common in spam emails: “please”, “click”, “money”, “business”, and “remove”. We construct <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> using the following procedure: transform each email into a feature vector by setting the vector’s <span class="math notranslate nohighlight">\(i\)</span>th entry to 1 if the <span class="math notranslate nohighlight">\(i\)</span>th word in <code class="docutils literal notranslate"><span class="pre">words_list</span></code> is contained in the email body and 0 if it isn’t. For example, using our five chosen words and the email body “please remove by tomorrow”, the feature vector would be <span class="math notranslate nohighlight">\([1, 0, 0, 0, 1]\)</span>. This procedure generates the <code class="docutils literal notranslate"><span class="pre">1000</span> <span class="pre">X</span> <span class="pre">5</span></code> feature matrix <span class="math notranslate nohighlight">\(\textbf{X}\)</span>.</p>
+<p>The following code block displays the accuracies of the classifiers. Model creation and training are omitted for brevity.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;please&#39;</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;money&#39;</span><span class="p">,</span> <span class="s1">&#39;business&#39;</span><span class="p">,</span> <span class="s1">&#39;remove&#39;</span><span class="p">]</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">words_in_texts</span><span class="p">(</span><span class="n">words_list</span><span class="p">,</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;spam&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+
+<span class="c1"># Train-test split</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">41</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span>
+<span class="p">)</span>
+
+<span class="c1">#Fit the model</span>
+<span class="n">words_list_model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">words_list_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">y_prediction_words_list</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_prediction_ham_only</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">))</span>
+<span class="n">y_prediction_spam_only</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+
+<span class="c1"># Our selected words</span>
+<span class="n">words_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;please&#39;</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;money&#39;</span><span class="p">,</span> <span class="s1">&#39;business&#39;</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ham_only test set accuracy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_prediction_ham_only</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spam_only test set accuracy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_prediction_spam_only</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;words_list_model test set accuracy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_prediction_words_list</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ham_only test set accuracy: 0.96
+spam_only test set accuracy: 0.04
+words_list_model test set accuracy: 0.96
+</pre></div>
+</div>
+</div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> classifies 96% of the test set emails correctly. Although this accuracy appears high, <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> achieves the same accuracy by simply labeling everything as ham. This is cause for concern because the data suggests we can do just as well without a spam filter at all.</p>
+<p>As the accuracies above show, model accuracy alone can be a misleading indicator of model performance. We can understand the model’s predictions in greater depth using a <strong>confusion matrix</strong>. A confusion matrix for a binary classifier is a two-by-two heatmap that contains the model predictions on one axis and the actual labels on the other.</p>
+<p>Each entry in a confusion matrix represents a possible outcome of the classifier. If a spam email is input to the classifier, there are two possible outcomes:</p>
+<ul class="simple">
+<li><p><strong>True Positive</strong> (top left entry): the model correctly labels it with the positive class (spam).</p></li>
+<li><p><strong>False Negative</strong> (top right entry): the model mislabels it with the negative class (ham), but it truly belongs in the positive class (spam). In our case, a false negative means that a spam email gets mislabelled as ham and ends up in the inbox.</p></li>
+</ul>
+<p>Similarly, if a ham email is input to the classifier, there are two possible outcomes.</p>
+<ul class="simple">
+<li><p><strong>False Positive</strong> (bottom left entry): the model mislabels it with the positive class (spam), but it truly belongs in the negative class (ham). In our case, a false positive means that a ham email gets flagged as spam and filtered out of the inbox.</p></li>
+<li><p><strong>True Negative</strong> (bottom right entry): the model correctly labels it with the negative class (ham).</p></li>
+</ul>
+<p>The costs of false positives and false negatives depend on the situation. For email classification, false positives result in important emails being filtered out, so they are worse than false negatives, in which a spam email winds up in the inbox. In medical settings, however, false negatives in a diagnostic test can be much more consequential than false positives.</p>
+<p>We will use scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix">confusion matrix function</a> to construct confusion matrices for the three models on the training data set. The <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> confusion matrix is shown below:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span>
+                          <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion matrix&#39;</span><span class="p">,</span>
+                          <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function prints and plots the confusion matrix.</span>
+<span class="sd">    Normalization can be applied by setting `normalize=True`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">itertools</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="c1">#         print(&quot;Normalized confusion matrix&quot;)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         print(&#39;Confusion matrix, without normalization&#39;)</span>
+
+<span class="c1">#     print(cm)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">tick_marks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">tick_marks</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">tick_marks</span><span class="p">,</span> <span class="n">classes</span><span class="p">)</span>
+
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;.2f&#39;</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="s1">&#39;d&#39;</span>
+    <span class="n">thresh</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">format</span><span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">fmt</span><span class="p">),</span>
+                 <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                 <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span> <span class="k">if</span> <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="k">else</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;True label&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted label&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">ham_only_y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
+<span class="n">spam_only_y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
+<span class="n">words_list_model_y_pred</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+
+<span class="n">class_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Spam&#39;</span><span class="p">,</span> <span class="s1">&#39;Ham&#39;</span><span class="p">]</span>
+
+<span class="n">ham_only_cnf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">ham_only_y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">ham_only_cnf_matrix</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ham_only Confusion Matrix&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/classification_sensitivity_specificity_13_0.png" src="../../_images/classification_sensitivity_specificity_13_0.png" />
+</div>
+</div>
+<p>Summing the quantities in a row indicates how many emails in the training dataset belong to the corresponding class:</p>
+<ul class="simple">
+<li><p>True label = spam (first row): the sum of true positives (0) and false negatives (42) reveals there are 42 spam emails in the training dataset.</p></li>
+<li><p>True label = ham (second row): the sum of false positives (0) and true negatives (758) reveals there are 758 ham emails in the training dataset.</p></li>
+</ul>
+<p>Summing the quantities in a column indicates how many emails the classifier predicted in the corresponding class:</p>
+<ul class="simple">
+<li><p>Predicted label = spam (first column): the sum of true positives (0) and false positives (0) reveals <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> predicted there are 0 spam emails in the training dataset.</p></li>
+<li><p>Predicted label = ham (second column): the sum of false negatives (42) and true negatives (758) reveals <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> predicted there are 800 ham emails in the training dataset.</p></li>
+</ul>
+<p>We can see that <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> had a high accuracy of <span class="math notranslate nohighlight">\(\left(\frac{758}{800} \approx .95\right)\)</span> because there are 758 ham emails in the training dataset out of 800 total emails.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spam_only_cnf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">spam_only_y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">spam_only_cnf_matrix</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;spam_only Confusion Matrix&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/classification_sensitivity_specificity_15_0.png" src="../../_images/classification_sensitivity_specificity_15_0.png" />
+</div>
+</div>
+<p>At the other extreme, <code class="docutils literal notranslate"><span class="pre">spam_only</span></code> predicts the training dataset has no ham emails, which the confusion matrix indicates is far from the truth with 758 false positives.</p>
+<p>Our main interest is the confusion matrix for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list_model_cnf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_model_y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">words_list_model_cnf_matrix</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;words_list_model Confusion Matrix&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/classification_sensitivity_specificity_17_0.png" src="../../_images/classification_sensitivity_specificity_17_0.png" />
+</div>
+</div>
+<p>The row totals match those of the <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> and <code class="docutils literal notranslate"><span class="pre">spam_only</span></code> confusion matrices as expected since the true labels in the training dataset are unaltered for all models.</p>
+<p>Of the 42 spam emails, <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> correctly classifies 18 of them, which is a poor performance. Its high accuracy is buoyed by the large number of true negatives, but this is insufficient because it does not serve its purpose of reliably filtering out spam emails.</p>
+<p>This emails dataset is an example of a <strong>class-imbalanced dataset</strong>, in which a vast majority of labels belong to one class over the other. In this case, most of our emails are ham. Another common example of class imbalance is disease detection when the frequency of the disease in a population is low. A medical test that always concludes a patient doesn’t have the disease will have a high accuracy because most patients truly won’t have the disease, but its inability to identify individuals with the disease renders it useless.</p>
+<p>We now turn to sensitivity and specificity, two metrics that are better suited for evaluating class-imbalanced datasets.</p>
+<div class="section" id="sensitivity">
+<h2><span class="section-number">24.7.1. </span>Sensitivity<a class="headerlink" href="#sensitivity" title="Permalink to this headline">¶</a></h2>
+<p><strong>Sensitivity</strong> (also called <strong>true positive rate</strong>) measures the proportion of data belonging to the positive class that the classifier correctly labels.</p>
+<div class="math notranslate nohighlight">
+\[ \text{Sensitivity} = \frac{TP}{TP + FN} \]</div>
+<p>From our discussion of confusion matrices, you should recognize the expression <span class="math notranslate nohighlight">\(TP + FN\)</span> as the sum of the entries in the first row, which is equal to the actual number of data points belonging to the positive class in the dataset. Using confusion matrices allows us to easily compare the sensitivities of our models:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ham_only</span></code>: <span class="math notranslate nohighlight">\(\frac{0}{0 + 42} = 0\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spam_only</span></code>: <span class="math notranslate nohighlight">\(\frac{42}{42 + 0} = 1\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">words_list_model</span></code>: <span class="math notranslate nohighlight">\(\frac{18}{18 + 24} \approx .429\)</span></p></li>
+</ul>
+<p>Since <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> has no true positives, it has the worst possible sensitivity value of 0. On the other hand, <code class="docutils literal notranslate"><span class="pre">spam_only</span></code> has an abysmally low accuracy but it has the best possible sensitivity value of 1 because it labels all spam emails correctly. The low sensitivity of <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> indicates that it frequently fails to mark spam emails as such; nevertheless, it significantly outperforms <code class="docutils literal notranslate"><span class="pre">ham_only</span></code>.</p>
+</div>
+<div class="section" id="specificity">
+<h2><span class="section-number">24.7.2. </span>Specificity<a class="headerlink" href="#specificity" title="Permalink to this headline">¶</a></h2>
+<p><strong>Specificity</strong> (also called <strong>true negative rate</strong>) measures the proportion of data belonging to the negative class that the classifier correctly labels.</p>
+<div class="math notranslate nohighlight">
+\[ \text{Specificity} = \frac{TN}{TN + FP} \]</div>
+<p>The expression <span class="math notranslate nohighlight">\(TN + FP\)</span> is equal to the actual number of data points belonging to the negative class in the dataset. Again the confusion matrices help to compare the specificities of our models:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ham_only</span></code>: <span class="math notranslate nohighlight">\(\frac{758}{758 + 0} = 1\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spam_only</span></code>: <span class="math notranslate nohighlight">\(\frac{0}{0 + 758} = 0\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">words_list_model</span></code>: <span class="math notranslate nohighlight">\(\frac{752}{752 + 6} \approx .992\)</span></p></li>
+</ul>
+<p>As with sensitivity, the worst and best specificities are 0 and 1 respectively. Notice that <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> has the best specificity and worst sensitivity, while <code class="docutils literal notranslate"><span class="pre">spam_only</span></code> has the worst specificity and best sensitivity. Since these models only predict one label, they will misclassify all instances of the other label, which is reflected in the extreme sensitivity and specificity values. The disparity is much smaller for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code>.</p>
+<p>Although sensitivity and specificity seem to describe different characteristics of a classifier, we draw an important connection between these two metrics using the classification threshold.</p>
+</div>
+<div class="section" id="classification-threshold">
+<h2><span class="section-number">24.7.3. </span>Classification Threshold<a class="headerlink" href="#classification-threshold" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>classification threshold</strong> is a value that determines what class a data point is assigned to; points that fall on opposite sides of the threshold are labeled with different classes. Recall that logistic regression outputs a probability that the data point belongs to the positive class. If this probability is greater than the threshold, the data point is labeled with the positive class, and if it is below the threshold, the data point is labeled with the negative class. For our case, let <span class="math notranslate nohighlight">\(f_{\hat{\theta}}\)</span> be the logistic model and <span class="math notranslate nohighlight">\(C\)</span> the threshold. If <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x) &gt; C\)</span>, <span class="math notranslate nohighlight">\(x\)</span> is labeled spam; if <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x) &lt; C\)</span>, <span class="math notranslate nohighlight">\(x\)</span> is labeled ham. Scikit-learn breaks ties by defaulting to the negative class, so if <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x) = C\)</span>, <span class="math notranslate nohighlight">\(x\)</span> is labeled ham.</p>
+<p>We can assess our model’s performance with classification threshold <span class="math notranslate nohighlight">\(C\)</span> by creating a confusion matrix. The <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> confusion matrix displayed earlier in the section uses scikit learn’s default threshold <span class="math notranslate nohighlight">\(C = .50\)</span>.</p>
+<p>Raising the threshold to <span class="math notranslate nohighlight">\(C = .70\)</span>, meaning we label an email <span class="math notranslate nohighlight">\(x\)</span> as spam if the probability <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x)\)</span> is greater than .70, results in the following confusion matrix:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list_prediction_probabilities</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">words_list_predictions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">pred</span> <span class="o">&gt;=</span> <span class="mf">.70</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">words_list_prediction_probabilities</span><span class="p">]</span>
+
+<span class="n">high_classification_threshold</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_predictions</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">high_classification_threshold</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;words_list_model Confusion Matrix $C = .70$&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/classification_sensitivity_specificity_22_0.png" src="../../_images/classification_sensitivity_specificity_22_0.png" />
+</div>
+</div>
+<p>By raising the bar for classifying an email as spam, 13 spam emails that were correctly classified with <span class="math notranslate nohighlight">\(C = .50\)</span> are now mislabeled.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} \text{Sensitivity } (C = .70) = \frac{5}{42} \approx .119 \\
+\text{Specificity } (C = .70) = \frac{757}{758} \approx .999
+\end{split}\]</div>
+<p>Compared to the default, a higher threshold of <span class="math notranslate nohighlight">\(C = .70\)</span> increases specificity but decreases sensitivity.</p>
+<p>Lowering the threshold to <span class="math notranslate nohighlight">\(C = .30\)</span>, meaning we label an email <span class="math notranslate nohighlight">\(x\)</span> as spam if the probability <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x)\)</span> is greater than .30, results in the following confusion matrix:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list_predictions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">pred</span> <span class="o">&gt;=</span> <span class="mf">.30</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">words_list_prediction_probabilities</span><span class="p">]</span>
+
+<span class="n">low_classification_threshold</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_predictions</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">low_classification_threshold</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;words_list_model Confusion Matrix $C = .30$&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/classification_sensitivity_specificity_24_0.png" src="../../_images/classification_sensitivity_specificity_24_0.png" />
+</div>
+</div>
+<p>By lowering the bar for classifying an email as spam, 6 spam emails that were mislabeled with <span class="math notranslate nohighlight">\(C = .50\)</span> are now correct. However, there are more false positives.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} \text{Sensitivity } (C = .30) = \frac{24}{42} \approx .571 \\
+\text{Specificity } (C = .30) = \frac{738}{758} \approx .974
+\end{split}\]</div>
+<p>Compared to the default, a lower threshold of <span class="math notranslate nohighlight">\(C = .30\)</span> increases sensitivity but decreases specificity.</p>
+<p>We adjust a model’s sensitivity and specificity by changing the classification threshold. Although we strive to maximize both sensitivity and specificity, we can see from the confusion matrices created with varying classification thresholds that there is a tradeoff. Increasing sensitivity leads to a decrease in specificity and vice versa.</p>
+</div>
+<div class="section" id="roc-curves">
+<h2><span class="section-number">24.7.4. </span>ROC Curves<a class="headerlink" href="#roc-curves" title="Permalink to this headline">¶</a></h2>
+<p>We can calculate sensitivity and specificity values for all classification thresholds between 0 and 1 and plot them. Each threshold value <span class="math notranslate nohighlight">\(C\)</span> is associated with a (sensitivity, specificity) pair. A <strong>ROC (Receiver Operating Characteristic) curve</strong> is a slight modification of this idea; instead of plotting (sensitivity, specificity) it plots (sensitivity, 1 - specificity) pairs, where 1 - specificity is defined as the false positive rate.</p>
+<div class="math notranslate nohighlight">
+\[ \text{False Positive Rate } = 1 - \frac{TN}{TN + FP} = \frac{TN + FP - TN}{TN + FP} = \frac{FP}{TN + FP} \]</div>
+<p>A point on the ROC curve represents the sensitivity and false positive rate associated with a specific threshold value.</p>
+<p>The ROC curve for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> is calculated below using scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html">ROC curve function</a>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_curve</span>
+
+<span class="n">words_list_model_probabilities</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">false_positive_rate_values</span><span class="p">,</span> <span class="n">sensitivity_values</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_model_probabilities</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">false_positive_rate_values</span><span class="p">,</span> <span class="n">sensitivity_values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+         <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate (1 - Specificity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Sensitivity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;words_list_model ROC Curve&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5,1,&#39;words_list_model ROC Curve&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/classification_sensitivity_specificity_28_1.png" src="../../_images/classification_sensitivity_specificity_28_1.png" />
+</div>
+</div>
+<p>Notice that as we move from left to right across the curve, sensitivity increases and the specificity decreases. Generally, the best classification threshold corresponds to high sensitivity and specificity (low false positive rate), so points in or around the northwest corner of the plot are preferable.</p>
+<p>Let’s examine the four corners of the plot:</p>
+<ul class="simple">
+<li><p>(0, 0): Specificity <span class="math notranslate nohighlight">\(=1\)</span>, which means all data points in the negative class are correctly labeled, but sensitivity <span class="math notranslate nohighlight">\(= 0\)</span>, so the model has no true positives. (0,0) maps to the classification threshold <span class="math notranslate nohighlight">\(C = 1.0\)</span>, which has the same effect as <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> since no email can have a probability greater than <span class="math notranslate nohighlight">\(1.0\)</span>.</p></li>
+<li><p>(1, 1): Specificity <span class="math notranslate nohighlight">\(=0\)</span>, which means the model has no true negatives, but sensitivity <span class="math notranslate nohighlight">\(= 1\)</span>, so all data points in the positive class are correctly labeled. (1,1) maps to the classification threshold <span class="math notranslate nohighlight">\(C = 0.0\)</span>, which has the same effect as <code class="docutils literal notranslate"><span class="pre">spam_only</span></code> since no email can have a probability lower than <span class="math notranslate nohighlight">\(0.0\)</span>.</p></li>
+<li><p>(0, 1): Both specificity <span class="math notranslate nohighlight">\(=1\)</span> and sensitivity <span class="math notranslate nohighlight">\(= 1\)</span>, which means there are no false positives or false negatives. A model with an ROC curve containing (0, 1) has a <span class="math notranslate nohighlight">\(C\)</span> value at which it is a perfect classifier!</p></li>
+<li><p>(1, 0): Both specificity <span class="math notranslate nohighlight">\(=0\)</span> and sensitivity <span class="math notranslate nohighlight">\(= 0\)</span>, which means there are no true positives or true negatives. A model with an ROC curve containing (1, 0) has a <span class="math notranslate nohighlight">\(C\)</span> value at which it predicts the wrong class for every data point!</p></li>
+</ul>
+<p>A classifier that randomly predicts classes has a diagonal ROC curve containing all points where sensitivity and the false positive rate are equal:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+         <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate (1 - Specificity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Sensitivity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Random Classifier ROC Curve&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5,1,&#39;Random Classifier ROC Curve&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/classification_sensitivity_specificity_30_1.png" src="../../_images/classification_sensitivity_specificity_30_1.png" />
+</div>
+</div>
+<p>Intuitively, a random classifier that predicts probability <span class="math notranslate nohighlight">\(p\)</span> for input <span class="math notranslate nohighlight">\(x\)</span> will result in either a true positive or false positive with chance <span class="math notranslate nohighlight">\(p\)</span>, so sensitivity and the false positive rate are equal.</p>
+<p>We want our classifier’s ROC curve to be high above the random model diagnoal line, which brings us to the AUC metric.</p>
+</div>
+<div class="section" id="auc">
+<h2><span class="section-number">24.7.5. </span>AUC<a class="headerlink" href="#auc" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>Area Under Curve (AUC)</strong> is the area under the ROC curve and serves as a single number performance summary of the classifier. The AUC for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> is shaded below and calculating using scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score">AUC function</a>:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">false_positive_rate_values</span><span class="p">,</span> <span class="n">sensitivity_values</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                 <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate (1 - Specificity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Sensitivity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;words_list_model ROC Curve&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5,1,&#39;words_list_model ROC Curve&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/classification_sensitivity_specificity_33_1.png" src="../../_images/classification_sensitivity_specificity_33_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+
+<span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_model_probabilities</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.9057984671441136
+</pre></div>
+</div>
+</div>
+</div>
+<p>AUC is interpreted as the probability that the classifier will assign a higher probability to a randomly chosen data point truly belonging to the positive class than a randomly chosen data point truly belonging to the negative class. A perfect AUC value of 1 corresponds to a perfect classifier (the ROC curve would contain (0, 1). The fact that <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> has an AUC of .906 means that roughly 90.6% of the time it is more likely to classify a spam email as spam than a ham email as spam.</p>
+<p>By inspection, the AUC of the random classifier is 0.5, though this can vary slightly due to the randomness. An effective model will have an AUC much higher than 0.5, which <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> achieves. If a model’s AUC is less than 0.5, it performs worse than random predictions.</p>
+</div>
+<div class="section" id="summary">
+<h2><span class="section-number">24.7.6. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>AUC is an use metric for evaluating models on class-imbalanced datasets. After training a model, it is best practice to generate an ROC curve and calculate AUC to determine the next step. If the AUC is sufficiently high, use the ROC curve to identify the best classification threshold. However, if the AUC is not satisfactory, consider doing further EDA and feature selection to improve the model.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/24"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1663,21 +2242,19 @@ words_list_model test set accuracy: 0.96
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 

@@ -42,7 +42,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -296,8 +296,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../06/pandas_exercises.html">
-     6.6. Exercises
+     6.7. Exercises
     </a>
    </li>
   </ul>
@@ -338,8 +343,13 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../07/sql_exercises.html">
-     7.6. Exercises
+     7.7. Exercises
     </a>
    </li>
   </ul>
@@ -1059,7 +1069,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -1077,7 +1087,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -1120,7 +1130,485 @@
         </div>
     </div>
 </div>
-    <div id="main-content" class="row">
+    <!-- Table of contents that is only displayed when printing the page -->
+    <div id="jb-print-docs-body" class="onlyprint">
+        <h1>Hypothesis Testing and Confidence Intervals</h1>
+        <!-- Table of contents -->
+        <div id="print-main-content" class="row">
+            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
+            <div id="jb-print-toc">
+                
+                <div>
+                    <h2> Contents </h2>
+                </div>
+                <nav aria-label="Page">
+                    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hypothesis-tests">
+   Hypothesis Tests
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#design">
+   Design
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#test-statistic">
+   Test Statistic
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conducting-a-permutation-test">
+   Conducting a Permutation Test
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bootstrap-confidence-intervals">
+   Bootstrap Confidence Intervals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   Summary
+  </a>
+ </li>
+</ul>
+
+                </nav>
+            </div>
+            
+              <div>
+                
+  <div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="hypothesis-testing-and-confidence-intervals">
+<h1>Hypothesis Testing and Confidence Intervals<a class="headerlink" href="#hypothesis-testing-and-confidence-intervals" title="Permalink to this headline">¶</a></h1>
+<p>In this section, we provide a brief review of hypothesis testing using the bootstrap and permutation tests. We assume familiarity with this topic since it is covered at length in Computational and Inferential Thinking, the textbook for Data 8. For a more thorough explanation of the concepts explained here, see <a class="reference external" href="https://www.inferentialthinking.com/chapters/11/Testing_Hypotheses">Chapter 11</a>, <a class="reference external" href="https://www.inferentialthinking.com/chapters/12/Comparing_Two_Samples">Chapter 12</a>, and <a class="reference external" href="https://www.inferentialthinking.com/chapters/13/Estimation">Chapter 13</a> of Computational and Inferential Thinking.</p>
+<div class="section" id="hypothesis-tests">
+<h2>Hypothesis Tests<a class="headerlink" href="#hypothesis-tests" title="Permalink to this headline">¶</a></h2>
+<p>When applying data science techniques to different domains, we are often faced with questions about the world. For example, does drinking coffee cause sleep deprivation? Do autonomous vehicles crash more often then non-autonomous vehicles? Does drug X help treat pneumonia? To help answer these questions, we use hypothesis tests to make informed conclusions based on observed evidence/data.</p>
+<p>Since data collection is often an imprecise process, we are often unsure whether the patterns in our dataset are due to noise or real phenomena. Hypothesis testing helps us determine whether a pattern could have happened because of random fluctuations in our data collection.</p>
+<p>To explore hypothesis testing, we start with an example. The table <code class="docutils literal notranslate"><span class="pre">baby</span></code> contains information on baby weights at birth. It records the baby’s birth weight in ounces and whether or not the mother smoked during pregnancy for 1174 babies.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;baby.csv&#39;</span><span class="p">)</span>
+<span class="n">baby</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;Birth Weight&quot;</span><span class="p">,</span> <span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Birth Weight</th>
+      <th>Maternal Smoker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>120</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>113</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>128</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1171</th>
+      <td>130</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1172</th>
+      <td>125</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1173</th>
+      <td>117</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>1174 rows × 2 columns</p>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="design">
+<h2>Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h2>
+<p>We would like to see whether maternal smoking was associated with birth weight.  To set up our hypothesis test, we can represent the two views of the world using the following null and alternative hypotheses:</p>
+<p><strong>Null hypothesis:</strong> In the population, the distribution of birth weights of babies is the same for mothers who don’t smoke as for mothers who do. The difference in the sample is due to chance.</p>
+<p><strong>Alternative hypothesis:</strong> In the population, the babies of the mothers who smoke have a lower birth weight, on average, than the babies of the non-smokers.</p>
+<p>Our ultimate goal is to make a decision between these two data generation models. One important point to notice is that we construct our hypotheses about the <em>parameters</em> of the data generation model rather than the outcome of the experiment. For example, we should not construct a null hypothesis such as “The birth weights of smoking mothers will be equal to the birth weights of nonsmoking mothers”, since there is natural variability in the outcome of this process.</p>
+<p>The null hypothesis emphasizes that if the data look different from what the null hypothesis predicts, the difference is due to nothing but chance. Informally, the alternative hypothesis says that the observed difference is “real.”</p>
+<p>We should take a closer look at the structure of our alternative hypothesis. In our current set up, notice that we would reject the null hypothesis if the birth weights of babies of the mothers who smoke are significantly lower than the birth weights of the babies of the mothers who do not smoke. In other words, the alternative hypothesis encompasses/supports one side of the distribution. We call this a <strong>one-sided</strong> alternative hypothesis. In general, we would only want to use this type of alternative hypothesis if we have a good reason to believe that it is impossible to see babies of the mothers who smoke have a higher birth weight, on average.</p>
+<p>To visualize the data, we’ve plotted histograms of the baby weights for babies born to maternal smokers and non-smokers.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">smokers_hist</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Birth Weight&quot;</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">))</span>
+<span class="n">non_smokers_hist</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Birth Weight&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Not Maternal Smoker&quot;</span><span class="p">))</span>
+<span class="n">smokers_hist</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Baby Birth Weights&quot;</span><span class="p">)</span>
+<span class="n">smokers_hist</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Proportion per Unit&quot;</span><span class="p">)</span>
+<span class="n">smokers_hist</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Birth Weights&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/hyp_introduction_7_0.png" src="../../_images/hyp_introduction_7_0.png" />
+</div>
+</div>
+<p>The weights of the babies of the mothers who smoked seem lower on average than the weights of the babies of the non-smokers. Could this difference likely have occurred due to random variation? We can try to answer this question using a hypothesis test.</p>
+<p>To perform a hypothesis test, we assume a particular model for generating the data; then, we ask ourselves, what is the chance we would see an outcome as extreme as the one that we observed? Intuitively, if the chance of seeing the outcome we observed is very small, the model that we assumed may not be the appropriate model.</p>
+<p>In particular, we assume that the null hypothesis and its probability model, the <strong>null model</strong>, is true. In other words, we assume that the null hypothesis is true and focus on what the value of the statistic would be under under the null hypothesis. This chance model says that there is no underlying difference; the distributions in the samples are different just due to chance.</p>
+</div>
+<div class="section" id="test-statistic">
+<h2>Test Statistic<a class="headerlink" href="#test-statistic" title="Permalink to this headline">¶</a></h2>
+<p>In our example, we would assume that maternal smoking has no effect on baby weight (where any observed difference is due to chance). In order to choose between our hypotheses, we will use the difference between the two group means as our <strong>test statistic</strong>.
+Formally, our test statistic is</p>
+<div class="math notranslate nohighlight">
+\[\mu_{\text{smoking}} - \mu_{\text{non-smoking}}\]</div>
+<p>so that small values (that is, large negative values) of this statistic will favor the alternative hypothesis. Let’s calculate the observed value of test statistic:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nonsmoker</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Birth Weight&quot;</span><span class="p">]</span>
+<span class="n">smoker</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Birth Weight&quot;</span><span class="p">]</span>
+<span class="n">observed_difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">smoker</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nonsmoker</span><span class="p">)</span>
+<span class="n">observed_difference</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-9.266142572024918
+</pre></div>
+</div>
+</div>
+</div>
+<p>If there were really no difference between the two distributions in the underlying population, then whether each mother was a maternal smoker or not should not affect the average birth weight. In other words, the label True or False with respect to maternal smoking should make no difference to the average.</p>
+<p>Therefore, in order to simulate the test statistic under the null hypothesis, we can shuffle all the birth weights randomly among the mothers. We conduct this random permutation below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">shuffle</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Shuffles a series and resets index to preserve shuffle when adding series</span>
+<span class="sd">    back to DataFrame.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">series</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Shuffled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Birth Weight&quot;</span><span class="p">])</span>
+<span class="n">baby</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Birth Weight</th>
+      <th>Maternal Smoker</th>
+      <th>Shuffled</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>120</td>
+      <td>False</td>
+      <td>122</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>113</td>
+      <td>False</td>
+      <td>167</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>128</td>
+      <td>True</td>
+      <td>115</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1171</th>
+      <td>130</td>
+      <td>True</td>
+      <td>116</td>
+    </tr>
+    <tr>
+      <th>1172</th>
+      <td>125</td>
+      <td>False</td>
+      <td>133</td>
+    </tr>
+    <tr>
+      <th>1173</th>
+      <td>117</td>
+      <td>False</td>
+      <td>120</td>
+    </tr>
+  </tbody>
+</table>
+<p>1174 rows × 3 columns</p>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="conducting-a-permutation-test">
+<h2>Conducting a Permutation Test<a class="headerlink" href="#conducting-a-permutation-test" title="Permalink to this headline">¶</a></h2>
+<p>Tests based on random permutations of the data are called <strong>permutation tests</strong>. In the cell below, we will simulate our test statistic many times and collect the differences in an array.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">differences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+<span class="n">repetitions</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+    <span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Shuffled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Birth Weight&quot;</span><span class="p">])</span>
+  
+    <span class="c1"># Find the difference between the means of two randomly assigned groups</span>
+    <span class="n">nonsmoker</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Shuffled&quot;</span><span class="p">]</span>
+    <span class="n">smoker</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Shuffled&quot;</span><span class="p">]</span>
+    <span class="n">simulated_difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">smoker</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nonsmoker</span><span class="p">)</span>
+
+    <span class="n">differences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">differences</span><span class="p">,</span> <span class="n">simulated_difference</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We plot a histogram of the simulated difference in means below:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">differences_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">differences_df</span><span class="p">[</span><span class="s2">&quot;differences&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">differences</span>
+<span class="n">diff_hist</span> <span class="o">=</span> <span class="n">differences_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;differences&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normed</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">diff_hist</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Birth Weight Difference&quot;</span><span class="p">)</span>
+<span class="n">diff_hist</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Proportion per Unit&quot;</span><span class="p">)</span>
+<span class="n">diff_hist</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Birth Weight Differences&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/hyp_introduction_17_0.png" src="../../_images/hyp_introduction_17_0.png" />
+</div>
+</div>
+<p>It makes intuitive sense that the distribution of differences is centered around 0 since the two groups should have the same average under the null hypothesis.</p>
+<p>In order to draw a conclusion for this hypothesis test, we should calculate the p-value. The empirical p-value of the test is the proportion of simulated differences that were equal to or less than the observed difference.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">differences</span> <span class="o">&lt;=</span> <span class="n">observed_difference</span><span class="p">)</span> <span class="o">/</span> <span class="n">repetitions</span>
+<span class="n">p_value</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>At the beginning of the hypothesis test we typically choose a p-value <strong>threshold of significance</strong> (commonly denoted as alpha). If our p-value is below our significance threshold, then we reject the null hypothesis. The most commonly chosen thresholds are 0.01 and 0.05, where 0.01 is considered to be more “strict” since we would need more evidence in favor of the alternative hypothesis to reject the null hypothesis.</p>
+<p>In either of these two cases, we reject the null hypothesis since the p-value is less than the significance threshold.</p>
+</div>
+<div class="section" id="bootstrap-confidence-intervals">
+<h2>Bootstrap Confidence Intervals<a class="headerlink" href="#bootstrap-confidence-intervals" title="Permalink to this headline">¶</a></h2>
+<p>Data scientists must often estimate an unknown population parameter using a random sample. Although we would ideally like to take numerous samples from the population to generate a sampling distribution, we are often limited to a single sample by money and time.</p>
+<p>Fortunately, a large, randomly collected sample looks like the original population. The bootstrap procedure uses this fact to simulate new samples by resampling from the original sample.</p>
+<p>To conduct the bootstrap, we perform the following steps:</p>
+<ol class="simple">
+<li><p>Sample with replacement from the original sample (now the bootstrap population). These samples are called bootstrap samples. We typically take thousands of bootstrap samples (~10,000 is common).</p></li>
+<li><p>Calculate the statistic of interest for each bootstrap sample. This statistic is called the bootstrap statistic, and the empirical distribution of these bootstrap statistics is an approximation to the sampling distribution of the bootstrapped statistic.</p></li>
+</ol>
+<p><img alt="alt text" src="https://www.inferentialthinking.com/images/chapters/13/2/Bootstrap_25_0.png" /></p>
+<p>We may use the bootstrap sampling distribution to create a confidence interval which we use to estimate the value of the population parameter.</p>
+<p>Since the birth weight data provides a large, random sample, we may act as if the data on mothers who did not smoke are representative of the population of nonsmoking mothers. Similarly, we act as if the data for smoking mothers are representative of the population of smoking mothers.</p>
+<p>Therefore, we treat our original sample as the bootstrap population to perform the bootstrap procedure:</p>
+<ol class="simple">
+<li><p>Draw a sample with replacement from the nonsmoking mothers and calculate the mean birth weight for these mothers. We also draw a sample with replacement from the smoking mothers and calculate the mean birth weight.</p></li>
+<li><p>Calculate the difference in means.</p></li>
+<li><p>Repeat the above process 10000 times, obtaining 10000 mean differences.</p></li>
+</ol>
+<p>This procedure gives us a empirical sampling distribution of differences in mean baby weights.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">bootstrap</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">stat</span><span class="p">,</span> <span class="n">replicates</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="n">stat</span><span class="p">(</span><span class="n">resample</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">replicates</span><span class="p">)</span>
+    <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nonsmoker</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Birth Weight&quot;</span><span class="p">]</span>
+<span class="n">smoker</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">baby</span><span class="p">[</span><span class="s2">&quot;Maternal Smoker&quot;</span><span class="p">],</span> <span class="s2">&quot;Birth Weight&quot;</span><span class="p">]</span>
+
+<span class="n">nonsmoker_means</span> <span class="o">=</span> <span class="n">bootstrap</span><span class="p">(</span><span class="n">nonsmoker</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="n">smoker_means</span> <span class="o">=</span> <span class="n">bootstrap</span><span class="p">(</span><span class="n">smoker</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">mean_differences</span> <span class="o">=</span> <span class="n">smoker_means</span> <span class="o">-</span> <span class="n">nonsmoker_means</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We plot the empirical distribution of the difference in means below:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean_differences_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">mean_differences_df</span><span class="p">[</span><span class="s2">&quot;differences&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean_differences</span><span class="p">)</span>
+<span class="n">mean_diff</span> <span class="o">=</span> <span class="n">mean_differences_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;differences&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">mean_diff</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Birth Weight Difference&quot;</span><span class="p">)</span>
+<span class="n">mean_diff</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Proportion per Unit&quot;</span><span class="p">)</span>
+<span class="n">mean_diff</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Birth Weight Differences&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/hyp_introduction_28_0.png" src="../../_images/hyp_introduction_28_0.png" />
+</div>
+</div>
+<p>Finally, to construct a 95% confidence interval we take the 2.5th and 97.5th percentiles of the bootstrap statistics:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">mean_differences</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span> 
+ <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">mean_differences</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(-11.36909646997882, -7.181670323140913)
+</pre></div>
+</div>
+</div>
+</div>
+<p>This confidence interval allows us to state with 95% confidence that the population mean difference in birth weights is between -11.37 and -7.18 ounces.</p>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we review hypothesis testing using the permutation test and confidence intervals using the bootstrap. To conduct a hypothesis test, we must state our null and alternative hypotheses, select an appropriate test statistic, and perform the testing procedure to calculate a p-value. To create a confidence interval, we select an appropriate test statistic, bootstrap the original sample to generate an empirical distribution of the test statistic, and select the quantiles corresponding to our desired confidence level.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/a03"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </div>
+        </div>
+    </div>
+    <div id="main-content" class="row noprint">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
         
               <div>
@@ -1572,21 +2060,19 @@ Formally, our test statistic is</p>
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
-        
-            &copy; Copyright 2021.<br/>
-          <div class="extra_footer">
-            <p>
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2021.<br/>
+      <div class="extra_footer">
+        <p>
 License: CC BY-NC-ND 4.0
 </p>
 
-          </div>
-      </p>
-    </div>
-  </footer>
+      </div>
+  </p>
+</footer>
 </main>
 
 
