@@ -164,22 +164,22 @@
   <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
-     2.1. Big Data Hubris
+     2.1. Big Data and New Opportunities
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_construct.html">
-     2.2. A Construct for Data Scope
+     2.2. Target Population, Access Frame, Sample
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_accuracy.html">
-     2.3. Accuracy
+     2.5. Accuracy
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_exercises.html">
-     2.4. Exercises
+     2.6. Exercises
     </a>
    </li>
   </ul>
@@ -201,22 +201,22 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_random_assignment.html">
-     3.2. Random Assignment
+     3.3. Random Assignment
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_measurement_error.html">
-     3.3. Measurement Error
+     3.4. Measurement Error
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_prob_dist.html">
-     3.4. Probability Distribution for a Statistic
+     3.5. Probability Distribution for a Statistic
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_exercises.html">
-     3.5. Exercises
+     3.6. Exercises
     </a>
    </li>
   </ul>
@@ -1161,19 +1161,20 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>Inference for Multiple Linear Regression</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
-                <div>
-                    <h2> Contents </h2>
-                </div>
-                <nav aria-label="Page">
-                    <ul class="visible nav section-nav flex-column">
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Inference for Multiple Linear Regression</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-data">
    19.2.1. The Data
@@ -1237,7 +1238,9 @@
  </li>
 </ul>
 
-                </nav>
+                        </nav>
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -1735,509 +1738,8 @@ procedure implicitly assumes that the errors are identically distributed. More s
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
-
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="inference-for-multiple-linear-regression">
-<h1><span class="section-number">19.2. </span>Inference for Multiple Linear Regression<a class="headerlink" href="#inference-for-multiple-linear-regression" title="Permalink to this headline">¶</a></h1>
-<p>Recall that in linear regression, we fit a model of the following form
-$<span class="math notranslate nohighlight">\(
-\begin{aligned}
-f_\hat{\theta} (x) = \hat{\theta_0} + \hat{\theta_1} x_1 + \ldots + \hat{\theta_p} x_p
-\end{aligned}
-\)</span>$</p>
-<p>We would like to infer the true coefficients of the model. Since the <span class="math notranslate nohighlight">\(\hat{\theta_0}\)</span>, <span class="math notranslate nohighlight">\(\hat{\theta_1}\)</span>, <span class="math notranslate nohighlight">\(\ldots\)</span> <span class="math notranslate nohighlight">\(\hat{\theta_p}\)</span> are estimators that vary based on our training data/observations, we would like to understand how our estimated coefficients compare with the true coefficients. Bootstrapping is a <em>nonparametric</em> approach to statistical inference that gives us standard errors and confidence intervals for our parameters.</p>
-<p>Let’s take a look at an example of how we use bootstrapping methods within linear regression.</p>
-<div class="section" id="the-data">
-<h2><span class="section-number">19.2.1. </span>The Data<a class="headerlink" href="#the-data" title="Permalink to this headline">¶</a></h2>
-<p>Otis Dudley Duncan was a quantitative sociologist interested in measuring the prestige levels of different occupations. There were only 90 occupations that were rated for their prestige level in the 1947 National Opinion Research Center (NORC) survey. Duncan wanted to “fill in” prestige scores for unrated occupations by using income and education data about each occupation recorded by the 1950 census. When joining the NORC data with the 1950 census data, only 45 occupations could be matched. Ultimately, Duncan’s goal was to create a model to explain prestige using different characteristics; using this model, one can predict the prestige of other occupations not recorded in the NORC survey.</p>
-<p>The Duncan dataset is a random sample of that contains information on the prestige and other characteristics of 45 U. S. occupations in 1950.
-The variables are:</p>
-<p><code class="docutils literal notranslate"><span class="pre">occupation</span></code> represents the type of occupation/title.</p>
-<p><code class="docutils literal notranslate"><span class="pre">income</span></code> represents the percentage of occupational incumbents who earned incomes in excess of $3,500.</p>
-<p><code class="docutils literal notranslate"><span class="pre">education</span></code> represents the percentage of incumbents in the occupation in the 1950 U.S. Census who were high school graduates.</p>
-<p><code class="docutils literal notranslate"><span class="pre">prestige</span></code> represents the percentage of respondents in a survey who rated an occupation as “good” or “excellent” in prestige.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">duncan</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;duncan.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;occupation&quot;</span><span class="p">,</span> <span class="s2">&quot;income&quot;</span><span class="p">,</span> <span class="s2">&quot;education&quot;</span><span class="p">,</span> <span class="s2">&quot;prestige&quot;</span><span class="p">]]</span>
-<span class="n">duncan</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>occupation</th>
-      <th>income</th>
-      <th>education</th>
-      <th>prestige</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>accountant</td>
-      <td>62</td>
-      <td>86</td>
-      <td>82</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>pilot</td>
-      <td>72</td>
-      <td>76</td>
-      <td>83</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>architect</td>
-      <td>75</td>
-      <td>92</td>
-      <td>90</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>42</th>
-      <td>janitor</td>
-      <td>7</td>
-      <td>20</td>
-      <td>8</td>
-    </tr>
-    <tr>
-      <th>43</th>
-      <td>policeman</td>
-      <td>34</td>
-      <td>47</td>
-      <td>41</td>
-    </tr>
-    <tr>
-      <th>44</th>
-      <td>waiter</td>
-      <td>8</td>
-      <td>32</td>
-      <td>10</td>
-    </tr>
-  </tbody>
-</table>
-<p>45 rows × 4 columns</p>
-</div></div></div>
-</div>
-<p>It is usually a good idea to explore the data through visualization in order to gain an understanding of the relationships between your variables. Below, we will visualize the correlations between income, educationa and prestige.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">duncan</span><span class="p">[</span><span class="s2">&quot;education&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">duncan</span><span class="p">[</span><span class="s2">&quot;prestige&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection at 0x1a1cf2cd30&gt;
-</pre></div>
-</div>
-<img alt="../../_images/mult_inference_5_1.png" src="../../_images/mult_inference_5_1.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">duncan</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">duncan</span><span class="p">[</span><span class="s2">&quot;prestige&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection at 0x1a1d0224e0&gt;
-</pre></div>
-</div>
-<img alt="../../_images/mult_inference_6_1.png" src="../../_images/mult_inference_6_1.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">duncan</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">duncan</span><span class="p">[</span><span class="s2">&quot;education&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection at 0x1a1d0de5f8&gt;
-</pre></div>
-</div>
-<img alt="../../_images/mult_inference_7_1.png" src="../../_images/mult_inference_7_1.png" />
-</div>
-</div>
-<p>From the plots above, we see that both education and income are positively correlated with prestige; hence, both of these variables might be useful in helping explain prestige. Let’s fit a linear model using these explanatory variables to explain prestige.</p>
-</div>
-<div class="section" id="fitting-the-model">
-<h2><span class="section-number">19.2.2. </span>Fitting the model<a class="headerlink" href="#fitting-the-model" title="Permalink to this headline">¶</a></h2>
-<p>We will fit the following model, that explains the prestige of an occupation as a linear function of income and education:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-\texttt{prestige}_i
-= \theta_0^* 
-+ \theta_\texttt{income}^*\cdot\texttt{income}_i
-+ \theta_\texttt{education}^*\cdot\texttt{education}_i
-+ \varepsilon_i
-\end{aligned}
-\]</div>
-<p>In order to fit this model, we will define the design matrix (X) and our response variable (y):</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">duncan</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">,</span> <span class="s2">&quot;education&quot;</span><span class="p">]]</span>
-<span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>income</th>
-      <th>education</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>62</td>
-      <td>86</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>72</td>
-      <td>76</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>75</td>
-      <td>92</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>55</td>
-      <td>90</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>64</td>
-      <td>86</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">duncan</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;prestige&quot;</span><span class="p">]</span>
-<span class="n">y</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0    82
-1    83
-2    90
-3    76
-4    90
-Name: prestige, dtype: int64
-</pre></div>
-</div>
-</div>
-</div>
-<p>Below, we fit our linear model and print all the <span class="math notranslate nohighlight">\(\widehat \theta\)</span> coefficients of the model (from the equation above) after the model has been fit to the data. Note that these are our sample coefficients.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sklearn.linear_model</span> <span class="k">as</span> <span class="nn">lm</span>
-
-<span class="n">linear_model</span> <span class="o">=</span> <span class="n">lm</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
-<span class="n">linear_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">intercept: </span><span class="si">%.2f</span><span class="s2"></span>
-<span class="s2">income:    </span><span class="si">%.2f</span><span class="s2"></span>
-<span class="s2">education:    </span><span class="si">%.2f</span><span class="s2"></span>
-<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="n">linear_model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">])</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">linear_model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>intercept: -6.06
-income:    0.60
-education:    0.55
-</pre></div>
-</div>
-</div>
-</div>
-<p>The coefficients above give us an estimate of the true coefficients. But had our sample data been different, we would have fit our model to different data, causing these coefficients to be different. We would like to explore what our coefficients might have been using bootstrapping methods.</p>
-<p>In our bootstrapping methods and analysis, we will focus on the coefficient of education. We would like to explore the partial relationship between prestige and education holding income constant (rather than the marginal relationship between prestige and education ignoring income). The partial regression coefficient <span class="math notranslate nohighlight">\(\widehat\theta_\texttt{education}\)</span> illustrates the partial relationship between prestige and education within our data.</p>
-</div>
-<div class="section" id="bootstrapping-the-observations">
-<h2><span class="section-number">19.2.3. </span>Bootstrapping the Observations<a class="headerlink" href="#bootstrapping-the-observations" title="Permalink to this headline">¶</a></h2>
-<p>In this method, we consider the pairs <span class="math notranslate nohighlight">\((X_i, y_i)\)</span> to be our sample, so we construct the bootstrap resample by sampling with replacement from these pairs:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-(X_i^*, y_i^*) 
-= (X_I, y_I), \text{ where } I=1,\dots,n \text{ is sampled uniformly at random.}
-\end{aligned}
-\]</div>
-<p>In other words, we sample n observations with replacement from our data points; this is our bootstrap sample. Then we will fit a new linear regression model to this sampled data and record the education coefficient <span class="math notranslate nohighlight">\(\tilde\theta_\texttt{education}\)</span>; this coefficient is our bootstrap statistic.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simple_resample</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> 
-    <span class="k">return</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">n</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">n</span><span class="p">))</span>
-
-<span class="k">def</span> <span class="nf">bootstrap</span><span class="p">(</span><span class="n">boot_pop</span><span class="p">,</span> <span class="n">statistic</span><span class="p">,</span> <span class="n">resample</span> <span class="o">=</span> <span class="n">simple_resample</span><span class="p">,</span> <span class="n">replicates</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">):</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">boot_pop</span><span class="p">)</span>
-    <span class="n">resample_estimates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">statistic</span><span class="p">(</span><span class="n">boot_pop</span><span class="p">[</span><span class="n">resample</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">replicates</span><span class="p">)])</span>
-    <span class="k">return</span> <span class="n">resample_estimates</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">educ_coeff</span><span class="p">(</span><span class="n">data_array</span><span class="p">):</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-    
-    <span class="n">linear_model</span> <span class="o">=</span> <span class="n">lm</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">theta_educ</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="k">return</span> <span class="n">theta_educ</span>
-
-<span class="n">data_array</span> <span class="o">=</span> <span class="n">duncan</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;prestige&quot;</span><span class="p">,</span> <span class="s2">&quot;income&quot;</span><span class="p">,</span> <span class="s2">&quot;education&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
-
-<span class="n">theta_hat_sampling</span> <span class="o">=</span> <span class="n">bootstrap</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="n">educ_coeff</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">theta_hat_sampling</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">normed</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">tilde{</span><span class="se">\\</span><span class="s2">theta}_</span><span class="si">{educ}</span><span class="s2">$ Values&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Proportion per Unit&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Bootstrap Sampling Distribution of $</span><span class="se">\\</span><span class="s2">tilde{</span><span class="se">\\</span><span class="s2">theta}_</span><span class="si">{educ}</span><span class="s2">$ (Nonparametric)&quot;</span><span class="p">);</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/mult_inference_18_0.png" src="../../_images/mult_inference_18_0.png" />
-</div>
-</div>
-<p>Notice how the sampling distribution above is slightly skewed to the left.</p>
-<div class="section" id="estimating-the-true-coefficients">
-<h3><span class="section-number">19.2.3.1. </span>Estimating the True Coefficients<a class="headerlink" href="#estimating-the-true-coefficients" title="Permalink to this headline">¶</a></h3>
-<p>Although we cannot directly measure <span class="math notranslate nohighlight">\(\theta^*_\texttt{education}\)</span> we can use a bootstrap confidence interval to account for variability in the sample regression coefficient <span class="math notranslate nohighlight">\(\widehat\theta_{\texttt{education}}\)</span>. Below, We construct an approximate 95% confidence interval for the true coefficient <span class="math notranslate nohighlight">\(\theta^*_\texttt{education}\)</span>, using the bootstrap percentile method. The confidence interval extends from the 2.5th percentile to the 97.5th percentile of the 10,000 bootstrapped coefficients.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">left_confidence_interval_endpoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">theta_hat_sampling</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
-<span class="n">right_confidence_interval_endpoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">theta_hat_sampling</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">)</span>
-
-<span class="n">left_confidence_interval_endpoint</span><span class="p">,</span> <span class="n">right_confidence_interval_endpoint</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(0.24714198882974781, 0.78293602739856061)
-</pre></div>
-</div>
-</div>
-</div>
-<p>From the confidence interval above, we are fairly certain that the true coefficient lies between 0.236 and 0.775.</p>
-</div>
-</div>
-<div class="section" id="confidence-interval-using-normal-theory">
-<h2><span class="section-number">19.2.4. </span>Confidence Interval Using Normal Theory<a class="headerlink" href="#confidence-interval-using-normal-theory" title="Permalink to this headline">¶</a></h2>
-<p>We can also create confidence intervals based on normal theory. Since the <span class="math notranslate nohighlight">\(\widehat \theta_{educ}\)</span> values appear normally distributed, we can construct a confidence interval using by computing the following:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-[\widehat \theta - z_{\frac{\alpha}{2}}*SE(\theta^*),  \widehat \theta + z_{\frac{\alpha}{2}}*SE(\theta^*)]
-\end{aligned}
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(SE(\theta^*)\)</span> is the standard error of our bootstrapped coefficients, <span class="math notranslate nohighlight">\(z\)</span> is a constant, and <span class="math notranslate nohighlight">\(\widehat \theta\)</span> is our sample coefficient. Note that <span class="math notranslate nohighlight">\(z\)</span> varies depending on the confidence level of the interval we are constructing. Since we are creating a 95% confidence interval, we will use 1.96.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We will use the statsmodels library in order to find the standard error of the coefficients</span>
-<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
-<span class="n">ols</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
-<span class="n">ols_result</span> <span class="o">=</span> <span class="n">ols</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-<span class="c1"># Now you have at your disposition several error estimates, e.g.</span>
-<span class="n">ols_result</span><span class="o">.</span><span class="n">HC0_se</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>income       0.15
-education    0.12
-dtype: float64
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">left_confidence_interval_endpoint_normal</span> <span class="o">=</span> <span class="mf">0.55</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.96</span><span class="o">*</span><span class="mf">0.12</span><span class="p">)</span>
-<span class="n">right_confidence_interval_endpoint_normal</span> <span class="o">=</span> <span class="mf">0.55</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.96</span><span class="o">*</span><span class="mf">0.12</span><span class="p">)</span>
-<span class="n">left_confidence_interval_endpoint_normal</span><span class="p">,</span> <span class="n">right_confidence_interval_endpoint_normal</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(0.3148000000000001, 0.7852)
-</pre></div>
-</div>
-</div>
-</div>
-<p>**Observations: **
-Notice how the confidence interval using normal theory is more narrow than the confidence interval using the percentile method, especially towards the left of the interval.</p>
-<p>We will not go into the normal theory confidence interval in great detail, but if you would like to learn more, refer to X.</p>
-<div class="section" id="could-the-true-coefficient-be-0">
-<h3><span class="section-number">19.2.4.1. </span>Could the true coefficient be 0?<a class="headerlink" href="#could-the-true-coefficient-be-0" title="Permalink to this headline">¶</a></h3>
-<p>Although we observed a positive partial relationship between education and prestige (from the 0.55 coefficient), what if the true coefficient is actually 0 and there is no partial relationship between education and prestige? In this case, the association that we observed was just due to variability in obtaining the points that form our sample.</p>
-<p>To formally test whether the partial relationship between education and prestige is real, we would like to test the following hypotheses:</p>
-<p><strong>Null Hypothesis:</strong> The true partial coefficient is 0.</p>
-<p><strong>Alternative Hypothesis.</strong> The true partial coefficient is not 0.</p>
-<p>Since we have already contructed a 95% confidence interval for the true coefficient, we just need to see whether 0 lies within this interval. Notice that 0 does not lie within our confidence interval above; therefore, we have enough evidence to reject the null hypothesis.</p>
-<p>If the confidence interval for the true coefficient did contain 0, then we would not have enough evidence to reject the null hypothesis. In this case, the observed coefficient <span class="math notranslate nohighlight">\(\widehat\theta_{\texttt{education}}\)</span> would likely spurious.</p>
-</div>
-<div class="section" id="method-1-bootstrapping-reflection">
-<h3><span class="section-number">19.2.4.2. </span>Method 1 Bootstrapping Reflection<a class="headerlink" href="#method-1-bootstrapping-reflection" title="Permalink to this headline">¶</a></h3>
-<p>In order to build the sampling distribution of the coefficient <span class="math notranslate nohighlight">\(\widehat\theta_{\texttt{education}}\)</span> and contruct the confidence interval for the true coefficient, we directly resampled the observations and fitted new regression models on our bootstrap samples. This method implicitly treats the regressors <span class="math notranslate nohighlight">\(X_i\)</span> as random rather than fixed.</p>
-<p>In some cases, we may want to treat the <span class="math notranslate nohighlight">\(X_i\)</span> as fixed (if, for example, the data were derive from an experimental
-design). In the case where the explanatory variables were controlled for, or the values of the explanatory variables were set by the experimenter, then we may consider the following alternative bootstrapping method.</p>
-</div>
-</div>
-<div class="section" id="alternative-bootstrapping-the-residuals">
-<h2><span class="section-number">19.2.5. </span>Alternative: Bootstrapping the Residuals<a class="headerlink" href="#alternative-bootstrapping-the-residuals" title="Permalink to this headline">¶</a></h2>
-<p>Another approach to hypothesis testing in linear regression is bootstrapping the residuals. This approach makes many underlying assumptions and used less frequently in practice. In this method, we consider the <em>residuals</em> <span class="math notranslate nohighlight">\(e_i := y_i - X_i\widehat\beta \)</span> to be our sample, so we construct the bootstrap resample by sampling with replacement from these residuals. Once we construct each bootstrap sample, we can compute new fitted values using these residuals. Then, we regress these new Y values onto the fixed X values to obtain bootstrap regression coefficients.</p>
-<p>For more clarity, let’s break this method down into steps:</p>
-<ol class="simple">
-<li><p>Estimate the regression coefficients for the original sample, and calculate
-the fitted value <span class="math notranslate nohighlight">\(\widehat y\)</span> and residual <span class="math notranslate nohighlight">\(e_i\)</span> for each observation.</p></li>
-<li><p>Select bootstrap samples of the residuals; we will denote these bootstrapped residuals as <span class="math notranslate nohighlight">\(\tilde e_1, \tilde e_2, \dots \tilde e_n\)</span>. Then, calculate bootstrapped <span class="math notranslate nohighlight">\(\tilde y_i\)</span> values by computing <span class="math notranslate nohighlight">\(\widehat y + \tilde e_i\)</span> where the fitted values <span class="math notranslate nohighlight">\(\widehat y_i = X_i\widehat\beta\)</span>
-are obtained from the original regression.</p></li>
-<li><p>Regress the bootstrapped <span class="math notranslate nohighlight">\(\tilde y_i\)</span> values on the fixed <span class="math notranslate nohighlight">\(X\)</span> values to obtain bootstrap regression
-coefficients <span class="math notranslate nohighlight">\(\tilde \theta\)</span>.</p></li>
-<li><p>Repeat steps two and three several times in order to obtain several bootstrap regression coefficients <span class="math notranslate nohighlight">\(\tilde \theta_1, \tilde \theta_2, \dots \tilde \theta_n\)</span>. These can be used to compute bootstrap standard errors and confidence intervals.</p></li>
-</ol>
-<div class="section" id="id1">
-<h3><span class="section-number">19.2.5.1. </span>Estimating the True Coefficients<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Now that we have the bootstrapped regression coefficients, we can construct a confidence interval using the same techniques as before. We will leave this as an exercise.</p>
-</div>
-<div class="section" id="bootstrapping-the-residuals-reflection">
-<h3><span class="section-number">19.2.5.2. </span>Bootstrapping the Residuals Reflection<a class="headerlink" href="#bootstrapping-the-residuals-reflection" title="Permalink to this headline">¶</a></h3>
-<p>Let’s reflect on this method. By randomly reattaching resampled residuals to ﬁtted values, this
-procedure implicitly assumes that the errors are identically distributed. More specifically, this method assumes that the distribution of fluctuations around the regression curve is the same for all values of the input <span class="math notranslate nohighlight">\(x_i\)</span>. This is a disadvantage because the true errors may have nonconstant variance; this phenomenon is called heteroscedasticity.</p>
-<p>Although this method does not make any assumptions about the shape of the error distribution, it implicitly assumes that the functional form of the model is correct. By relying on the model to create each bootstrap sample, we assume that the model structure is appropriate.</p>
-</div>
-</div>
-<div class="section" id="summary">
-<h2><span class="section-number">19.2.6. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>In this section, we highlight bootstrapping techniques used in a linear regression setting.</p>
-<p>In general, bootstrapping the observations is more commonly used for bootstrapping. This method is often more robust than other techniques because it makes less underlying assumptions; for example, if an incorrect model is fitted, this method will still yield an appropriate sampling distribution of the parameter of interest.</p>
-<p>We also highlight an alternative method, which has several disadvantages. Bootstrapping the residuals can be used when we would like the treat our observations <span class="math notranslate nohighlight">\(X\)</span> as fixed. Note that this method should be used with caution because it makes additional assumptions about the errors and form of the model.</p>
-</div>
-</div>
-
-    <script type="text/x-thebe-config">
-    {
-        requestKernel: true,
-        binderOptions: {
-            repo: "binder-examples/jupyter-stacks-datascience",
-            ref: "master",
-        },
-        codeMirrorConfig: {
-            theme: "abcdef",
-            mode: "python"
-        },
-        kernelOptions: {
-            kernelName: "python3",
-            path: "./ch/19"
-        },
-        predefinedOutput: true
-    }
-    </script>
-    <script>kernelName = 'python3'</script>
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="mult_model.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -2254,7 +1756,7 @@ procedure implicitly assumes that the errors are identically distributed. More s
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

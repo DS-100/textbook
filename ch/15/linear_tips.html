@@ -164,22 +164,22 @@
   <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
-     2.1. Big Data Hubris
+     2.1. Big Data and New Opportunities
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_construct.html">
-     2.2. A Construct for Data Scope
+     2.2. Target Population, Access Frame, Sample
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_accuracy.html">
-     2.3. Accuracy
+     2.5. Accuracy
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_exercises.html">
-     2.4. Exercises
+     2.6. Exercises
     </a>
    </li>
   </ul>
@@ -201,22 +201,22 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_random_assignment.html">
-     3.2. Random Assignment
+     3.3. Random Assignment
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_measurement_error.html">
-     3.3. Measurement Error
+     3.4. Measurement Error
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_prob_dist.html">
-     3.4. Probability Distribution for a Statistic
+     3.5. Probability Distribution for a Statistic
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_exercises.html">
-     3.5. Exercises
+     3.6. Exercises
     </a>
    </li>
   </ul>
@@ -1105,19 +1105,20 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>Predicting Tip Amounts</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
-                <div>
-                    <h2> Contents </h2>
-                </div>
-                <nav aria-label="Page">
-                    <ul class="visible nav section-nav flex-column">
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Predicting Tip Amounts</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#defining-a-simple-linear-model">
    15.1.1. Defining a Simple Linear Model
@@ -1125,7 +1126,9 @@
  </li>
 </ul>
 
-                </nav>
+                        </nav>
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -1341,227 +1344,8 @@ f_\boldsymbol\theta (x) = \theta_1 x + \theta_0
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
-
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="predicting-tip-amounts">
-<h1><span class="section-number">15.1. </span>Predicting Tip Amounts<a class="headerlink" href="#predicting-tip-amounts" title="Permalink to this headline">¶</a></h1>
-<p>Previously, we worked with a dataset that contained one row for each table that a waiter served in a week. Our waiter collected this data in order to predict the tip amount he could expect to receive from a future table.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
-<span class="n">tips</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>total_bill</th>
-      <th>tip</th>
-      <th>sex</th>
-      <th>smoker</th>
-      <th>day</th>
-      <th>time</th>
-      <th>size</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>16.99</td>
-      <td>1.01</td>
-      <td>Female</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>10.34</td>
-      <td>1.66</td>
-      <td>Male</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>21.01</td>
-      <td>3.50</td>
-      <td>Male</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>23.68</td>
-      <td>3.31</td>
-      <td>Male</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>24.59</td>
-      <td>3.61</td>
-      <td>Female</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>4</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_tips_3_0.png" src="../../_images/linear_tips_3_0.png" />
-</div>
-</div>
-<p>As we have covered previously, if we choose a constant model and the mean squared error cost, our model will predict the mean of the tip amount:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.9982786885245902
-</pre></div>
-</div>
-</div>
-</div>
-<p>This means that if a new party orders a meal and the waiter asks us how much tip he will likely receive, we will say “around $3”, no matter how large the table is or how much their total bill was.</p>
-<p>However, looking at other variables in the dataset, we see that we might be able to make more accurate predictions if we incorporate them into our model. For example, the following plot of the tip amount against the total bill shows a positive association.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;total_bill&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;tip&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tips</span><span class="p">,</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Tip amount vs. Total Bill&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Total Bill&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Tip Amount&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_tips_7_0.png" src="../../_images/linear_tips_7_0.png" />
-</div>
-</div>
-<p>Although the average tip amount is <span class="math notranslate nohighlight">\(\$3\)</span>, if a table orders <span class="math notranslate nohighlight">\(\$40\)</span> worth of food we would certainly expect that the waiter receives more than <span class="math notranslate nohighlight">\(\$3\)</span> of tip. Thus, we would like to alter our model so that it makes predictions based on the variables in our dataset instead of blindly predicting the mean tip amount. To do this, we use a linear model instead of constant one.</p>
-<p>Let’s briefly review our current toolbox for modeling and estimation and define some new notation so that we can better represent the additional complexity that linear models have.</p>
-<div class="section" id="defining-a-simple-linear-model">
-<h2><span class="section-number">15.1.1. </span>Defining a Simple Linear Model<a class="headerlink" href="#defining-a-simple-linear-model" title="Permalink to this headline">¶</a></h2>
-<p>We are interested in predicting the tip amount based on the total bill of a table. Let <span class="math notranslate nohighlight">\( y \)</span> represent the tip amount, the variable we are trying to predict. Let <span class="math notranslate nohighlight">\( x \)</span> represent the total bill, the variable we are incorporating for prediction.</p>
-<p>We define a linear model <span class="math notranslate nohighlight">\( f_\boldsymbol\theta^* \)</span> that depends on <span class="math notranslate nohighlight">\( x \)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-f_\boldsymbol\theta^* (x) = \theta_1^* x + \theta_0^*
-\]</div>
-<p>We treat <span class="math notranslate nohighlight">\( f_\boldsymbol\theta^* (x) \)</span> as the underlying function that generated the data.</p>
-<p><span class="math notranslate nohighlight">\( f_\boldsymbol\theta^* (x) \)</span> assumes that in truth, <span class="math notranslate nohighlight">\( y \)</span> has a perfectly linear relationship with <span class="math notranslate nohighlight">\( x \)</span>. However, our observed data do not follow a perfectly straight line because of some random noise <span class="math notranslate nohighlight">\( \epsilon \)</span>. Mathematically, we account for this by adding a noise term:</p>
-<div class="math notranslate nohighlight">
-\[
-y = f_\boldsymbol\theta^* (x) + \epsilon
-\]</div>
-<p>If the assumption that <span class="math notranslate nohighlight">\( y \)</span> has a perfectly linear relationship with <span class="math notranslate nohighlight">\( x \)</span> holds, and we are able to somehow find the exact values of <span class="math notranslate nohighlight">\( \theta_1^* \)</span> and <span class="math notranslate nohighlight">\( \theta_0^* \)</span>, and we magically have no random noise, we will be able to perfectly predict the amount of tip the waiter will get for all tables, forever. Of course, we cannot completely fulfill any of these criteria in practice. Instead, we will estimate <span class="math notranslate nohighlight">\( \theta_1^* \)</span> and <span class="math notranslate nohighlight">\( \theta_0^* \)</span> using our dataset to make our predictions as accurate as possible.</p>
-<p><strong>Estimating the Linear Model</strong></p>
-<p>Since we cannot find <span class="math notranslate nohighlight">\( \theta_1^* \)</span> and <span class="math notranslate nohighlight">\( \theta_0^* \)</span> exactly, we will assume that our dataset approximates our population and use our dataset to estimate these parameters. We denote our estimations with <span class="math notranslate nohighlight">\(\theta_1\)</span> and <span class="math notranslate nohighlight">\(\theta_0\)</span>, our fitted estimations with <span class="math notranslate nohighlight">\( \hat{\theta_1} \)</span> and <span class="math notranslate nohighlight">\( \hat{\theta_0} \)</span>, and our model as:</p>
-<div class="math notranslate nohighlight">
-\[
-f_\boldsymbol\theta (x) = \theta_1 x + \theta_0
-\]</div>
-<p>Sometimes you will see <span class="math notranslate nohighlight">\( h(x) \)</span> written instead of <span class="math notranslate nohighlight">\( f_\hat{\boldsymbol\theta} (x) \)</span>; the “<span class="math notranslate nohighlight">\( h \)</span>” stands for hypothesis, as <span class="math notranslate nohighlight">\( f_\hat{\boldsymbol\theta} (x) \)</span> is our hypothesis of <span class="math notranslate nohighlight">\( f_{\boldsymbol\theta^*} (x) \)</span>.</p>
-<p>In order to determine <span class="math notranslate nohighlight">\( \hat{\theta_1} \)</span> and <span class="math notranslate nohighlight">\( \hat{\theta_0} \)</span>, we choose a cost function and minimize it using gradient descent.</p>
-</div>
-</div>
-
-    <script type="text/x-thebe-config">
-    {
-        requestKernel: true,
-        binderOptions: {
-            repo: "binder-examples/jupyter-stacks-datascience",
-            ref: "master",
-        },
-        codeMirrorConfig: {
-            theme: "abcdef",
-            mode: "python"
-        },
-        kernelOptions: {
-            kernelName: "python3",
-            path: "./ch/15"
-        },
-        predefinedOutput: true
-    }
-    </script>
-    <script>kernelName = 'python3'</script>
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="linear_models.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -1578,7 +1362,7 @@ f_\boldsymbol\theta (x) = \theta_1 x + \theta_0
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

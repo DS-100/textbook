@@ -164,22 +164,22 @@
   <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
-     2.1. Big Data Hubris
+     2.1. Big Data and New Opportunities
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_construct.html">
-     2.2. A Construct for Data Scope
+     2.2. Target Population, Access Frame, Sample
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_accuracy.html">
-     2.3. Accuracy
+     2.5. Accuracy
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_exercises.html">
-     2.4. Exercises
+     2.6. Exercises
     </a>
    </li>
   </ul>
@@ -201,22 +201,22 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_random_assignment.html">
-     3.2. Random Assignment
+     3.3. Random Assignment
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_measurement_error.html">
-     3.3. Measurement Error
+     3.4. Measurement Error
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_prob_dist.html">
-     3.4. Probability Distribution for a Statistic
+     3.5. Probability Distribution for a Statistic
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_exercises.html">
-     3.5. Exercises
+     3.6. Exercises
     </a>
    </li>
   </ul>
@@ -1125,19 +1125,20 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>Fitting a Logistic Model</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
-                <div>
-                    <h2> Contents </h2>
-                </div>
-                <nav aria-label="Page">
-                    <ul class="visible nav section-nav flex-column">
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Fitting a Logistic Model</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#batch-gradient-descent">
    24.6.1. Batch Gradient Descent
@@ -1165,7 +1166,9 @@
  </li>
 </ul>
 
-                </nav>
+                        </nav>
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -1376,222 +1379,8 @@ Wall time: 119 ms
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
-
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="fitting-a-logistic-model">
-<h1><span class="section-number">24.6. </span>Fitting a Logistic Model<a class="headerlink" href="#fitting-a-logistic-model" title="Permalink to this headline">¶</a></h1>
-<p>Previously, we covered batch gradient descent, an algorithm that iteratively updates <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> to find the loss-minimizing parameters <span class="math notranslate nohighlight">\(\boldsymbol{\hat\theta}\)</span>. We also discussed stochastic gradient descent and mini-batch gradient descent, methods that take advantage of statistical theory and parallelized hardware to decrease the time spent training the gradient descent algorithm. In this section, we will apply these concepts to logistic regression and walk through examples using scikit-learn functions.</p>
-<div class="section" id="batch-gradient-descent">
-<h2><span class="section-number">24.6.1. </span>Batch Gradient Descent<a class="headerlink" href="#batch-gradient-descent" title="Permalink to this headline">¶</a></h2>
-<p>The general update formula for batch gradient descent is given by:</p>
-<div class="math notranslate nohighlight">
-\[
-\boldsymbol{\theta}^{(t+1)} = \boldsymbol{\theta}^{(t)} - \alpha \cdot \nabla_\boldsymbol{\theta} L(\boldsymbol{\theta}^{(t)}, \textbf{X}, \textbf{y})
-\]</div>
-<p>In logistic regression, we use the cross entropy loss as our loss function:</p>
-<div class="math notranslate nohighlight">
-\[
-L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = \frac{1}{n} \sum_{i=1}^{n} \left(-y_i \ln \left(f_{\boldsymbol{\theta}} \left(\textbf{X}_i \right) \right) - \left(1 - y_i \right) \ln \left(1 - f_{\boldsymbol{\theta}} \left(\textbf{X}_i \right) \right) \right)
-\]</div>
-<p>The gradient of the cross entropy loss is <span class="math notranslate nohighlight">\(\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = -\frac{1}{n}\sum_{i=1}^n(y_i - \sigma_i)\textbf{X}_i \)</span>. Plugging this into the update formula allows us to find the gradient descent algorithm specific to logistic regression. Letting <span class="math notranslate nohighlight">\( \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{align}
-\boldsymbol{\theta}^{(t+1)} &amp;= \boldsymbol{\theta}^{(t)} - \alpha \cdot \left(- \frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) \textbf{X}_i \right) \\
-&amp;= \boldsymbol{\theta}^{(t)} + \alpha \cdot \left(\frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) \textbf{X}_i \right)
-\end{align}
-\end{split}\]</div>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\boldsymbol{\theta}^{(t)}\)</span> is the current estimate of <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> at iteration <span class="math notranslate nohighlight">\(t\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is the learning rate</p></li>
-<li><p><span class="math notranslate nohighlight">\(-\frac{1}{n} \sum_{i=1}^{n} \left(y_i - \sigma_i\right) \textbf{X}_i\)</span> is the gradient of the cross entropy loss</p></li>
-<li><p><span class="math notranslate nohighlight">\(\boldsymbol{\theta}^{(t+1)}\)</span> is the next estimate of <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> computed by subtracting the product of <span class="math notranslate nohighlight">\(\alpha\)</span> and the cross entropy loss computed at <span class="math notranslate nohighlight">\(\boldsymbol{\theta}^{(t)}\)</span></p></li>
-</ul>
-</div>
-<div class="section" id="stochastic-gradient-descent">
-<h2><span class="section-number">24.6.2. </span>Stochastic Gradient Descent<a class="headerlink" href="#stochastic-gradient-descent" title="Permalink to this headline">¶</a></h2>
-<p>Stochastic gradient descent approximates the gradient of the loss function across all observations using the gradient of the loss of a single data point.The general update formula is below, where <span class="math notranslate nohighlight">\(\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)\)</span> is the loss function for a single data point:</p>
-<div class="math notranslate nohighlight">
-\[
-\boldsymbol{\theta}^{(t+1)} = \boldsymbol{\theta}^{(t)} - \alpha \nabla_\boldsymbol{\theta} \ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)
-\]</div>
-<p>Returning back to our example in logistic regression, we approximate the gradient of the cross entropy loss across all data points using the gradient of the cross entropy loss of one data point. This is shown below, with <span class="math notranslate nohighlight">\( \sigma_i = f_{\boldsymbol{\theta}}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{align}
-\nabla_\boldsymbol{\theta} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) &amp;\approx \nabla_\boldsymbol{\theta} \ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)\\
-&amp;= -(y_i - \sigma_i)\textbf{X}_i
-\end{align}
-\end{split}\]</div>
-<p>When we plug this approximation into the general formula for stochastic gradient descent, we find the stochastic gradient descent update formula for logistic regression.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{align}
-\boldsymbol{\theta}^{(t+1)} &amp;= \boldsymbol{\theta}^{(t)} - \alpha \nabla_\boldsymbol{\theta} \ell(\boldsymbol{\theta}, \textbf{X}_i, y_i) \\
-&amp;= \boldsymbol{\theta}^{(t)} + \alpha \cdot (y_i - \sigma_i)\textbf{X}_i
-\end{align}
-\end{split}\]</div>
-</div>
-<div class="section" id="mini-batch-gradient-descent">
-<h2><span class="section-number">24.6.3. </span>Mini-batch Gradient Descent<a class="headerlink" href="#mini-batch-gradient-descent" title="Permalink to this headline">¶</a></h2>
-<p>Similarly, we can approximate the gradient of the cross entropy loss for all observations using a random sample of data points, known as a mini-batch.</p>
-<div class="math notranslate nohighlight">
-\[
-\nabla_\boldsymbol{\theta} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) \approx \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}\nabla_{\boldsymbol{\theta}} \ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)
-\]</div>
-<p>We substitute this approximation for the gradient of the cross entropy loss, yielding a mini-batch gradient descent update formula specific to logistic regression:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{align}
-\boldsymbol{\theta}^{(t+1)} &amp;= \boldsymbol{\theta}^{(t)} - \alpha \cdot -\frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)\textbf{X}_i \\
-&amp;= \boldsymbol{\theta}^{(t)} + \alpha \cdot \frac{1}{|\mathcal{B}|} \sum_{i\in\mathcal{B}}(y_i - \sigma_i)\textbf{X}_i
-\end{align}
-\end{split}\]</div>
-</div>
-<div class="section" id="implementation-in-scikit-learn">
-<h2><span class="section-number">24.6.4. </span>Implementation in Scikit-learn<a class="headerlink" href="#implementation-in-scikit-learn" title="Permalink to this headline">¶</a></h2>
-<p>Scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html"><code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code></a> class provides an implementation for stochastic gradient descent, which we can use by specifying <code class="docutils literal notranslate"><span class="pre">loss=log</span></code>. Since scikit-learn does not have a model that implements batch gradient descent, we will compare <code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code>’s performance against <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html"><code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a> on the <code class="docutils literal notranslate"><span class="pre">emails</span></code> dataset. We omit feature extraction for brevity:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">emails</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;emails_sgd.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;spam&#39;</span><span class="p">]</span>
-<span class="n">X_tr</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_tr</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_reg</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">stochastic_gd</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
-<span class="n">log_reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">log_reg_pred</span> <span class="o">=</span> <span class="n">log_reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Logistic Regression&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Accuracy:  &#39;</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">log_reg_pred</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Precision: &#39;</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">log_reg_pred</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Recall:    &#39;</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">log_reg_pred</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Logistic Regression
-  Accuracy:   0.9913793103448276
-  Precision:  0.974169741697417
-  Recall:     0.9924812030075187
-
-CPU times: user 3.2 s, sys: 0 ns, total: 3.2 s
-Wall time: 3.26 s
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
-<span class="n">stochastic_gd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">stochastic_gd_pred</span> <span class="o">=</span> <span class="n">stochastic_gd</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stochastic GD&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Accuracy:  &#39;</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">stochastic_gd_pred</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Precision: &#39;</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">stochastic_gd_pred</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Recall:    &#39;</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">stochastic_gd_pred</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Stochastic GD
-  Accuracy:   0.9808429118773946
-  Precision:  0.9392857142857143
-  Recall:     0.9887218045112782
-
-CPU times: user 93.8 ms, sys: 31.2 ms, total: 125 ms
-Wall time: 119 ms
-</pre></div>
-</div>
-</div>
-</div>
-<p>The results above indicate that <code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code> is able to find a solution in significantly less time than <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code>. Although the evaluation metrics are slightly worse on the <code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code>, we can improve the <code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code>’s performance by tuning hyperparameters. Furthermore, this discrepancy is a tradeoff that data scientists often encounter in the real world. Depending on the situation, data scientists might place greater value on the lower runtime or on the higher metrics.</p>
-</div>
-<div class="section" id="summary">
-<h2><span class="section-number">24.6.5. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Stochastic gradient descent is a method that data scientists use to cut down on computational cost and runtime. We can see the value of stochastic gradient descent in logistic regression, since we would only have to calculate the gradient of the cross entropy loss for one observation at each iteration instead of for every observation in batch gradient descent. From the example using scikit-learn’s <code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code>, we observe that stochastic gradient descent may achieve slightly worse evaluation metrics, but drastically improves runtime. On larger datasets or for more complex models, the difference in runtime might be much larger and thus more valuable.</p>
-</div>
-</div>
-
-    <script type="text/x-thebe-config">
-    {
-        requestKernel: true,
-        binderOptions: {
-            repo: "binder-examples/jupyter-stacks-datascience",
-            ref: "master",
-        },
-        codeMirrorConfig: {
-            theme: "abcdef",
-            mode: "python"
-        },
-        kernelOptions: {
-            kernelName: "python3",
-            path: "./ch/24"
-        },
-        predefinedOutput: true
-    }
-    </script>
-    <script>kernelName = 'python3'</script>
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="classification_cost_justification.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -1608,7 +1397,7 @@ Wall time: 119 ms
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">

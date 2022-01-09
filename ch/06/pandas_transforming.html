@@ -162,22 +162,22 @@
   <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
-     2.1. Big Data Hubris
+     2.1. Big Data and New Opportunities
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_construct.html">
-     2.2. A Construct for Data Scope
+     2.2. Target Population, Access Frame, Sample
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_accuracy.html">
-     2.3. Accuracy
+     2.5. Accuracy
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../02/data_scope_exercises.html">
-     2.4. Exercises
+     2.6. Exercises
     </a>
    </li>
   </ul>
@@ -199,22 +199,22 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_random_assignment.html">
-     3.2. Random Assignment
+     3.3. Random Assignment
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_measurement_error.html">
-     3.3. Measurement Error
+     3.4. Measurement Error
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_prob_dist.html">
-     3.4. Probability Distribution for a Statistic
+     3.5. Probability Distribution for a Statistic
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_exercises.html">
-     3.5. Exercises
+     3.6. Exercises
     </a>
    </li>
   </ul>
@@ -1118,19 +1118,20 @@
         </div>
     </div>
 </div>
-    <!-- Table of contents that is only displayed when printing the page -->
-    <div id="jb-print-docs-body" class="onlyprint">
-        <h1>Transforming</h1>
-        <!-- Table of contents -->
-        <div id="print-main-content" class="row">
-            <div class="col-12 col-md-12 pl-md-5 pr-md-5">
-            <div id="jb-print-toc">
-                
-                <div>
-                    <h2> Contents </h2>
-                </div>
-                <nav aria-label="Page">
-                    <ul class="visible nav section-nav flex-column">
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Transforming</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#apply">
    6.4.1. Apply
@@ -1153,7 +1154,9 @@
  </li>
 </ul>
 
-                </nav>
+                        </nav>
+                    </div>
+                </div>
             </div>
             
               <div>
@@ -1627,485 +1630,8 @@ manipulate data tables.</p>
 
               </div>
               
-            </div>
-        </div>
-    </div>
-    <div id="main-content" class="row noprint">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
-              <div>
-                
-  <div class="section" id="transforming">
-<h1><span class="section-number">6.4. </span>Transforming<a class="headerlink" href="#transforming" title="Permalink to this headline">¶</a></h1>
-<p>Data scientists transform dataframe columns when they need to change each value
-in a feature in the same way. For example, if a feature contains heights of
-people in feet, a data scientist might want to transform the heights to
-centimeters. In this section, we’ll introduce <em>apply</em>, an operation that
-transforms columns of data using a user-defined function.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;babynames.csv&#39;</span><span class="p">)</span>
-<span class="n">baby</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-      <th>Year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Liam</td>
-      <td>M</td>
-      <td>19659</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Noah</td>
-      <td>M</td>
-      <td>18252</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-      <td>M</td>
-      <td>14147</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>2020719</th>
-      <td>Verona</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-    </tr>
-    <tr>
-      <th>2020720</th>
-      <td>Vertie</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-    </tr>
-    <tr>
-      <th>2020721</th>
-      <td>Wilma</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-    </tr>
-  </tbody>
-</table>
-<p>2020722 rows × 4 columns</p>
-</div></div></div>
-</div>
-<p>In the baby names New York Times article <span id="id1">[<a class="reference internal" href="../../references.html#id9">Williams, 2021</a>]</span>, Pamela
-mentions that names starting with the letter “L” and “K” became popular
-after 2000. On the other hand, names starting with the letter “J” peaked in
-popularity in the 1970s and 1980s and have dropped off in popularity since. We
-can verify these claims using the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataset.</p>
-<p>We approach this problem using the following steps:</p>
-<ol class="simple">
-<li><p>Transform the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column into a new column that contains the first
-letters of each value in <code class="docutils literal notranslate"><span class="pre">Name</span></code>.</p></li>
-<li><p>Group the dataframe by the first letter and year.</p></li>
-<li><p>Aggregate the name counts by summing.</p></li>
-</ol>
-<p>To complete the first step, we’ll <em>apply</em> a function to the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column.</p>
-<div class="section" id="apply">
-<h2><span class="section-number">6.4.1. </span>Apply<a class="headerlink" href="#apply" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> objects contain an <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> method that takes in a function and
-applies it to each value in the series. For instance, to find the lengths of
-each name, we apply the <code class="docutils literal notranslate"><span class="pre">len</span></code> function.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">names</span> <span class="o">=</span> <span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
-<span class="n">names</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0          4
-1          4
-2          6
-          ..
-2020719    6
-2020720    6
-2020721    5
-Name: Name, Length: 2020722, dtype: int64
-</pre></div>
-</div>
-</div>
-</div>
-<p>To extract the first letter of each name, define a custom function and pass it
-into <code class="docutils literal notranslate"><span class="pre">.apply()</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The argument to the function is an individual value in the series. </span>
-<span class="k">def</span> <span class="nf">first_letter</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="n">names</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">first_letter</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0          L
-1          N
-2          O
-          ..
-2020719    V
-2020720    V
-2020721    W
-Name: Name, Length: 2020722, dtype: object
-</pre></div>
-</div>
-</div>
-</div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> is similar to using a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop. The code above is roughly
-equivalent to writing:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">first_letter</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>Now, we can assign the first letters to a new column in the dataframe:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">letters</span> <span class="o">=</span> <span class="n">baby</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Firsts</span><span class="o">=</span><span class="n">names</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">first_letter</span><span class="p">))</span>
-<span class="n">letters</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-      <th>Year</th>
-      <th>Firsts</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Liam</td>
-      <td>M</td>
-      <td>19659</td>
-      <td>2020</td>
-      <td>L</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Noah</td>
-      <td>M</td>
-      <td>18252</td>
-      <td>2020</td>
-      <td>N</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-      <td>M</td>
-      <td>14147</td>
-      <td>2020</td>
-      <td>O</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>2020719</th>
-      <td>Verona</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-      <td>V</td>
-    </tr>
-    <tr>
-      <th>2020720</th>
-      <td>Vertie</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-      <td>V</td>
-    </tr>
-    <tr>
-      <th>2020721</th>
-      <td>Wilma</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-      <td>W</td>
-    </tr>
-  </tbody>
-</table>
-<p>2020722 rows × 5 columns</p>
-</div></div></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To create a new column in a dataframe, you might also encounter this syntax:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Firsts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">first_letter</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This mutates the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table by adding a new column called <code class="docutils literal notranslate"><span class="pre">Firsts</span></code>. In the
-code above, we use <code class="docutils literal notranslate"><span class="pre">.assign()</span></code> which doesn’t mutate the <code class="docutils literal notranslate"><span class="pre">baby</span></code> table itself; it
-creates a new dataframe instead. Mutating dataframes isn’t wrong but can be a
-common source of bugs. Because of this, we’ll mostly use <code class="docutils literal notranslate"><span class="pre">.assign()</span></code> in this
-book.</p>
-</div>
-</div>
-<div class="section" id="example-popularity-of-l-names">
-<h2><span class="section-number">6.4.2. </span>Example: Popularity of “L” Names<a class="headerlink" href="#example-popularity-of-l-names" title="Permalink to this headline">¶</a></h2>
-<p>Now, we can use the <code class="docutils literal notranslate"><span class="pre">letters</span></code> dataframe to see the popularity of first letters
-over time.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">letter_counts</span> <span class="o">=</span> <span class="p">(</span><span class="n">letters</span>
- <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Firsts&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">])</span>
- <span class="p">[</span><span class="s1">&#39;Count&#39;</span><span class="p">]</span>
- <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
- <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="p">)</span>
-<span class="n">letter_counts</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Firsts</th>
-      <th>Year</th>
-      <th>Count</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>1880</td>
-      <td>16740</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>A</td>
-      <td>1881</td>
-      <td>16257</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>A</td>
-      <td>1882</td>
-      <td>18790</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>3638</th>
-      <td>Z</td>
-      <td>2018</td>
-      <td>55996</td>
-    </tr>
-    <tr>
-      <th>3639</th>
-      <td>Z</td>
-      <td>2019</td>
-      <td>55293</td>
-    </tr>
-    <tr>
-      <th>3640</th>
-      <td>Z</td>
-      <td>2020</td>
-      <td>54011</td>
-    </tr>
-  </tbody>
-</table>
-<p>3641 rows × 3 columns</p>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">letter_counts</span>
- <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">letter_counts</span><span class="p">[</span><span class="s1">&#39;Firsts&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">]</span>
- <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Popularity of &quot;L&quot; names&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/pandas_transforming_15_0.svg" src="../../_images/pandas_transforming_15_0.svg" /></div>
-</div>
-<p>The plot shows that “L” names were popular in the 1960s, dipped in the decades
-after, but have indeed resurged in popularity after 2000.</p>
-<p>What about “J” names?</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">letter_counts</span>
- <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">letter_counts</span><span class="p">[</span><span class="s1">&#39;Firsts&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;J&#39;</span><span class="p">]</span>
- <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Count&#39;</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Popularity of &quot;J&quot; names&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/pandas_transforming_17_0.svg" src="../../_images/pandas_transforming_17_0.svg" /></div>
-</div>
-<p>The NYT article says that “J” names were popular in the 1970s and 80s. The plot
-agrees, and also shows that they have become less popular after 2000.</p>
-</div>
-<div class="section" id="the-price-of-apply">
-<h2><span class="section-number">6.4.3. </span>The Price of Apply<a class="headerlink" href="#the-price-of-apply" title="Permalink to this headline">¶</a></h2>
-<p>The power of <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> is its flexibility—you can call it with any function
-that takes in a single data value and outputs a single data value.</p>
-<p>Its flexibility has a price, though. Using <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> can be slow, since
-<code class="docutils literal notranslate"><span class="pre">pandas</span></code> can’t optimize arbitrary functions. For example, using <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> for
-numeric calculations is much slower than using vectorized operations directly
-on <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> objects:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
-
-<span class="c1"># Calculate the decade using vectorized operators</span>
-<span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">10</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>15 ms ± 254 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
-
-<span class="k">def</span> <span class="nf">decade</span><span class="p">(</span><span class="n">yr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">yr</span> <span class="o">//</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">10</span>
-
-<span class="c1"># Calculate the decade using apply</span>
-<span class="n">baby</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">decade</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>518 ms ± 10.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-</pre></div>
-</div>
-</div>
-</div>
-<p>The version using <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> is more than 30 times slower! For numeric
-operations in particular, we recommend operating on <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> objects
-directly.</p>
-</div>
-<div class="section" id="takeaways">
-<h2><span class="section-number">6.4.4. </span>Takeaways<a class="headerlink" href="#takeaways" title="Permalink to this headline">¶</a></h2>
-<p>To transform values in a dataframe, we commonly use the <code class="docutils literal notranslate"><span class="pre">.apply()</span></code> and
-<code class="docutils literal notranslate"><span class="pre">.assign()</span></code> functions.
-In the next section, we’ll compare dataframes with other ways to represent and
-manipulate data tables.</p>
-</div>
-</div>
-
-    <script type="text/x-thebe-config">
-    {
-        requestKernel: true,
-        binderOptions: {
-            repo: "binder-examples/jupyter-stacks-datascience",
-            ref: "master",
-        },
-        codeMirrorConfig: {
-            theme: "abcdef",
-            mode: "python"
-        },
-        kernelOptions: {
-            kernelName: "python3",
-            path: "./ch/06"
-        },
-        predefinedOutput: true
-    }
-    </script>
-    <script>kernelName = 'python3'</script>
-
-              </div>
-              
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="pandas_joining.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -2122,7 +1648,7 @@ manipulate data tables.</p>
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">
