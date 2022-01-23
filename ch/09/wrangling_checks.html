@@ -1179,6 +1179,196 @@
                 
   <div class="section" id="quality-checks">
 <span id="ch-wrangling-checks"></span><h1><span class="section-number">8.6. </span>Quality Checks<a class="headerlink" href="#quality-checks" title="Permalink to this headline">¶</a></h1>
+<p>Once your data are in a table and you understand its scope and granularity, it’s time to inspect their quality. You may have come across errors in the data as you examined it and wrangled it into a data frame. In this section, we continue the inspection and carry out a more thorough assessment of the quality of the features and their values.  We consider quality from four vantage points:</p>
+<p><strong>Quality based on scope</strong>. Earlier, in <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a>, we addressed whether or not the data that have been collected can adequately address the problem at hand. We introduced a <em><strong>framework</strong></em> to help us consider possible limitations in the way in which the data were collected that might impact the generalizability of our findings. These considerations are especially important to consider as we deliberate or findings, but here, in this section, we limit ourselves to checking the quality of values using information about the scope of the data.  For example, with San Francisco restaurant inspections, the first three digits of a restaurant’s zip code should be 941.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;postal_code&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>95105    1
+92672    1
+94602    1
+        ..
+94621    1
+Ca       1
+64110    1
+Name: postal_code, Length: 10, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Other initial digits can point to a problem with the data.</p>
+<p>As another example, background reading on atmospheric CO2 uncovered typical measurements to be about 400 ppm worldwide and we say the monthly averages of CO2 at Mauna Loa to be in the 300 to 400 ppm range.</p>
+<p><strong>Quality of measurements and recorded values</strong>. We can use our knowledge of the scope of the data to check quality, as mentioned already, but we can also check the quality of measurements by considering what might be a reasonable value for a feature. For example, whats seems like a reasonable range for the number of violations in a restaurant inspection?  Possibly, 0 to 5? Other checks can be based on common knowledge of ranges: a restaurant inspection score must be between 0 and 100; months run between 1 and 12.  We can use documentation to tells us the expected values for a feature. For example, the type of emergency room visit in the DAWN has been coded as 1, 2, …, 8 (see <a class="reference internal" href="#dawn-codebook"><span class="std std-numref">Figure 8.4</span></a> below for a screenshot of the codebook explanation of the field) so we can confirm that all values for the type of visit are indeed either a 1 or 2 or … 8.</p>
+<div class="figure align-default" id="dawn-codebook">
+<img alt="../../_images/DAWN_codebook.png" src="../../_images/DAWN_codebook.png" />
+<p class="caption"><span class="caption-number">Fig. 8.4 </span><span class="caption-text">Screenshot of the description of the CASETYPE variable in the DAWN survey. Notice that there are eight possible values for this feature. And to help in figuring out if we have properly read the data, we can check the counts for these eight values.</span><a class="headerlink" href="#dawn-codebook" title="Permalink to this image">¶</a></p>
+</div>
+<p>More generic checks can confirm, say, that a proportion ranges between 0 and 1. We want to ensure that the data type matches our expectations. For example, we expect a price to be a number, whether or not it’s stored as integer, floating point, or string.  Confirming that the units of measurement match what is expected can be another useful quality check to perform (for example weight recorded in pounds, not kilograms). We can devise checks for all of these situations.</p>
+<p><strong>Quality of relationships.</strong>   In addition to checking individual values in a column, we also want to cross-check values between features. To do this cross-checking, we use builtin conditions on the relationship of values between two (or more) features. For example, according to the documentation for the DAWN study, alcohol consumption is only considered a type of visit for patients under 21 so we can check that all instances that record alcohol for the type of visit also have age recorded as under 21. Alcohol is coded as a 3, and ages under 21 are coded as 1, 2, 3, and 4.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">dawn</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>type</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+    </tr>
+    <tr>
+      <th>age</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>-8</th>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>21</td>
+      <td>5</td>
+      <td>1</td>
+      <td>1</td>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>6</td>
+      <td>20</td>
+      <td>6231</td>
+      <td>313</td>
+      <td>4</td>
+      <td>2101</td>
+      <td>69</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8</td>
+      <td>2</td>
+      <td>15</td>
+      <td>1774</td>
+      <td>119</td>
+      <td>4</td>
+      <td>119</td>
+      <td>61</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1616</td>
+      <td>3770</td>
+      <td>0</td>
+      <td>12404</td>
+      <td>3407</td>
+      <td>75</td>
+      <td>150</td>
+      <td>18381</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>616</td>
+      <td>1207</td>
+      <td>0</td>
+      <td>12291</td>
+      <td>2412</td>
+      <td>31</td>
+      <td>169</td>
+      <td>7109</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>205</td>
+      <td>163</td>
+      <td>0</td>
+      <td>24085</td>
+      <td>2218</td>
+      <td>12</td>
+      <td>308</td>
+      <td>1537</td>
+    </tr>
+  </tbody>
+</table>
+<p>12 rows × 8 columns</p>
+</div></div></div>
+</div>
+<p>The cross tabulation shows that all of the alcohol cases are for patients under 21. The data values are as expected.</p>
+<p><strong>Quality for analysis</strong>. Even when data pass your quality checks, problems can arise with its usefulness. For example, if all but a handful of values for a feature are identical, then that feature adds little to the understanding of underlying patterns and relationships.  Or, if there are too many missing values, especially if there is a discernible pattern in the missing values, our findings may be limited.  We dedicate a section to the topic of missing values (<a class="reference internal" href="wrangling_missing.html#ch-wrangling-missing"><span class="std std-numref">Section 8.7</span></a>). If a feature has many bad/corrupted values, then we might question the accuracy of even those values that fall in the appropriate range.</p>
+<p>We see that the type of restaurant inspection can be either routine or a complaint. The San Francisco restaurants inspections had only one inspection for a complaint and all of the rest are routine.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">insp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>routine      14221
+complaint        1
+Name: type, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<p>This feature adds nothing to the data and we can simply drop it from the data frame.</p>
+<p>Two questions that might have come to your mind at this point are: How do we look for garbled, anomalous, and inconsistently coded values? And, once we find them, what do we do? We address these questions generally here, and show some of the practicalities in the example in <a class="reference internal" href="wrangling_restaurants.html#ch-wrangling-restaurants"><span class="std std-numref">Section 8.10</span></a>.</p>
+<p><strong>How to find bad values and features?</strong></p>
+<ul class="simple">
+<li><p>Check summary statistics, distributions, and value counts. <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 9</span></a> provides examples and guidance on how to go about checking the quality of your data using visualizations and summary statistics. We briefly mention a few approaches here. A table of counts of unique values in a feature can uncover unexpected encodings and lopsided distributions, where one option is a rare occurrence. Percentiles can be helpful in revealing the proportion of values with unusually high (or low) values.</p></li>
+<li><p>Logical expressions can identify records with values out of range or relationships that are out of wack. Simply computing the number of records that do not pass the quality, check can quickly reveal the size of the problem.</p></li>
+<li><p>Examine the whole record for those records with problematic values for a particular feature. At times, an entire record is garbled when, for example, a comma is misplaced in a CSV formatted file. Or, the record(s) might represent an unusual situation (such as ranches being included in data on house sales), and you will need to decide whether they should be included in your analysis or not.</p></li>
+<li><p>Refer to an external source to figure out if there’s a reason for the anomaly.</p></li>
+</ul>
+<p><strong>What to do with your discoveries?</strong> You have essentially four options: leave the data as is; modify values; remove features; or drop records.  Not every unusual aspect of the data needs to be fixed. You might have discovered a characteristic of your data that will inform you with your analysis, but otherwise does not need any correcting. Or, you might find that the problem is relatively minor and most likely will not impact your analysis so you can leave the data as is.</p>
+<p>On the other hand, you might want to replace corrupted values with NaN (<a class="reference internal" href="wrangling_missing.html#ch-wrangling-missing"><span class="std std-numref">Section 8.7</span></a> describes the potential impact of missing values on an analysis). You might have figured out what went wrong and correct the value. Other possibilities for modifying records are covered in the examples of <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 9</span></a>. If you plan to change the values of a variable, then it’s good practice to create a new feature with the modified value and preserve the original feature, or at a minimum, create a new feature that indicates which values in the original feature have been modified. These approaches give you some flexibility in checking the influence of the modified values on your analysis.</p>
+<p>If you find yourself modifying many values for a feature then you might consider eliminating the feature from the dataset. Either way, you will want to study the possible impact of excluding the feature from your analysis.  In particular, you will want to determine whether the records with corrupted values are similar to each other, and different from the rest of the data. This would indicate that you may be unable to capture the impact of a potentially useful feature in your analysis. Rather than exclude the feature entirely, there may be a transformation that allows you to keep the feature while reducing the level of detail recorded.</p>
+<p>At times, you will want to eliminate the problematic records. In general, we do not want to drop a large number of observations from a dataset without good reason. We may want to scale back our investigation to a particular subgroup of the data, but that’s a different situation than dropping records because of a corrupted value in a field (see Section xx).  When you discover that an unusual value is in fact correct,  you still might decide to exclude the record from your analysis because it’s so different from the rest of your data and you do not want it to overly influence your analysis.</p>
+<p>We suggested that there may be times when you want to replace corrupted data values with NA, and hence treat them as missing. At other times, data might arrive missing. What to do with missing data is an important topic and there is a lot of research on this problem; we touch on some of the possible ways to address missing data in the next section.</p>
 </div>
 
     <script type="text/x-thebe-config">

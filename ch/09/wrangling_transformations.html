@@ -43,6 +43,8 @@
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -1159,6 +1161,19 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#transforming-time">
+   8.8.1. Transforming Time
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -1171,6 +1186,19 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#transforming-time">
+   8.8.1. Transforming Time
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -1179,6 +1207,37 @@
                 
   <div class="section" id="transformations">
 <span id="ch-wrangling-transformations"></span><h1><span class="section-number">8.8. </span>Transformations<a class="headerlink" href="#transformations" title="Permalink to this headline">¶</a></h1>
+<p>At times a feature is not in a form best suited for analysis and so we transform it. There are many reasons a feature might need a transformation. The value codings might not be useful for analysis, we may want to combine two features into one using an arithmetic expression, or we might want to pull information out of a feature to create a new feature. We describe these three basic kinds of transformations: type conversions, mathematical transformations, and extractions.</p>
+<p><strong>Type conversion.</strong> This kind of transformation occurs when we convert the data from one format to another to make the data more useful for analysis. We might convert information stored as a string to another format. For example, we would want to convert prices reported as strings to numeric (like changing “$2.17” to 2.17) so that we can compute summary statistics on them. Or, we might want to convert a time stored as a string, such as “1955-10-12”, to a datetime format. Yet another example occurs when we  lump categories together, such as reducing the 11 categories for age in DAWN to 5 groupings.</p>
+<p><strong>Mathematical transformation.</strong> One kind of mathematical transformation is when we change the units of a measurement from, say, pounds to kilograms. We might make unit conversions so statistics on our data can be more easily compared to other statistics.  Yet another reason to transform a feature is to symmetrize its distribution (this notion is covered in <a class="reference internal" href="../10/eda_distributions.html#ch-eda-distributions"><span class="std std-numref">Section 9.2</span></a>. The most common such transformation is the logarithm; another widely used transformation is the square root.  Lastly, we might want to create new features from an arithmetic operations on others. For example, height and weight can be combined to create body mass index using the formula: <span class="math notranslate nohighlight">\(height/weight^2\)</span>.</p>
+<p><strong>Extraction</strong>: Sometimes we will want to create a feature that contains partial information taken from another feature. For example, the inspection violations consists of a string with a description of the violation, and we may be interested in only whether the violation is related to, say vermin. We can create a new feature that is True if the violation contains the word “vermin” in its text description and False otherwise.  This conversion of information to logical values (or 0-1 values) is extremely useful in data science. The example in
+<a class="reference internal" href="wrangling_restaurants.html#ch-wrangling-restaurants"><span class="std std-numref">Section 8.10</span></a>, gives you a sense of the power of these binary features.</p>
+<p>The type conversion that deals with dates and times is of particular note because many datasets include time as a feature. The datetime format is worthy of its own section (see below). Many other examples of transformations and their usefulness can be found in <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 9</span></a>.</p>
+<div class="section" id="transforming-time">
+<h2><span class="section-number">8.8.1. </span>Transforming Time<a class="headerlink" href="#transforming-time" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">insp</span><span class="p">[</span><span class="s1">&#39;new_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">insp</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">insp</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">insp</span><span class="p">[</span><span class="s1">&#39;new_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+
+
+<span class="n">viol</span><span class="p">[</span><span class="s1">&#39;new_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">viol</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">viol</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">viol</span><span class="p">[</span><span class="s1">&#39;new_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+
+<span class="c1">#DEPRECATED </span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-6-d784463129c5&gt;:1: FutureWarning: The pandas.datetime class is deprecated and will be removed from pandas in a future version. Import from datetime module instead.
+  insp[&#39;new_date&#39;] = insp[&#39;date&#39;].apply(lambda d: pd.datetime.strptime(str(d),&#39;%Y%m%d&#39;))
+&lt;ipython-input-6-d784463129c5&gt;:5: FutureWarning: The pandas.datetime class is deprecated and will be removed from pandas in a future version. Import from datetime module instead.
+  viol[&#39;new_date&#39;] = viol[&#39;date&#39;].apply(lambda d: pd.datetime.strptime(str(d),&#39;%Y%m%d&#39;))
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
