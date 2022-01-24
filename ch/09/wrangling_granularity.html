@@ -1370,11 +1370,10 @@ identifying the contents: the name, address, city, state, postal code,
 latitude, longitude, phone number, and zip code of the restaurant. It’s a bit
 odd that one column is for a postal code and another is for a zip code, and the
 records that we have examined show the exact same values in these two fields.
-We will want to check that these are indeed redundant and possibly remove one
-of them. This activity is part of the quality checking and transformation
-actions that we perform to prepare our data for analysis. We will leave it to
-you to answer this question and carry out the reduction to keep one column, if
-that makes sense.</p>
+In practice, we
+will want to check that these column are indeed redundant and
+possibly remove one of them.
+This step is left as an exercise to the reader.</p>
 <p>Let’s continue the examination of the inspections and violations data frames
 and find their granularity.</p>
 <div class="section" id="granularity-of-restaurant-inspections-and-violations">
@@ -1479,7 +1478,8 @@ dtype: int64
 </div>
 </div>
 </div>
-<p>It looks like the same restaurant got two different scores on this date.</p>
+<p>It looks like restaurant <code class="docutils literal notranslate"><span class="pre">64859</span></code> got two different scores on the date
+<code class="docutils literal notranslate"><span class="pre">20150924</span></code> (Sept. 24, 2015).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">insp</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;business_id == 64859 and date == 20150924&#39;</span><span class="p">)</span>
@@ -1654,17 +1654,12 @@ We’ll cover these operations later in this chapter, in
 granularity. Let’s begin by examining its encoding with the <code class="docutils literal notranslate"><span class="pre">file</span></code> CLI tool.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>file data/*
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>file data/DAWN-Data.txt
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>data/DAWN-Data.txt:   ASCII text, with very long lines
-data/businesses.csv:  ISO-8859 text, with CRLF line terminators
-data/co2_mm_mlo.txt:  ASCII text
-data/inspections.csv: ASCII text, with CRLF line terminators
-data/legend.csv:      ASCII text, with CRLF line terminators
-data/violations.csv:  ASCII text, with CRLF line terminators
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>data/DAWN-Data.txt: ASCII text, with very long lines
 </pre></div>
 </div>
 </div>
@@ -1688,23 +1683,42 @@ characters. On average, there are about 1200 characters per line.</p>
 <p>Given the line length, let’s look at just one line in the file. We can use the
 <code class="docutils literal notranslate"><span class="pre">-n</span> <span class="pre">1</span></code> argument to do this. The display of the first line below has been
 formatted to fit more easily in the code block.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head -n <span class="m">1</span> data/DAWN-Data.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>!head -n <span class="m">1</span> data/DAWN-Data.txt
+<span class="c1"># The output is one (long) line:</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>     1 2251082    .9426354082   3 4 1 2201141 2 865 105 1102005 1 2 1 2.00-7.00-7.0000-7.0000-7.00001255 105 1142032 4 1 1 2.50 5.00 5.0100-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.0000  -7  -7  -7  -7-7-7-7-7.00-7.00-7.0000-7.0000-7.00008 611001
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>     <span class="mi">1</span> <span class="mi">2251082</span>    <span class="mf">.9426354082</span>   <span class="mi">3</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">2201141</span> <span class="mi">2</span> <span class="mi">865</span> <span class="mi">105</span> <span class="mi">1102005</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">1</span>
+<span class="mf">2.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.00001255</span> <span class="mi">105</span> <span class="mi">1142032</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mf">2.50</span> <span class="mf">5.00</span>
+<span class="mf">5.0100</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span> 
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span> 
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  <span class="o">-</span><span class="mi">7</span>  
+<span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.00</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.0000</span><span class="o">-</span><span class="mf">7.00008</span> <span class="mi">611001</span>
 </pre></div>
 </div>
-</div>
-</div>
-<p>What do you notice about the line of data? The values seem to run into each
-other. That is it’s hard to figure out where one field stops and another begins
-for some of the numbers. There are a lot of -7 and -7.00 and -7.000. This is a
+<p>What do you notice about the line of data?
+The values seem to run into each
+other. It’s hard to figure out where one field stops and another begins
+for some of the numbers. There are many values of -7, -7.00, and -7.000. This is a
 fixed-width formatted file, and we need to read the code book to find out
-where the fields are. For example, the codebook in <a class="reference internal" href="#dawn-age"><span class="std std-numref">Figure 8.3</span></a> tells us that age
+where the fields are. For example, the codebook in
+<a class="reference internal" href="#dawn-age"><span class="std std-numref">Figure 8.3</span></a> tells us that age
 appears in positions 34 and 35 in the row, and it is categorized into 11 age
 groups, 1 stands for 5 and under, 2 for 6 to 11, …, and 11 for 65 or older.
 Also, -8 represents a missing value.</p>
@@ -1712,7 +1726,11 @@ Also, -8 represents a missing value.</p>
 <img alt="../../_images/DAWN_Age.png" src="../../_images/DAWN_Age.png" />
 <p class="caption"><span class="caption-number">Fig. 8.3 </span><span class="caption-text">Screenshot of a portion of the DAWN coding for age.</span><a class="headerlink" href="#dawn-age" title="Permalink to this image">¶</a></p>
 </div>
-<p>We read just a few variables into a data frame to show how you can do this. With the <code class="docutils literal notranslate"><span class="pre">read_fwf</span></code> function, we specify the positions of the fields in each line to extract, the associated names of the fields, and other information about the header and index.</p>
+<p>We read just a few variables into a data frame to show how you can do this.
+<code class="docutils literal notranslate"><span class="pre">pandas</span></code> provides a <code class="docutils literal notranslate"><span class="pre">pd.read_fwf</span></code> function for reading in fixed-width format
+files. We specify the positions of the fields in each line to extract, the
+associated names of the fields, and other information about the header and
+index.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">colspecs</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">29</span><span class="p">),</span> <span class="p">(</span><span class="mi">33</span><span class="p">,</span><span class="mi">35</span><span class="p">),</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span> <span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="mi">39</span><span class="p">),</span> <span class="p">(</span><span class="mi">1213</span><span class="p">,</span> <span class="mi">1214</span><span class="p">)]</span>
@@ -1836,7 +1854,19 @@ Name: wt, Length: 3500, dtype: int64
 </div>
 </div>
 </div>
-<p>Some weights are less than 1 meaning that this kind of ER visit is over represented in the data set. Notice also that some weights are as large as 84, meaning that record is underrepresented in the data set. It is critical to include these weights in your analysis. For example, we can compare the calculation of the proportion of females among the ER visits with and without the weights.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>What do these weights mean? As a simplified example,
+suppose you ran a survey and 75% of your respondents reported their sex
+as female.
+Since you know from the Census that roughly 50% of the
+U.S. population is female, you could adjust your survey responses by using
+a small weight (less than 1) for female responses and a
+larger weight (greater than 1) for male responses.
+The DAWN survey uses the same idea, except that they split the groups
+much more finely.</p>
+</div>
+<p>It is critical to include the survey weights in your analysis. For example, we can compare the calculation of the proportion of females among the ER visits with and without the weights.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">))</span>
@@ -1866,11 +1896,12 @@ Name: wt, Length: 3500, dtype: int64
 <div class="section" id="summary">
 <h2><span class="section-number">8.4.3. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
 <p>After looking at the granularity of your datasets, you should have answers to the following questions.
-(We provide answers for the three restaurant inspections datasets. You can try answering the questions for the DAWN dataset.)</p>
+Here, we provide answers for the three restaurant inspections datasets.
+As an exercise, answer the questions for the DAWN dataset.</p>
 <p><strong>What does a record represent?</strong></p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">bus</span></code> table, each record represents a restaurant; in the <code class="docutils literal notranslate"><span class="pre">insp</span></code> table, a record corresponds to an inspection; and in the <code class="docutils literal notranslate"><span class="pre">viol</span></code> table each record represents a violation found during an inspection.</p>
 <p><strong>Do all records capture granularity at the same level? (Sometimes a table will contain summary rows.)</strong></p>
-<p>Yes, the records within each of the <code class="docutils literal notranslate"><span class="pre">bus</span></code>,  <code class="docutils literal notranslate"><span class="pre">insp</span></code><strong>,</strong> and <code class="docutils literal notranslate"><span class="pre">viol</span></code> tables has the same granularity.</p>
+<p>Yes, the records within each of the <code class="docutils literal notranslate"><span class="pre">bus</span></code>, <code class="docutils literal notranslate"><span class="pre">insp</span></code>, and <code class="docutils literal notranslate"><span class="pre">viol</span></code> tables has the same granularity.</p>
 <p><strong>If the data were aggregated, how was the aggregation performed? Sampling and averaging are are common aggregations.</strong></p>
 <p>According to the data description, each record is the mean of daily readings. But, the data website also has hourly readings, so we suspect that both daily and monthly readings are aggregated from the hourly readings.</p>
 <p><strong>What kinds of aggregations can we perform on the data?</strong></p>
