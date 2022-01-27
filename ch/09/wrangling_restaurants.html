@@ -53,7 +53,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="8.11. Summary" href="wrangling_summary.html" />
-    <link rel="prev" title="8.9. Modify Structure" href="wrangling_structure.html" />
+    <link rel="prev" title="8.9. Modifying Structure" href="wrangling_structure.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -426,12 +426,12 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="wrangling_transformations.html">
-     8.8. Transformations
+     8.8. Transformations and Timestamps
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="wrangling_structure.html">
-     8.9. Modify Structure
+     8.9. Modifying Structure
     </a>
    </li>
    <li class="toctree-l2 current active">
@@ -1159,6 +1159,24 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-violations-descriptions">
+   8.10.1. Using Violations Descriptions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#takeaways">
+   8.10.2. Takeaways
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -1171,6 +1189,24 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-violations-descriptions">
+   8.10.1. Using Violations Descriptions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#takeaways">
+   8.10.2. Takeaways
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -1179,8 +1215,181 @@
                 
   <div class="section" id="example-wrangling-restaurant-safety-violations">
 <span id="ch-wrangling-restaurants"></span><h1><span class="section-number">8.10. </span>Example: Wrangling Restaurant Safety Violations<a class="headerlink" href="#example-wrangling-restaurant-safety-violations" title="Permalink to this headline">¶</a></h1>
-<p>The violations dataset contains detailed information about the violations found during an inspection. We would like to capture some of this information and add it to the inspection-level dataset that has the inspection score.</p>
-<p>As a first step, let’s simplify the structure by reducing the rows to those inspections from one year. Recall that this dataset contains four years of inspection information.  Below we tally the number of records for each year.</p>
+<p>In this section, we’ll demonstrate data wrangling techniques from this chapter
+on the restaurant safety dataset. The data are stored in three tables: <code class="docutils literal notranslate"><span class="pre">bus</span></code>
+(for businesses), <code class="docutils literal notranslate"><span class="pre">insp</span></code> (for inspections), and <code class="docutils literal notranslate"><span class="pre">viol</span></code> (for safety violations).</p>
+<p>We want to figure out: <strong>what kinds of safety violations lower the restaurant
+safety score the most?</strong></p>
+<p>First, let’s peek at the first few rows of each table to remind ourselves of
+what they contain.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bus:&#39;</span><span class="p">)</span>
+<span class="n">display_df</span><span class="p">(</span><span class="n">bus</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">cols</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># Note that we&#39;ve already parsed timestamps and years for insp and viol </span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;insp:&#39;</span><span class="p">)</span>
+<span class="n">display_df</span><span class="p">(</span><span class="n">insp</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;viol:&#39;</span><span class="p">)</span>
+<span class="n">display_df</span><span class="p">(</span><span class="n">viol</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>bus:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>name</th>
+      <th>...</th>
+      <th>longitude</th>
+      <th>phone_number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>NRGIZE LIFESTYLE CAFE</td>
+      <td>...</td>
+      <td>-122.42</td>
+      <td>+14157763262</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24</td>
+      <td>OMNI S.F. HOTEL - 2ND FLOOR PANTRY</td>
+      <td>...</td>
+      <td>-122.40</td>
+      <td>+14156779494</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 9 columns</p>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>insp:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>score</th>
+      <th>date</th>
+      <th>type</th>
+      <th>timestamp</th>
+      <th>year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>94</td>
+      <td>20160513</td>
+      <td>routine</td>
+      <td>2016-05-13</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19</td>
+      <td>94</td>
+      <td>20171211</td>
+      <td>routine</td>
+      <td>2017-12-11</td>
+      <td>2017</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>viol:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>date</th>
+      <th>description</th>
+      <th>timestamp</th>
+      <th>year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>20171211</td>
+      <td>Inadequate food safety knowledge or lack of ce...</td>
+      <td>2017-12-11</td>
+      <td>2017</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19</td>
+      <td>20171211</td>
+      <td>Unapproved or unmaintained equipment or utensils</td>
+      <td>2017-12-11</td>
+      <td>2017</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The violations dataset contains detailed information about the violations found
+during an inspection. We would like to capture some of this information and add
+it to the inspection-level dataset that has the inspection score.</p>
+<p>As a first step, let’s simplify the structure by reducing the rows to those
+inspections from one year. Recall that this dataset contains four years of
+inspection information.  Below we tally the number of records for each year.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">insp</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
@@ -1197,19 +1406,23 @@ Name: year, dtype: int64
 </div>
 </div>
 </div>
-<p>Let’s take a subset of the data from the most recent year, 2016. When we reduce the data frame to those records from 2016 we create a copy of the portion of the data frame because…</p>
+<p>Let’s take a subset of the data from the most recent year, 2016. Here, we’ll
+use the pipe function once again to apply the same transformation to both
+dataframes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vio2016</span> <span class="o">=</span> <span class="n">viol</span><span class="p">[</span><span class="n">viol</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">2016</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">ins2016</span> <span class="o">=</span> <span class="n">insp</span><span class="p">[</span><span class="n">insp</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">2016</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subset_2016</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;year == 2016&#39;</span><span class="p">)</span>
+
+<span class="n">vio2016</span> <span class="o">=</span> <span class="n">viol</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_2016</span><span class="p">)</span>
+<span class="n">ins2016</span> <span class="o">=</span> <span class="n">insp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_2016</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Let’s examine the heads of the two files again to familiarize ourselves with the data again.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ins2016</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ins2016</span>
 </pre></div>
 </div>
 </div>
@@ -1236,7 +1449,7 @@ Name: year, dtype: int64
       <th>score</th>
       <th>date</th>
       <th>type</th>
-      <th>new_date</th>
+      <th>timestamp</th>
       <th>year</th>
     </tr>
   </thead>
@@ -1269,31 +1482,55 @@ Name: year, dtype: int64
       <td>2016</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>45</td>
-      <td>78</td>
-      <td>20160104</td>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>13820</th>
+      <td>90096</td>
+      <td>91</td>
+      <td>20161229</td>
       <td>routine</td>
-      <td>2016-01-04</td>
+      <td>2016-12-29</td>
       <td>2016</td>
     </tr>
     <tr>
-      <th>9</th>
-      <td>45</td>
-      <td>84</td>
-      <td>20160614</td>
+      <th>13850</th>
+      <td>90268</td>
+      <td>100</td>
+      <td>20161229</td>
       <td>routine</td>
-      <td>2016-06-14</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>13852</th>
+      <td>90269</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>2016-12-29</td>
       <td>2016</td>
     </tr>
   </tbody>
 </table>
+<p>5443 rows × 6 columns</p>
 </div></div></div>
 </div>
-<p>Recall that <code class="docutils literal notranslate"><span class="pre">new_data</span></code> is a <code class="docutils literal notranslate"><span class="pre">datetime</span></code> formatted variable, and the business_id along with new_date uniquely identifies the inspections. Notice that business #24 had two inspections in 2016, one in March and another in October.</p>
+<p>Recall that <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> contains the parsed timestamps. From the previous
+section on granularity, we also found that <code class="docutils literal notranslate"><span class="pre">business_id</span></code> and <code class="docutils literal notranslate"><span class="pre">timestamp</span></code>
+together uniquely identify the inspections.</p>
+<p>By looking at the first few rows of <code class="docutils literal notranslate"><span class="pre">ins2016</span></code>, we can see that restaurants can
+receive multiple inspections in a year—business #24 had two inspections in
+2016, one in March and another in October.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vio2016</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vio2016</span>
 </pre></div>
 </div>
 </div>
@@ -1319,7 +1556,7 @@ Name: year, dtype: int64
       <th>business_id</th>
       <th>date</th>
       <th>description</th>
-      <th>new_date</th>
+      <th>timestamp</th>
       <th>year</th>
     </tr>
   </thead>
@@ -1349,67 +1586,139 @@ Name: year, dtype: int64
       <td>2016</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>24</td>
-      <td>20161005</td>
-      <td>Unclean or degraded floors walls or ceilings  ...</td>
-      <td>2016-10-05</td>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>38147</th>
+      <td>89900</td>
+      <td>20161206</td>
+      <td>No hot water or running water  [ date violatio...</td>
+      <td>2016-12-06</td>
       <td>2016</td>
     </tr>
     <tr>
-      <th>7</th>
-      <td>24</td>
-      <td>20160311</td>
-      <td>Unclean or degraded floors walls or ceilings  ...</td>
-      <td>2016-03-11</td>
+      <th>38220</th>
+      <td>90096</td>
+      <td>20161229</td>
+      <td>No plan review or Building Permit  [ date viol...</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>38221</th>
+      <td>90096</td>
+      <td>20161229</td>
+      <td>Unclean or unsanitary food contact surfaces  [...</td>
+      <td>2016-12-29</td>
       <td>2016</td>
     </tr>
   </tbody>
 </table>
+<p>15624 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>Notice that the first five records in the violations data frame are all for the same restaurant. One transformation that might prove useful in understanding the score is the count of the number of violations found in a single inspection and add this new feature to the inspections data frame. To count up the violations per inspection we change the granularity of the violations data frame to match the inspections data frame (that is, to group together all records for the same restaurant inspection), and calculate the size of teach group.</p>
+<p>Notice that the first few records in the <code class="docutils literal notranslate"><span class="pre">vio2016</span></code> dataframe are all for the
+same restaurant. Do restaurants with more violations get a lower safety score?
+To check this, we can group this table by <code class="docutils literal notranslate"><span class="pre">business_id</span></code> and <code class="docutils literal notranslate"><span class="pre">timestamp</span></code>, then
+find the size of each group.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_vios</span> <span class="o">=</span> <span class="p">(</span><span class="n">vio2016</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;new_date&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_vios</span> <span class="o">=</span> <span class="p">(</span><span class="n">vio2016</span>
+            <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">size</span><span class="p">()</span>
             <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
             <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;num_vio&#39;</span><span class="p">}));</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Now we want to merge num_vios with <code class="docutils literal notranslate"><span class="pre">ins2016</span></code>. What kind of merge do we want to perform? We want a left join of <code class="docutils literal notranslate"><span class="pre">ins2016</span></code> with <code class="docutils literal notranslate"><span class="pre">num_vios</span></code> because there could be inspections that do not have any violations.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined_dataR</span> <span class="o">=</span> <span class="n">ins2016</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">num_vios</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;new_date&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>When there are no violations for an inspection, the feature <code class="docutils literal notranslate"><span class="pre">num_vio</span></code> will be missing. We can check how many NULL values are in this feature.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined_dataR</span><span class="p">[</span><span class="s1">&#39;num_vio&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">num_vios</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>833
-</pre></div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>timestamp</th>
+      <th>num_vio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>2016-05-13</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24</td>
+      <td>2016-03-11</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24</td>
+      <td>2016-10-05</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>4803</th>
+      <td>89790</td>
+      <td>2016-11-29</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4804</th>
+      <td>89900</td>
+      <td>2016-12-06</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4805</th>
+      <td>90096</td>
+      <td>2016-12-29</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+<p>4806 rows × 3 columns</p>
+</div></div></div>
 </div>
-</div>
-</div>
-<p>If a score is 100, then we wouldn’t expect any violations, and we can correct these missing values by setting them to 0. We are using deductive imputation here.</p>
+<p>Now we want to merge num_vios with <code class="docutils literal notranslate"><span class="pre">ins2016</span></code>. What kind of merge do we want to
+perform? We want a <em>left join</em> of <code class="docutils literal notranslate"><span class="pre">ins2016</span></code> with <code class="docutils literal notranslate"><span class="pre">num_vios</span></code> because there could
+be inspections that do not have any violations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined_dataR</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">joined_dataR</span><span class="o">.</span><span class="n">score</span> <span class="o">==</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;num_vio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined_dataR</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">left_join_vios</span><span class="p">(</span><span class="n">ins</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ins</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">num_vios</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+
+<span class="n">ins_and_num_vios</span> <span class="o">=</span> <span class="n">ins2016</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">left_join_vios</span><span class="p">)</span>
+<span class="n">ins_and_num_vios</span>
 </pre></div>
 </div>
 </div>
@@ -1436,7 +1745,7 @@ Name: year, dtype: int64
       <th>score</th>
       <th>date</th>
       <th>type</th>
-      <th>new_date</th>
+      <th>timestamp</th>
       <th>year</th>
       <th>num_vio</th>
     </tr>
@@ -1473,33 +1782,190 @@ Name: year, dtype: int64
       <td>2.0</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>45</td>
-      <td>78</td>
-      <td>20160104</td>
-      <td>routine</td>
-      <td>2016-01-04</td>
-      <td>2016</td>
-      <td>7.0</td>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>45</td>
-      <td>84</td>
-      <td>20160614</td>
+      <th>5440</th>
+      <td>90096</td>
+      <td>91</td>
+      <td>20161229</td>
       <td>routine</td>
-      <td>2016-06-14</td>
+      <td>2016-12-29</td>
       <td>2016</td>
-      <td>5.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>5441</th>
+      <td>90268</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5442</th>
+      <td>90269</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+      <td>NaN</td>
     </tr>
   </tbody>
 </table>
+<p>5443 rows × 7 columns</p>
 </div></div></div>
 </div>
-<p>When we check again, there are now only about 65.</p>
+<p>When there are no violations for an inspection, the feature <code class="docutils literal notranslate"><span class="pre">num_vio</span></code> will have
+a missing value (<code class="docutils literal notranslate"><span class="pre">NaN</span></code>). We can check how many values are missing:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined_dataR</span><span class="p">[</span><span class="s1">&#39;num_vio&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ins_and_num_vios</span><span class="p">[</span><span class="s1">&#39;num_vio&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>833
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, about 15% of restaurant inspections in 2016 found no safety violations.</p>
+<p>We’d expect that if a restaurant received a perfect safety score, the
+restaurant had no violations. So, we can correct these missing values by
+setting them to 0. This is an example of deductive imputation, since we’re
+using domain knowledge to fill in missing values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">zero_vios_for_perfect_scores</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;num_vio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="n">ins_and_num_vios</span> <span class="o">=</span> <span class="p">(</span><span class="n">ins2016</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">left_join_vios</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">zero_vios_for_perfect_scores</span><span class="p">))</span>
+<span class="n">ins_and_num_vios</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>score</th>
+      <th>date</th>
+      <th>type</th>
+      <th>timestamp</th>
+      <th>year</th>
+      <th>num_vio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>94</td>
+      <td>20160513</td>
+      <td>routine</td>
+      <td>2016-05-13</td>
+      <td>2016</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24</td>
+      <td>98</td>
+      <td>20161005</td>
+      <td>routine</td>
+      <td>2016-10-05</td>
+      <td>2016</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24</td>
+      <td>96</td>
+      <td>20160311</td>
+      <td>routine</td>
+      <td>2016-03-11</td>
+      <td>2016</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5440</th>
+      <td>90096</td>
+      <td>91</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>5441</th>
+      <td>90268</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>5442</th>
+      <td>90269</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>2016-12-29</td>
+      <td>2016</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5443 rows × 7 columns</p>
+</div></div></div>
+</div>
+<p>Now, there are only 65 missing violation counts:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ins_and_num_vios</span><span class="p">[</span><span class="s1">&#39;num_vio&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1509,68 +1975,187 @@ Name: year, dtype: int64
 </div>
 </div>
 </div>
-<p>We have corrected a large number of missing values. With further investigation, we find that some of the businesses have inspection dates in <code class="docutils literal notranslate"><span class="pre">ins2016</span></code> that differ from the dates in <code class="docutils literal notranslate"><span class="pre">vio2016</span></code> by one or two days. We could change the dates in <code class="docutils literal notranslate"><span class="pre">vio2016</span></code>, if we wanted to fix additional missing data. We leave that to an exercise.</p>
-<p>Let’s examine the relationship between the number of violations and the inspection score.</p>
+<p>We have corrected a large number of missing values. With further investigation,
+we find that some of the businesses have inspection dates in <code class="docutils literal notranslate"><span class="pre">ins2016</span></code> that
+differ from the dates in <code class="docutils literal notranslate"><span class="pre">vio2016</span></code> by one or two days. We could change the
+dates in <code class="docutils literal notranslate"><span class="pre">vio2016</span></code> if we wanted to fix additional missing data. We leave this
+as an exercise for the reader.</p>
+<p>Now, let’s examine the relationship between the number of violations and the
+inspection score.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;num_vio&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">joined_dataR</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;num_vio&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ins_and_num_vios</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:xlabel=&#39;num_vio&#39;, ylabel=&#39;score&#39;&gt;
-</pre></div>
-</div>
-<img alt="../../_images/wrangling_restaurants_21_1.png" src="../../_images/wrangling_restaurants_21_1.png" />
+<img alt="../../_images/wrangling_restaurants_23_0.png" src="../../_images/wrangling_restaurants_23_0.png" />
 </div>
 </div>
-<p>As we might expect there is a negative relationship between the inspection score and the number of violations found during the inspection. The variability in the score appears greater for lower scores.  Undoubtedly, not all violations impact the score the same amount.</p>
-<p>How can we use the information in the description of the violation to capture the kind of violation that has occurred?</p>
-<p>We saw earlier that the feature description in the violations data frame has a lot of text, including information in square brackets about when the violation was corrected. We can tally the descriptions and examine the most “popular” violations.</p>
+<p>As we might expect there is a negative relationship between the inspection
+score and the number of violations found during the inspection. We can also see
+variability in score—two restaurants could both have two violations, but one
+could receive a lower overall score than the other. This implies that some
+violations are more serious than others and have a greater impact on the score.</p>
+<div class="section" id="using-violations-descriptions">
+<h2><span class="section-number">8.10.1. </span>Using Violations Descriptions<a class="headerlink" href="#using-violations-descriptions" title="Permalink to this headline">¶</a></h2>
+<p>How can we use the information in the description of the violation to capture
+the kind of violation that has occurred?</p>
+<p>We saw earlier that the feature description in the violations data frame has a
+lot of text, including information in square brackets about when the violation
+was corrected. We can tally the descriptions and examine the most common
+violations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">display_df</span><span class="p">(</span><span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">rows</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Unclean or degraded floors walls or ceilings        161
-Unapproved or unmaintained equipment or utensils     99
-Moderate risk food holding temperature               95
-                                                   ... 
-Improper or defective plumbing                       28
-Inadequate ventilation or lighting                   26
-Unclean or unsanitary food contact surfaces          23
-Name: description, Length: 20, dtype: int64
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Unclean or degraded floors walls or ceilings                                 161
+Unapproved or unmaintained equipment or utensils                              99
+Moderate risk food holding temperature                                        95
+Inadequate and inaccessible handwashing facilities                            93
+Inadequately cleaned or sanitized food contact surfaces                       92
+Improper food storage                                                         81
+Wiping cloths not clean or properly stored or inadequate sanitizer            71
+Food safety certificate or food handler card not available                    64
+Moderate risk vermin infestation                                              58
+Foods not protected from contamination                                        56
+Unclean nonfood contact surfaces                                              54
+Inadequate food safety knowledge or lack of certified food safety manager     52
+Permit license or inspection report not posted                                41
+Improper storage of equipment utensils or linens                              41
+Low risk vermin infestation                                                   34
+High risk food holding temperature                                            32
+Inadequate warewashing facilities or equipment                                31
+Improper or defective plumbing                                                28
+Inadequate ventilation or lighting                                            26
+Unclean or unsanitary food contact surfaces                                   23
+Name: description, dtype: int64
 </pre></div>
 </div>
 </div>
 </div>
-<p>These descriptions are long and wordy. Reading through these descriptions, we see that some are related to the cleanliness of facilities, others are related to the food storage, and still others pertain to the cleanliness of the staff.  We are interested in the basic gist of the violations.  For example, if a description contains the term “high risk” then we can create a feature, called isHighRisk, that is True or False depending on whether or not the description contains the term.</p>
-<p>Below, we create eights new features that we have developed to give us a sense of the kind of violation that has occurred.  Don’t worry about the particular details of the code. Basically, each feature is True/False according to the presence/absence of specific words in the description.</p>
+<p>These descriptions are long and wordy. Reading through these descriptions, we
+see that some are related to the cleanliness of facilities, others are related
+to the food storage, and still others pertain to the cleanliness of the staff.</p>
+<p>Since there are many types of violations, we’d like to group violations
+together into larger categories. One way to do this is to create a simple
+boolean flag depending on what the violation text contains. For example, we can
+create a feature called <code class="docutils literal notranslate"><span class="pre">is_high_risk</span></code>, that contains <code class="docutils literal notranslate"><span class="pre">True</span></code> if if a
+description contains the term “high risk”.</p>
+<p>We’ll create eight new features for different categories of violations. Don’t
+worry about the particular details of the code for now—this code uses
+regular expressions, covered in the later <a class="reference internal" href="../13/text_intro.html#ch-text"><span class="std std-ref">Working with Text</span></a> chapter. The important
+idea is that this code creates features containing <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> based on
+whether the violation description contains specific words.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isHighRisk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;high risk&quot;</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isClean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;clean|sanit&quot;</span><span class="p">)</span>
-<span class="n">surface</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;surface&quot;</span><span class="p">)</span>
-<span class="n">food</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\Wfood&quot;</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isFoodSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">surface</span> <span class="o">&amp;</span> <span class="n">food</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isVermin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;vermin&quot;</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isStorage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;thaw|cool|therm|storage&quot;</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isDisplayPermit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;certificate|permit&quot;</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isNonFoodSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;wall|ceiling|floor|surface&quot;</span><span class="p">)</span>
-<span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;isHuman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vio2016</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;hand|glove|hair|nail&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_vio_categories</span><span class="p">(</span><span class="n">vio</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">has</span><span class="p">(</span><span class="n">term</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+
+    <span class="n">vio</span> <span class="o">=</span> <span class="n">vio</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_high_risk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;high risk&quot;</span><span class="p">)</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_clean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;clean|sanit&quot;</span><span class="p">)</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_food_surface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;surface&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\Wfood&quot;</span><span class="p">))</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_vermin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;vermin&quot;</span><span class="p">)</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_storage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;thaw|cool|therm|storage&quot;</span><span class="p">)</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_display_permit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;certificate|permit&quot;</span><span class="p">)</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_non_food_surface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;wall|ceiling|floor|surface&quot;</span><span class="p">)</span>
+    <span class="n">vio</span><span class="p">[</span><span class="s1">&#39;is_human&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;hand|glove|hair|nail&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vio</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Now that we have these new features in <code class="docutils literal notranslate"><span class="pre">vio2016</span></code>, we again want to merge this information with the inspection information. We roll up the violations again to the restaurant/date level and track whether any of the values in the group is True or not.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">features</span> <span class="o">=</span> <span class="n">vio2016</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;new_date&#39;</span><span class="p">])[[</span><span class="s1">&#39;isClean&#39;</span><span class="p">,</span> <span class="s1">&#39;isFoodSurface&#39;</span><span class="p">,</span> <span class="s1">&#39;isVermin&#39;</span><span class="p">,</span>
-                                                <span class="s1">&#39;isStorage&#39;</span><span class="p">,</span> <span class="s1">&#39;isDisplayPermit&#39;</span><span class="p">,</span> <span class="s1">&#39;isHuman&#39;</span><span class="p">,</span>
-                                                <span class="s1">&#39;isNonFoodSurface&#39;</span><span class="p">,</span> <span class="s1">&#39;isHighRisk&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="n">features</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The violations with the new categories</span>
+<span class="n">vio2016</span> <span class="o">=</span> <span class="p">(</span><span class="n">viol</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_2016</span><span class="p">)</span>
+           <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">make_vio_categories</span><span class="p">))</span>
+<span class="n">vio2016</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>date</th>
+      <th>description</th>
+      <th>timestamp</th>
+      <th>...</th>
+      <th>is_storage</th>
+      <th>is_display_permit</th>
+      <th>is_non_food_surface</th>
+      <th>is_human</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>19</td>
+      <td>20160513</td>
+      <td>Unapproved or unmaintained equipment or utensi...</td>
+      <td>2016-05-13</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>19</td>
+      <td>20160513</td>
+      <td>Unclean or degraded floors walls or ceilings  ...</td>
+      <td>2016-05-13</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 13 columns</p>
+</div></div></div>
+</div>
+<p>Now that we have these new features in <code class="docutils literal notranslate"><span class="pre">vio2016</span></code>, we again want to merge this
+information with the inspection information. We roll up the violations again to
+the restaurant/date level and track whether any of the values in the group is
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feature_names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;is_high_risk&#39;</span><span class="p">,</span> <span class="s1">&#39;is_clean&#39;</span><span class="p">,</span> <span class="s1">&#39;is_food_surface&#39;</span><span class="p">,</span> <span class="s1">&#39;is_vermin&#39;</span><span class="p">,</span> <span class="s1">&#39;is_storage&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;is_display_permit&#39;</span><span class="p">,</span> <span class="s1">&#39;is_non_food_surface&#39;</span><span class="p">,</span> <span class="s1">&#39;is_human&#39;</span>
+<span class="p">]</span>
+
+<span class="n">features</span> <span class="o">=</span> <span class="p">(</span><span class="n">vio2016</span>
+            <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
+            <span class="p">[</span><span class="n">feature_names</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="n">features</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1594,18 +2179,18 @@ Name: description, Length: 20, dtype: int64
     <tr style="text-align: right;">
       <th></th>
       <th></th>
-      <th>isClean</th>
-      <th>isFoodSurface</th>
-      <th>isVermin</th>
-      <th>isStorage</th>
-      <th>isDisplayPermit</th>
-      <th>isHuman</th>
-      <th>isNonFoodSurface</th>
-      <th>isHighRisk</th>
+      <th>is_high_risk</th>
+      <th>is_clean</th>
+      <th>is_food_surface</th>
+      <th>is_vermin</th>
+      <th>is_storage</th>
+      <th>is_display_permit</th>
+      <th>is_non_food_surface</th>
+      <th>is_human</th>
     </tr>
     <tr>
       <th>business_id</th>
-      <th>new_date</th>
+      <th>timestamp</th>
       <th></th>
       <th></th>
       <th></th>
@@ -1620,6 +2205,7 @@ Name: description, Length: 20, dtype: int64
     <tr>
       <th>19</th>
       <th>2016-05-13</th>
+      <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>False</td>
@@ -1627,48 +2213,13 @@ Name: description, Length: 20, dtype: int64
       <td>True</td>
       <td>True</td>
       <td>True</td>
-      <td>False</td>
     </tr>
     <tr>
-      <th rowspan="2" valign="top">24</th>
+      <th>24</th>
       <th>2016-03-11</th>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>False</td>
       <td>True</td>
       <td>False</td>
-    </tr>
-    <tr>
-      <th>2016-10-05</th>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th rowspan="2" valign="top">45</th>
-      <th>2016-01-04</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>2016-06-14</th>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
@@ -1679,38 +2230,392 @@ Name: description, Length: 20, dtype: int64
 </table>
 </div></div></div>
 </div>
-<p>Again, we use a left join to merge these new features into the inspection-level data frame, <code class="docutils literal notranslate"><span class="pre">joined_dataR</span></code>. And, for the special case of a score of 100, we set each of the new features to False.</p>
+<p>We’ll once again use a left join to merge these new features into the
+inspection-level data frame, <code class="docutils literal notranslate"><span class="pre">ins2016</span></code>. And, for the special case of a score of
+100, we set all of the new features to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined_dataB</span> <span class="o">=</span> <span class="n">joined_dataR</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;new_date&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">left_join_features</span><span class="p">(</span><span class="n">ins</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ins</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
 
-<span class="n">feature_names</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span>
-
-<span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">feature_names</span><span class="p">:</span>
-    <span class="n">joined_dataB</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">joined_dataB</span><span class="o">.</span><span class="n">score</span> <span class="o">==</span> <span class="mi">100</span><span class="p">,</span> <span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="k">def</span> <span class="nf">zero_features_for_perfect_scores</span><span class="p">(</span><span class="n">ins</span><span class="p">):</span>
+    <span class="n">ins</span> <span class="o">=</span> <span class="n">ins</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ins</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ins</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">100</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">ins</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We can check our transformations  with a collection of boxplots that compares the distribution of the inspection score each violation type.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">feature_names</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">joined_dataB</span><span class="p">)</span>
-    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ins_and_vios</span> <span class="o">=</span> <span class="p">(</span><span class="n">ins2016</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">left_join_features</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">zero_features_for_perfect_scores</span><span class="p">))</span>
+<span class="n">ins_and_vios</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_restaurants_31_0.png" src="../../_images/wrangling_restaurants_31_0.png" />
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>business_id</th>
+      <th>score</th>
+      <th>date</th>
+      <th>type</th>
+      <th>...</th>
+      <th>is_storage</th>
+      <th>is_display_permit</th>
+      <th>is_non_food_surface</th>
+      <th>is_human</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19</td>
+      <td>94</td>
+      <td>20160513</td>
+      <td>routine</td>
+      <td>...</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24</td>
+      <td>98</td>
+      <td>20161005</td>
+      <td>routine</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>24</td>
+      <td>96</td>
+      <td>20160311</td>
+      <td>routine</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5440</th>
+      <td>90096</td>
+      <td>91</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5441</th>
+      <td>90268</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5442</th>
+      <td>90269</td>
+      <td>100</td>
+      <td>20161229</td>
+      <td>routine</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>5443 rows × 14 columns</p>
+</div></div></div>
+</div>
+<p>To see how each violation category affects the score, we can make a collection
+of boxplots that compares the score distributions with and without each
+violation. First, we’ll subset the table so that we have just the scores and
+the violation categories.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ins_and_vios</span><span class="p">[[</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">feature_names</span><span class="p">]]</span>
+</pre></div>
 </div>
 </div>
-<p>A few observations about these boxplots: restaurants that have no cleanliness-related violations have the highest scores; having a display permit violation isn’t much of a detractor; high risk violations lower the distribution of scores more than any other violation. These observations are just the beginning of a possible analysis into understanding what a score means.</p>
-<p>This example has shown how text has the potential to be used in a data analysis. We can derive analyzable features from text. There are other techniques for converting text into data that can be analyzed statistically (see <a class="reference internal" href="../13/text_intro.html#ch-text"><span class="std std-numref">Chapter 12</span></a>).</p>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>score</th>
+      <th>is_high_risk</th>
+      <th>is_clean</th>
+      <th>is_food_surface</th>
+      <th>...</th>
+      <th>is_storage</th>
+      <th>is_display_permit</th>
+      <th>is_non_food_surface</th>
+      <th>is_human</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>94</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>...</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>98</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>96</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5440</th>
+      <td>91</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5441</th>
+      <td>100</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5442</th>
+      <td>100</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>5443 rows × 9 columns</p>
+</div></div></div>
+</div>
+<p>Our plotting library expects long-form data, so we first use <code class="docutils literal notranslate"><span class="pre">.melt()</span></code> to
+transform this table from wide-form to long-form:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">features_long</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">ins_and_vios</span><span class="p">[[</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">feature_names</span><span class="p">]],</span>
+                        <span class="n">id_vars</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span>
+                        <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span>
+                        <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;violated&#39;</span><span class="p">)</span>
+<span class="n">features_long</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>score</th>
+      <th>category</th>
+      <th>violated</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>94</td>
+      <td>is_high_risk</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>98</td>
+      <td>is_high_risk</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>96</td>
+      <td>is_high_risk</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>43541</th>
+      <td>91</td>
+      <td>is_human</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>43542</th>
+      <td>100</td>
+      <td>is_human</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>43543</th>
+      <td>100</td>
+      <td>is_human</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>43544 rows × 3 columns</p>
+</div></div></div>
+</div>
+<p>Now, we make our plot:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">catplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">features_long</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;violated&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span>
+                <span class="n">col</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">);</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">59</span><span class="p">,</span> <span class="mi">101</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wrangling_restaurants_42_0.png" src="../../_images/wrangling_restaurants_42_0.png" />
+</div>
+</div>
+<p>What do we observe? Restaurants that have no cleanliness-related violations
+have the highest scores. Having a display permit violation isn’t much of a
+detractor. And, high risk violations lower the distribution of scores more than any
+other violation. These observations are just the beginning of a possible
+analysis into understanding what a score means.</p>
+</div>
+<div class="section" id="takeaways">
+<h2><span class="section-number">8.10.2. </span>Takeaways<a class="headerlink" href="#takeaways" title="Permalink to this headline">¶</a></h2>
+<p>We used several techniques from this chapter to wrangle the restaurant safety
+data. First, we applied transformations to subset rows. We used quality checks,
+looked for missing values, and filled them in using deductive imputation. We
+also saw how text can be used in a data analysis by extracting features from
+the violation descriptions. Finally, we modified the dataframe’s structure to
+make it easier to produce the final plots for this analysis.</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1742,7 +2647,7 @@ Name: description, Length: 20, dtype: int64
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">8.9. </span>Modify Structure</p>
+            <p class="prev-next-title"><span class="section-number">8.9. </span>Modifying Structure</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="wrangling_summary.html" title="next page">
