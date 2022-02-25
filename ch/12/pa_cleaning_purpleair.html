@@ -1,0 +1,3235 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>12.3. Exploring and Cleaning PurpleAir Sensor Data &#8212; Principles and Techniques of Data Science</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="12.4. Creating a Model to Correct PurpleAir Measurements" href="pa_modeling.html" />
+    <link rel="prev" title="12.2. Exploring and Cleaning AQS Sensor Data" href="pa_cleaning_aqs.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-113006011-1', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Principles and Techniques of Data Science</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p class="caption">
+ <span class="caption-text">
+  Frontmatter
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../preface.html">
+   To the Reader
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../prereqs.html">
+   Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notation.html">
+   Notation
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  The Data Science Lifecycle
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../01/lifecycle_intro.html">
+   1. The Data Science Lifecycle
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_1.html">
+     1.1. The Students of Data 100
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_2.html">
+     1.2. Exploratory Data Analysis
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_students_3.html">
+     1.3. What’s in a Name?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../02/data_scope_intro.html">
+   2. Data Scope
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
+     2.1. Big Data and New Opportunities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_construct.html">
+     2.2. Target Population, Access Frame, Sample
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_protocols.html">
+     2.3. Instruments and Protocols
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_natural.html">
+     2.4. Measuring Natural Phenomenon
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_accuracy.html">
+     2.5. Accuracy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_summary.html">
+     2.6. Summary
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_exercises.html">
+     2.7. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../03/theory_intro.html">
+   3. Theory for Data Design
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_urn.html">
+     3.1. The Urn Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_election.html">
+     3.2. Simulating Election Polls: Bias, Variance, and Big Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_vaccine_efficacy.html">
+     3.3. Simulating a Randomized Trial: Vaccine Efficacy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_measurement_error.html">
+     3.4. Measurement Error: Air Quality Variation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_probability.html">
+     3.5. Probability and the Urn Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_exercises.html">
+     3.6. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../04/modeling_intro.html">
+   4. Modeling and Estimation
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_simple.html">
+     4.1. Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_loss_functions.html">
+     4.2. Loss Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_abs_huber.html">
+     4.3. Absolute and Huber Loss
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../05/cycle_case_study_intro.html">
+   5. [In progress] Case Study
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Rectangular Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../06/pandas_intro.html">
+   6. Working With Dataframes Using pandas
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_subsetting.html">
+     6.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_aggregating.html">
+     6.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_joining.html">
+     6.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_transforming.html">
+     6.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_other_reps.html">
+     6.5. How are Dataframes Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_conclusion.html">
+     6.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_exercises.html">
+     6.7. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../07/sql_intro.html">
+   7. Working With Relations Using SQL
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_subsetting.html">
+     7.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_aggregating.html">
+     7.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_joining.html">
+     7.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_transforming.html">
+     7.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_other_reps.html">
+     7.5. How are Relations Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_conclusion.html">
+     7.6. Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_exercises.html">
+     7.7. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Understanding The Data
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../08/files_intro.html">
+   8. Wrangling Files
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_datasets.html">
+     8.1. Data Source Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_formats.html">
+     8.2. File Formats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_size.html">
+     8.3. File Size
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_command_line.html">
+     8.4. The Shell and Command Line Tools
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_granularity.html">
+     8.5. Table Shape and Granularity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_summary.html">
+     8.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../09/wrangling_intro.html">
+   9. Wrangling Dataframes
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_co2.html">
+     9.1. Example: Wrangling CO2 Measurements from Mauna Loa Observatory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_checks.html">
+     9.2. Quality Checks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_missing.html">
+     9.3. Missing Values and Records
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_transformations.html">
+     9.4. Transformations and Timestamps
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_structure.html">
+     9.5. Modifying Structure
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_restaurants.html">
+     9.6. Example: Wrangling Restaurant Safety Violations
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_summary.html">
+     9.7. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../10/eda_intro.html">
+   10. Exploratory Data Analysis
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_feature_types.html">
+     10.1. Feature Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_distributions.html">
+     10.2. What to Look For in a Distribution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_relationships.html">
+     10.3. What to Look For in a Relationship?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_guidelines.html">
+     10.4. Guidelines for Exploration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_example.html">
+     10.5. Example: Sale Prices for Houses
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_summary.html">
+     10.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../11/viz_intro.html">
+   11. Data Visualization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_scale.html">
+     11.1. Choosing Scale to Reveal Structure
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_smoothing.html">
+     11.2. Smoothing and Aggregating Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_comparisons.html">
+     11.3. Facilitating Meaningful Comparisons
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_data_design.html">
+     11.4. Incorporating the Data Design
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_context.html">
+     11.5. Adding Context
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_plotly.html">
+     11.6. Creating Plots Using
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       plotly
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_other_tools.html">
+     11.7. Other Tools for Visualization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_summary.html">
+     11.8. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="pa_intro.html">
+   12. Case Study: Data Science for Accurate and Timely Air Quality Measurements
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="pa_collocated.html">
+     12.1. Finding Collocated Sensors
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pa_cleaning_aqs.html">
+     12.2. Exploring and Cleaning AQS Sensor Data
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     12.3. Exploring and Cleaning PurpleAir Sensor Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pa_modeling.html">
+     12.4. Creating a Model to Correct PurpleAir Measurements
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pa_conclusion.html">
+     12.5. In Conclusion
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="pa_exercises.html">
+     12.6. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Other Data Sources
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../13/text_intro.html">
+   13. Working with Text
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_strings.html">
+     13.1. Python String Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_regex.html">
+     13.2. Regular Expressions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_re.html">
+     13.3. Regex and Python
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../14/web_intro.html">
+   14. Web Technologies
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_http.html">
+     14.1. HTTP
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_rest.html">
+     14.2. [In Progress] REST
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_html.html">
+     14.3. [In Progress] XPath and HTML
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Linear Modeling
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../15/linear_models.html">
+   15. Linear Models
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_tips.html">
+     15.1. Predicting Tip Amounts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_fitting.html">
+     15.2. [In progress] Fitting a linear model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_inference.html">
+     15.3. [In progress] Inference for Linear Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_projection.html">
+     15.4. Least Squares — A Geometric Perspective
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../16/prob_and_gen.html">
+   16. Probability and Generalization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+  <label for="toctree-checkbox-15">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_random_vars.html">
+     16.1. Random Variables
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_exp_var.html">
+     16.2. Expectation and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/prob_risk.html">
+     16.3. Risk
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../17/gradient_descent.html">
+   17. Gradient Descent and Numerical Optimization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+  <label for="toctree-checkbox-16">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_basics.html">
+     17.1. Loss Minimization Using a Program
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_descent_define.html">
+     17.2. Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_convexity.html">
+     17.3. Convexity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_stochastic.html">
+     17.4. Stochastic Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../17/gradient_lin_reg.html">
+     17.5. Fitting a Linear Model Using Gradient Descent
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../18/donkey_intro.html">
+   18. [In progress] Case Study: Donkey Dimensions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+  <label for="toctree-checkbox-17">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_analysis.html">
+     18.1. Linear Regression Case Study
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Multiple Linear Modeling
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../19/mult_intro.html">
+   19. [In progress] Multiple Linear Regression
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+  <label for="toctree-checkbox-18">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/mult_model.html">
+     19.1. Multiple Linear Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/mult_inference.html">
+     19.2. Inference for Multiple Linear Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../20/feature_engineering.html">
+   20. Feature Engineering
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+  <label for="toctree-checkbox-19">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/feature_one_hot.html">
+     20.1. The Walmart dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/feature_polynomial.html">
+     20.2. Predicting Ice Cream Ratings
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../21/bias_intro.html">
+   21. The Bias-Variance Tradeoff
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/>
+  <label for="toctree-checkbox-20">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_risk.html">
+     21.1. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_modeling.html">
+     21.2. Model Bias and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/bias_cv.html">
+     21.3. Cross-Validation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../22/reg_intro.html">
+   22. Regularization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/>
+  <label for="toctree-checkbox-21">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_intuition.html">
+     22.1. Regularization Intuition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_ridge.html">
+     22.2. L2 Regularization: Ridge Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/reg_lasso.html">
+     22.3. L1 Regularization: Lasso Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../23/mult_case_intro.html">
+   23. [In progress] Case Study: Multiple Linear Models
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Classification
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../24/classification_intro.html">
+   24. Classification
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/>
+  <label for="toctree-checkbox-22">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_prob.html">
+     24.1. Regression on Probabilities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_log_model.html">
+     24.2. The Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_cost.html">
+     24.3. A Loss Function for the Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_log_reg.html">
+     24.4. Using Logistic Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_cost_justification.html">
+     24.5. Approximating the Empirical Probability Distribution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_sgd.html">
+     24.6. Fitting a Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_sensitivity_specificity.html">
+     24.7. Evaluating Logistic Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../24/classification_multiclass.html">
+     24.8. Multiclass Classification
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Replicability
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../25/repl_intro.html">
+   25. [In progress] Replicable Research
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/>
+  <label for="toctree-checkbox-23">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../25/repl_phacking.html">
+     25.1. P-hacking
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Extra Topics
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../26/pca_intro.html">
+   26. Dimensionality Reduction and PCA
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/>
+  <label for="toctree-checkbox-24">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_dims.html">
+     26.1. Dimensions of a Data Table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_svd.html">
+     26.2. PCA using the Singular Value Decomposition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../26/pca_in_practice.html">
+     26.3. PCA in Practice
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../27/dtrees_intro.html">
+   27. [In progress] Decision Trees and Random Forests
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../28/clustering_intro.html">
+   28. [In progress] Clustering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Appendices
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a01/prob_review.html">
+   Probability Review
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a02/vector_space_review.html">
+   Vector Space Review
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a03/hyp_intro.html">
+   Statistical Inference Review
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/>
+  <label for="toctree-checkbox-25">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction.html">
+     Hypothesis Testing and Confidence Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction_part2.html">
+     Permutation Test
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a04/ref_intro.html">
+   Reference Tables
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/>
+  <label for="toctree-checkbox-26">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_pandas.html">
+     pandas
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_seaborn.html">
+     Seaborn
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_matplotlib.html">
+     matplotlib
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_sklearn.html">
+     scikit-learn
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a05/contributors.html">
+   Contributors
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../references.html">
+   References
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/ch/12/pa_cleaning_purpleair.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        
+        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/12/pa_cleaning_purpleair.ipynb&branch=master"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch JupyterHub" data-toggle="tooltip"
+                data-placement="left"><img class="jupyterhub-button-logo"
+                    src="../../_static/images/logo_jupyterhub.svg"
+                    alt="Interact on JupyterHub">JupyterHub</button></a>
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-and-subsetting-columns-from-instrument-a">
+   12.3.1. Loading and Subsetting Columns from Instrument A
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#whats-the-granularity">
+   12.3.2. What’s the Granularity?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#parsing-the-timestamps">
+     12.3.2.1. Parsing the Timestamps
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#visualizing-timestamps">
+     12.3.2.2. Visualizing Timestamps
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#why-is-the-sampling-rate-inconsistent">
+     12.3.2.3. Why is the Sampling Rate Inconsistent?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-do-we-do-about-missing-data">
+   12.3.3. What do we do About Missing Data?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-if-a-and-b-channels-disagree">
+   12.3.4. What if A and B channels disagree?
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Exploring and Cleaning PurpleAir Sensor Data</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-and-subsetting-columns-from-instrument-a">
+   12.3.1. Loading and Subsetting Columns from Instrument A
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#whats-the-granularity">
+   12.3.2. What’s the Granularity?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#parsing-the-timestamps">
+     12.3.2.1. Parsing the Timestamps
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#visualizing-timestamps">
+     12.3.2.2. Visualizing Timestamps
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#why-is-the-sampling-rate-inconsistent">
+     12.3.2.3. Why is the Sampling Rate Inconsistent?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-do-we-do-about-missing-data">
+   12.3.3. What do we do About Missing Data?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-if-a-and-b-channels-disagree">
+   12.3.4. What if A and B channels disagree?
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="exploring-and-cleaning-purpleair-sensor-data">
+<span id="ch-pa-cleaning-pa"></span><h1><span class="section-number">12.3. </span>Exploring and Cleaning PurpleAir Sensor Data<a class="headerlink" href="#exploring-and-cleaning-purpleair-sensor-data" title="Permalink to this headline">¶</a></h1>
+<p>To recap our analysis, our plan is to:</p>
+<ol class="simple">
+<li><p>Find a list of possibly collocated AQS and PurpleAir sensors.</p></li>
+<li><p>Contact AQS sites to find truly collocated sensor pairs.</p></li>
+<li><p>Explore and clean AQS measurements for one sensor.</p></li>
+<li><p>Explore and clean PurpleAir measurements for the other sensor in the pair</p></li>
+<li><p>Join the AQS and PurpleAir measurements together for all the sensor pairs.</p></li>
+<li><p>Fit a model to make PurpleAir measurements match AQS measurements.</p></li>
+</ol>
+<p>In this section, we’ll perform step 4 of this plan.
+We’ll explore and clean data from a PurpleAir sensor.
+We’ll use Barkjohn’s data to skip step 5.</p>
+<p>In the previous section (<a class="reference internal" href="pa_cleaning_aqs.html#ch-pa-cleaning-aqs"><span class="std std-numref">Section 12.2</span></a>),
+we analyzed data from the AQS site <code class="docutils literal notranslate"><span class="pre">06-067-0010</span></code>.
+The matching PurpleAir sensor is named <code class="docutils literal notranslate"><span class="pre">AMTS_TESTINGA</span></code>, and we’ve used
+the PurpleAir website to download the
+data for this sensor into the <code class="docutils literal notranslate"><span class="pre">data/purpleair_AMTS</span></code> folder.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>ls -alh data/purpleair_AMTS/*
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-rw-r--r--  1 sam  staff    50M Nov  3 15:52 data/purpleair_AMTS/AMTS_TESTING (outside) (38.568404 -121.493163) Primary Real Time 05_20_2018 12_29_2019.csv
+-rw-r--r--  1 sam  staff    50M Nov  3 15:52 data/purpleair_AMTS/AMTS_TESTING (outside) (38.568404 -121.493163) Secondary Real Time 05_20_2018 12_29_2019.csv
+-rw-r--r--  1 sam  staff    48M Nov  3 15:52 data/purpleair_AMTS/AMTS_TESTING B (undefined) (38.568404 -121.493163) Primary Real Time 05_20_2018 12_29_2019.csv
+-rw-r--r--  1 sam  staff    50M Nov  3 15:52 data/purpleair_AMTS/AMTS_TESTING B (undefined) (38.568404 -121.493163) Secondary Real Time 05_20_2018 12_29_2019.csv
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are four CSV files. What does each one contain?
+The data dictionary for the PurpleAir data <a class="footnote-reference brackets" href="#pa-dict" id="id1">1</a> says that each sensor
+has two separate instruments, A and B, that each record data.
+In this case, the first two CSV files correspond to the instrument A,
+and then last two CSV files correspond to B.
+Having two instruments is useful for data cleaning; if A and B disagree about
+a measurement, we might question the integrity of the measurement and decide to
+remove it.</p>
+<p>The data dictionary also mentions that each instrument records Primary data and
+Secondary data. The Primary data contains the fields we’re interested in: PM2.5,
+temperature, and humidity. The Secondary data contains data for other particle
+sizes, like PM1.0 and PM10. Since we’re interested in PM2.5, we’ll work
+only with the Primary data for instruments A and B.</p>
+<p>Our goals for this section:</p>
+<ol class="simple">
+<li><p>Load and subset columns from instrument A.</p></li>
+<li><p>Check and adjust the granularity of the PM2.5 readings.</p></li>
+<li><p>Repeat steps 1 and 2 for instrument B.</p></li>
+<li><p>Average together A and B measurements, dropping values where the two instruments
+disagree.</p></li>
+<li><p>Join PurpleAir and AQS data.</p></li>
+</ol>
+<div class="section" id="loading-and-subsetting-columns-from-instrument-a">
+<h2><span class="section-number">12.3.1. </span>Loading and Subsetting Columns from Instrument A<a class="headerlink" href="#loading-and-subsetting-columns-from-instrument-a" title="Permalink to this headline">¶</a></h2>
+<p>When CSV files have long names, we can load the CSV names into a Python variable
+to more easily load them into <code class="docutils literal notranslate"><span class="pre">pandas</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">data_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/purpleair_AMTS&#39;</span><span class="p">)</span>
+<span class="n">pa_csvs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data_folder</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.csv&#39;</span><span class="p">))</span>
+<span class="n">pa_csvs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[PosixPath(&#39;data/purpleair_AMTS/AMTS_TESTING (outside) (38.568404 -121.493163) Primary Real Time 05_20_2018 12_29_2019.csv&#39;),
+ PosixPath(&#39;data/purpleair_AMTS/AMTS_TESTING (outside) (38.568404 -121.493163) Secondary Real Time 05_20_2018 12_29_2019.csv&#39;),
+ PosixPath(&#39;data/purpleair_AMTS/AMTS_TESTING B (undefined) (38.568404 -121.493163) Primary Real Time 05_20_2018 12_29_2019.csv&#39;),
+ PosixPath(&#39;data/purpleair_AMTS/AMTS_TESTING B (undefined) (38.568404 -121.493163) Secondary Real Time 05_20_2018 12_29_2019.csv&#39;)]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The Primary data for instrument A is the first CSV in `pa_csvs`</span>
+<span class="n">pa</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">pa</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>created_at</th>
+      <th>entry_id</th>
+      <th>PM1.0_CF1_ug/m3</th>
+      <th>PM2.5_CF1_ug/m3</th>
+      <th>...</th>
+      <th>Temperature_F</th>
+      <th>Humidity_%</th>
+      <th>PM2.5_ATM_ug/m3</th>
+      <th>Unnamed: 10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2018-05-20 00:00:35 UTC</td>
+      <td>20733</td>
+      <td>0.98</td>
+      <td>1.23</td>
+      <td>...</td>
+      <td>83.0</td>
+      <td>32.0</td>
+      <td>1.23</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2018-05-20 00:01:55 UTC</td>
+      <td>20734</td>
+      <td>0.96</td>
+      <td>1.94</td>
+      <td>...</td>
+      <td>83.0</td>
+      <td>32.0</td>
+      <td>1.94</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2018-05-20 00:03:15 UTC</td>
+      <td>20735</td>
+      <td>1.07</td>
+      <td>1.80</td>
+      <td>...</td>
+      <td>83.0</td>
+      <td>32.0</td>
+      <td>1.80</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>672752</th>
+      <td>2019-12-29 23:55:30 UTC</td>
+      <td>523358</td>
+      <td>24.44</td>
+      <td>40.45</td>
+      <td>...</td>
+      <td>52.0</td>
+      <td>67.0</td>
+      <td>36.91</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>672753</th>
+      <td>2019-12-29 23:57:30 UTC</td>
+      <td>523359</td>
+      <td>23.69</td>
+      <td>37.72</td>
+      <td>...</td>
+      <td>58.0</td>
+      <td>67.0</td>
+      <td>35.49</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>672754</th>
+      <td>2019-12-29 23:59:30 UTC</td>
+      <td>523360</td>
+      <td>24.60</td>
+      <td>37.57</td>
+      <td>...</td>
+      <td>58.0</td>
+      <td>66.0</td>
+      <td>35.33</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>672755 rows × 11 columns</p>
+</div></div></div>
+</div>
+<p>Let’s look at the columns to see which ones we want to subset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">display_df</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">rows</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>index</th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>created_at</td>
+      <td>2018-05-20 00:00:35 UTC</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>entry_id</td>
+      <td>20733</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>PM1.0_CF1_ug/m3</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>PM2.5_CF1_ug/m3</td>
+      <td>1.23</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>PM10.0_CF1_ug/m3</td>
+      <td>1.23</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>UptimeMinutes</td>
+      <td>2299.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>RSSI_dbm</td>
+      <td>-62.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Temperature_F</td>
+      <td>83.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Humidity_%</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>PM2.5_ATM_ug/m3</td>
+      <td>1.23</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Unnamed: 10</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Although we’re interested in PM2.5, it appears there are two columns that
+contain PM2.5 data: <code class="docutils literal notranslate"><span class="pre">PM2.5_CF1_ug/m3</span></code> and <code class="docutils literal notranslate"><span class="pre">PM2.5_ATM_ug/m3</span></code>.
+What is the difference between these two columns?
+For brevity, we’ll share what Barkjohn et al. found: PurpleAir sensors use a
+calculation to convert a raw laser recording into a PM2.5 number.
+There are two ways to convert the raw laser data into PM2.5 which correspond to
+the CF1 and ATM columns.
+The CF1 conversions result in higher PM2.5 numbers when more PM2.5 particles are
+present.
+Barkjohn found that using CF1 produced better results than ATM, so we’ll
+keep <code class="docutils literal notranslate"><span class="pre">PM2.5_CF1_ug/m3</span></code>.</p>
+<p>So, we’ll subset and rename the columns of <code class="docutils literal notranslate"><span class="pre">pa</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subset_and_rename_A</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;PM2.5_CF1_ug/m3&#39;</span><span class="p">,</span> <span class="s1">&#39;Temperature_F&#39;</span><span class="p">,</span> <span class="s1">&#39;Humidity_%&#39;</span><span class="p">]]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;PM25cf1&#39;</span><span class="p">,</span> <span class="s1">&#39;TempF&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;RH&#39;</span><span class="p">]</span> <span class="c1"># RH stands for Relative Humidity</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_A</span><span class="p">))</span>
+<span class="n">pa</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>timestamp</th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2018-05-20 00:00:35 UTC</td>
+      <td>1.23</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2018-05-20 00:01:55 UTC</td>
+      <td>1.94</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2018-05-20 00:03:15 UTC</td>
+      <td>1.80</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>672752</th>
+      <td>2019-12-29 23:55:30 UTC</td>
+      <td>40.45</td>
+      <td>52.0</td>
+      <td>67.0</td>
+    </tr>
+    <tr>
+      <th>672753</th>
+      <td>2019-12-29 23:57:30 UTC</td>
+      <td>37.72</td>
+      <td>58.0</td>
+      <td>67.0</td>
+    </tr>
+    <tr>
+      <th>672754</th>
+      <td>2019-12-29 23:59:30 UTC</td>
+      <td>37.57</td>
+      <td>58.0</td>
+      <td>66.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>672755 rows × 4 columns</p>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="whats-the-granularity">
+<h2><span class="section-number">12.3.2. </span>What’s the Granularity?<a class="headerlink" href="#whats-the-granularity" title="Permalink to this headline">¶</a></h2>
+<p>In order for the granularity of these measurements to match the AQS data,
+we want one average PM2.5 for each date (a 24-hour period).
+PurpleAir states that sensors take measurements every 2 minutes.
+Let’s double check the granularity of the raw measurements, before we aggregate
+measurements to 24-hour periods.</p>
+<div class="section" id="parsing-the-timestamps">
+<h3><span class="section-number">12.3.2.1. </span>Parsing the Timestamps<a class="headerlink" href="#parsing-the-timestamps" title="Permalink to this headline">¶</a></h3>
+<p>Like the AQS data, we’ll convert the <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> column from strings
+to <code class="docutils literal notranslate"><span class="pre">pd.TimeStamp</span></code> objects using <code class="docutils literal notranslate"><span class="pre">pd.to_datetime</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>timestamp</th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2018-05-20 00:00:35 UTC</td>
+      <td>1.23</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2018-05-20 00:01:55 UTC</td>
+      <td>1.94</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">date_format</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> </span><span class="si">%X</span><span class="s1"> %Z&#39;</span>
+<span class="n">times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">pa</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="n">date_format</span><span class="p">)</span>
+<span class="n">times</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0        2018-05-20 00:00:35+00:00
+1        2018-05-20 00:01:55+00:00
+2        2018-05-20 00:03:15+00:00
+                    ...           
+672752   2019-12-29 23:55:30+00:00
+672753   2019-12-29 23:57:30+00:00
+672754   2019-12-29 23:59:30+00:00
+Name: timestamp, Length: 672755, dtype: datetime64[ns, UTC]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we’ll apply this conversion to the <code class="docutils literal notranslate"><span class="pre">pa</span></code> dataframe.
+As we’ll soon see, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> has special support for dataframes with an index
+of timestamps, so we’ll also set the dataframe index to the timestamps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_timestamps</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">date_format</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> </span><span class="si">%X</span><span class="s1"> %Z&#39;</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="n">date_format</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">))</span>
+
+<span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_A</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">))</span>
+<span class="n">pa</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-20 00:00:35+00:00</th>
+      <td>1.23</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2018-05-20 00:01:55+00:00</th>
+      <td>1.94</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Timestamps are tricky—notice that the original timestamps were given in the UTC
+timezone. However, the AQS data were averaged according to the <em>local time in
+California</em>, which is either 7 or 8 hours behind UTC time, depending on whether
+daylight saving time is in effect.
+Thus, we also need to change the timezone of the PurpleAir timestamps to match
+the local timezone using the <code class="docutils literal notranslate"><span class="pre">df.tz_convert()</span></code> method.
+This method only operates on the index of the dataframe, which is one reason
+why we set the index of <code class="docutils literal notranslate"><span class="pre">pa</span></code> to the timestamps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># https://pvlib-python.readthedocs.io/en/stable/timetimezones.html</span>
+<span class="c1"># The US/Pacific timezone corresponds to the timezone in California, and will</span>
+<span class="c1"># automatically adjust for Daylight Saving Time.</span>
+<span class="n">pa</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s1">&#39;US/Pacific&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-19 17:00:35-07:00</th>
+      <td>1.23</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2018-05-19 17:01:55-07:00</th>
+      <td>1.94</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2018-05-19 17:03:15-07:00</th>
+      <td>1.80</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-12-29 15:55:30-08:00</th>
+      <td>40.45</td>
+      <td>52.0</td>
+      <td>67.0</td>
+    </tr>
+    <tr>
+      <th>2019-12-29 15:57:30-08:00</th>
+      <td>37.72</td>
+      <td>58.0</td>
+      <td>67.0</td>
+    </tr>
+    <tr>
+      <th>2019-12-29 15:59:30-08:00</th>
+      <td>37.57</td>
+      <td>58.0</td>
+      <td>66.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>672755 rows × 3 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">convert_tz</span><span class="p">(</span><span class="n">pa</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s1">&#39;US/Pacific&#39;</span><span class="p">)</span>
+
+<span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_A</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">convert_tz</span><span class="p">))</span>
+<span class="n">pa</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-19 17:00:35-07:00</th>
+      <td>1.23</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2018-05-19 17:01:55-07:00</th>
+      <td>1.94</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="visualizing-timestamps">
+<h3><span class="section-number">12.3.2.2. </span>Visualizing Timestamps<a class="headerlink" href="#visualizing-timestamps" title="Permalink to this headline">¶</a></h3>
+<p>One way to visualize the timestamps is to count how many appear in each 24-hour
+period, then plot those counts over time.
+To group time series data in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we can use the <code class="docutils literal notranslate"><span class="pre">df.resample()</span></code> method.
+This method works on dataframes that have a index of timestamps.
+It behaves like <code class="docutils literal notranslate"><span class="pre">df.groupby()</span></code>, except that we can specify how we want the
+timestamps to be grouped—we can group into dates, weeks, months, and many
+more options.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The &#39;D&#39; argument tells resample to aggregate timestamps into individual dates</span>
+<span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="c1"># We can call aggregation methods just like we would with `groupby()`</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>timestamp
+2018-05-19 00:00:00-07:00     315
+2018-05-20 00:00:00-07:00    1079
+2018-05-21 00:00:00-07:00    1074
+                             ... 
+2019-12-27 00:00:00-08:00    1440
+2019-12-28 00:00:00-08:00    1200
+2019-12-29 00:00:00-08:00     480
+Freq: D, Length: 590, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We&#39;ll reuse this plotting code later, so we&#39;ll put it in a function</span>
+<span class="k">def</span> <span class="nf">plot_measurements_per_day</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">extra_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># Make the plot wider</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sensor&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;# measurements / day&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">extra_lines</span><span class="p">:</span> <span class="k">return</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="s1">&#39;2019-05-30&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;May 30, 2019&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mf">0.63</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1080 points / day&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mf">0.64</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s1">&#39;720 points / day&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_measurements_per_day</span><span class="p">(</span><span class="n">pa</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_cleaning_purpleair_31_0.png" src="../../_images/pa_cleaning_purpleair_31_0.png" />
+</div>
+</div>
+<p>This is a fascinating plot. First, we see clear gaps in the data where there
+were no measurements. It appears that significant portions of data in July 2018,
+September 2019, and October 2019 are missing. Even when the sensor appears to be
+working, the number of measurements per day is slightly different. For
+instance, the plot is “bumpy” between August and September 2018—each date
+has a different number of measurements. This means we need to decide: what should
+we do with missing data? But perhaps more urgently…</p>
+<p>There are strange “steps” in the plot—some dates have around 1000
+readings, some around 2000, some around 700, and some around 1400. If a sensor
+takes measurements every 2 minutes, there should be a maximum of 720 measurements
+per day. For a perfect sensor, the plot would display a flat line at 720
+measurements. Why is this not the case?</p>
+</div>
+<div class="section" id="why-is-the-sampling-rate-inconsistent">
+<h3><span class="section-number">12.3.2.3. </span>Why is the Sampling Rate Inconsistent?<a class="headerlink" href="#why-is-the-sampling-rate-inconsistent" title="Permalink to this headline">¶</a></h3>
+<p>Deeper digging reveals that although PurpleAir sensors currently record data
+every 120 seconds, this was not always the case. Before May 30, 2019, sensors
+recorded data every 80 seconds. That is, before May 30, 2019, a perfect sensor
+would record 1080 points a day.</p>
+<p>Let’s mark these on the plot of measurement counts per day.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_measurements_per_day</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="n">extra_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_cleaning_purpleair_36_0.png" src="../../_images/pa_cleaning_purpleair_36_0.png" />
+</div>
+</div>
+<p>We see that the change in sampling rate does explain the drop at May 30, 2019.
+But what about the time periods where there were many more points than expected?
+This could mean that some measurements were duplicated in the data.
+We can check this by looking at the measurements for, say, Jan 1, 2019.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Passing a string into .loc will filter timestamps</span>
+<span class="n">pa</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;2019-01-01&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2019-01-01 00:00:17-08:00</th>
+      <td>0.61</td>
+      <td>50.0</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>2019-01-01 00:01:40-08:00</th>
+      <td>0.53</td>
+      <td>50.0</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>2019-01-01 00:02:57-08:00</th>
+      <td>0.40</td>
+      <td>50.0</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-01-01 23:56:51-08:00</th>
+      <td>55.83</td>
+      <td>44.0</td>
+      <td>62.0</td>
+    </tr>
+    <tr>
+      <th>2019-01-01 23:58:19-08:00</th>
+      <td>60.64</td>
+      <td>44.0</td>
+      <td>61.0</td>
+    </tr>
+    <tr>
+      <th>2019-01-01 23:59:29-08:00</th>
+      <td>60.82</td>
+      <td>44.0</td>
+      <td>62.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>2154 rows × 3 columns</p>
+</div></div></div>
+</div>
+<p>There are 2154 readings, which is almost double the 1080 expected readings.
+Is this because the readings are duplicated?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;2019-01-01&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2019-01-01 00:00:17-08:00    2
+2019-01-01 16:08:39-08:00    2
+2019-01-01 15:49:59-08:00    2
+                            ..
+2019-01-01 08:12:08-08:00    2
+2019-01-01 08:13:28-08:00    2
+2019-01-01 23:59:29-08:00    2
+Name: timestamp, Length: 1077, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that each timestamp appears exactly twice.
+And, if we look at the data for one timestamp, we see that the data are
+repeated.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;2019-01-01 00:00&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2019-01-01 00:00:17-08:00</th>
+      <td>0.61</td>
+      <td>50.0</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>2019-01-01 00:00:17-08:00</th>
+      <td>0.61</td>
+      <td>50.0</td>
+      <td>28.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Next, we can verify that all duplicated dates contain the same PM2.5 reading.
+Using <code class="docutils literal notranslate"><span class="pre">.groupby('timestamp')</span></code> is possible, but runs very slowly.
+Instead, we’ll resample into minute-long intervals.
+We know that the PM2.5 readings within an interval are all equal if the maximum
+reading minus minimum reading is zero.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some 1-min intervals have no readings, so we need to handle that case</span>
+<span class="k">def</span> <span class="nf">ptp</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="p">(</span><span class="n">pa</span>
+ <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;1min&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">ptp</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>timestamp
+2018-05-19 17:00:00-07:00    0
+2018-05-19 17:01:00-07:00    0
+2018-05-19 17:02:00-07:00    0
+                            ..
+2019-12-29 15:57:00-08:00    0
+2019-12-29 15:58:00-08:00    0
+2019-12-29 15:59:00-08:00    0
+Freq: T, Name: PM25cf1, Length: 848160, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">pa</span>
+ <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;1min&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">ptp</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="c1"># A standard deviation of 0 means that all values are equal.</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>count    848160.0
+mean          0.0
+std           0.0
+           ...   
+50%           0.0
+75%           0.0
+max           0.0
+Name: PM25cf1, Length: 8, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, every duplicated timestamp has identical PM2.5 readings. Since this is also
+true for both temperature and humidity, we’ll drop duplicate rows from <code class="docutils literal notranslate"><span class="pre">pa</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">drop_duplicate_rows</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()]</span>
+
+<span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_A</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">convert_tz</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_duplicate_rows</span><span class="p">))</span>
+<span class="n">pa</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-19 17:00:35-07:00</th>
+      <td>1.23</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2018-05-19 17:01:55-07:00</th>
+      <td>1.94</td>
+      <td>83.0</td>
+      <td>32.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_measurements_per_day</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="n">extra_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_cleaning_purpleair_48_0.png" src="../../_images/pa_cleaning_purpleair_48_0.png" />
+</div>
+</div>
+<p>We see that after dropping duplicate dates, the plot of measurements per day
+looks much more consistent with the the sampling rate we expect <a class="footnote-reference brackets" href="#dst" id="id2">2</a>.</p>
+</div>
+</div>
+<div class="section" id="what-do-we-do-about-missing-data">
+<h2><span class="section-number">12.3.3. </span>What do we do About Missing Data?<a class="headerlink" href="#what-do-we-do-about-missing-data" title="Permalink to this headline">¶</a></h2>
+<p>Next, we must decide how to handle missing values. We’ll follow Barkjohn’s
+original analysis: we only keep a 24-hour average if there are at least 90%
+of the possible points for that day. We’ll need to remember that
+before May 30, 2019 there are 1080 possible points in a day—after May 30,
+there are 720 points possible.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">per_day</span> <span class="o">=</span> <span class="p">(</span><span class="n">pa</span>
+ <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;per_day&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">per_day</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>per_day</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-19 00:00:00-07:00</th>
+      <td>315</td>
+    </tr>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>1079</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>1074</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-12-27 00:00:00-08:00</th>
+      <td>720</td>
+    </tr>
+    <tr>
+      <th>2019-12-28 00:00:00-08:00</th>
+      <td>720</td>
+    </tr>
+    <tr>
+      <th>2019-12-29 00:00:00-08:00</th>
+      <td>480</td>
+    </tr>
+  </tbody>
+</table>
+<p>590 rows × 1 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">needed_measurements_80s</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="mi">1080</span>
+<span class="n">needed_measurements_120s</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="mi">720</span>
+<span class="n">cutoff_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2019-05-30&#39;</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="s1">&#39;US/Pacific&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">has_enough_readings</span><span class="p">(</span><span class="n">one_day</span><span class="p">):</span>
+    <span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">one_day</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">one_day</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span> <span class="n">needed_measurements_80s</span>
+            <span class="k">if</span> <span class="n">date</span> <span class="o">&lt;=</span> <span class="n">cutoff_date</span>
+            <span class="k">else</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="n">needed_measurements_120s</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">should_keep</span> <span class="o">=</span> <span class="n">per_day</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">has_enough_readings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+<span class="n">should_keep</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>timestamp
+2018-05-19 00:00:00-07:00    False
+2018-05-20 00:00:00-07:00     True
+2018-05-21 00:00:00-07:00     True
+                             ...  
+2019-12-27 00:00:00-08:00     True
+2019-12-28 00:00:00-08:00     True
+2019-12-29 00:00:00-08:00    False
+Freq: D, Length: 590, dtype: bool
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we can average together the readings for each day, then remove the days
+with incomplete data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">should_keep</span><span class="p">]</span>
+ <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>2.48</td>
+      <td>83.35</td>
+      <td>28.72</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>3.00</td>
+      <td>83.25</td>
+      <td>29.91</td>
+    </tr>
+    <tr>
+      <th>2018-05-22 00:00:00-07:00</th>
+      <td>3.47</td>
+      <td>83.09</td>
+      <td>31.50</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-12-26 00:00:00-08:00</th>
+      <td>1.56</td>
+      <td>54.46</td>
+      <td>48.93</td>
+    </tr>
+    <tr>
+      <th>2019-12-27 00:00:00-08:00</th>
+      <td>7.66</td>
+      <td>54.38</td>
+      <td>46.43</td>
+    </tr>
+    <tr>
+      <th>2019-12-28 00:00:00-08:00</th>
+      <td>35.78</td>
+      <td>54.28</td>
+      <td>51.10</td>
+    </tr>
+  </tbody>
+</table>
+<p>515 rows × 3 columns</p>
+</div></div></div>
+</div>
+<p>Finally, we can put this step into the pipeline:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_daily_avgs</span><span class="p">(</span><span class="n">pa</span><span class="p">):</span>
+    <span class="n">should_keep</span> <span class="o">=</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+                   <span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+                   <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+                   <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+                   <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">has_enough_readings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">should_keep</span><span class="p">])</span>
+
+<span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_A</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">convert_tz</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_duplicate_rows</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">compute_daily_avgs</span><span class="p">))</span>
+<span class="n">pa</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>2.48</td>
+      <td>83.35</td>
+      <td>28.72</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>3.00</td>
+      <td>83.25</td>
+      <td>29.91</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Now, we have the average daily PM2.5 readings for instrument A.</p>
+</div>
+<div class="section" id="what-if-a-and-b-channels-disagree">
+<h2><span class="section-number">12.3.4. </span>What if A and B channels disagree?<a class="headerlink" href="#what-if-a-and-b-channels-disagree" title="Permalink to this headline">¶</a></h2>
+<p>Recall that there are two instruments per sensor named A and B.
+If the sensors disagree on a particular day, we’ll drop the day from the
+data. First, we’ll need to repeat the data wrangling we just performed on
+instrument A on instrument B.</p>
+<p>Thankfully, the CSV for instrument B is very similar to the CSV for instrument A
+except that the CSVs contain slightly different sets of columns.
+We’ll define a subset procedure for instrument B, then reuse the same pipeline.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa_B</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">pa_B</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>created_at</th>
+      <th>entry_id</th>
+      <th>PM1.0_CF1_ug/m3</th>
+      <th>PM2.5_CF1_ug/m3</th>
+      <th>...</th>
+      <th>Pressure_hpa</th>
+      <th>IAQ</th>
+      <th>PM2.5_ATM_ug/m3</th>
+      <th>Unnamed: 10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2018-05-20 00:01:05 UTC</td>
+      <td>20741</td>
+      <td>1.44</td>
+      <td>1.51</td>
+      <td>...</td>
+      <td>1010.73</td>
+      <td>NaN</td>
+      <td>1.51</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2018-05-20 00:02:25 UTC</td>
+      <td>20742</td>
+      <td>1.27</td>
+      <td>1.33</td>
+      <td>...</td>
+      <td>1010.75</td>
+      <td>NaN</td>
+      <td>1.33</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 11 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subset_and_rename_B</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;PM2.5_CF1_ug/m3&#39;</span><span class="p">]]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa_B</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_B</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">convert_tz</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_duplicate_rows</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">compute_daily_avgs</span><span class="p">))</span>
+<span class="n">pa_B</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>2.42</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>3.01</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We can see that the values in B differ slightly from the values in A.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">pa</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">})</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">B</span><span class="o">=</span><span class="n">pa_B</span><span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">])</span>
+ <span class="p">[[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>2.48</td>
+      <td>2.42</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>3.00</td>
+      <td>3.01</td>
+    </tr>
+    <tr>
+      <th>2018-05-22 00:00:00-07:00</th>
+      <td>3.47</td>
+      <td>3.46</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-12-26 00:00:00-08:00</th>
+      <td>1.56</td>
+      <td>1.42</td>
+    </tr>
+    <tr>
+      <th>2019-12-27 00:00:00-08:00</th>
+      <td>7.66</td>
+      <td>8.08</td>
+    </tr>
+    <tr>
+      <th>2019-12-28 00:00:00-08:00</th>
+      <td>35.78</td>
+      <td>39.15</td>
+    </tr>
+  </tbody>
+</table>
+<p>515 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>We’ll apply Barkjohn’s method: drop rows if the PM2.5 values for A and B differ by more
+than 61%, or by more than 5 µg m⁻³.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">pa</span><span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">pa_B</span><span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+
+<span class="n">abs_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+<span class="n">perc_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">B</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">B</span><span class="p">)</span>
+<span class="n">should_drop</span> <span class="o">=</span> <span class="p">(</span><span class="n">perc_diff</span> <span class="o">&gt;=</span> <span class="mf">0.61</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">abs_diff</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c1"># We&#39;ll end up dropping 12 rows</span>
+<span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">should_drop</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we’ll add this step into the pipeline. After dropping rows, our final
+PM2.5 values will be the average of instruments A and B.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_instrument_B</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="n">pa_B</span><span class="p">):</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">pa</span><span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">pa_B</span><span class="p">[</span><span class="s1">&#39;PM25cf1&#39;</span><span class="p">]</span>
+    <span class="n">avg</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="n">abs_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+    <span class="n">perc_diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">B</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">should_drop</span> <span class="o">=</span> <span class="p">(</span><span class="n">perc_diff</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span> <span class="o">|</span> <span class="p">(</span><span class="n">perc_diff</span> <span class="o">&gt;=</span> <span class="mf">0.61</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">abs_diff</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pa</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">PM25cf1</span><span class="o">=</span><span class="n">avg</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">should_drop</span><span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pa_csvs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_and_rename_A</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">convert_tz</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_duplicate_rows</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">compute_daily_avgs</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">process_instrument_B</span><span class="p">,</span> <span class="n">pa_B</span><span class="p">))</span>
+<span class="n">pa</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PM25cf1</th>
+      <th>TempF</th>
+      <th>RH</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>2.45</td>
+      <td>83.35</td>
+      <td>28.72</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>3.01</td>
+      <td>83.25</td>
+      <td>29.91</td>
+    </tr>
+    <tr>
+      <th>2018-05-22 00:00:00-07:00</th>
+      <td>3.46</td>
+      <td>83.09</td>
+      <td>31.50</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2019-12-26 00:00:00-08:00</th>
+      <td>1.49</td>
+      <td>54.46</td>
+      <td>48.93</td>
+    </tr>
+    <tr>
+      <th>2019-12-27 00:00:00-08:00</th>
+      <td>7.87</td>
+      <td>54.38</td>
+      <td>46.43</td>
+    </tr>
+    <tr>
+      <th>2019-12-28 00:00:00-08:00</th>
+      <td>37.46</td>
+      <td>54.28</td>
+      <td>51.10</td>
+    </tr>
+  </tbody>
+</table>
+<p>502 rows × 3 columns</p>
+</div></div></div>
+</div>
+<p>At last, we have the final PM2.5 readings for a PurpleAir sensor.
+We’ve done a lot of work: we’ve decided how to handle
+missing data, we aggregated the readings for instrument A, averaged the readings
+together with instrument B, and removed rows where A and B disagreed.
+This work has given us a set of PM2.5 readings that we are more confident in.
+We know that each PM2.5 value in the final <code class="docutils literal notranslate"><span class="pre">pa</span></code> dataframe is the daily average from
+two separate instruments that generated consistent and complete readings.</p>
+<p>To fully replicate Barkjohn’s analysis, we would need to repeat this process
+over all the PurpleAir sensors.
+Then, we would repeat the AQS cleaning procedure on all the AQS sensor.
+Finally, we would merge the PurpleAir and AQS data together.
+This procedure produces daily average readings for each collocated sensor pair.</p>
+<p>For brevity, we’ll omit the code to repeat the data processing for the rest of
+the raw sensor data.
+Instead, we’ll reuse Barkjohn’s cleaned and merged final dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># just display a few columns</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">]</span>
+<span class="n">final</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/cleaned_purpleair_aqs/Full24hrdataset.csv&#39;</span><span class="p">)</span>
+         <span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">])</span>
+<span class="n">final</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Date</th>
+      <th>ID</th>
+      <th>PM25FM</th>
+      <th>PM25cf1</th>
+      <th>TempC</th>
+      <th>RH</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2019-05-17</td>
+      <td>AK1</td>
+      <td>6.7</td>
+      <td>8.62</td>
+      <td>18.03</td>
+      <td>38.56</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2019-05-18</td>
+      <td>AK1</td>
+      <td>3.8</td>
+      <td>3.49</td>
+      <td>16.12</td>
+      <td>49.40</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2019-05-21</td>
+      <td>AK1</td>
+      <td>4.0</td>
+      <td>3.80</td>
+      <td>19.90</td>
+      <td>29.97</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>12427</th>
+      <td>2019-02-20</td>
+      <td>WI6</td>
+      <td>15.6</td>
+      <td>25.30</td>
+      <td>1.71</td>
+      <td>65.78</td>
+    </tr>
+    <tr>
+      <th>12428</th>
+      <td>2019-03-04</td>
+      <td>WI6</td>
+      <td>14.0</td>
+      <td>8.21</td>
+      <td>-14.38</td>
+      <td>48.21</td>
+    </tr>
+    <tr>
+      <th>12429</th>
+      <td>2019-03-22</td>
+      <td>WI6</td>
+      <td>5.8</td>
+      <td>9.44</td>
+      <td>5.08</td>
+      <td>52.20</td>
+    </tr>
+  </tbody>
+</table>
+<p>12430 rows × 6 columns</p>
+</div></div></div>
+</div>
+<p>In the next section, we’ll proceed to the final step of the analysis—constructing
+models that can produce a correction for PurpleAir sensor measurements.</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="pa-dict"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a href="/purpleair_study/pa_data_dict.pdf" target="_blank">pa_data_dict.pdf</a>,
+downloaded from <a class="reference external" href="https://www.purpleair.com/sensorlist">https://www.purpleair.com/sensorlist</a> in November 2021.</p>
+</dd>
+<dt class="label" id="dst"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Careful readers will see two spikes above the maximum measurements around
+November of each year when Daylight Saving Time is no longer in effect.
+When clocks are rolled back one hour, that day has 25 hours instead of the usual
+24 hours. Timestamps are tricky!</p>
+</dd>
+</dl>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/12"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="pa_cleaning_aqs.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">12.2. </span>Exploring and Cleaning AQS Sensor Data</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="pa_modeling.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">12.4. </span>Creating a Model to Correct PurpleAir Measurements</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2022.<br/>
+      <div class="extra_footer">
+        <p>
+License: CC BY-NC-ND 4.0
+</p>
+
+      </div>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>
