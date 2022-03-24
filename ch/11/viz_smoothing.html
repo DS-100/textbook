@@ -44,6 +44,8 @@
     <script src="../../_static/custom.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -1203,13 +1205,23 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#principles-of-smoothing">
-   11.2.2. Principles of Smoothing
+  <a class="reference internal nav-link" href="#smoothing-techniques-to-uncover-relationships-and-trends">
+   11.2.2. Smoothing Techniques to Uncover Relationships and Trends
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#takeaways">
-   11.2.3. Takeaways
+  <a class="reference internal nav-link" href="#smoothing-techniques-need-tuning">
+   11.2.3. Smoothing Techniques Need Tuning
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reducing-distributions-to-quantiles">
+   11.2.4. Reducing Distributions to Quantiles
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-not-to-smooth">
+   11.2.5. When Not to Smooth
   </a>
  </li>
 </ul>
@@ -1238,13 +1250,23 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#principles-of-smoothing">
-   11.2.2. Principles of Smoothing
+  <a class="reference internal nav-link" href="#smoothing-techniques-to-uncover-relationships-and-trends">
+   11.2.2. Smoothing Techniques to Uncover Relationships and Trends
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#takeaways">
-   11.2.3. Takeaways
+  <a class="reference internal nav-link" href="#smoothing-techniques-need-tuning">
+   11.2.3. Smoothing Techniques Need Tuning
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reducing-distributions-to-quantiles">
+   11.2.4. Reducing Distributions to Quantiles
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-not-to-smooth">
+   11.2.5. When Not to Smooth
   </a>
  </li>
 </ul>
@@ -1260,13 +1282,13 @@
 <span id="ch-viz-smoothing"></span><h1><span class="section-number">11.2. </span>Smoothing and Aggregating Data<a class="headerlink" href="#smoothing-and-aggregating-data" title="Permalink to this headline">¶</a></h1>
 <p>When we have lots of data, we often don’t want to plot all of the individual
 data points.
-The scatter plot below shows data from the
-Cherry Blossom Run, an annual 10-mile run in Washington D.C.
-We’ve put runners’ ages on the x-axis and race times on the y-axis.</p>
+The scatter plot below shows data from the Cherry Blossom Run, an annual 10-mile run in Washington D.C.
+These data were scraped from the Web and include run times for all registered male runners from 1999 to 2012.
+We’ve put the runner’s registered age on the x-axis and race time on the y-axis.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers&#39;</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">go</span><span class="o">.</span><span class="n">Scattergl</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">runners</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">runners</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers&#39;</span><span class="p">),</span>
     <span class="n">layout</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">)</span>
@@ -1279,30 +1301,31 @@ We’ve put runners’ ages on the x-axis and race times on the y-axis.</p>
 <img alt="../../_images/viz_smoothing_5_0.svg" src="../../_images/viz_smoothing_5_0.svg" /></div>
 </div>
 <p>This scatter plot contains over 70,000 points.
-Because there are so many points, many of them overlap with each other.
+With so many points, many of them overlap with each other.
 This is a common problem called <em>over-plotting</em>.
-In this case, over-plotting prevents us from seeing how time and age are
-related.
-To address over-plotting,
-we use smoothing techniques that aggregate data together before plotting.</p>
+In this case, over-plotting prevents us from seeing how time and age are related.
+About the only thing that we can see in this plot is a group of very young runners, which points to issues in the data.
+To address over-plotting, we use smoothing techniques that aggregate data together before plotting.</p>
 <div class="section" id="smoothing-techniques-to-uncover-shape">
 <h2><span class="section-number">11.2.1. </span>Smoothing Techniques to Uncover Shape<a class="headerlink" href="#smoothing-techniques-to-uncover-shape" title="Permalink to this headline">¶</a></h2>
-<p>The histogram is likely the most familiar type of plot that
-uses smoothing.
-A histogram aggregates points together by putting points into bins.
-Then, it plots one bar for each bin.
-For instance, the histogram below plots the distribution of lifespans
-for dog breeds.
-Above the histogram is a rug plot that draws a single line for every point
-in the data.
-We can see that even a small amount of data can cause overplotting in the rug
-plot.
-By smoothing out the points in the rug plot, the histogram shows the shape
-of the distribution.</p>
+<p>The histogram is a familiar type of plot that uses smoothing.
+A histogram aggregates data values together by putting points into bins and plotting one bar for each bin.
+Smoothing here means that we can not differenitate points from each other in a bin.
+The area of a bin corresponds to the percentage (or count or proportion) of points in the bin.
+Often the bins are equal in width and we take a shortcut to label the height of a bin as the proportion.</p>
+<p>The histogram below plots the distribution of lifespans for dog breeds.
+Above the histogram is a rug plot that draws a single line for every data value.
+We can see in the tallest bin that even a small amount of data can cause overplotting in the rug plot.
+By smoothing out the points in the rug plot, the histogram reveals the general shape of the distribution.
+In this case, we see that many breeds have a longevity of about 12 years.  For more on how to read and interpret
+histograms, see {numref}‘Section %s <a class="reference external" href="ch:eda_distributions">ch:eda_distributions</a>’.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">marginal</span><span class="o">=</span><span class="s2">&quot;rug&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">marginal</span><span class="o">=</span><span class="s2">&quot;rug&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                   <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;longevity&quot;</span><span class="p">:</span><span class="s2">&quot;years&quot;</span><span class="p">},</span>
+             <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span>  <span class="nb">dict</span><span class="p">(</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
@@ -1313,17 +1336,20 @@ of the distribution.</p>
 A KDE plot shows the distribution using a smooth curve rather than bars.
 In the plot below, we show the same histogram of dog longevities
 with a KDE curve overlain on top.
-We can see the KDE curve shows a similar distribution as the histogram.</p>
+We can see the KDE curve shows a similar shape distribution as the histogram.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">marginal</span><span class="o">=</span><span class="s2">&quot;rug&quot;</span><span class="p">,</span>
-                   <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                   <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                   <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;longevity&quot;</span><span class="p">:</span><span class="s2">&quot;years&quot;</span><span class="p">},</span>
                    <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker_color</span><span class="o">=</span><span class="s1">&#39;rgba(76,114,176,0.3)&#39;</span><span class="p">,</span>
                   <span class="n">selector</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;histogram&#39;</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span>  <span class="nb">dict</span><span class="p">(</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">0.2</span>
 <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dogs</span><span class="p">[</span><span class="s1">&#39;longevity&#39;</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">dogs</span><span class="p">[</span><span class="s1">&#39;longevity&#39;</span><span class="p">]),</span> <span class="mi">100</span><span class="p">)</span>
@@ -1340,155 +1366,141 @@ We can see the KDE curve shows a similar distribution as the histogram.</p>
 <div class="cell_output docutils container">
 <img alt="../../_images/viz_smoothing_11_0.svg" src="../../_images/viz_smoothing_11_0.svg" /></div>
 </div>
-<p>What about plots that show two variables of the data, like scatter plots?
-We can smooth in two dimensions by using a two-dimensional histogram.
-This plot uses rectangular bins to aggregates points together.
-Then, it shades the rectangles based on how many points are in each bin.</p>
-<p>Let’s use this to plot the Cherry Blossom race times against age.</p>
-<div class="cell tag_hide-input docutils container">
+<p>What about plots for two variables, like scatter plots? There are similar techniques to histograms and kernel density estimates for smoothing pairs of features. This is the topic of the next section.</p>
+</div>
+<div class="section" id="smoothing-techniques-to-uncover-relationships-and-trends">
+<h2><span class="section-number">11.2.2. </span>Smoothing Techniques to Uncover Relationships and Trends<a class="headerlink" href="#smoothing-techniques-to-uncover-relationships-and-trends" title="Permalink to this headline">¶</a></h2>
+<p>We can find high density regions of a scatter plot by binning data, like in a histogram.
+The plot below, remakes the earlier scatter plot of the Cherry Blossom race times against age.
+(Note that we have dropped the dubious young runners from this plot).
+This plot uses rectangular bins to aggregate points together, and
+then shades the rectangles based on how many points fall in them.</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">250</span><span class="p">]);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">runnersOver17</span> <span class="o">=</span> <span class="n">runners</span><span class="p">[</span><span class="n">runners</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">17</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/viz_smoothing_13_0.svg" src="../../_images/viz_smoothing_13_0.svg" /></div>
 </div>
-<p>Kernel density estimation also works in two dimensions.
-When we use KDE in two dimensions, we plot the contours of the resulting
-two-dimensional curve.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Takes a while to run!</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">runnersOver17</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">250</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="../../_images/viz_smoothing_15_0.svg" src="../../_images/viz_smoothing_15_0.svg" /></div>
 </div>
-<p>Using smoothing techniques lets us visualize lots of data at once.
-For the Cherry Blossom race, smoothing reveals information about
-the data that was hard to otherwise see.
-For example, there’s a cluster of points around 5000 seconds
-(about 80 minutes).
-And, older runners tend to run more slowly than younger runners, but not by
-much.
-There’s also a group of runners under 10 years old, which might point to
-issues in the data.</p>
-</div>
-<div class="section" id="principles-of-smoothing">
-<h2><span class="section-number">11.2.2. </span>Principles of Smoothing<a class="headerlink" href="#principles-of-smoothing" title="Permalink to this headline">¶</a></h2>
-<p>Now that we’ve seen how smoothing is useful for plotting, we turn to
-principles of smoothing that we consider while creating visualizations.</p>
-<p><strong>Smoothing Techniques Need Tuning</strong>.
-Most smoothing techniques need the data scientist to tune how much
-smoothing is applied. For histograms, we need to choose the number of bins.
-And KDE plots have a parameter called the “bandwidth” that
-works similarly to the number of bins on a histogram.
-The left histogram below has too few bins, and the right histogram
-has too many. In both cases, it’s hard to see the shape of the distribution.</p>
+<p>Notice the high density region in the 25 to 40 age group.
+Many of the runners in this age range complete the race in around 5000 seconds (about 80 minutes).</p>
+<p>Kernel density estimation also works in two dimensions.
+When we use KDE in two dimensions, we plot the contours of the resulting two-dimensional curve.
+You read this plot like a topographical map.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">f2</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Takes a while to run!</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">runnersOver17</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_smoothing_17_0.svg" src="../../_images/viz_smoothing_17_0.svg" /></div>
+</div>
+<p>The two-dimensional KDE gives similar insights as the shaded bins. In this example, we see a concentration of runners in the 25 to 40 age group and these runners have times that appear to be roughly 5000 seconds.<br />
+Using smoothing techniques lets us get a better picture of lots of data.
+Smoothing can reveal information about the distribution of data values that is hard to otherwise see.</p>
+<p>Another, informative informative approach to smoothing scatter plots that can be easier to read smooths the y-values for points with similar x-value. To explain, let’s group together the race times for runners with ages in five-year increments: 20-25, 25-30, 30-35, etc. Then, plot the average time for each group and connect the points. Such a curve appears below.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">runnersOver17</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">age5</span><span class="o">=</span><span class="n">runnersOver17</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;age5&#39;</span><span class="p">)</span>
+    <span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="p">)</span>
 
-<span class="n">left_right</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age5&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="../../_images/viz_smoothing_20_0.svg" src="../../_images/viz_smoothing_20_0.svg" /></div>
 </div>
-<p>When we create visualizations that use smoothing, it’s important
-to try several different smoothing amounts to create the most useful
-plot.</p>
-<p><strong>Smoothing to Uncover Trends</strong>.
-With large amounts of data, we can replace
-individual values with aggregates before plotting.
-Earlier in this section,
-we used a 2D histogram to visualize the Cherry Blossom race data.
-Another way to smooth the data is to group together the race times for ages
-0-5, 5-10, 10-15, etc., then plot the average time for each group.</p>
+<p>This plot shows once again that runners in the 25 to 40 year age range have typical run times of about 5400 seconds. It also show that older runners took longer to complete the race on average (not really a surprise, but it wasn’t evident in the earlier plots). The dip for runners under 20 and the flattening of the curve at 80 may be simply the result of fewer runners who are also fitter runners in these groups. There are also other techniques to view trends that are based on kernel smoothing and splines. We don’t go into this topic further.</p>
+<p>Whether using a binning technique or kernel smooth technique, these methods rely on a tuning parameter that specifies the width of the bin or the spread of the kernel. This is the topic of the next section.</p>
+</div>
+<div class="section" id="smoothing-techniques-need-tuning">
+<h2><span class="section-number">11.2.3. </span>Smoothing Techniques Need Tuning<a class="headerlink" href="#smoothing-techniques-need-tuning" title="Permalink to this headline">¶</a></h2>
+<p>Now that we’ve seen how smoothing is useful for plotting, we turn to the issue of tuning.
+For histograms, the width of the bins or, equivalently, for equal-width bins, the number of bins affect the look of the histogram.
+For example, the left histogram of longevity below has a few wide bins, and the right histogram
+has many narrow bins. In both cases, it’s hard to see the shape of the distribution.
+With a few wide bins, we have over-smoothed the distribution, which makes it impossible to discern modes and tails. On the other hand, too many narrow bins, gives a plot that’s little better than a rug plot.
+KDE plots have a parameter called the “bandwidth” that works similarly to the binwidth of a histogram.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">age5</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;age5&#39;</span><span class="p">)</span>
-    <span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
-    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="p">)</span>
-<span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age5&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span>
+             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">f1</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker_color</span><span class="o">=</span><span class="s1">&#39;rgba(76,114,176,0.3)&#39;</span><span class="p">,</span>
+                  <span class="n">selector</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;histogram&#39;</span><span class="p">))</span>
+
+<span class="n">f1</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span>  <span class="nb">dict</span><span class="p">(</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#bandwidth = 0.5</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dogs</span><span class="p">[</span><span class="s1">&#39;longevity&#39;</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">dogs</span><span class="p">[</span><span class="s1">&#39;longevity&#39;</span><span class="p">]),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">dogs</span><span class="p">[</span><span class="s1">&#39;longevity&#39;</span><span class="p">])(</span><span class="n">xs</span><span class="p">)</span>
+<span class="n">curve</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ys</span><span class="p">)</span>
+<span class="n">f1</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">curve</span><span class="p">)</span>
+
+<span class="n">f2</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span>
+             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">f2</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker_color</span><span class="o">=</span><span class="s1">&#39;rgba(76,114,176,0.3)&#39;</span><span class="p">,</span>
+                  <span class="n">selector</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;histogram&#39;</span><span class="p">))</span>
+
+<span class="n">f2</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span>  <span class="nb">dict</span><span class="p">(</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="n">left_right</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/viz_smoothing_23_0.svg" src="../../_images/viz_smoothing_23_0.svg" /></div>
+<img alt="../../_images/viz_smoothing_24_0.svg" src="../../_images/viz_smoothing_24_0.svg" /></div>
 </div>
-<p>This plot shows once again that older runners took longer to
-complete the race than younger ones on average.</p>
-<p><strong>Reducing Shape to a Box-and-Whisker Plot</strong>.
-Box plots aren’t as informative as histograms since histograms show the entire
-distribution rather than a few summary statistics.
-But box plots are very useful when comparing many groups at once.
-In the plot below, we use multiple box plots instead of a line plot to show
-race times against runner age. This plot
-reveals more information than the simple line plot.</p>
-<div class="cell tag_hide-input docutils container">
+<p>Most histogram and KDE software chooses the binwidth and bandwidth automatically, but these often need a bit of fiddling. When you create visualizations that use smoothing, it’s important to try a few different smoothing amounts to create the most useful plot.</p>
+</div>
+<div class="section" id="reducing-distributions-to-quantiles">
+<h2><span class="section-number">11.2.4. </span>Reducing Distributions to Quantiles<a class="headerlink" href="#reducing-distributions-to-quantiles" title="Permalink to this headline">¶</a></h2>
+<p>We found in {numref}‘Chapter %s<a class="reference external" href="ch:eda">ch:eda</a>’ that while box plots aren’t as informative as histograms, they can be useful when comparing the distributions of many groups at once. A box plot reduces the data too a few essential features based on the data quartiles. More generally, quantiles (the lower quartile, median, and upper quartile are just the 25th, 50th, and 75th quantiles) can provide a useful reduction in the data for comparing distributions.</p>
+<p>When two distributions are similar, it can be hard to see the differences with histograms.
+For instance, the histograms below show two- and four-bedroom house price distributions for the SF housing data.
+The distributions look roughly similar in shape, but it’s hard to see whether one distribution is more skewed than another.</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">age5</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age5&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/viz_smoothing_26_0.svg" src="../../_images/viz_smoothing_26_0.svg" /></div>
-</div>
-<p><strong>When Not to Smooth</strong>. When we have only a handful of observations, smoothing
-techniques can give misleading representations of the data. With just a few
-observations, we prefer rug plots over histograms, box plots, and density
-curves, and we make scatter plots rather than smooth curves and density
-contours.</p>
-<p><strong>Reducing Distributions to Quantiles.</strong>
-When we compare two distributions, we can use side-by-side
-histograms, or overlay two KDE curves.
-However, when two distributions are similar, it can be hard to see the
-differences.
-For instance, the histograms below show the race times for 25-year-olds
-on the left and 40-year-olds on the right.
-It’s hard to understand how these distributions are different based on
-this plot.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;age in [25, 40]&#39;</span><span class="p">),</span>
-                   <span class="n">x</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">sfh</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;br in [2, 4]&#39;</span><span class="p">),</span>
+                   <span class="n">x</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;br&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 <span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/viz_smoothing_29_0.svg" src="../../_images/viz_smoothing_29_0.svg" /></div>
+<img alt="../../_images/viz_smoothing_28_0.svg" src="../../_images/viz_smoothing_28_0.svg" /></div>
 </div>
-<p>One useful way of comparing distributions is a quantile-quantile plot.
-To make this plot, we first compute percentiles (also called quantiles)
-for both distributions.
-Then, we plot matching percentiles on a scatter plot.</p>
-<div class="cell tag_hide-input docutils container">
+<p>Rather than compare histograms, we can compare quantiles with a quantile-quantile plot, called q-q plot for short. To make this plot, we first compute percentiles (also called quantiles) for both distributions.
+Then, we plot matching percentiles on a scatter plot. We usually also show the reference line (y = x).</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">run25</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;age == 25&#39;</span><span class="p">)</span>
-<span class="n">run40</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;age == 40&#39;</span><span class="p">)</span>
-<span class="n">percs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span>
-<span class="n">perc25</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">run25</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
-<span class="n">perc40</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">run40</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
-<span class="n">perc_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;percentile&#39;</span><span class="p">:</span> <span class="n">percs</span><span class="p">,</span> <span class="s1">&#39;age25&#39;</span><span class="p">:</span> <span class="n">perc25</span><span class="p">,</span> <span class="s1">&#39;age40&#39;</span><span class="p">:</span> <span class="n">perc40</span><span class="p">})</span>
-<span class="n">perc_df</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">br2</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;br == 2&#39;</span><span class="p">)</span>
+<span class="n">br4</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;br == 4&#39;</span><span class="p">)</span>
+<span class="n">percs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">perc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">br2</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">],</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+<span class="n">perc4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">br4</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">],</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+<span class="n">perc_sfh</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;percentile&#39;</span><span class="p">:</span> <span class="n">percs</span><span class="p">,</span> <span class="s1">&#39;br2&#39;</span><span class="p">:</span> <span class="n">perc2</span><span class="p">,</span> <span class="s1">&#39;br4&#39;</span><span class="p">:</span> <span class="n">perc4</span><span class="p">})</span>
+<span class="n">perc_sfh</span>
 </pre></div>
 </div>
 </div>
@@ -1512,28 +1524,28 @@ Then, we plot matching percentiles on a scatter plot.</p>
     <tr style="text-align: right;">
       <th></th>
       <th>percentile</th>
-      <th>age25</th>
-      <th>age40</th>
+      <th>br2</th>
+      <th>br4</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
-      <td>2820.0</td>
-      <td>3108.0</td>
+      <td>1</td>
+      <td>1.50e+05</td>
+      <td>2.05e+05</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
-      <td>2929.0</td>
-      <td>3444.0</td>
+      <td>2</td>
+      <td>1.82e+05</td>
+      <td>2.50e+05</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
-      <td>3216.0</td>
-      <td>3625.0</td>
+      <td>3</td>
+      <td>2.03e+05</td>
+      <td>2.75e+05</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1542,75 +1554,90 @@ Then, we plot matching percentiles on a scatter plot.</p>
       <td>...</td>
     </tr>
     <tr>
-      <th>98</th>
+      <th>96</th>
+      <td>97</td>
+      <td>1.04e+06</td>
+      <td>1.75e+06</td>
+    </tr>
+    <tr>
+      <th>97</th>
       <td>98</td>
-      <td>7572.0</td>
-      <td>7756.0</td>
+      <td>1.20e+06</td>
+      <td>1.95e+06</td>
     </tr>
     <tr>
-      <th>99</th>
+      <th>98</th>
       <td>99</td>
-      <td>7908.0</td>
-      <td>8067.0</td>
-    </tr>
-    <tr>
-      <th>100</th>
-      <td>100</td>
-      <td>9502.0</td>
-      <td>8832.0</td>
+      <td>1.44e+06</td>
+      <td>2.34e+06</td>
     </tr>
   </tbody>
 </table>
-<p>101 rows × 3 columns</p>
+<p>99 rows × 3 columns</p>
 </div></div></div>
 </div>
-<div class="cell tag_hide-input docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">perc_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age25&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;age40&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-                 <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;age25&#39;</span><span class="p">:</span> <span class="s1">&#39;Race times for age 25&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;age40&#39;</span><span class="p">:</span> <span class="s1">&#39;Race times for age 40&#39;</span><span class="p">})</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">perc_sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;br2&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;br4&#39;</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
+                 <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;br2&#39;</span><span class="p">:</span> <span class="s1">&#39;Price of Two Bedroom Houses&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;br4&#39;</span><span class="p">:</span> <span class="s1">&#39;Price of Four Bedroom Houses&#39;</span><span class="p">})</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">3000</span><span class="p">,</span> <span class="mi">9500</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">3000</span><span class="p">,</span> <span class="mi">9500</span><span class="p">],</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mf">1e5</span><span class="p">,</span> <span class="mf">2e6</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mf">1e5</span><span class="p">,</span> <span class="mf">2e6</span><span class="p">],</span> 
                <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">dash</span><span class="o">=</span><span class="s1">&#39;dash&#39;</span><span class="p">),</span>
                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Reference (y = x)&#39;</span><span class="p">)</span>
 <span class="p">)</span>
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/viz_smoothing_32_0.svg" src="../../_images/viz_smoothing_32_0.svg" /></div>
+<img alt="../../_images/viz_smoothing_31_0.svg" src="../../_images/viz_smoothing_31_0.svg" /></div>
 </div>
-<p>In the quantile-quantile plot, we usually also show the reference line (y = x).
-This lets us see that at lower percentiles, 40-year-old runners run slower than
-25-year-olds since the points appear above the reference line.
-But otherwise, the race times look quite similar; 40-year-olds kept up well
-with 25-year-olds.</p>
-<p><strong>Other Ways to Reveal Density in a Scatter Plot</strong>.
-There are plenty of other ways to reduce over-plotting in a scatter plot.
-For instance, we can make the dots partially transparent so overlapping points
-appear darker.
-If many observations have the
-same values (e.g., when measurements are rounded to the nearest inch),
-then we can
-add a small amount of random noise to the values to reduce the amount of
-over-plotting. This procedure is called “jittering”.
+<p>When the points in the plot fall along a line, the variables have similar shaped distributions.
+Lines parallel to the reference indicate a difference in means; lines with slopes other than 1 indicate a difference in spread, and curvature indicates difference in shape.
+From the q-q plot above, we see that the distribution of price for four-bedroom houses is similar in shape to the two-bedroom  distribution, except for a shift of about <span class="math notranslate nohighlight">\(\$100K\)</span> in price and a slightly longer right tail.
+Reading a q-q plot takes practice. Once you get the hang of it though, it can be a handy way to compare distributions.</p>
+<p>Notice that the housing data have over 100,000 observations, and the q-q plot has reduced the data to 99 percentiles.</p>
+</div>
+<div class="section" id="when-not-to-smooth">
+<h2><span class="section-number">11.2.5. </span>When Not to Smooth<a class="headerlink" href="#when-not-to-smooth" title="Permalink to this headline">¶</a></h2>
+<p>Smoothing and aggregating can help us see important features and relationships, but when we have only a handful of observations, smoothing techniques can give misleading representations of the data.  With just a few
+observations, we prefer rug plots over histograms, box plots, and density curves, and we use scatter plots rather than smooth curves and density contours. One of the most common misuses of smoothing happens with box plots. For example, below is a collection of seven box plots of longevity, one for each breed group. Some of these boxplots have as few as two or three observations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;longevity&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_smoothing_34_0.svg" src="../../_images/viz_smoothing_34_0.svg" /></div>
+</div>
+<p>The strip plot below is preferrable visualization. We can still compare the groups, but we can also see the exact value for each group. For example, we see there are only three breeds in the non-sporting group, and the impression of a skewed distribution based on the corresponding box plot would be reading too much into the box.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/viz_smoothing_36_0.svg" src="../../_images/viz_smoothing_36_0.svg" /></div>
+</div>
+<p>There are plenty of other ways to reduce over-plotting in scatter plots.
+For instance, we can make the dots partially transparent so overlapping points appear darker.
+If many observations have the same values (e.g., when measurements are rounded to the nearest inch),
+then we can add a small amount of random noise to the values to reduce the amount of over-plotting.
+This procedure is called “jittering” (it is used in the strip plot above).
 Transparency and jittering are convenient for medium-sized data.
 However, they don’t work very well for large datasets since they still plot
 all the points in the data.</p>
-</div>
-<div class="section" id="takeaways">
-<h2><span class="section-number">11.2.3. </span>Takeaways<a class="headerlink" href="#takeaways" title="Permalink to this headline">¶</a></h2>
-<p>This section introduced the problem of over-plotting, where we have
-overlapping points because of a large dataset.
-To address this issue, we introduced smoothing techniques that aggregate data
-together.
-We saw two common examples of smoothing:
-histograms and kernel density estimation curves.
-Then, we discussed principles of smoothing, such as the need to tune the
-smoothing amount, aggregating the data before plotting, and when not to smooth.
-In the next section, we’ll talk about how to design visualizations to
-facilitate meaningful comparisons.</p>
+<p>This section introduced the problem of over-plotting, where we have overlapping points because of a large dataset. To address this issue, we introduced smoothing techniques that aggregate data together.
+We saw two common examples of smoothing: binning and kernel smoothing, and applied them in the one- and two-dimensional settings. In one-dimension, these are histograms and kernel density curves, and they both help us see distributions.
+In two dimensions, we examined binning to create contours that show high denisty regions through
+color (the histogram approach) and topographical curves (the kernel approach).
+Additionally, we discussed how to smooth y-values while keeping x-values fixed in order to visualize trends in the data, and how to compare distributions with quantile-quantile plots.
+We addressed the need to tune the smoothing amount to get more informative histograms and density curves, and we cautioned against smoothing with too few data.</p>
+<p>The quantile-quantile plot we introduced in this section offers one way to compare distributions, another is to use side-by-side box plots. In the next section, we’ll discuss several principles for designing visualizations that facilitate meaningful comparisons for a variety of plot types.</p>
 </div>
 </div>
 
