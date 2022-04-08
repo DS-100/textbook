@@ -53,7 +53,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="3.5. Probability and the Urn Model" href="theory_probability.html" />
+    <link rel="next" title="3.5. Summary" href="theory_summary.html" />
     <link rel="prev" title="3.3. Simulating a Randomized Trial: Vaccine Efficacy" href="theory_vaccine_efficacy.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -200,7 +200,7 @@
  </li>
  <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="theory_intro.html">
-   3. Theory for Data Design
+   3. Simulation and Data Design
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
   <label for="toctree-checkbox-3">
@@ -229,8 +229,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="theory_probability.html">
-     3.5. Probability and the Urn Model
+    <a class="reference internal" href="theory_summary.html">
+     3.5. Summary
     </a>
    </li>
    <li class="toctree-l2">
@@ -1212,12 +1212,11 @@
                 
   <div class="section" id="measurement-error-air-quality-variation">
 <span id="sec-theory-measurementerror"></span><h1><span class="section-number">3.4. </span>Measurement Error: Air Quality Variation<a class="headerlink" href="#measurement-error-air-quality-variation" title="Permalink to this headline">¶</a></h1>
-<p>Simulating the draw of marbles from an urn is a useful abstraction for studying the possible outcomes from survey samples and controlled experiments. Of course, this is only possible if a chance mechanism is used to select the sample or to assign the treatment. However in many settings, measurement error also follows a similar chance process. As mentioned in <a class="reference internal" href="../02/data_scope_construct.html#sec-scope-construct"><span class="std std-numref">Section 2.2</span></a>, instruments typically have an error associated with them, and by taking repeated measurements on the same object, we can quantify the variability associated with the instrument. However to detect bias in the instruments measurements, we need comparisons to a more accurate instrument or measurements on a standard that has a known value. For example, the International Bureau of Weights and Measures in Sèvres, France has kept a one kilogram cylinder of platinum since 1889 to calibrate instruments.</p>
-<p>(In 2011, the definition of the kilogram changed to no longer rely on a physical object, and instead be defined by a physical constant—Planck’s constant—because the standard in France was found to have lost 50 micrograms in comparison to other copies of the standard kilogram).</p>
-<p>As an example, we consider the variation in measurements of a PurpleAir sensor that measures air quality. PurpleAir provides a data download tool so anyone can access air quality measurements by interacting with their map. These data are available in 10-minute intervals for any sensor appearing on the map. To get a sense of the size of the variations in measurements for one sensor, we downloaded data for one sensor from a 36-hour period and selected four 30-minute periods (giving us three consecutive measurements) for a total of 12 measurements.  These are available in ‘data/purpleAir30minsample.csv’.</p>
+<p>Simulating the draw of marbles from an urn is a useful abstraction for studying the possible outcomes from survey samples and controlled experiments. The simulation works becuase it imitates the chance mechanism used to select the sample or to assign the treatment. In many settings, measurement error also follows a similar chance process. As mentioned in <a class="reference internal" href="../02/data_scope_construct.html#sec-scope-construct"><span class="std std-numref">Section 2.2</span></a>, instruments typically have an error associated with them, and by taking repeated measurements on the same object, we can quantify the variability associated with the instrument.</p>
+<p>As an example, let’s look at data from a PurpleAir sensor that measures air quality. PurpleAir provides a data download tool so anyone can access air quality measurements by interacting with their map. These data are available in 2-minute intervals for any sensor appearing on their map. To get a sense of the size of the variations in measurements for a sensor, we downloaded data for one sensor from a 24-hour period and selected five 60-minute periods throughout the day to examine, giving us thirty consecutive measurements for a total of 150 measurements. These are available in ‘data/purpleAir2minsample.csv’.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/purpleAir30minsample.csv&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/purpleAir2minsample.csv&#39;</span><span class="p">)</span>
 <span class="n">pm</span>
 </pre></div>
 </div>
@@ -1241,58 +1240,82 @@
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>pm2.5</th>
+      <th>aq2.5</th>
       <th>time</th>
+      <th>hour</th>
+      <th>diffs</th>
+      <th>meds</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>9.48</td>
-      <td>A</td>
+      <td>6.14</td>
+      <td>2022-04-01 00:01:10 UTC</td>
+      <td>0</td>
+      <td>0.77</td>
+      <td>5.38</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>9.32</td>
-      <td>A</td>
+      <td>5.00</td>
+      <td>2022-04-01 00:03:10 UTC</td>
+      <td>0</td>
+      <td>-0.38</td>
+      <td>5.38</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>9.29</td>
-      <td>A</td>
+      <td>5.29</td>
+      <td>2022-04-01 00:05:10 UTC</td>
+      <td>0</td>
+      <td>-0.09</td>
+      <td>5.38</td>
     </tr>
     <tr>
       <th>...</th>
       <td>...</td>
       <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
     </tr>
     <tr>
-      <th>9</th>
-      <td>15.31</td>
-      <td>D</td>
+      <th>147</th>
+      <td>8.08</td>
+      <td>2022-04-01 19:57:20 UTC</td>
+      <td>19</td>
+      <td>-0.47</td>
+      <td>8.55</td>
     </tr>
     <tr>
-      <th>10</th>
-      <td>15.49</td>
-      <td>D</td>
+      <th>148</th>
+      <td>7.38</td>
+      <td>2022-04-01 19:59:20 UTC</td>
+      <td>19</td>
+      <td>-1.18</td>
+      <td>8.55</td>
     </tr>
     <tr>
-      <th>11</th>
-      <td>14.72</td>
-      <td>D</td>
+      <th>149</th>
+      <td>7.26</td>
+      <td>2022-04-01 20:01:20 UTC</td>
+      <td>19</td>
+      <td>-1.29</td>
+      <td>8.55</td>
     </tr>
   </tbody>
 </table>
-<p>12 rows × 2 columns</p>
+<p>150 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>The feature <code class="docutils literal notranslate"><span class="pre">pm2.5</span></code> refers to the amount of particulate matter measured in the air that has a diameter smaller than 2.5 micrometers (the unit of measurement is micrograms per cubic meter: μg/m3). These measurements are 10-minute averages. The time periods are simply denoted, A, B, C, and D.</p>
-<p>A scatter plot of the particulate matter measurements gives us a basic sense of variation in the instrument. In each time period, the measurements cluster together. For example, at time “C”, the measurements are all about 12. We can also see in the plot that the level of particulate matter changes quite a bit over the course of a day, in comparison to the variability of the measurements taken close in time.</p>
+<p>The feature <code class="docutils literal notranslate"><span class="pre">aq2.5</span></code> refers to the amount of particulate matter measured in the air that has a diameter smaller than 2.5 micrometers (the unit of measurement is micrograms per cubic meter: μg/m3). These measurements are 2-minute averages. The scatter plot below gives us a sense of variation in the instrument. For each hour, we expect the measurements to be roughly the same, and so give us a sense of the variability in the instrument. At 11 in the morning, the measurements clump around 7, and five hours later, they cluster around 10 or so. We see that the level of particulate matter changes over the course of a day, and in any one hour most measurements are within about +/-1 of the median.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pm</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;pm2.5&quot;</span><span class="p">,</span>  <span class="n">dodge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Thirty-minute time interval&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Count of Particlutate matter&quot;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pm</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;hour&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;aq2.5&quot;</span><span class="p">,</span>  <span class="n">dodge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Hour of Day&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;2-minute measurements&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Particulate Matter 2.5&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1300,48 +1323,23 @@
 <img alt="../../_images/theory_measurement_error_5_0.png" src="../../_images/theory_measurement_error_5_0.png" />
 </div>
 </div>
-<p>We can get a sense of the variation in the instruments measurements by examining the variation of the individual measurements from the average of each time period.</p>
+<p>To get a better sense of this variation, we examine the differences of each individual measurement from the median for the hour. Below is a histogram of these differences.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean_time</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)[</span><span class="s1">&#39;pm2.5&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">mean_time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">pm</span><span class="p">[</span><span class="s1">&#39;diffs&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Deviation from Hourly Median&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>time
-A     9.36
-B     6.09
-C    11.97
-D    15.17
-Name: pm2.5, dtype: float64
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Deviation from Hourly Median&#39;)
 </pre></div>
 </div>
+<img alt="../../_images/theory_measurement_error_7_1.png" src="../../_images/theory_measurement_error_7_1.png" />
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">errors</span> <span class="o">=</span> <span class="n">pm</span><span class="p">[</span><span class="s1">&#39;pm2.5&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="mf">9.36</span><span class="p">,</span> <span class="mf">9.36</span><span class="p">,</span> <span class="mf">9.36</span><span class="p">,</span> <span class="mf">6.09</span><span class="p">,</span> <span class="mf">6.09</span><span class="p">,</span> <span class="mf">6.09</span><span class="p">,</span> <span class="mf">11.97</span><span class="p">,</span> <span class="mf">11.97</span><span class="p">,</span> <span class="mf">11.97</span><span class="p">,</span> <span class="mf">15.17</span><span class="p">,</span> <span class="mf">15.17</span><span class="p">,</span> <span class="mf">15.17</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;# of Measurements&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Deviation from Group Average&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Deviation from Group Average&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/theory_measurement_error_9_1.png" src="../../_images/theory_measurement_error_9_1.png" />
-</div>
-</div>
-<p>The histogram shows us that typical error for PM2.5 measurements from this instrument is about 0.25. Given the measurements range from 6 to 15, we find that the instrument is relatively accurate compared to the size of the typiucal measurements. Unfortunately, what we don’t know is whether the measurements are cloase to the true air quality at that time and place. A more comprehensive analysis of the measurement error, including bias is addressed in <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>. The remainder of this chapter is dedicated to more formal treatment of these concepts using probability. We begin by tackling random sampling schemes.</p>
+<p>The histogram shows us that typical error for PM2.5 measurements from this instrument is about 1. Given the measurements range from 4 to 13, we find the instrument is relatively accurate compared to the typical measurements. Unfortunately, what we don’t know is whether the measurements are close to the true air quality at that time and place. To detect bias in the instrument, we need to make comparisons against a more accurate instrument or take measurements in a protected environment where the air has a known quantity of PM2.5. A more comprehensive analysis of the PurpleAir sensor measurement error, including bias is addressed in <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>. The remainder of this chapter is dedicated to more formal treatment of these concepts using probability. We begin by tackling random sampling schemes.</p>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1376,10 +1374,10 @@ Name: pm2.5, dtype: float64
             <p class="prev-next-title"><span class="section-number">3.3. </span>Simulating a Randomized Trial: Vaccine Efficacy</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="theory_probability.html" title="next page">
+    <a class='right-next' id="next-link" href="theory_summary.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">3.5. </span>Probability and the Urn Model</p>
+        <p class="prev-next-title"><span class="section-number">3.5. </span>Summary</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
