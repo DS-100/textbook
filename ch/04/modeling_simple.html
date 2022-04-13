@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4.1. Models &#8212; Principles and Techniques of Data Science</title>
+    <title>4.1. The Constant Model &#8212; Principles and Techniques of Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -56,7 +56,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="4.2. Loss Functions" href="modeling_loss_functions.html" />
-    <link rel="prev" title="4. Modeling and Estimation" href="modeling_intro.html" />
+    <link rel="prev" title="4. Modeling and Summary Statistics" href="modeling_intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -244,7 +244,7 @@
  </li>
  <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="modeling_intro.html">
-   4. Modeling and Estimation
+   4. Modeling and Summary Statistics
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
   <label for="toctree-checkbox-4">
@@ -254,7 +254,7 @@
   <ul class="current">
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     4.1. Models
+     4.1. The Constant Model
     </a>
    </li>
    <li class="toctree-l2">
@@ -263,8 +263,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="modeling_abs_huber.html">
-     4.3. Absolute and Huber Loss
+    <a class="reference internal" href="modeling_summary.html">
+     4.3. Summary
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="modeling_exercises.html">
+     4.4. Exercises
     </a>
    </li>
   </ul>
@@ -1194,24 +1199,6 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
-            <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
-            </div>
-            <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-simple-model">
-   4.1.1. A Simple Model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loss-function-intuition">
-   4.1.2. Loss Function Intuition
-  </a>
- </li>
-</ul>
-
-            </nav>
         </div>
     </div>
 </div>
@@ -1219,43 +1206,31 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Models</h1>
+                <h1>The Constant Model</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-simple-model">
-   4.1.1. A Simple Model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loss-function-intuition">
-   4.1.2. Loss Function Intuition
-  </a>
- </li>
-</ul>
-
-                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="section" id="models">
-<h1><span class="section-number">4.1. </span>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
-<p>In the United States, many diners will leave a tip for their waiter or waitress as the diners pay for the meal. Although it is customary in the US to offer 15% of the total bill as tip, perhaps some restaurants have more generous patrons than others.</p>
-<p>One particular waiter was so interested in how much tip he could expect to get that he collected information about all the tables he served during a month of employment.</p>
+  <div class="section" id="the-constant-model">
+<h1><span class="section-number">4.1. </span>The Constant Model<a class="headerlink" href="#the-constant-model" title="Permalink to this headline">¶</a></h1>
+<p>A transit rider named Jake often takes the northbound C bus at the 3rd &amp; Pike
+bus stop in downtown Seattle <a class="footnote-reference brackets" href="#jake" id="id1">1</a>. The bus is supposed to arrive every 10
+minutes, but Jake notices that he sometimes waits a long time for the bus. He
+wants to know how late the bus usually is. Washington State keeps track of both
+scheduled bus arrival times and the actual arrival times, which lets Jake
+calculate the minutes that each bus is late for his stop. We’ll use this
+dataset to introduce the constant model, which summarizes the data with a
+single number (a constant). First, we read in the data.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
-<span class="n">tips</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/seattle_bus_times_NC.csv&#39;</span><span class="p">)</span>
+<span class="n">times</span>
 </pre></div>
 </div>
 </div>
@@ -1278,45 +1253,37 @@
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>total_bill</th>
-      <th>tip</th>
-      <th>sex</th>
-      <th>smoker</th>
-      <th>day</th>
-      <th>time</th>
-      <th>size</th>
+      <th>route</th>
+      <th>direction</th>
+      <th>scheduled</th>
+      <th>actual</th>
+      <th>minutes_late</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>16.99</td>
-      <td>1.01</td>
-      <td>Female</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>2</td>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-03-26 06:30:28</td>
+      <td>2016-03-26 06:26:04</td>
+      <td>-4.40</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>10.34</td>
-      <td>1.66</td>
-      <td>Male</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>3</td>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-03-26 01:05:25</td>
+      <td>2016-03-26 01:10:15</td>
+      <td>4.83</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>21.01</td>
-      <td>3.50</td>
-      <td>Male</td>
-      <td>No</td>
-      <td>Sun</td>
-      <td>Dinner</td>
-      <td>3</td>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-03-26 21:00:25</td>
+      <td>2016-03-26 21:05:00</td>
+      <td>4.58</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1325,137 +1292,102 @@
       <td>...</td>
       <td>...</td>
       <td>...</td>
-      <td>...</td>
-      <td>...</td>
     </tr>
     <tr>
-      <th>241</th>
-      <td>22.67</td>
-      <td>2.00</td>
-      <td>Male</td>
-      <td>Yes</td>
-      <td>Sat</td>
-      <td>Dinner</td>
-      <td>2</td>
+      <th>1431</th>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-04-10 06:15:28</td>
+      <td>2016-04-10 06:11:37</td>
+      <td>-3.85</td>
     </tr>
     <tr>
-      <th>242</th>
-      <td>17.82</td>
-      <td>1.75</td>
-      <td>Male</td>
-      <td>No</td>
-      <td>Sat</td>
-      <td>Dinner</td>
-      <td>2</td>
+      <th>1432</th>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-04-10 17:00:28</td>
+      <td>2016-04-10 16:56:54</td>
+      <td>-3.57</td>
     </tr>
     <tr>
-      <th>243</th>
-      <td>18.78</td>
-      <td>3.00</td>
-      <td>Female</td>
-      <td>No</td>
-      <td>Thur</td>
-      <td>Dinner</td>
-      <td>2</td>
+      <th>1433</th>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-04-10 20:15:25</td>
+      <td>2016-04-10 20:18:21</td>
+      <td>2.93</td>
     </tr>
   </tbody>
 </table>
-<p>244 rows × 7 columns</p>
+<p>1434 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>We can plot a histogram of the tip amounts:</p>
+<p>In the table above, the <code class="docutils literal notranslate"><span class="pre">minutes_late</span></code> column records how late each bus was.
+Notice that some of the times are negative, which means that the bus arrived
+early. Let’s plot a histogram of the minutes each bus is late.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Tip Amount in Dollars&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Dollar&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span> <span class="n">title_text</span><span class="o">=</span><span class="s1">&#39;Minutes Late&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/modeling_simple_4_0.png" src="../../_images/modeling_simple_4_0.png" />
+<img alt="../../_images/modeling_simple_4_0.svg" src="../../_images/modeling_simple_4_0.svg" /></div>
 </div>
-</div>
-<p>There are already some interesting patterns in the data. For example, there is a clear mode at <span class="math notranslate nohighlight">\(\$2\)</span> and most tips seem to be in multiples of <span class="math notranslate nohighlight">\(\$0.50\)</span>.</p>
-<p>For now, we are most interested in the percent tip: the tip amount divided by the bill amount. We can create a column in our DataFrame for this variable and show its distribution.</p>
+<p>There are already some interesting patterns in the data. For example, many
+buses arrive earlier than scheduled and some are well over 20 minutes late. We
+also see a clear mode (high point) at 0, meaning many buses arrive roughly on
+time.</p>
+<p>We want to understand how late the bus usually is. To do this, we’d like to
+summarize the lateness by a constant—this is a single number, like the mean,
+median, or mode. Let’s find each of these summary statistics for the
+<code class="docutils literal notranslate"><span class="pre">minutes_late</span></code> data.</p>
+<p>From the histogram, we estimate that the mode of the data is 0. We’ll use
+Python to compute the mean and median.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;total_bill&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mean:    </span><span class="si">{</span><span class="n">times</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> mins late&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;median:  </span><span class="si">{</span><span class="n">times</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> mins late&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mode:    </span><span class="si">{</span><span class="mi">0</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> mins late&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/modeling_simple_6_0.png" src="../../_images/modeling_simple_6_0.png" />
-</div>
-</div>
-<p>It looks like one table left our waiter a tip of <span class="math notranslate nohighlight">\(70\%\)</span>! However, most of the tips percentages are under <span class="math notranslate nohighlight">\(30\%\)</span>. Let’s zoom into that part of the distribution.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean:    1.92 mins late
+median:  0.74 mins late
+mode:    0.00 mins late
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/modeling_simple_8_0.png" src="../../_images/modeling_simple_8_0.png" />
 </div>
-</div>
-<p>We can see that the distribution is roughly centered at <span class="math notranslate nohighlight">\(15\%\)</span> with another potential mode at <span class="math notranslate nohighlight">\(20\%\)</span>. Suppose our waiter is interested in predicting how much percent tip he will get from a given table. To address this question, we can create a model for how much tip the waiter will get.</p>
-<div class="section" id="a-simple-model">
-<h2><span class="section-number">4.1.1. </span>A Simple Model<a class="headerlink" href="#a-simple-model" title="Permalink to this headline">¶</a></h2>
-<p>One simple model is ignore the data altogether and state that since the convention in the U.S. is to give 15% tip, the waiter will always get 15% tip from his tables. While extremely simple, we will use this model to define some variables that we’ll use later on.</p>
-<p>This model assumes that there is one true percentage tip that all tables, past and future, will give the waiter. This is the <em>population parameter</em> for the percent tip, which we will denote by <span class="math notranslate nohighlight">\( \theta^* \)</span>.</p>
-<p>After making this assumption, our model then says that our guess for <span class="math notranslate nohighlight">\( \theta^* \)</span> is <span class="math notranslate nohighlight">\(15\%\)</span>. We will use <span class="math notranslate nohighlight">\( \theta \)</span> to represent our current guess.</p>
-<p>In mathematical notation, our model states that:</p>
-<div class="math notranslate nohighlight">
-\[ \theta = 15 \]</div>
-<p>This model is clearly problematic—if the model were true, every table in our dataset should have given the waiter exactly 15% tip. Nonetheless, this model will make a reasonable guess for many scenarios. In fact, this model might be the most useful choice if we had no other information aside from the fact that the waiter is employed in the US.</p>
-<p>Since our waiter collected data, however, we can use his history of his tips to create a model instead of picking 15% based on convention alone.</p>
-</div>
-<div class="section" id="loss-function-intuition">
-<h2><span class="section-number">4.1.2. </span>Loss Function Intuition<a class="headerlink" href="#loss-function-intuition" title="Permalink to this headline">¶</a></h2>
-<p>The distribution of tip percents from our dataset is replicated below for convenience.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/modeling_simple_13_0.png" src="../../_images/modeling_simple_13_0.png" />
-</div>
-</div>
-<p>Let’s suppose we are trying to compare two choices for <span class="math notranslate nohighlight">\(\theta\)</span>: <span class="math notranslate nohighlight">\(10\%\)</span> and <span class="math notranslate nohighlight">\(15\%\)</span>. We can mark both of these choices on our distribution:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">tips</span><span class="p">[</span><span class="s1">&#39;pcttip&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 10$&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$ \theta = 15$&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Percent Tip Amount&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion per Percent&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/modeling_simple_15_0.png" src="../../_images/modeling_simple_15_0.png" />
-</div>
-</div>
-<p>Intuitively, it looks like choosing <span class="math notranslate nohighlight">\( \theta = 15 \)</span> makes more sense than <span class="math notranslate nohighlight">\( \theta = 10 \)</span> given our dataset. Why is this? When we look at the points in our data, we can see that more points fall close to <span class="math notranslate nohighlight">\(15\)</span> than they do to <span class="math notranslate nohighlight">\(10\)</span>.</p>
-<p>Although it seems apparent that <span class="math notranslate nohighlight">\( \theta = 15 \)</span> is a better choice than <span class="math notranslate nohighlight">\( \theta = 10 \)</span>, it is not so clear whether <span class="math notranslate nohighlight">\( \theta = 15 \)</span> is a better choice than <span class="math notranslate nohighlight">\( \theta = 16 \)</span>. To make precise choices between different values of <span class="math notranslate nohighlight">\( \theta \)</span>, we would like to assign each value of <span class="math notranslate nohighlight">\( \theta \)</span> a number that measures how “good” it is for our data. That is, we want a function that takes as input a value of <span class="math notranslate nohighlight">\( \theta \)</span> and the points in our dataset, outputting a single number that we will use to select the best value of <span class="math notranslate nohighlight">\( \theta \)</span> that we can.</p>
-<p>We call this function a <strong>loss function</strong>.</p>
-</div>
+<p>After finding these three summary statistics, we naturally want to know: which
+of these numbers is best? Rather than relying on rules of thumb, we’ll take a
+more formal approach. In this example, we’re making a model for bus lateness
+that consists of a constant. Let’s call this constant <span class="math notranslate nohighlight">\( \theta \)</span>. For example,
+if we say that <span class="math notranslate nohighlight">\( \theta = 5 \)</span>, our model’s best guess is that the bus will be 5
+minutes late.</p>
+<p>Now, <span class="math notranslate nohighlight">\( \theta = 5 \)</span> isn’t a particularly good guess. From the histogram of
+arrival times, we saw that there are lot more points closer to 0 than 5. But it
+isn’t clear that <span class="math notranslate nohighlight">\(\theta = 0\)</span> (the mode) is a better choice than
+<span class="math notranslate nohighlight">\(\theta = 0.74\)</span> (the median), <span class="math notranslate nohighlight">\( \theta = 1.92 \)</span> (the mean), or something in
+between.
+To
+make precise choices between different values of <span class="math notranslate nohighlight">\( \theta \)</span>, we would like to
+assign each value of <span class="math notranslate nohighlight">\(\theta\)</span> a score that measures how well the model fits the
+data. Using more formal language, we’ll use a <em>loss function</em> to pick the best
+<span class="math notranslate nohighlight">\(\theta\)</span> for our model. A loss function takes as input a value of <span class="math notranslate nohighlight">\( \theta \)</span>
+and the points in our dataset. It outputs a single number that we can use to
+select the best <span class="math notranslate nohighlight">\( \theta \)</span>. In the next section, we examine how to define and
+use loss functions to fit the constant model.</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="jake"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>We (the authors) first learned of the bus arrival time data from an
+analysis by a data scientist named Jake VanderPlas. We’ve named the
+protagonist of this section in his honor.</p>
+</dd>
+</dl>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1487,7 +1419,7 @@
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">4. </span>Modeling and Estimation</p>
+            <p class="prev-next-title"><span class="section-number">4. </span>Modeling and Summary Statistics</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="modeling_loss_functions.html" title="next page">
