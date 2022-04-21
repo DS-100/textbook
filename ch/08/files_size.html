@@ -1255,7 +1255,7 @@
                 
   <div class="section" id="file-size">
 <span id="ch-files-size"></span><h1><span class="section-number">8.3. </span>File Size<a class="headerlink" href="#file-size" title="Permalink to this headline">¶</a></h1>
-<p>Computers have finite limits on computing power. You have likely
+<p>Computers have finite resources. You have likely
 encountered these limits firsthand if your computer has slowed down from having
 too many applications open at once. We want to make sure that we do not
 exceed the computer’s limits while working with data, and we might examine a file differently, depending on its size. If we know that our dataset is relatively small, then a text editor or a spreadsheet can be convenient to look at the data. On the other hand, for large datasets, a more programmatic exploration or even distributed computing tools may be needed.</p>
@@ -1378,51 +1378,68 @@ combine all the data into a single data frame.</p>
 </div>
 </div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>As a rule of thumb, reading in a file using <code class="docutils literal notranslate"><span class="pre">pandas</span></code>
-usually requires at least double the available memory as the file size. That
-is, reading in a 1 GiB file will typically require at least 2 GiB of available
-memory. Memory is shared by all programs running on a computer, including the
-operating system, web browsers, and yes, Jupyter notebook itself. A computer
+usually requires at least five times
+the available memory as the file size.
+For example, reading in a 1 GiB file will typically require at least 5 GiB of available
+memory.
+Memory is shared by all programs running on a computer, including the
+operating system, web browsers, and Jupyter notebook itself. A computer
 with 4 GiB total RAM might have only 1 GiB available RAM with many applications
 running. With 1 GiB available RAM, it is unlikely that <code class="docutils literal notranslate"><span class="pre">pandas</span></code> will be able to
 read in a 1 GiB file.</p>
+</div>
 <p>Next, we discuss strategies for working with data that are far larger than what is feasible to load into memory.</p>
 <div class="section" id="working-with-large-datasets">
 <h2><span class="section-number">8.3.1. </span>Working With Large Datasets<a class="headerlink" href="#working-with-large-datasets" title="Permalink to this headline">¶</a></h2>
-<p>The popular term “big data” generally refers to the scenario where the data are large enough that even the best computers can’t read the data directly into memory.
-This is a common scenario in some scientific domains like  astronomy, where telescopes capture many large images of space. It’s also common for companies that have lots of users.</p>
+<p>The popular term “big data” generally refers to the scenario where the data are large enough that even top-of-the-line computers can’t read the data directly into memory.
+This is a common scenario in scientific domains like astronomy, where telescopes capture many large images of space. It’s also common for companies that have lots of users.</p>
 <p>Figuring out how to draw insights from large datasets is an important research
 problem that motivates the fields of database engineering and distributed
 computing. While we won’t cover these fields in depth in this
-book, we can provide a brief overview of basic approaches. If you are interested in learning more, there are many specialized texts that can help.</p>
-<p><em>Subset The Data.</em> One simple approach is to subset the data. Rather than
+book, we can provide a brief overview of basic approaches.</p>
+<p><em>Subset The Data.</em></p>
+<p>One simple approach is to subset the data. Rather than
 loading in the entire source file, we can either select a specific part of it
 (e.g. one day’s worth of data), or we can randomly sample the dataset. Because
 of its simplicity, we use this approach quite often in this book. The natural
 downside is that this approach loses many of the benefits of analyzing a large
 dataset, like being able to study rare events.</p>
-<p><em>Use a Database System.</em> As we discussed in <a class="reference internal" href="../07/sql_intro.html#ch-sql"><span class="std std-numref">Chapter 7</span></a>,
-database systems like PostgreSQL are specifically design to store large
-datasets. Relational database management systems (RDBMS) let users query the
-data using SQL, which can even manipulate data that are too large to fit into
-memory. Because of their advantages, RDBMS’s are common in research and
-industry settings for data storage. One downside is that they often require a
+<p><em>Use a Database System.</em></p>
+<p>As we discussed in <a class="reference internal" href="../07/sql_intro.html#ch-sql"><span class="std std-numref">Chapter 7</span></a>,
+relational database management systems (RDBMS) were specifically designed
+to store large datasets.
+These systems can manipulate data that are too large to fit into
+memory using SQL queries.
+Because of their advantages, RDBMS’s are common in research and
+industry settings for data storage.
+One downside is that they often require a
 separate server for the data that needs its own configuration. Another downside
-is that SQL is less flexible in what it can compute than Python, which is
-especially relevant for modeling and prediction.</p>
-<p><em>Use a Distributed Computing System.</em> One approach to handle complex
+is that SQL is less flexible in what it can compute than Python, which becomes
+especially relevant for modeling and prediction.
+One useful hybrid approach is to use
+SQL to subset, aggregate, or sample the data into
+batches that are small enough to read into Python. Then, we can use Python
+for more sophisticated analyses.</p>
+<p><em>Use a Distributed Computing System.</em></p>
+<p>Another approach to handle complex
 computations on large datasets is to use a distributed computing system like
-Apache Spark or Ray. These systems let users write programs in a programming
-language like Python, and automatically run them across large
-datasets. Because of this, these systems have great flexibility and can be used
+MapReduce, Spark, or Ray.
+These systems work best on tasks that can be split into many smaller parts
+since they split up large datasets into smaller ones, then run programs on
+all of the smaller datasets at once.
+Because of this, these systems have great flexibility and can be used
 in a variety of scenarios like modeling and prediction. Their main downside is
-that they typically require a lot of work to install and configure properly,
+that they can require a lot of work to install and configure properly,
 since these systems are typically installed across many computers that need to
 coordinate with each other.</p>
-<p>We have often found that a combination of a RDBMS and Python offers a good balance, where: queries to the RDMS can return results in batches for an incremental approach; random sampling from the RDMS offers a starting point in modeling; and summaries and subsets derived using SQL can be ported to Python for more sophisticated analysis (see <a class="reference internal" href="../07/sql_intro.html#ch-sql"><span class="std std-numref">Chapter 7</span></a>).</p>
-<p>This section introduced common file size notation, and showed how to check file sizes in Python.
-It is convenient to use Python libraries to determine a file format, encoding, and size because we are sticking to one environment and language. However, the shell is a powerful tool and it can be useful to have more than one tool to work with files.<br />
-In the next section, we introduce a few command line tools available in the shell for carrying out the same tasks of finding out information about a file before reading it into a data frame.</p>
+<p>In sum, this section introduced common file size notation and showed how to check file sizes in Python.
+It is convenient to use Python to determine a file format, encoding, and size.
+Another powerful tool for working with files is the shell, which is widely
+used and has a more succinct syntax than Python.
+In the next section, we introduce a few command-line tools available in the shell for carrying out the same tasks of finding out information about a file before reading it into a data frame.</p>
 </div>
 </div>
 

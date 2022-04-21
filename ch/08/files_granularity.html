@@ -1263,7 +1263,10 @@
                 
   <div class="section" id="table-shape-and-granularity">
 <span id="ch-files-granularity"></span><h1><span class="section-number">8.5. </span>Table Shape and Granularity<a class="headerlink" href="#table-shape-and-granularity" title="Permalink to this headline">¶</a></h1>
-<p>As described earlier, we refer to a dataset’s <em>structure</em> as a mental representation of the data, and in particular, we represent data that has a <em>table</em> structure by arranging data values in rows and columns. Now that we have investigated the restaurant inspection files, we load them into DataFrames and examine their shapes.</p>
+<p>In this section, we introduce <em>granularity</em>: what each row
+in the table represents.</p>
+<p>As described earlier, we refer to a dataset’s <em>structure</em> as a mental representation of the data, and in particular, we represent data that has a <em>table</em> structure by arranging data values in rows and columns. Now that we have investigated the restaurant inspection files, we load them into dataframes
+and examine their shapes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/businesses.csv&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ISO-8859-1&#39;</span><span class="p">)</span>
@@ -1275,20 +1278,24 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot; Businesses shape:&quot;</span><span class="p">,</span> <span class="n">bus</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Inspections shape:&quot;</span><span class="p">,</span> <span class="n">insp</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-      <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Violations shape:&quot;</span><span class="p">,</span> <span class="n">viol</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot; Businesses shape:&quot;</span><span class="p">,</span> <span class="n">bus</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inspections shape:&quot;</span><span class="p">,</span> <span class="n">insp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; Violations shape:&quot;</span><span class="p">,</span> <span class="n">viol</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Businesses shape: (6406, 9) 
- Inspections shape: (14222, 4) 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Businesses shape: (6406, 9)
+Inspections shape: (14222, 4)
  Violations shape: (39042, 3)
 </pre></div>
 </div>
 </div>
 </div>
-<p>We find that the restaurants table has 6406 rows and 9 columns. But to understand what a row in the table represents, we need to know the table <em>granularity</em>. Below are two rows in the table.</p>
+<p>We find that the businesses table has 6406 rows and 9 columns. Now,
+let’s figure out the granularity of this table by understanding what
+each row represents.
+To start, we’ll look at the first two rows.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <div class="output text_html"><div>
@@ -1511,10 +1518,14 @@ dtype: int64
 </div></div></div>
 </div>
 <p>Restaurant <code class="docutils literal notranslate"><span class="pre">64859</span></code> got two different inspection scores on <code class="docutils literal notranslate"><span class="pre">20150924</span></code> (Sept. 24, 2015). How could this happen? It may be that the restaurant had two inspections in one day, or it might be an error.
-We address these sorts of questions when we consider the data quality in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>. In any case, for all intents and purposes, the primary key for the inspections table is the combination of restaurant ID and inspection date.</p>
-<p>Note that the <code class="docutils literal notranslate"><span class="pre">business_id</span></code> field in the inspections table acts as a reference to the primary key in the business table, for this reason <code class="docutils literal notranslate"><span class="pre">business_id</span></code> in <code class="docutils literal notranslate"><span class="pre">insp</span></code> is called a <em>foreign key</em>.
-The foreign key links the records in the inspections table to the business table. That is, we can use it to join these tables.</p>
-<p>Briefly, we examine the granularity of the violations table.</p>
+We address these sorts of questions when we consider the data quality in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.
+In this case, we’ll assume that a restaurant can have two inspections on the
+same date. So, the primary key for the inspections table is the combination of restaurant ID and inspection date.</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">business_id</span></code> field in the inspections table acts as a reference to the primary key in the business table.
+Because of this, <code class="docutils literal notranslate"><span class="pre">business_id</span></code> in <code class="docutils literal notranslate"><span class="pre">insp</span></code> is called a <em>foreign key</em>: it
+links each record in the inspections table to a record in the business table.
+This means that we can readily join these two tables together.</p>
+<p>Next, we examine the granularity of the violations table.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <div class="output text_html"><div>
@@ -1603,7 +1614,12 @@ in the description within square brackets.</p>
 </div>
 </div>
 </div>
-<p>In summary, we have found that these three tables have different granularities. If we are interested in studying inspections, we can, say, aggregate the violations table to find the number of violations that occurred in an inspection, and add this information to the inspection table. We would use the combination of business ID and inspection date to do this join. We can also reduce the inspection table by selecting one inspection, say the most recent one, for each restaurant. This reduced data table essentially has a granularity of restaurant, which may be useful for a restaurant-based analysis. These kinds of actions reshape the data table, transform columns, and create new columns. We’ll cover these operations later, in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.</p>
+<p>In summary, we have found that these three tables have different granularities.
+If we are interested in studying inspections, we can join the violations
+and inspections together using the business ID and inspection date.
+This would let us find the number of violations that happened
+in each inspection.</p>
+<p>We can also reduce the inspection table by selecting the most recent inspection for each restaurant. This reduced data table essentially has a granularity of restaurant, which may be useful for a restaurant-based analysis. These kinds of actions reshape the data table, transform columns, and create new columns. We’ll cover these operations in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.</p>
 <p>We conclude this section with a look at the shape and granularity of the DAWN survey data.</p>
 </div>
 <div class="section" id="dawn-survey-shape-and-granularity">
@@ -1617,9 +1633,10 @@ and older. Also, -8 represents a missing value.</p>
 </div>
 <p>Earlier, we determined the file contains 200 thousand lines and over 280 million
 characters so, on average, there are about 1200 characters per line.
-That’s why they use FWF rather than CSV to format the file. Imagine how much larger the file would be if there was a comma between every field!</p>
+This might be why they used a fixed-width file rather than a CSV file;
+the file would be much larger if there was a comma between every field!</p>
 <p>Given the tremendous amount of information on each line, we read just a few
-variables into a data frame. We can use the <code class="docutils literal notranslate"><span class="pre">pandas.read_fwf</span></code> method to do this. We must specify the exact positions of the fields to extract, provide names for these fields, and other information about the header and index.</p>
+variables into a data frame. We can use the <code class="docutils literal notranslate"><span class="pre">pandas.read_fwf</span></code> method to do this. We specify the exact positions of the fields to extract, provide names for these fields, and other information about the header and index.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">colspecs</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">29</span><span class="p">),</span> <span class="p">(</span><span class="mi">33</span><span class="p">,</span><span class="mi">35</span><span class="p">),</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span> <span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="mi">39</span><span class="p">),</span> <span class="p">(</span><span class="mi">1213</span><span class="p">,</span> <span class="mi">1214</span><span class="p">)]</span>
@@ -1710,7 +1727,7 @@ variables into a data frame. We can use the <code class="docutils literal notran
 </table>
 </div></div></div>
 </div>
-<p>It appears that we have correctly loaded the dataset. We can compare the rows in the table to the number of lines in the file.</p>
+<p>We can compare the rows in the table to the number of lines in the file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dawn</span><span class="o">.</span><span class="n">shape</span>
@@ -1725,7 +1742,7 @@ variables into a data frame. We can use the <code class="docutils literal notran
 </div>
 <p>The number of rows in the data frame matches the number of lines in the file. That’s good.
 The granularity of the data frame is a bit complicated due to the survey design.  Recall that these data are part of a large scientific study, with a complex sampling scheme. A row represents an emergency room visit, so the granularity is at the emergency room visit level. However, in order to reflect the sampling scheme and be representative of the population, weights are provided. We must apply a weight to each record when we compute summary statistics, build histograms, and fit models.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">wt</span></code> field contains a value that takes into account the probability of an ER visit like this one appearing in the sample. By “like this one” we mean a visit with similar visitor age and race and visit location, time of day, etc. We examine the different values in <code class="docutils literal notranslate"><span class="pre">wt</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">wt</span></code> field contains a value that takes into account the probability of an ER visit like this one appearing in the sample. By “like this one” we mean a visit with similar features, like the visitor age, race, visit location, and time of day. We examine the different values in <code class="docutils literal notranslate"><span class="pre">wt</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dawn</span><span class="p">[</span><span class="s1">&#39;wt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
@@ -1760,29 +1777,29 @@ much more finely.</p>
 <p>It is critical to include the survey weights in your analysis to get data that represents the population at large. For example, we can compare the calculation of the proportion of females among the ER visits both with and without the weights.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unweighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unweighted % female: </span><span class="si">{</span><span class="n">unweighted</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Weighted % female: </span><span class="si">{</span><span class="n">weighted</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.48003804354939333
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.523468490709998
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Unweighted % female: 48.0%
+  Weighted % female: 52.3%
 </pre></div>
 </div>
 </div>
 </div>
 <p>These figures differ by more than 4 percentage points. The weighted version is a more accurate estimate of the proportion of females among the entire population of drug-related ER visits.</p>
+<p>In this section, we discovered the granularity for
+the restaurant dataset tables and the DAWN data.
+Sometimes the granularity can be tricky to figure out, like we saw with the
+inspections data.
+And, we needed to take the sampling weights into account when looking at the granularity for the DAWN data.
+These examples show it’s important to take your time and review the data
+descriptions before proceeding with analysis.</p>
 </div>
 </div>
 
