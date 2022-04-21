@@ -55,6 +55,20 @@ def display_df(
         display(df)
 
 
+def df_interact(df, nrows=7, ncols=7):
+    '''
+    Outputs sliders that show rows and columns of df
+    '''
+    def peek(row=0, col=0):
+        return df.iloc[row:row + nrows, col:col + ncols]
+    if len(df.columns) <= ncols:
+        interact(peek, row=(0, len(df) - nrows, nrows), col=fixed(0))
+    else:
+        interact(peek,
+                 row=(0, len(df) - nrows, nrows),
+                 col=(0, len(df.columns) - ncols))
+    print('({} rows, {} columns) total'.format(df.shape[0], df.shape[1]))
+
 ##############################################################################
 # Plotly
 ##############################################################################
