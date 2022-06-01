@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>16. Probability and Generalization &#8212; Principles and Techniques of Data Science</title>
+    <title>16.2. Basics of Hypothesis Testing &#8212; Principles and Techniques of Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -53,8 +53,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="16.1. Random Variables" href="prob_random_vars.html" />
-    <link rel="prev" title="15.4. Least Squares — A Geometric Perspective" href="../15/linear_projection.html" />
+    <link rel="next" title="16.3. Random Variables" href="prob_random_vars.html" />
+    <link rel="prev" title="16.1. Distributions: Population, Empirical, Sampling" href="inf_pred_gen_dist.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -741,28 +741,38 @@
   </ul>
  </li>
  <li class="toctree-l1 current active has-children">
-  <a class="current reference internal" href="#">
-   16. Probability and Generalization
+  <a class="reference internal" href="inf_pred_gen_intro.html">
+   16. Theory for Inference and Prediction
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
   <label for="toctree-checkbox-15">
    <i class="fas fa-chevron-down">
    </i>
   </label>
-  <ul>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_dist.html">
+     16.1. Distributions: Population, Empirical, Sampling
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     16.2. Basics of Hypothesis Testing
+    </a>
+   </li>
    <li class="toctree-l2">
     <a class="reference internal" href="prob_random_vars.html">
-     16.1. Random Variables
+     16.3. Random Variables
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="prob_exp_var.html">
-     16.2. Expectation and Variance
+     16.4. Expectation and Variance
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="prob_risk.html">
-     16.3. Risk
+     16.5. Risk
     </a>
    </li>
   </ul>
@@ -1205,7 +1215,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../../_sources/ch/16/prob_and_gen.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../../_sources/ch/16/inf_pred_gen_HT.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -1231,7 +1241,7 @@
     <div class="dropdown-buttons">
         
         
-        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/16/prob_and_gen.ipynb&branch=master"><button type="button"
+        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/16/inf_pred_gen_HT.ipynb&branch=master"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch JupyterHub" data-toggle="tooltip"
                 data-placement="left"><img class="jupyterhub-button-logo"
                     src="../../_static/images/logo_jupyterhub.svg"
@@ -1247,6 +1257,34 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-effect-of-informal-award-on-wikipedia-contributors">
+   16.2.1. The Effect of Informal Award on Wikipedia Contributors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-test-for-proportions">
+   16.2.2. A test for proportions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-test-for-a-difference-in-medians">
+   16.2.3. A test for a difference in medians
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-test-based-on-ranks">
+   16.2.4. A test based on ranks
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -1254,29 +1292,326 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Probability and Generalization</h1>
+                <h1>Basics of Hypothesis Testing</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-effect-of-informal-award-on-wikipedia-contributors">
+   16.2.1. The Effect of Informal Award on Wikipedia Contributors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-test-for-proportions">
+   16.2.2. A test for proportions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-test-for-a-difference-in-medians">
+   16.2.3. A test for a difference in medians
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-test-based-on-ranks">
+   16.2.4. A test based on ranks
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="section" id="probability-and-generalization">
-<span id="ch-prob"></span><h1><span class="section-number">16. </span>Probability and Generalization<a class="headerlink" href="#probability-and-generalization" title="Permalink to this headline">¶</a></h1>
-<p>We have introduced a sequence of steps to create a model using a dataset:</p>
+  <div class="section" id="basics-of-hypothesis-testing">
+<h1><span class="section-number">16.2. </span>Basics of Hypothesis Testing<a class="headerlink" href="#basics-of-hypothesis-testing" title="Permalink to this headline">¶</a></h1>
+<p>A hypothesis test can offer support for your data design and model, and it can help formally refute another understanding of the world. There are four basic steps to hypothesis testing:</p>
 <ol class="simple">
-<li><p>Select a model.</p></li>
-<li><p>Select a loss function.</p></li>
-<li><p>Fit the model by minimizing the loss on the dataset.</p></li>
+<li><p>Set up: You have your data, and you want to test whether a particular model is reasonably consistent with the data. So, you specify a test statistic, such as the average value, fraction of zeros in the sample, fitted regression coefficient, etc. You are interested in comparing your data’s statistic to what might have been produced under the model.</p></li>
+<li><p>Model: Spell out the model you want to test. This model is a data generation mechanism, and often includes an assumption about, say, the population mean, the chance of a 0 in the sample, the regression coefficient, etc. You are interested in the distribution of the summary statistic under this model. The model is referred to as the Null hypothesis, and the sampling distribution of the statistic is called the null distribution.</p></li>
+<li><p>Compute: How likely, according to the model in Step 2, is it to get a summary statistic at least as extreme as what you actually got in Step 1?  In formal inference, this probability is called the p-value. There are three general approaches to computing p-values, brute force, mathematical theory, and simulation.</p>
+<ol class="simple">
+<li><p>Brute force: List all the samples, compute values of the test statistic for each sample, and count.</p></li>
+<li><p>Mathematical theory:  Find a shortcut by applying mathematical ideas (e.g., the theory of permutations and combinations) to the structure of the set of samples in the null model.</p></li>
+<li><p>Simulation:  Use a computer to generate a large number of random samples, and estimate the p-value using the fraction of samples that give a value of the test statistic at least as extreme as the observed value.</p></li>
 </ol>
-<p>Thus far, we have introduced the constant model (1), a set of loss functions (2), and gradient descent as a general method of minimizing the loss (3). Following these steps will often generate a model that makes accurate predictions on the dataset it was trained on.</p>
-<p>Unfortunately, a model that only performs well on its training data has little real-world utility. We care about the model’s ability to <strong>generalize</strong>. Our model should make accurate predictions about the population, not just the training data. This problem seems challenging to answer—how might we reason about data we haven’t seen yet?</p>
-<p>Here we turn to the inferential power of statistics. We first introduce some mathematical tools: random variables, expectation, and variance. Using these tools, we draw conclusions about our model’s long-term performance on data from our population, even data that we did not use to train the model!</p>
-<div class="toctree-wrapper compound">
+</li>
+<li><p>Interpret: The p-value is used as a measure of surprise.  If the model that you spelled out in Step 2 is believable, how surprised should you be to get the data (and summary statistic) that you actually got?  A moderate sized p-value means that the observed value of the test statistic is pretty much what you would expect to get for data generated by the null model.  A tiny p-value raises doubts about the null model: If the model is correct (or approximately correct), then it would be very unusual to get such an extreme value of the test statistic for data generated by the model.  In other words, either the null model is wrong, or else a very unlikely outcome has occurred. Statistical logic says to conclude that the pattern is real, that is, more than just coincidence.  It is then up to you to explain why the data generation process led to such an unusual value. This is when a careful examination of the scope is important.</p></li>
+</ol>
+<p>Let’s make this process more concrete with an example.</p>
+<div class="section" id="the-effect-of-informal-award-on-wikipedia-contributors">
+<h2><span class="section-number">16.2.1. </span>The Effect of Informal Award on Wikipedia Contributors<a class="headerlink" href="#the-effect-of-informal-award-on-wikipedia-contributors" title="Permalink to this headline">¶</a></h2>
+<p>Recall the Wikipedia example from <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a>, where randomly selected set of 200 top contributors chosen from among  the top 1% contributors who were active in the past 30 days on the English-language Wikipedia and who had never receive an informal  “barnstart” award from another contributor.  The 200 contributors were divided at random into two groups of 100, and each contributor in one group was awarded a barnstar, while no one in the other group was given an award. All 200 the contributors were followed for 90 days and their activity on Wikipedia recorded.</p>
+<p>It has been conjectured that informal awards have a reinforcing effect on volunteer work, and this experiment was designed to formally study this conjecture. We will carry out three different tests of this hypothesis, each using a different feature that we observe in our exploration of the data. We begin by reading the data into data frame and exploring it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wiki</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/Wikipedia.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wiki</span><span class="o">.</span><span class="n">describe</span><span class="p">()[</span><span class="mi">3</span><span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>experiment</th>
+      <th>posttreatmentproductivity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>min</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>0.0</td>
+      <td>57.5</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>0.5</td>
+      <td>250.5</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>1.0</td>
+      <td>608.0</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>1.0</td>
+      <td>2344.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/inf_pred_gen_HT_6_0.svg" src="../../_images/inf_pred_gen_HT_6_0.svg" /></div>
+</div>
+<p>The histogram of the productivity of the 200 subjects after half of them received an informal award is highly skewed, with a spike near zero. Let’s compare the median productivity for the two groups.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Median productivity:&#39;</span><span class="p">,</span> <span class="n">wiki</span><span class="o">.</span><span class="n">median</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> 
+      <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Median productivity in control group: &#39;</span><span class="p">,</span> <span class="n">control</span><span class="o">.</span><span class="n">median</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span>
+      <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Median productivity in treatment group: &#39;</span><span class="p">,</span> <span class="n">treatment</span><span class="o">.</span><span class="n">median</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Median productivity: 250.5 
+Median productivity in control group:  157.5 
+Median productivity me in treatment group:  369.5
+</pre></div>
+</div>
+</div>
+</div>
+<p>The medians are quite different. Let’s make a finer comparison of the  control and treatment groups with a quantile-quantile plot (see <a class="reference internal" href="../11/viz_intro.html#ch-viz"><span class="std std-numref">Chapter 11</span></a>). Since the distribution is highly skewed, we have plotted the quantiles on a log scale. And, to handle problems with taking a logarithm of zero, we added one to all the data values. This addition has little impact on the quantiles and distributions since they range from 0 to 2344.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/inf_pred_gen_HT_10_0.svg" src="../../_images/inf_pred_gen_HT_10_0.svg" /></div>
+</div>
+<p>With one glaring exception, the quantiles of the two distributions roughly follow a line, which indicates that the distributions are similar in shape. The exception is the number of ones in the first several quantiles for the control group. Let’s compare the count of zeros in the two groups (remember we added 1 to all of the values before finding the quantiles).</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Count of no-productivity members:  19 
+Count in control group:  14 
+Count in treatment group:  5
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are quite a few more zeros in the control group compared to treatment.
+Let’s start with the simplest test that is based on the proportion of zeros in the two groups.</p>
+</div>
+<div class="section" id="a-test-for-proportions">
+<h2><span class="section-number">16.2.2. </span>A test for proportions<a class="headerlink" href="#a-test-for-proportions" title="Permalink to this headline">¶</a></h2>
+<p>Statistic: Proportion of zeros.</p>
+<p>More specifically, the Null hypothesis is that informal awards have <em>no</em> effect on productivity, and any difference in post-treatment productivity is just due to the random assignment of contributors to the two groups.</p>
+<p>Under the null, the proportion of zeros in the treatment and control groups is the same, and any observed difference is due to the random variation in assignment to treatment/control group.</p>
+<p>In <code class="xref std std-numref docutils literal notranslate"><span class="pre">Chapter</span> <span class="pre">%s</span></code></p>
+<p>For each of these test statistics, we will compute the chance of observing a difference between the two groups that is at least the size of what we found in our data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sim0s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">hypergeometric</span><span class="p">(</span><span class="n">ngood</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span> <span class="n">nbad</span><span class="o">=</span><span class="mi">181</span><span class="p">,</span> 
+                                 <span class="n">nsample</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Count of 0-productivity Cases in the Treatment Group&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/inf_pred_gen_HT_16_1.svg" src="../../_images/inf_pred_gen_HT_16_1.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">sim0s</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">100000</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.02594
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="a-test-for-a-difference-in-medians">
+<h2><span class="section-number">16.2.3. </span>A test for a difference in medians<a class="headerlink" href="#a-test-for-a-difference-in-medians" title="Permalink to this headline">¶</a></h2>
+<p>Statistic: Median productivity. Under the null, we expect the treatment to have no effect and each contributor’s productivity would be unaffected by their receipt of the award so the median productivity for top contributors would be unchanged by the receipt of an informal award. Any difference in the observed medians for the two groups is simply due to the chance assignment to groups.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">default_rng</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">median_difference</span><span class="p">(</span><span class="n">production</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">production</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">production</span><span class="p">[:</span><span class="n">n</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">production</span><span class="p">[</span><span class="n">n</span><span class="p">:]))</span>
+            
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">wiki</span><span class="p">[[</span><span class="s1">&#39;posttreatmentproductivity&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">median_diff_simulation</span> <span class="o">=</span> <span class="p">[</span><span class="n">median_difference</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">)]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Difference in median productivity between treatment and control&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/inf_pred_gen_HT_23_1.svg" src="../../_images/inf_pred_gen_HT_23_1.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">median_diff_simulation</span> <span class="k">if</span> <span class="n">elem</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">212</span><span class="p">])</span> <span class="o">/</span> <span class="mi">10000</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0001
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="a-test-based-on-ranks">
+<h2><span class="section-number">16.2.4. </span>A test based on ranks<a class="headerlink" href="#a-test-based-on-ranks" title="Permalink to this headline">¶</a></h2>
+<p>Back before the days of cheap computers, it was often not practical to estimate p-values by simulation.  Statisticians who wanted to do randomization tests found a clever way around the problem.  Their solution was based on the fact that if your population consists of consecutive integers, like {1, 2, 3,…,  n} there is a theoretical analysis that gives a workable approximation to p-values.   Of course most populations don’t consist of consecutive integers, but you can force them to if you replace the actual data values with their ranks:  order the values from smallest to largest, assign rank 1 to the smallest, rank 2 to the next smallest, etc.  Once you’ve assigned ranks, you can do a two-sample permutation test on the ranks.</p>
+<p>Statistic: Rank sum. We pool all of the data and assign them ranks from 1 for the smallest value to 200 for the largest value. Like with the previous statistics, under the null, the difference in the sum of the ranks for productivity for the two groups is due to the chance process in group assignment.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">rankdata</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">wiki</span><span class="p">[[</span><span class="s1">&#39;posttreatmentproductivity&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">ranks</span> <span class="o">=</span> <span class="n">rankdata</span><span class="p">(</span><span class="n">wiki</span><span class="p">[</span><span class="s1">&#39;posttreatmentproductivity&#39;</span><span class="p">],</span> <span class="s1">&#39;average&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">ranks</span><span class="p">[</span><span class="mi">100</span><span class="p">:])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>11368.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rank_sum</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ranks</span><span class="p">[</span><span class="n">n</span><span class="p">:])</span>         
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rank_sum_simulation</span> <span class="o">=</span> <span class="p">[</span><span class="n">rank_sum</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Rank Sum for treatment&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/inf_pred_gen_HT_31_1.svg" src="../../_images/inf_pred_gen_HT_31_1.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rank_sum_simulation</span> <span class="k">if</span> <span class="n">elem</span> <span class="o">&gt;=</span> <span class="mi">11368</span><span class="p">])</span> <span class="o">/</span> <span class="mi">100000</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00059
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -1305,17 +1640,17 @@
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="../15/linear_projection.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="inf_pred_gen_dist.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">15.4. </span>Least Squares — A Geometric Perspective</p>
+            <p class="prev-next-title"><span class="section-number">16.1. </span>Distributions: Population, Empirical, Sampling</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="prob_random_vars.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">16.1. </span>Random Variables</p>
+        <p class="prev-next-title"><span class="section-number">16.3. </span>Random Variables</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
