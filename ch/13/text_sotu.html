@@ -1272,6 +1272,19 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-have-the-speeches-changed-over-time">
+   13.4.1. How Have the Speeches Changed Over Time?
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -1284,6 +1297,19 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-have-the-speeches-changed-over-time">
+   13.4.1. How Have the Speeches Changed Over Time?
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -1292,34 +1318,52 @@
                 
   <div class="section" id="text-analysis">
 <h1><span class="section-number">13.4. </span>Text Analysis<a class="headerlink" href="#text-analysis" title="Permalink to this headline">¶</a></h1>
-<p>The examples that we have seen so far in this chapter have cleaned text fields and converted strings into quantitative features for analysis. In this section, we demonstrate how to analyze documents. This analysis, called text mining, transforms unstructured text into a quantitative representation with the aim of uncovering meaningful patterns and insights.</p>
-<p>We do not provide a comprehensive treatment of text mining here, but introduce a few key ideas through an example. We analyze the State of the Union speeches from 1790 to 2022. The State of the Union is a report given by the US president to the US Congress annually. It contains information on the situation in the country and recommendations for Congress to consider. The American Presidency Project<a class="footnote-reference brackets" href="#app" id="id1">1</a> has the text from all of these speeches.</p>
-<p>We have collected these speeches into one file which we open and read as strings.</p>
+<p>So far, we’ve used Python methods and regular expressions to clean short
+text fields and strings.
+In this section, we’ll analyze entire documents using a technique called
+<em>text mining</em>, which transforms free-form text into
+a quantitative representation
+to uncover meaningful patterns and insights.</p>
+<p>Text mining is a deep topic. Instead of a comprehensive treatment, we’ll
+introduce a few key ideas
+through an example.
+In this section, we analyze the State of the Union speeches from 1790 to 2022.
+Every year, the US president gives a State of the Union speech to Congress.
+These speeches talk about current events in the country and
+make recommendations for Congress to consider.
+The American Presidency Project makes these speeches available online <a class="footnote-reference brackets" href="#app" id="id1">1</a>.</p>
+<p>We’ll start by opening the file that has all of the speeches.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">insp_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span> <span class="o">/</span> <span class="s1">&#39;data&#39;</span> <span class="o">/</span> <span class="s1">&#39;stateoftheunion1790-2022.txt&#39;</span>
 
-<span class="k">with</span> <span class="n">insp_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/stateoftheunion1790-2022.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We saw earlier in the chapter that the speeches are delimited by lines of the form ***. We can use a regular expression to count the number of occurrences of three asterisks.</p>
+<p>Earlier in the chapter, we saw that each speech in the data begins with
+a line with three asterisks: <code class="docutils literal notranslate"><span class="pre">***</span></code>.
+We can use a regular expression to count the number of times the
+string <code class="docutils literal notranslate"><span class="pre">***</span></code> appears.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Count ***s&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\*\*\*&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">num_speeches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\*\*\*&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="n">num_speeches</span><span class="si">}</span><span class="s1"> speeches total&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Count ***s 232
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>There are 232 speeches total
 </pre></div>
 </div>
 </div>
 </div>
-<p>The file contains 232 speeches (or 232 documents), and we can use string manipulation to create separate “documents” for each.</p>
+<p>In text analysis, a <em>document</em> refers to a single piece of text that we want
+to analyze. Here, each speech is a document.
+We’ll split apart the <code class="docutils literal notranslate"><span class="pre">text</span></code> variable into its individual documents.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">records</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;***&quot;</span><span class="p">)</span>
@@ -1327,20 +1371,21 @@
 </div>
 </div>
 </div>
-<p>Before we can apply text mining techniques, we must clean and prepare each document. For example, following the three asterisks there is a blank line and then three lines of information about the speech. We want to remove these from the document and place this information in corresponding features.</p>
-<div class="cell docutils container">
+<p>Then, we can put the speeches into a dataframe:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">extract_parts</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
-    <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="n">date</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">text</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">extract_parts</span><span class="p">(</span><span class="n">speech</span><span class="p">):</span>
+    <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="o">*</span><span class="n">lines</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">body</span><span class="p">]</span>
 
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">extract_parts</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">records</span><span class="p">[</span><span class="mi">1</span><span class="p">:]],</span>
-                   <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">,</span> <span class="s2">&quot;Text&quot;</span><span class="p">])</span>
-    
-<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">read_speeches</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">extract_parts</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">records</span><span class="p">[</span><span class="mi">1</span><span class="p">:]],</span>
+                        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">])</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">read_speeches</span><span class="p">()</span>
+<span class="n">df</span>
 </pre></div>
 </div>
 </div>
@@ -1363,9 +1408,9 @@
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Name</th>
-      <th>Date</th>
-      <th>Text</th>
+      <th>name</th>
+      <th>date</th>
+      <th>text</th>
     </tr>
   </thead>
   <tbody>
@@ -1388,115 +1433,260 @@
       <td>Fellow-Citizens of the Senate and House of Rep...</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>George Washington</td>
-      <td>November 6, 1792</td>
-      <td>Fellow-Citizens of the Senate and House of Rep...</td>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>George Washington</td>
-      <td>December 3, 1793</td>
-      <td>Fellow-Citizens of the Senate and House of Rep...</td>
+      <th>229</th>
+      <td>Donald J. Trump</td>
+      <td>February 4, 2020</td>
+      <td>Thank you very much. Thank you. Thank you very...</td>
+    </tr>
+    <tr>
+      <th>230</th>
+      <td>Joseph R. Biden, Jr.</td>
+      <td>April 28, 2021</td>
+      <td>Thank you. Thank you. Thank you. Good to be ba...</td>
+    </tr>
+    <tr>
+      <th>231</th>
+      <td>Joseph R. Biden, Jr.</td>
+      <td>March 1, 2022</td>
+      <td>Madam Speaker, Madam Vice President, our First...</td>
     </tr>
   </tbody>
 </table>
+<p>232 rows × 3 columns</p>
 </div></div></div>
 </div>
-<p>To clean the documents, we remove blank lines, extra whitespace, convert uppercase letters to lowercase, and eliminate all literals that are not letters and spaces.  Additionally, we remove remarks between squuare brackets, such as [laughter], because these are clarifications or comments from the audience, and we remove the phrase “The President.” when it appears at the beginning of a line because it refers to the president speaking and is not part of the speech itself. Notice in the regular expressions below how we: escape the metacharacter meaning of left and right brackets with a backslash in order to locate the bracketed remarks that are not part of the speech; use the caret inside the two equivalence classes, one time to locate any literal except the right bracket and another time to match everything that isn’t a letter or whitespace (the shortcut for whitespace is <code class="docutils literal notranslate"><span class="pre">\s</span></code>); and locate the term “The President.” at the beginning of a new line. Also consider the sequence in which these string replacemnts are carried out. We want to be sure to replace “The President” first, before we start replacing end of line characters with blanks.</p>
-<div class="cell docutils container">
+<div class="section" id="how-have-the-speeches-changed-over-time">
+<h2><span class="section-number">13.4.1. </span>How Have the Speeches Changed Over Time?<a class="headerlink" href="#how-have-the-speeches-changed-over-time" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have the speeches loaded into a dataframe, we want to write
+a program that can help us see how the speeches have changed
+over time.
+Our basic idea is to look at the words in the speeches—if two speeches
+included a very different set of words, our program should tell us that the
+speeches are very different.
+If we have a measure of similarity, we can see how the speeches have
+become different over time.</p>
+<p>There are few problems in the data that we need to take care of first:</p>
+<ol class="simple">
+<li><p>Capitalization shouldn’t matter: <code class="docutils literal notranslate"><span class="pre">Citizens</span></code> and <code class="docutils literal notranslate"><span class="pre">citizens</span></code> should be
+considered the same word. We can address this by lowercasing the text.</p></li>
+<li><p>There are unspoken remarks in the text: <code class="docutils literal notranslate"><span class="pre">[laughter]</span></code> points out where the
+audience laughed, but these shouldn’t count as part of the speech.
+We can address this by using a regex to remove text within
+brackets: <code class="docutils literal notranslate"><span class="pre">\[[^\]]+\]</span></code>. Remember that <code class="docutils literal notranslate"><span class="pre">\[</span></code> and <code class="docutils literal notranslate"><span class="pre">\]</span></code> match
+the literal left and right brackets, and <code class="docutils literal notranslate"><span class="pre">[^\]]</span></code> matches any character that
+isn’t a right bracket.</p></li>
+<li><p>We should take out characters that aren’t letters or whitespace: some
+speeches talk about finances, but a dollar amount shouldn’t count as
+a word. We can use the regex <code class="docutils literal notranslate"><span class="pre">[^a-z\s]</span></code> to remove these characters.
+This regex matches any character that isn’t a lowercase letter
+(<code class="docutils literal notranslate"><span class="pre">a-z</span></code>) or a whitespace character (<code class="docutils literal notranslate"><span class="pre">\s</span></code>).</p></li>
+</ol>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Text&#39;</span><span class="p">]</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">\s*The President\.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;\[[^\]]+\]&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-z\s]&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-6-326613f2bdaa&gt;:2: FutureWarning:
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">bracket_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[[^\]]+\]&#39;</span><span class="p">)</span>
+    <span class="n">not_a_word_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^a-z\s]&#39;</span><span class="p">)</span>
+    <span class="n">cleaned</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">bracket_re</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">not_a_word_re</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">cleaned</span><span class="p">)</span>
 
-The default value of regex will change from True to False in a future version.
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">read_speeches</span><span class="p">()</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">clean_text</span><span class="p">))</span>
+<span class="n">df</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0    fellow citizens of the senate and house of rep...
-1    fellow citizens of the senate and house of rep...
-2    fellow citizens of the senate and house of rep...
-3    fellow citizens of the senate and house of rep...
-4    fellow citizens of the senate and house of rep...
-Name: clean text, dtype: object
-</pre></div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>date</th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>George Washington</td>
+      <td>January 8, 1790</td>
+      <td>fellow citizens of the senate and house of rep...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>George Washington</td>
+      <td>December 8, 1790</td>
+      <td>fellow citizens of the senate and house of rep...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>George Washington</td>
+      <td>October 25, 1791</td>
+      <td>fellow citizens of the senate and house of rep...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>229</th>
+      <td>Donald J. Trump</td>
+      <td>February 4, 2020</td>
+      <td>thank you very much  thank you  thank you very...</td>
+    </tr>
+    <tr>
+      <th>230</th>
+      <td>Joseph R. Biden, Jr.</td>
+      <td>April 28, 2021</td>
+      <td>thank you  thank you  thank you  good to be ba...</td>
+    </tr>
+    <tr>
+      <th>231</th>
+      <td>Joseph R. Biden, Jr.</td>
+      <td>March 1, 2022</td>
+      <td>madam speaker  madam vice president  our first...</td>
+    </tr>
+  </tbody>
+</table>
+<p>232 rows × 3 columns</p>
+</div></div></div>
 </div>
-</div>
-</div>
-<p>Now we’re ready to perform a little text mining. The key idea idea is to analyze the speeches as collections of words. To do this, we organize the words in each document into a <em>word vector</em>. We break each document up into separate strings of one word each, which are referred to as <em>terms</em> or <em>tokens</em>. This process, called <em>tokenization</em>, often includes <em>stemming</em>, where a word is reduced to its “stem.” For example, “runs”, “running”, and “ran” are all mapped to the same stem, “run”. Stemming reduces similar words to the same core to make it easier to find similarities between documents. Another processing step removes <em>stop words</em>, such as “is”, “and”, “the”, and  “a”, from the document. The rational being that these word are so common that they are not helpful in comparing documents.</p>
-<p>Below we use a stemming method in the NLTK library to tokenize (by splitting on whitepace) and stem the words in a string. We will use this tokenizer on the speeches.</p>
-<div class="cell docutils container">
+<p>Next, we’ll look at some more complex issues:</p>
+<ol class="simple">
+<li><p><em>Stop words</em> like <code class="docutils literal notranslate"><span class="pre">is</span></code>, <code class="docutils literal notranslate"><span class="pre">and</span></code>, <code class="docutils literal notranslate"><span class="pre">the</span></code>, and <code class="docutils literal notranslate"><span class="pre">but</span></code> appear so often that we
+should just remove them.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">argue</span></code> and <code class="docutils literal notranslate"><span class="pre">arguing</span></code> should count as the same word,
+even though they appear different in the text. To address this,
+we’ll use <em>word stemming</em>, which transforms both words to <code class="docutils literal notranslate"><span class="pre">argu</span></code>.</p></li>
+</ol>
+<p>To handle these issues, we’ll use built-in methods from
+<a class="reference external" href="https://www.nltk.org/">the <code class="docutils literal notranslate"><span class="pre">nltk</span></code> library</a>.</p>
+<p>Finally, we’ll use a technique called
+<em>term frequency-inverse document frequency</em> (tf-idf for short) to
+transform each speech into a vector of numbers.
+This technique counts up the words that each document uses. Then, it
+puts more weight on words that only appear in a few documents.
+The idea is that if only a few documents mention the word <code class="docutils literal notranslate"><span class="pre">sanction</span></code>,
+this word is extra useful for distinguishing documents from each other.
+<a class="reference external" href="https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting">The scikit-learn library</a> has a complete
+description of the transform and an implementation we’ll use.</p>
+<p>After applying these transforms, we have a 2-dimensional array
+<code class="docutils literal notranslate"><span class="pre">speech_vectors</span></code>. Each row of this array is one speech transformed into a
+vector.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">nltk.stem.porter</span> <span class="kn">import</span> <span class="n">PorterStemmer</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">from</span> <span class="nn">nltk.stem.porter</span> <span class="kn">import</span> <span class="n">PorterStemmer</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+
+<span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">corpus</span><span class="o">.</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
 <span class="n">porter_stemmer</span> <span class="o">=</span> <span class="n">PorterStemmer</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">stemming_tokenizer</span><span class="p">(</span><span class="n">str_input</span><span class="p">):</span>
-    <span class="n">words</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">str_input</span><span class="p">)</span>
-    <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">porter_stemmer</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">stemming_tokenizer</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">porter_stemmer</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">words</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>To create a speech’s word vector, we tally up the number of time each word in a dictionary occurs in the speech. The dictionary used to create the word vectors might simply be the collection of all unique words across all of the documents being analyzed, which is referred to as a <em>bag of words</em>.</p>
-<p>Representing a speech in this way ignores the actual order of the words. It may not be immediately obvious that this representation can be useful. The bi-gram is an extension of this notion, where pairs of words are the tokens. You can imagine that this extension can bring more nuance to a text analysis.</p>
-<p>The count of a word in a document is called the <em>term frequency</em>. Ideally the vectors of term frequencies can be used to compare documents. To make these comparisons, we typically normalize a term frequency by its <em>inverse document frequency</em>, which is a count of the number of documents the word appears in. A word that appears in all of the documents will likely not be of much use in our comparisons. The product of the term frequency and inverse document frequency is called the tf-idf.</p>
-<p>We use the <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code> method in scikit learn to compute the tf-id vectors, and provide our tokenizer to stem the words.</p>
-<div class="cell tag_remove-output docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
-<span class="n">vec</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">stemming_tokenizer</span><span class="p">,</span> <span class="n">stop_words</span><span class="o">=</span><span class="s1">&#39;english&#39;</span><span class="p">)</span>
-<span class="n">tfidf</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;clean text&#39;</span><span class="p">])</span>
+
+<span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">stemming_tokenizer</span><span class="p">)</span>
+<span class="n">speech_vectors</span> <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tfidf</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">speech_vectors</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(232, 13130)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(232, 13211)
 </pre></div>
 </div>
 </div>
 </div>
-<p>Each of the 232 speeches is represented by a 13348 vector of tf-idf values.</p>
-<p>Now that we have converted documents into high-dimensional vectors, we can use dimension reduction techniques to look for patterns (see <a class="reference internal" href="../26/pca_intro.html#ch-pca"><span class="std std-numref">Chapter 26</span></a>). We close this section with a plot of the tf-idf vectors of the 232 documents. These have been reduced to two-dimensional representations in the scatter plot below. Each point there is on of the speeches, and these are color-coded by year. We note that speeches in the same era are close to each other, even when given by presidents of different political parties. Also notable are a couple of anomalous speeches. Something to look into.</p>
-<div class="cell tag_remove-input docutils container">
+<p>We have 232 speeches, and each speech was transformed into a
+length-13211 vector.
+To visualize these speeches, we’ll use a technique called
+<em>principal component analysis</em> to compress the length-13211 vectors into
+length-2 vectors which we can put directly into a scatter plot.
+(We cover principal component analysis in detail in
+<a class="reference internal" href="../26/pca_intro.html#ch-pca"><span class="std std-numref">Chapter 26</span></a>.)</p>
+<p>In the plot below, each point is one speech. We’ve colored the points
+using the year of the speech.
+Points that are close together represent similar speeches, and
+points that are far away represent dissimilar speeches.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
+
+<span class="k">def</span> <span class="nf">compute_pcs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">centered</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">centered</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="c1"># setting the random seed doesn&#39;t affect for svds(), so re-running this code</span>
+<span class="c1"># might flip the points along the x or y-axes.</span>
+<span class="n">pcs</span> <span class="o">=</span> <span class="n">compute_pcs</span><span class="p">(</span><span class="n">speech_vectors</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">with_pcs1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
+                      <span class="n">pc1</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pc2</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">with_pcs1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pc1&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pc2&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
+           <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+           <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x121ec2370&gt;]
-</pre></div>
+<img alt="../../_images/text_sotu_21_0.svg" src="../../_images/text_sotu_21_0.svg" /></div>
 </div>
-<img alt="../../_images/text_sotu_21_1.svg" src="../../_images/text_sotu_21_1.svg" /></div>
-</div>
+<p>We see a clear difference in speeches over time—speeches given in the 1800s
+used very different words than speeches after 2000.
+It’s also interesting to see that speeches from 1900-1970 seem to
+more scattered, while speeches before 1900 or after 1970 seem to cluster
+more tightly.
+This plot suggests that speeches from 1900-1970 had their own distinct
+patterns of word usage, and yet were also quite different from each other.</p>
+<p>This section gave a whirlwind introduction to text analysis.
+We used text manipulation tools from previous sections to clean up the
+presidential speeches.
+Then, we used more advanced techniques like stemming,
+the tf-idf transform, and principal component analysis to compare speeches.
+Although we don’t have enough space in this book
+to cover all of these techniques in detail, we hope that this section
+piques your interest in the exciting world of text analysis.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="app"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p><a class="reference external" href="https://www.presidency.ucsb.edu/">https://www.presidency.ucsb.edu/</a></p>
 </dd>
 </dl>
+</div>
 </div>
 
     <script type="text/x-thebe-config">

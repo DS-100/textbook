@@ -1338,17 +1338,105 @@
                 
   <div class="section" id="string-manipulation">
 <h1><span class="section-number">13.2. </span>String Manipulation<a class="headerlink" href="#string-manipulation" title="Permalink to this headline">¶</a></h1>
-<p>A few basic string manipulation tools can be handy for cleaning text or extracting a portion of a string. These common tools manipulate strings in the following ways:</p>
+<p>There are a few basic string manipulation tools that we use all the time
+when working with text:</p>
 <ul class="simple">
 <li><p>Transform upper case characters to lower case (or vice versa).</p></li>
 <li><p>Replace a substring with another or delete a substring.</p></li>
 <li><p>Split a string into pieces at a particular character.</p></li>
 <li><p>Slice a string at specified locations.</p></li>
 </ul>
-<p>We need only the first two of these tools to clean the county names so that they are consistent across the two tables.</p>
+<p>We’ll show how we can combine these tools to clean up the county names data.
+Remember that we have two tables that we want to join, but the county names are
+spelled inconsistently. Below, we’ve displayed the <code class="docutils literal notranslate"><span class="pre">election</span></code> DataFrame on the
+left and the <code class="docutils literal notranslate"><span class="pre">census</span></code> DataFrame on the right.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dfs_side_by_side</span><span class="p">(</span><span class="n">election</span><span class="p">,</span> <span class="n">census</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <div style="display: flex; gap: 1rem;">
+        <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>State</th>
+      <th>Voted</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>De Witt County</td>
+      <td>IL</td>
+      <td>97.8</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Lac qui Parle County</td>
+      <td>MN</td>
+      <td>98.8</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Lewis and Clark County</td>
+      <td>MT</td>
+      <td>95.2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>St John the Baptist Parish</td>
+      <td>LA</td>
+      <td>52.6</td>
+    </tr>
+  </tbody>
+</table><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>County</th>
+      <th>State</th>
+      <th>Population</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>DeWitt</td>
+      <td>IL</td>
+      <td>16,798</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Lac Qui Parle</td>
+      <td>MN</td>
+      <td>8,067</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Lewis &amp; Clark</td>
+      <td>MT</td>
+      <td>55,716</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>St. John the Baptist</td>
+      <td>LA</td>
+      <td>43,044</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+</div></div>
+</div>
 <div class="section" id="converting-text-to-a-standard-format-with-python-string-methods">
 <h2><span class="section-number">13.2.1. </span>Converting Text to a Standard Format with Python String Methods<a class="headerlink" href="#converting-text-to-a-standard-format-with-python-string-methods" title="Permalink to this headline">¶</a></h2>
-<p>We need to address the following inconsistencies between the county names in the two tables.</p>
+<p>We need to address the following inconsistencies between the county names in
+the two tables.</p>
 <ol class="simple">
 <li><p>Capitalization: <code class="docutils literal notranslate"><span class="pre">qui</span></code> vs <code class="docutils literal notranslate"><span class="pre">Qui</span></code></p></li>
 <li><p>Omission of words: <code class="docutils literal notranslate"><span class="pre">County</span></code> and <code class="docutils literal notranslate"><span class="pre">Parish</span></code> are absent from the <code class="docutils literal notranslate"><span class="pre">census</span></code> table</p></li>
@@ -1356,8 +1444,13 @@
 <li><p>Different punctuation conventions: <code class="docutils literal notranslate"><span class="pre">St.</span></code> vs <code class="docutils literal notranslate"><span class="pre">St</span></code></p></li>
 <li><p>Use of whitespace: <code class="docutils literal notranslate"><span class="pre">DeWitt</span></code> vs <code class="docutils literal notranslate"><span class="pre">De</span> <span class="pre">Witt</span></code></p></li>
 </ol>
-<p>When we clean text, a typical first step is to convert all of the characters to lower case. It’s much easier to work with all lower case characters than to try to track combinations of upper and lower case. As a second step, we want to fix inconsistent words: replace <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> with <code class="docutils literal notranslate"><span class="pre">and</span></code>, remove <code class="docutils literal notranslate"><span class="pre">County</span></code> and <code class="docutils literal notranslate"><span class="pre">Parish</span></code>. Then, there’s the punctuation and whitespace inconsistencies. Removing them should be the final step. We demonstrate how to do this with Python string methods.</p>
-<p>Following these steps, we create a method called <code class="docutils literal notranslate"><span class="pre">clean_county</span></code> that normalizes an input county name that uses two of Python’s string methods.</p>
+<p>When we clean text, we usually start by converting all of the characters to
+lowercase—it’s easier to work with all lowercase characters than to try to
+track combinations of uppercase and lowercase. Next, we want to fix
+inconsistent words by replacing <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> with <code class="docutils literal notranslate"><span class="pre">and</span></code> and removing <code class="docutils literal notranslate"><span class="pre">County</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Parish</span></code>. Finally, we’ll fix up the punctuation and whitespace inconsistencies.</p>
+<p>Following these steps, we create a method called <code class="docutils literal notranslate"><span class="pre">clean_county</span></code> that cleans
+an input county name using two of Python’s string methods.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">clean_county</span><span class="p">(</span><span class="n">county</span><span class="p">):</span>
@@ -1372,8 +1465,13 @@
 </div>
 </div>
 </div>
-<p>Python provides a variety of methods for basic string manipulation. Although simple, these methods are the primitives that piece together to form more complex string operations.
-These methods are conveniently defined on all Python strings and do not require importing other modules. Although it is worth familiarizing yourself with <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#string-methods">the complete list of string methods</a>, we describe a few of the most commonly used methods in the table below.</p>
+<p>Python provides a variety of methods for basic string manipulation. Although
+simple, these methods are the primitives that piece together to form more
+complex string operations. These methods are conveniently defined on all Python
+strings and do not require importing other modules. Although it is worth
+familiarizing yourself with <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#string-methods">the complete list of string
+methods</a>, we
+describe a few of the most commonly used methods in the table below.</p>
 <table class="colwidths-auto table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Method</p></th>
@@ -1414,14 +1512,19 @@ These methods are conveniently defined on all Python strings and do not require 
 </div>
 </div>
 </div>
-<p>Since each county name in both tables now has the same transformed representation, we can successfully join the two tables.</p>
+<p>Since each county name in both tables now has the same transformed
+representation, we can successfully join the two tables.</p>
 </div>
 <div class="section" id="string-methods-in-pandas">
 <h2><span class="section-number">13.2.2. </span>String Methods in pandas<a class="headerlink" href="#string-methods-in-pandas" title="Permalink to this headline">¶</a></h2>
-<p>In the code above we used a loop to transform each county name. <code class="docutils literal notranslate"><span class="pre">pandas</span></code> Series objects provide a convenient way to apply string methods to each item in the series.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">.str</span></code> property on <code class="docutils literal notranslate"><span class="pre">pandas</span></code> Series exposes the same string methods as Python does. Calling a method on the <code class="docutils literal notranslate"><span class="pre">.str</span></code> property calls the method on each item in the series.
-This allows us to transform each string in the series without using a loop.
-We save the transformed counties back into their originating tables:</p>
+<p>In the code above we used a loop to transform each county name. <code class="docutils literal notranslate"><span class="pre">pandas</span></code> Series
+objects provide a convenient way to apply string methods to each item in the
+series.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">.str</span></code> property on <code class="docutils literal notranslate"><span class="pre">pandas</span></code> Series exposes the same string methods as
+Python does. Calling a method on the <code class="docutils literal notranslate"><span class="pre">.str</span></code> property calls the method on each
+item in the series. This allows us to transform each string in the series
+without using a loop. We save the transformed counties back into their
+originating tables:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">election</span><span class="p">[</span><span class="s1">&#39;County&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">election</span><span class="p">[</span><span class="s1">&#39;County&#39;</span><span class="p">]</span>
@@ -1429,7 +1532,7 @@ We save the transformed counties back into their originating tables:</p>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parish&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;county&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">)</span>
- <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
 
 <span class="n">census</span><span class="p">[</span><span class="s1">&#39;County&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">census</span><span class="p">[</span><span class="s1">&#39;County&#39;</span><span class="p">]</span>
@@ -1437,19 +1540,8 @@ We save the transformed counties back into their originating tables:</p>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;parish&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;county&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">)</span>
- <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
  <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-5-931149a8a573&gt;:1: FutureWarning:
-
-The default value of regex will change from True to False in a future version. In addition, single character regular expressions will*not* be treated as literal strings when regex=True.
-
-&lt;ipython-input-5-931149a8a573&gt;:9: FutureWarning:
-
-The default value of regex will change from True to False in a future version. In addition, single character regular expressions will*not* be treated as literal strings when regex=True.
 </pre></div>
 </div>
 </div>
@@ -1519,13 +1611,25 @@ The default value of regex will change from True to False in a future version. I
 </table>
 </div></div></div>
 </div>
-<p>Note that we have merged on two columns: the county name and the state. We did this because some states have counties with the same name.  For example, California and New York both have a county called King.</p>
-<p>Python’s string methods form a set of simple and useful operations for string manipulation. <code class="docutils literal notranslate"><span class="pre">pandas</span></code> Series implement the same methods that apply the underlying Python method to each string in the series. You may find the complete docs on Python’s <code class="docutils literal notranslate"><span class="pre">string</span></code> methods <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#string-methods">here</a> and the docs on Pandas <code class="docutils literal notranslate"><span class="pre">str</span></code> methods <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/text.html#method-summary">here</a>.</p>
-<p>We have carried out the canonicalization task using only <code class="docutils literal notranslate"><span class="pre">str.lower()</span></code> and multiple calls to <code class="docutils literal notranslate"><span class="pre">str.replace()</span></code>. We tackle next the task of extracting text with another string method, <code class="docutils literal notranslate"><span class="pre">str.split()</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that we merged on two columns: the county name and the state. We did
+this because some states have counties with the same name. For example,
+California and New York both have a county called King.</p>
+</div>
+<p>Python’s string methods form a set of simple and useful operations for string
+manipulation. <code class="docutils literal notranslate"><span class="pre">pandas</span></code> Series implement the same methods that apply the
+underlying Python method to each string in the series. To see the complete list
+of methods, we recommend looking at the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#string-methods">Python documentation on <code class="docutils literal notranslate"><span class="pre">str</span></code>
+methods</a> and the <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/text.html#method-summary">Pandas documentation for the <code class="docutils literal notranslate"><span class="pre">.str</span></code>
+accessor</a>. We did the canonicalization task above using only
+<code class="docutils literal notranslate"><span class="pre">str.lower()</span></code> and multiple calls to <code class="docutils literal notranslate"><span class="pre">str.replace()</span></code>. Next, we’ll extracting
+text with another string method, <code class="docutils literal notranslate"><span class="pre">str.split()</span></code>.</p>
 </div>
 <div class="section" id="splitting-strings-to-extract-pieces-of-text">
 <h2><span class="section-number">13.2.3. </span>Splitting Strings to Extract Pieces of Text<a class="headerlink" href="#splitting-strings-to-extract-pieces-of-text" title="Permalink to this headline">¶</a></h2>
-<p>Recall the issue of extracting the date from a Web log entry (shown below) to create a feature.</p>
+<p>Let’s say we want to extract the date from a web server’s log entry shown
+below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_entry</span>
@@ -1538,7 +1642,24 @@ The default value of regex will change from True to False in a future version. I
 </div>
 </div>
 </div>
-<p>String splitting can help us narrow in on the pieces of information that form the date. For example, when we split the string on the left bracket, we get two strings:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">fill</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">fill</span><span class="p">(</span><span class="n">log_entry</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">79</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>169.237.46.168 - - [26/Jan/2004:10:47:58 -0800]&quot;GET /stat141/Winter04 HTTP/1.1&quot;
+301 328 &quot;http://anson.ucdavis.edu/courses&quot;&quot;Mozilla/4.0 (compatible; MSIE 6.0;
+Windows NT 5.0; .NET CLR 1.1.4322)&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<p>String splitting can help us narrow in on the pieces of information that form
+the date. For example, when we split the string on the left bracket, we get two
+strings:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span>
@@ -1552,7 +1673,8 @@ The default value of regex will change from True to False in a future version. I
 </div>
 </div>
 </div>
-<p>The second string has the date information, and if we want the day, month, and year, we can split that string on a colon.</p>
+<p>The second string has the date information, and if we want the day, month, and
+year, we can split that string on a colon.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1565,7 +1687,9 @@ The default value of regex will change from True to False in a future version. I
 </div>
 </div>
 </div>
-<p>To separate out these three parts of the date, we can split on the forward slash. All together we split the original string three times, each time keeping only the pieces we are interested in.</p>
+<p>To separate out these three parts of the date, we can split on the forward
+slash. All together we split the original string three times, each time keeping
+only the pieces we are interested in.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">log_entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
@@ -1580,23 +1704,28 @@ The default value of regex will change from True to False in a future version. I
 </div>
 </div>
 </div>
-<p>If we want to also get the hour, minute, second, and time zone of the activity, we can use <code class="docutils literal notranslate"><span class="pre">split()</span></code> six times all together to get these eight components. But, this approach feels a bit hacky. Instead, we can achieve the same results with the simple expression below.</p>
+<p>By repeatedly using <code class="docutils literal notranslate"><span class="pre">split()</span></code>, we can extract out all the parts of the log
+entry. But this approach is complicated—if we wanted to
+also get the hour, minute, second, and time zone of the activity,
+we would need to use <code class="docutils literal notranslate"><span class="pre">split()</span></code> six times in total.
+There’s a simpler way to extract out the parts:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
 
-<span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[\[/:]&#39;</span> 
-<span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">log_entry</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[ \[/:\]]&#39;</span> 
+<span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">log_entry</span><span class="p">)[</span><span class="mi">4</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;26&#39;, &#39;Jan&#39;, &#39;2004&#39;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;26&#39;, &#39;Jan&#39;, &#39;2004&#39;, &#39;10&#39;, &#39;47&#39;, &#39;58&#39;, &#39;-0800&#39;]
 </pre></div>
 </div>
 </div>
 </div>
-<p>This alternative approach uses a regular expression. We introduce this powerful notion next.</p>
+<p>This alternative approach uses a powerful tool called a regular expression,
+which we’ll cover in the next section.</p>
 </div>
 </div>
 
