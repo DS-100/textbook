@@ -8,7 +8,7 @@ import seaborn as sns
 import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual
 from IPython import get_ipython
-from IPython.display import display, set_matplotlib_formats
+from IPython.display import display, set_matplotlib_formats, HTML
 import myst_nb
 
 import plotly
@@ -55,19 +55,33 @@ def display_df(
         display(df)
 
 
+def dfs_side_by_side(*dfs):
+    """Displays two or more dataframes side by side"""
+    display(
+        HTML(
+            f"""
+        <div style="display: flex; gap: 1rem;">
+        {''.join(df.to_html() for df in dfs)}
+        </div>
+    """
+        )
+    )
+
+
 def df_interact(df, nrows=7, ncols=7):
-    '''
+    """
     Outputs sliders that show rows and columns of df
-    '''
+    """
+
     def peek(row=0, col=0):
-        return df.iloc[row:row + nrows, col:col + ncols]
+        return df.iloc[row : row + nrows, col : col + ncols]
+
     if len(df.columns) <= ncols:
-        interact(peek, row=(0, len(df) - nrows, nrows), col=fixed(0))
+        interact(peek, row=(0, len(df), nrows), col=fixed(0))
     else:
-        interact(peek,
-                 row=(0, len(df) - nrows, nrows),
-                 col=(0, len(df.columns) - ncols))
-    print('({} rows, {} columns) total'.format(df.shape[0], df.shape[1]))
+        interact(peek, row=(0, len(df), nrows), col=(0, len(df.columns) - ncols))
+    print("({} rows, {} columns) total".format(df.shape[0], df.shape[1]))
+
 
 ##############################################################################
 # Plotly
