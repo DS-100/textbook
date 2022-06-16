@@ -1585,11 +1585,20 @@ we’ll use <em>word stemming</em>, which transforms both words to <code class="
 </ol>
 <p>To handle these issues, we’ll use built-in methods from
 <a class="reference external" href="https://www.nltk.org/">the <code class="docutils literal notranslate"><span class="pre">nltk</span></code> library</a>.</p>
-<p>Finally, we’ll use a technique called
+<p>Finally, we’ll transform the speeches into <em>word vectors</em>.
+A word vector represents a document using a vector of numbers.
+For example, one basic type of word vector counts up how many times
+each word appears in the text, as depicted in
+<a class="reference internal" href="#fig-word-vectors"><span class="std std-numref">Figure 13.2</span></a>.</p>
+<div class="figure align-default" id="fig-word-vectors">
+<img alt="../../_images/word-vectors.svg" src="../../_images/word-vectors.svg" /><p class="caption"><span class="caption-number">Fig. 13.2 </span><span class="caption-text">Bag-of-words vectors for three small example documents.</span><a class="headerlink" href="#fig-word-vectors" title="Permalink to this image">¶</a></p>
+</div>
+<p>This simple transform is called bag-of-words, and we’ll apply it
+on all of our speeches.
+Then, we’ll use a statistic called
 <em>term frequency-inverse document frequency</em> (tf-idf for short) to
-transform each speech into a vector of numbers.
-This technique counts up the words that each document uses. Then, it
-puts more weight on words that only appear in a few documents.
+normalize the counts.
+This technique puts more weight on words that only appear in a few documents.
 The idea is that if only a few documents mention the word <code class="docutils literal notranslate"><span class="pre">sanction</span></code>,
 this word is extra useful for distinguishing documents from each other.
 <a class="reference external" href="https://scikit-learn.org/stable/modules/feature_extraction.html#tfidf-term-weighting">The scikit-learn library</a> has a complete
@@ -1641,7 +1650,7 @@ length-2 vectors which we can put directly into a scatter plot.
 using the year of the speech.
 Points that are close together represent similar speeches, and
 points that are far away represent dissimilar speeches.</p>
-<div class="cell tag_hide-input docutils container">
+<div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
 
@@ -1650,28 +1659,48 @@ points that are far away represent dissimilar speeches.</p>
     <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">centered</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
-<span class="c1"># setting the random seed doesn&#39;t affect for svds(), so re-running this code</span>
+<span class="c1"># Setting the random seed doesn&#39;t affect svds(), so re-running this code</span>
 <span class="c1"># might flip the points along the x or y-axes.</span>
 <span class="n">pcs</span> <span class="o">=</span> <span class="n">compute_pcs</span><span class="p">(</span><span class="n">speech_vectors</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
+<span class="c1"># So we&#39;ll use a hack: we make sure the first row&#39;s PCs are both positive to get</span>
+<span class="c1"># the same plot each time.</span>
+<span class="k">if</span> <span class="n">pcs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="k">if</span> <span class="n">pcs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+
 <span class="n">with_pcs1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
                       <span class="n">pc1</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pc2</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">with_pcs1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pc1&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pc2&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">with_pcs1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pc1&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pc2&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
            <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
            <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">coloraxis_colorbar_thickness</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/text_sotu_21_0.svg" src="../../_images/text_sotu_21_0.svg" /></div>
+<img alt="../../_images/text_sotu_24_0.svg" src="../../_images/text_sotu_24_0.svg" /></div>
 </div>
 <p>We see a clear difference in speeches over time—speeches given in the 1800s
 used very different words than speeches after 2000.
-It’s also interesting to see that speeches from 1900-1970 seem to
-more scattered, while speeches before 1900 or after 1970 seem to cluster
-more tightly.
-This plot suggests that speeches from 1900-1970 had their own distinct
-patterns of word usage, and yet were also quite different from each other.</p>
+It’s also interesting to see that the speeches cluster tightly in the same
+time period.
+This suggests that speeches within the same period
+sound relatively similar, even though the speakers were from
+different political parties.
+Here are some questions we could explore next:</p>
+<ol class="simple">
+<li><p>What words seem to best differentiate speeches from different centuries?</p></li>
+<li><p>If we color the points by political party, will the points of the same political party be grouped together?</p></li>
+</ol>
 <p>This section gave a whirlwind introduction to text analysis.
 We used text manipulation tools from previous sections to clean up the
 presidential speeches.
