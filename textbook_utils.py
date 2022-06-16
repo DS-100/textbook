@@ -87,6 +87,7 @@ def df_interact(df, nrows=7, ncols=7):
 # Plotly
 ##############################################################################
 
+# When two traces share bingroup, plotly thinks they're the same plot
 _clear = ["bingroup"]
 
 
