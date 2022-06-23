@@ -102,19 +102,43 @@ def _clear_props(traces):
             _clear_prop(trace, prop)
 
 
-def left_right(left, right, width=700, height=250, **kwargs):
-    """Combine two plotly figures side by side"""
-    fig = make_subplots(cols=2, **kwargs)
+def plots_in_row(figures, width=700, height=250, **kwargs):
+    """Combine plotly figures side by side"""
+    fig = make_subplots(cols=len(figures), **kwargs)
     fig.update_layout(width=width, height=height)
 
-    t1 = next(left.select_traces())
-    t2 = next(right.select_traces())
-    _clear_props([t1, t2])
-    fig.add_trace(t1, row=1, col=1)
-    fig.add_trace(t2, row=1, col=2)
+    traces = [next(fig.select_traces()) for fig in figures]
+    _clear_props(traces)
+    for i, trace in enumerate(traces):
+        fig.add_trace(trace, row=1, col=i + 1)
     return fig
+
+
+def left_right(left, right, width=700, height=250, **kwargs):
+    """Two plotly figures side by side"""
+    return plots_in_row([left, right], width=width, height=height, **kwargs)
 
 
 def margin(fig, **kwargs):
     """Set margins for a plotly figure"""
     return fig.update_layout(margin=kwargs)
+
+
+def title(fig, label, **kwargs):
+    """Set title for a plotly figure"""
+    return fig.update_layout(
+        title={
+            "text": label,
+            **kwargs,
+        }
+    )
+
+
+def xlabel(fig, label, **kwargs):
+    """Set xlabel for a plotly figure"""
+    return fig.update_xaxes(title=label, **kwargs)
+
+
+def ylabel(fig, label, **kwargs):
+    """Set ylabel for a plotly figure"""
+    return fig.update_yaxes(title=label, **kwargs)
