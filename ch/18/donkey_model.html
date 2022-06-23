@@ -1360,191 +1360,63 @@
                 
   <div class="section" id="modeling-a-donkeys-weight">
 <h1><span class="section-number">18.5. </span>Modeling a Donkey’s Weight<a class="headerlink" href="#modeling-a-donkeys-weight" title="Permalink to this headline">¶</a></h1>
-<p>We want to build a simple model for predicting the weight of a donkey. The model should be easy for a vet to implement in the field with only a hand calculator, and it should be easy to interpret for the vet.
-We also want the model to depend on the vet’s situation: whether they need to prescribe an antibiotic or an anesthetic. For brevity, we consider the case of prescribing an anesthetic; in the exercises, you have the chance to create a model for prescribing antibiotics.</p>
-<p>Our first step is to choose a loss function that reflects this situation.</p>
+<p>We want to build a simple model for predicting the weight of a donkey. The model should be easy for a vet to implement in the field with only a hand calculator. The model should also be easy to interpret.</p>
+<p>In the real world, we’ll also want the model to depend on the vet’s situation—for example, whether they’re prescribing an antibiotic or an anesthetic.
+For brevity, we’ll only consider the case of prescribing an anesthetic; in the exercises, you have the chance to create a model for prescribing antibiotics.</p>
+<p>Our first step is to choose a loss function for prescribing anesthetic.</p>
 <div class="section" id="a-loss-function-for-prescribing-anesthetics">
 <h2><span class="section-number">18.5.1. </span>A Loss Function for Prescribing Anesthetics<a class="headerlink" href="#a-loss-function-for-prescribing-anesthetics" title="Permalink to this headline">¶</a></h2>
-<p>An over estimate of a donkey’s weight when prescribing an anesthetic can have serious consequences. For this reason we don’t want symmetric loss.  That is, we want a function that has a greater loss for, say, an overestimate of 10% than an underestimate of 10%. We have created a loss function, <code class="docutils literal notranslate"><span class="pre">an_loss</span></code>, with this feature. The plot shows the asymmetry for the relative error: <span class="math notranslate nohighlight">\(100(y - \hat{y})/\hat{y}\)</span>, where <span class="math notranslate nohighlight">\(y\)</span> is the true value and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the prediction. Negative values reflect an overestimate.</p>
+<p>For anesthetics, overdosing can be much worse than underdosing.
+It’s not hard for a vet to see when a donkey has too little anesthetic (it’ll complain), so the vet can give the donkey a bit more.
+But, giving too much anesthetic can cause serious issues and could even be
+fatal.
+Because of this, we want an asymmetric loss function: it should have bigger
+losses for overestimating the weight compared to underestimating the weight.</p>
+<p>We’ve created a loss function <code class="docutils literal notranslate"><span class="pre">anes_loss(x)</span></code> with this in mind.
+The plot below shows the asymmetry for the relative error: <span class="math notranslate nohighlight">\(100(y - \hat{y})/\hat{y}\)</span>, where <span class="math notranslate nohighlight">\(y\)</span> is the true value and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the prediction. For this plot, -10 on the x-axis reflects overestimating the weight by 10%.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">an_loss</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">anes_loss</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Loss&#39;)
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">anes_loss</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Modified Quadratic Loss&#39;</span><span class="p">,</span>
+              <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">xlabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;relative error (%)&#39;</span><span class="p">)</span>
+<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;loss&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../../_images/donkey_model_5_1.svg" src="../../_images/donkey_model_5_1.svg" /></div>
 </div>
-<p>We will use this function when we fit models to the training data. To begin, let’s fit a simple linear model.</p>
+<div class="cell_output docutils container">
+<img alt="../../_images/donkey_model_5_0.svg" src="../../_images/donkey_model_5_0.svg" /></div>
+</div>
+<p>Next, let’s fit a simple linear model using this loss function.</p>
 </div>
 <div class="section" id="fitting-a-simple-linear-model">
 <h2><span class="section-number">18.5.2. </span>Fitting a Simple Linear Model<a class="headerlink" href="#fitting-a-simple-linear-model" title="Permalink to this headline">¶</a></h2>
 <p>We saw that girth has the highest correlation with weight among the donkey’s in our training set. So, we fit a model of the form:</p>
 <div class="math notranslate nohighlight">
 \[
-f_\theta (\textbf{x}) = \theta_0 + \theta_1 Girth
+f_{\theta}(x) = \theta_0 + \theta_1 \cdot \text{Girth}
 \]</div>
-<p>To find the best fitting <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>, we create the design matrix of girth and the constant, which we call <span class="math notranslate nohighlight">\(X\)</span>, and we create the <span class="math notranslate nohighlight">\(y\)</span> vector of weights.</p>
+<p>To find the best fit <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>, we’ll first
+create a design matrix <span class="math notranslate nohighlight">\( X \)</span> that has <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and an intercept term.
+We’ll also create the <span class="math notranslate nohighlight">\(y\)</span> vector of observed donkey weights.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">train_set</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">train_set</span><span class="p">[[</span><span class="s1">&#39;Girth&#39;</span><span class="p">]]</span>
-<span class="n">X_w1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="mi">1</span><span class="p">))])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We want to minimize the loss in estimating <span class="math notranslate nohighlight">\(y\)</span> with <span class="math notranslate nohighlight">\(\theta_0 + \theta_1 Girth\)</span> with respect to the parameters <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>.
-To do this we use the <code class="docutils literal notranslate"><span class="pre">minimize</span></code> method in the <code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code>. We create a wrapper function for <code class="docutils literal notranslate"><span class="pre">an_loss</span></code> that accepts our design matrix, <span class="math notranslate nohighlight">\(X\)</span>, parameter values, <span class="math notranslate nohighlight">\(\theta\)</span>s, and <span class="math notranslate nohighlight">\(y\)</span>, and constructs the relative error needed by <code class="docutils literal notranslate"><span class="pre">an_loss</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
-
-<span class="k">def</span> <span class="nf">an_loss_rel</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="n">yhat</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">an_loss</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">yhat</span><span class="p">)</span> <span class="o">/</span> <span class="n">yhat</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We’re now ready to find the best linear model for predicting weight from girth, using our anesthetic loss function.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">an_loss_rel</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_w1</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We extract the minimizing parameter values and create the predictions with:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta_est</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_w1</span> <span class="o">@</span> <span class="n">theta_est</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Let’s examine the errors in our predictions as a percentage of the predicted value.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resids</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span><span class="n">y_pred</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">resids</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection at 0x1097c7fd0&gt;
-</pre></div>
-</div>
-<img alt="../../_images/donkey_model_16_1.svg" src="../../_images/donkey_model_16_1.svg" /></div>
-</div>
-<p>With the simplest model, some of the predictions are off by 20 to 30 percent. Let’s see if a slightly more complicated model improves the predictions.</p>
-</div>
-<div class="section" id="fitting-a-multiple-linear-model">
-<h2><span class="section-number">18.5.3. </span>Fitting a Multiple Linear Model<a class="headerlink" href="#fitting-a-multiple-linear-model" title="Permalink to this headline">¶</a></h2>
-<p>We have three possible numeric explanatory variables, and we can fit all seven possible models formed by the various combinations of these features. We use <code class="docutils literal notranslate"><span class="pre">combinations</span></code> in the <code class="docutils literal notranslate"><span class="pre">itertools</span></code> library to construct these combinations.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
-
-<span class="n">models</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">response_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Height&#39;</span><span class="p">]</span>
-
-<span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_vars</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
-  <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">response_vars</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
-    <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">subset</span><span class="p">))</span>
-    
-<span class="n">models</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[&#39;Girth&#39;],
- [&#39;Length&#39;],
- [&#39;Height&#39;],
- [&#39;Girth&#39;, &#39;Length&#39;],
- [&#39;Girth&#39;, &#39;Height&#39;],
- [&#39;Length&#39;, &#39;Height&#39;],
- [&#39;Girth&#39;, &#39;Length&#39;, &#39;Height&#39;]]
-</pre></div>
-</div>
-</div>
-</div>
-<p>Looping over each combination of features, we find the parameter estimates that minimize the average error for each model.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">risk_mods</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">for</span> <span class="n">a_mod</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">train_set</span><span class="p">[</span><span class="n">a_mod</span><span class="p">]</span>
-    <span class="n">X_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="mi">1</span><span class="p">))])</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">an_loss_rel</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_1</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a_mod</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-    <span class="n">theta_est</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_1</span> <span class="o">@</span> <span class="n">theta_est</span>
-    <span class="n">risk_mods</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">an_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">))))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Below, we compare the average error, or risk, for these seven fitted models.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span> 
-    <span class="nb">print</span><span class="p">(</span><span class="n">models</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">risk_mods</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;Girth&#39;] 94.36269797875123
-[&#39;Length&#39;] 200.54900898899834
-[&#39;Height&#39;] 268.87904718045996
-[&#39;Girth&#39;, &#39;Length&#39;] 65.65383972158509
-[&#39;Girth&#39;, &#39;Height&#39;] 86.18257949276183
-[&#39;Length&#39;, &#39;Height&#39;] 151.14747194389452
-[&#39;Girth&#39;, &#39;Length&#39;, &#39;Height&#39;] 63.43690848121743
-</pre></div>
-</div>
-</div>
-</div>
-<p>As we stated earlier, the girth of the donkey is the single best predictor for weight. However, the combination of  girth and length has quite a bit smaller average loss than girth alone, and this particular two-variable model is nearly as good as the model that includes all three. Keeping in mind the desire for a simple model, we select the two-variable model over the three-variable.  But, the categorical variables may lead to an even better model.</p>
-</div>
-<div class="section" id="bringing-qualitative-features-into-the-model">
-<h2><span class="section-number">18.5.4. </span>Bringing Qualitative Features into the Model<a class="headerlink" href="#bringing-qualitative-features-into-the-model" title="Permalink to this headline">¶</a></h2>
-<p>In our exploratory analysis, we found that the box plots of weight for donkey’s body condition and age might contain useful information in predicting weight. We can use the categorical variables to adjust the constant (or “bias”) in our model for each category. To explain, recall that our current model includes girth and length:</p>
-<div class="math notranslate nohighlight">
-\[
-\theta_0 + \theta_1 Girth + \theta_2 Length
-\]</div>
-<p>If the age feature consists of three age categories, “under 2”, “2 to 5”, and “over 5”, then we create 0-1 features (that is, we use one-hot encoding), where the feature is 1 when a record belongs to a particular age category and 0 otherwise. We express this model as follows:</p>
-<div class="math notranslate nohighlight">
-\[
-\theta_0 + \theta_1 Girth + \theta_2 Length + \theta_3 Age\_Under\_2 + \theta_4 Age\_2\_to\_5,
-\]</div>
-<p>where <code class="docutils literal notranslate"><span class="pre">Age_Under_2</span></code> is 1 for a donkey under 2 and 0 otherwise, and, similarly, <code class="docutils literal notranslate"><span class="pre">Age_2_to_5</span></code> is 1 for a donkey between 2 and 5 years old and 0 otherwise. This model can be more clearly expressed as three linear models that are identical except for the size of the constant:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{align}
-(\theta_0 + \theta_3 ) + \theta_1 Girth + \theta_2 Length &amp; ~~~~~~~~~~\textrm{for a donkey under 2.}\\
-(\theta_0 + \theta_4 ) + \theta_1 Girth + \theta_2 Length &amp; ~~~~~~~~~~\textrm{for~a~donkey~between~2~and~4.}\\
-\theta_0  + \theta_1 Girth + \theta_2 Length &amp; ~~~~~~~~~~\textrm{for~a~donkey~over~5.}
-\end{align}
-\end{split}\]</div>
-<p>Notice that we did not include a dummy variable for those donkeys over 5 because they are determined when the other two dummies are both 0.</p>
-<p>Let’s examine which of the categorical variables most improves on our two-variable model. To do this, we first create dummy variables for the original body condition score, age, and sex features.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_wDummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span>
-<span class="n">train_wDummies</span> <span class="o">=</span> <span class="n">train_wDummies</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Height&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight&#39;</span><span class="p">,</span> 
-                          <span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_female&#39;</span><span class="p">],</span> 
-                         <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">train_wDummies</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">train_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">train_set</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
+<span class="n">X</span>
 </pre></div>
 </div>
 </div>
@@ -1567,10 +1439,317 @@ To do this we use the <code class="docutils literal notranslate"><span class="pr
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>intr</th>
+      <th>Girth</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>230</th>
+      <td>1</td>
+      <td>116</td>
+    </tr>
+    <tr>
+      <th>74</th>
+      <td>1</td>
+      <td>117</td>
+    </tr>
+    <tr>
+      <th>354</th>
+      <td>1</td>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>157</th>
+      <td>1</td>
+      <td>123</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>1</td>
+      <td>103</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>1</td>
+      <td>106</td>
+    </tr>
+  </tbody>
+</table>
+<p>433 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>Now, we want to find the <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span> that minimize <code class="docutils literal notranslate"><span class="pre">anes_loss</span></code>.
+To do this, we could use calculus as we did in
+<a class="reference internal" href="../15/linear_simple_fit.html#sec-linear-simple-fit"><span class="std std-numref">Section 15.2</span></a>.
+To make things simpler, this time we’ll instead use the
+<code class="docutils literal notranslate"><span class="pre">minimize</span></code> method from the <code class="docutils literal notranslate"><span class="pre">scipy</span></code> package, which uses an
+algorithm to find <span class="math notranslate nohighlight">\( \theta_0 \)</span> and <span class="math notranslate nohighlight">\( \theta_1 \)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+
+<span class="k">def</span> <span class="nf">training_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span> <span class="o">/</span> <span class="n">predicted</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">loss</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;After fitting:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;θ₀ = </span><span class="si">{</span><span class="n">theta_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">&gt;7.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;θ₁ = </span><span class="si">{</span><span class="n">theta_hat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">&gt;7.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After fitting:
+θ₀ = -218.51
+θ₁ =    3.16
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see how this simple model does.
+We’ll use the model to predict the donkey weights on our training set,
+then look at the residual plot.
+The plot below shows the model error as a percentage of the predicted value.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_hat</span>
+<span class="n">resids</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span> <span class="o">/</span> <span class="n">predicted</span>
+
+<span class="n">resid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;predicted weight&#39;</span><span class="p">:</span> <span class="n">predicted</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">:</span> <span class="n">resids</span><span class="p">})</span>
+<span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;predicted weight&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
+           <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/donkey_model_13_0.svg" src="../../_images/donkey_model_13_0.svg" /></div>
+</div>
+<p>With the simplest model, some of the predictions are off by 20 to 30 percent. Let’s see if a slightly more complicated model improves the predictions.</p>
+</div>
+<div class="section" id="fitting-a-multiple-linear-model">
+<h2><span class="section-number">18.5.3. </span>Fitting a Multiple Linear Model<a class="headerlink" href="#fitting-a-multiple-linear-model" title="Permalink to this headline">¶</a></h2>
+<p>Let’s incorporate the other numeric variables in our model.
+We have three numeric variables: <code class="docutils literal notranslate"><span class="pre">Girth</span></code>, <code class="docutils literal notranslate"><span class="pre">Length</span></code>, and <code class="docutils literal notranslate"><span class="pre">Height</span></code>.
+There are 7 total ways to combine these variables:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="n">numeric_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Height&#39;</span><span class="p">]</span>
+
+<span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+          <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">numeric_vars</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span>
+<span class="n">models</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[&#39;Girth&#39;],
+ [&#39;Length&#39;],
+ [&#39;Height&#39;],
+ [&#39;Girth&#39;, &#39;Length&#39;],
+ [&#39;Girth&#39;, &#39;Height&#39;],
+ [&#39;Length&#39;, &#39;Height&#39;],
+ [&#39;Girth&#39;, &#39;Length&#39;, &#39;Height&#39;]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ll fit one model for each of these variable combinations.
+Then, we can look at how well each model does on the training set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_error</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">train_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="p">]]</span>
+    <span class="n">theta_hat</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+    <span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_hat</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span><span class="o">/</span> <span class="n">predicted</span><span class="p">))</span>
+
+<span class="n">model_risks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">training_error</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>mean_training_error</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>[Girth]</td>
+      <td>94.36</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>[Length]</td>
+      <td>200.55</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>[Height]</td>
+      <td>268.88</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>[Girth, Length]</td>
+      <td>65.65</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>[Girth, Height]</td>
+      <td>86.18</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>[Length, Height]</td>
+      <td>151.15</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>[Girth, Length, Height]</td>
+      <td>63.44</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>As we stated earlier, the girth of the donkey is the single best predictor for weight. However, the combination of  girth and length has quite a bit smaller average loss than girth alone, and this particular two-variable model is nearly as good as the model that includes all three. Since we want a simple model, we select the two-variable model over the three-variable.</p>
+<p>Next, we’ll use feature engineering to incorporate categorical variables which will improve our model.</p>
+</div>
+<div class="section" id="bringing-qualitative-features-into-the-model">
+<h2><span class="section-number">18.5.4. </span>Bringing Qualitative Features into the Model<a class="headerlink" href="#bringing-qualitative-features-into-the-model" title="Permalink to this headline">¶</a></h2>
+<p>In our exploratory analysis, we found that the box plots of weight for donkey’s body condition and age could contain useful information in predicting weight.
+Since the body condition and age are categorical variables, we’ll
+use a one-hot encoding transform, as we explained in
+<a class="reference internal" href="../15/linear_feature_eng.html#sec-linear-feature-eng"><span class="std std-numref">Section 15.5</span></a>.</p>
+<p>Using a one-hot encoding lets the model adjust its predictions for each
+category.
+Our current model includes the numeric variables girth and length:</p>
+<div class="math notranslate nohighlight">
+\[
+f_{\theta}(x) = \theta_0 +
+    \theta_1 \cdot \text{Girth} +
+    \theta_2 \cdot \text{Length}
+\]</div>
+<p>Let’s say that the <code class="docutils literal notranslate"><span class="pre">Age</span></code> feature consists of three categories:
+“under 2”, “2 to 5”, and “over 5”.
+After applying a one-hot encoding, we’ll create 0-1 features for
+each category. This gives us the model:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+f_{\theta}(x) =
+    \theta_0
+    &amp; + \theta_1 \cdot \text{Girth }
+      + \theta_2 \cdot \text{Length } \\
+    &amp; + \theta_3 \cdot \text{Age&lt;2 }
+      + \theta_4 \cdot \text{Age2-5 }
+\end{aligned}
+\end{split}\]</div>
+<p>In this model,
+<code class="docutils literal notranslate"><span class="pre">Age&lt;2</span></code> is 1 for a donkey younger than 2 and 0 otherwise.
+Similarly, <code class="docutils literal notranslate"><span class="pre">Age2-5</span></code> is 1 for a donkey between 2 and 5 years old and 0 otherwise.</p>
+<p>We can think of this model as fitting three linear models that are
+identical except for the size of the constant, since the model
+is equivalent to:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+(\theta_0 + \theta_3 ) + \theta_1 Girth + \theta_2 Length
+  &amp; ~~~~~~~~~~\text{for a donkey under 2.}\\
+(\theta_0 + \theta_4 ) + \theta_1 Girth + \theta_2 Length
+  &amp; ~~~~~~~~~~\text{for a donkey between 2 and 4.}\\
+\theta_0  + \theta_1 Girth + \theta_2 Length
+  &amp; ~~~~~~~~~~\text{for a donkey over 5.}
+\end{align}
+\end{split}\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As we discussed in the previous section on one-hot encoding,
+the one-hot encoded variables are also called <em>dummy variables</em>.
+When we make dummy variables, we take out one of the variables to make our model interpretable.
+In this case, we didn’t include a dummy variable for donkeys older than 5.</p>
+</div>
+<p>Now, let’s apply a one-hot encoding to all three of our categorical variables
+(<code class="docutils literal notranslate"><span class="pre">BCS</span></code>, <code class="docutils literal notranslate"><span class="pre">Age</span></code>, <code class="docutils literal notranslate"><span class="pre">Sex</span></code>).
+We can then see which categorical variables improve on our
+previous two-variable model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_one_hot</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">train_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">]]</span>
+    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_female&#39;</span><span class="p">])</span>
+<span class="p">)</span>
+<span class="n">X_one_hot</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>intr</th>
       <th>Length</th>
       <th>Girth</th>
       <th>BCS_1.5</th>
-      <th>BCS_2.0</th>
       <th>...</th>
       <th>Age_&lt;2</th>
       <th>Age_&gt;20</th>
@@ -1581,9 +1760,9 @@ To do this we use the <code class="docutils literal notranslate"><span class="pr
   <tbody>
     <tr>
       <th>230</th>
+      <td>1</td>
       <td>101</td>
       <td>116</td>
-      <td>0</td>
       <td>0</td>
       <td>...</td>
       <td>0</td>
@@ -1593,9 +1772,9 @@ To do this we use the <code class="docutils literal notranslate"><span class="pr
     </tr>
     <tr>
       <th>74</th>
+      <td>1</td>
       <td>92</td>
       <td>117</td>
-      <td>0</td>
       <td>0</td>
       <td>...</td>
       <td>0</td>
@@ -1605,10 +1784,10 @@ To do this we use the <code class="docutils literal notranslate"><span class="pr
     </tr>
     <tr>
       <th>354</th>
+      <td>1</td>
       <td>103</td>
       <td>123</td>
       <td>0</td>
-      <td>0</td>
       <td>...</td>
       <td>0</td>
       <td>1</td>
@@ -1616,113 +1795,221 @@ To do this we use the <code class="docutils literal notranslate"><span class="pr
       <td>0</td>
     </tr>
     <tr>
-      <th>87</th>
-      <td>91</td>
-      <td>111</td>
-      <td>0</td>
-      <td>0</td>
+      <th>...</th>
       <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
     </tr>
     <tr>
-      <th>473</th>
-      <td>98</td>
+      <th>157</th>
+      <td>1</td>
+      <td>93</td>
       <td>123</td>
       <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>1</td>
+      <td>89</td>
+      <td>103</td>
+      <td>0</td>
+      <td>...</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>1</td>
+      <td>86</td>
+      <td>106</td>
       <td>0</td>
       <td>...</td>
       <td>0</td>
       <td>0</td>
-      <td>1</td>
+      <td>0</td>
       <td>0</td>
     </tr>
   </tbody>
 </table>
-<p>5 rows × 14 columns</p>
+<p>433 rows × 15 columns</p>
 </div></div></div>
 </div>
-<p>We dropped one level for each categorical variable. Since <code class="docutils literal notranslate"><span class="pre">BCS</span></code>, <code class="docutils literal notranslate"><span class="pre">Age</span></code>, and <code class="docutils literal notranslate"><span class="pre">Sex</span></code> have six, six, and three categories, respectively, and we drop one category for each variable, we have added 12 dummy variables to the design matrix for a total of 14 columns, including <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and <code class="docutils literal notranslate"><span class="pre">Length</span></code>.</p>
+<p>We dropped one level for each categorical variable.
+<code class="docutils literal notranslate"><span class="pre">BCS</span></code>, <code class="docutils literal notranslate"><span class="pre">Age</span></code>, and <code class="docutils literal notranslate"><span class="pre">Sex</span></code> have six, six, and three categories, respectively.
+Since we drop one category for each variable, we added 12 dummy variables to the design matrix for a total of 15 columns,
+including the intercept term <code class="docutils literal notranslate"><span class="pre">intr</span></code>, <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and <code class="docutils literal notranslate"><span class="pre">Length</span></code>.</p>
 <p>We fit the model that includes the dummies from all three categorical features, along with <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and <code class="docutils literal notranslate"><span class="pre">Length</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">train_wDummies</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">train_wDummies</span><span class="p">),</span> <span class="mi">1</span><span class="p">))])</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">an_loss_rel</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_1</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
-<span class="n">theta_est</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_1</span> <span class="o">@</span> <span class="n">theta_est</span>
-<span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">an_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">)))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X_one_hot</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X_one_hot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_one_hot</span> <span class="o">@</span> <span class="n">theta_hat</span>
+<span class="n">training_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training error: </span><span class="si">{</span><span class="n">training_error</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>51.47218713446053
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training error: 51.47
 </pre></div>
 </div>
 </div>
 </div>
-<p>According to the average error, the model is better. However, we want to examine the coefficients for the dummies to see if a simpler model might be just as effective. Below is a plot of the coefficients for each of the dummy variables.</p>
-<div class="cell tag_remove-input docutils container">
+<p>This model does better than the previous model with only <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and <code class="docutils literal notranslate"><span class="pre">Length</span></code>.
+Now, let’s try to make this model simpler while keeping its accuracy.
+To do this, we’ll look at the coefficients for each of the dummy variables,
+as shown in the plot below.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bcs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_2.0&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_2.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_3.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_4.0&#39;</span><span class="p">]</span>
+<span class="n">age_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Age_&lt;2&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_2-5&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_&gt;20&#39;</span><span class="p">]</span>
+<span class="n">sex_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Sex_gelding&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_stallion&#39;</span><span class="p">]</span>
+
+<span class="n">thetas</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;var&#39;</span><span class="p">:</span> <span class="n">X_one_hot</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;theta_hat&#39;</span><span class="p">:</span> <span class="n">theta_hat</span><span class="p">})</span>
+          <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">))</span>
+
+<span class="n">f1</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bcs_vars</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;theta_hat&#39;</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sex_vars</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;theta_hat&#39;</span><span class="p">)</span>
+<span class="n">f3</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">age_vars</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;theta_hat&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plots_in_row</span><span class="p">([</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">],</span>
+                   <span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span>
+                   <span class="n">shared_yaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">column_widths</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+
+<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;theta_hat&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">tickangle</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x1097d78e0&gt;
-</pre></div>
+<img alt="../../_images/donkey_model_31_0.svg" src="../../_images/donkey_model_31_0.svg" /></div>
 </div>
-<img alt="../../_images/donkey_model_33_1.svg" src="../../_images/donkey_model_33_1.svg" /></div>
-</div>
-<p>The coefficients confirm what we saw in the box plots. The coefficients for the sex of the donkey are close to zero, meaning that knowing the sex doesn’t really change the model. We also see that combining the age categories for donkeys over 5 will simplify the model without losing much. Since there are so few donkeys with a body condition score of 1.5, we are inclined to collapse these two categories as well.</p>
+<p>The coefficients confirm what we saw in the box plots. The coefficients for the sex of the donkey are close to zero, meaning that knowing the sex doesn’t really change the model. We also see that combining the age categories for donkeys over 5 will simplify the model without losing much. Since there are so few donkeys with a body condition score of 1.5, we are inclined to collapse that category as well.</p>
 <p>We update the design matrix in view of these findings and refit the simpler model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_wDummies</span><span class="p">[</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_wDummies</span><span class="p">[</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">train_wDummies</span><span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">]</span>
-<span class="n">train_wDummies</span> <span class="o">=</span> <span class="n">train_wDummies</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">,</span> 
-                                      <span class="s1">&#39;Age_10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_&gt;20&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;Sex_gelding&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_stallion&#39;</span><span class="p">],</span> 
-                         <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">combine_bcs</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="n">new_bcs_2</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">:</span> <span class="n">new_bcs_2</span><span class="p">})</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">combine_age_and_sex</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Age_10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_&gt;20&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;Sex_gelding&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_stallion&#39;</span><span class="p">])</span>
+
+<span class="n">X_one_hot_simple</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">X_one_hot</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_bcs</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_age_and_sex</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">train_wDummies</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">train_wDummies</span><span class="p">),</span> <span class="mi">1</span><span class="p">))])</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">theta</span><span class="p">:</span> <span class="n">an_loss_rel</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_1</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span>
-<span class="n">theta_est</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_1</span> <span class="o">@</span> <span class="n">theta_est</span>
-<span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">an_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X_one_hot_simple</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X_one_hot_simple</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_one_hot_simple</span> <span class="o">@</span> <span class="n">theta_hat</span>
+<span class="n">training_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training error: </span><span class="si">{</span><span class="n">training_error</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>53.20369817973034
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training error: 53.20
 </pre></div>
 </div>
 </div>
 </div>
 <p>The average error is close enough to that of the more complex model for us to settle on this simpler one. Let’s display the coefficients, and summarize the model.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name_vars</span> <span class="o">=</span> <span class="n">train_wDummies</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span>
-<span class="n">name_vars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name_vars</span><span class="p">,</span> <span class="s2">&quot;theta0&quot;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">):</span> 
-    <span class="nb">print</span><span class="p">(</span><span class="n">name_vars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">theta_est</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
+<div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Length 1.0125794089717444
-Girth 1.9745313548988621
-BCS_2.0 -6.326981546955034
-BCS_2.5 -5.111379574152733
-BCS_3.5 7.361721974135387
-BCS_4.0 20.045914981980044
-Age_2-5 -3.470734730105586
-Age_&lt;2 -6.487011994176165
-theta0 -175.25339314397604
-</pre></div>
-</div>
-</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var</th>
+      <th>theta_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>intr</td>
+      <td>-175.25</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Length</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Girth</td>
+      <td>1.97</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>BCS_2.0</td>
+      <td>-6.33</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>BCS_2.5</td>
+      <td>-5.11</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>BCS_3.5</td>
+      <td>7.36</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>BCS_4.0</td>
+      <td>20.05</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Age_2-5</td>
+      <td>-3.47</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Age_&lt;2</td>
+      <td>-6.49</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>Our model is roughly:</p>
 <div class="math notranslate nohighlight">
@@ -1738,15 +2025,14 @@ To do this, we need to prepare the test set. Our model uses the girth and length
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_test</span> <span class="o">=</span> <span class="n">test_set</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
 
-<span class="n">test_wDummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">test_set</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">])</span>
-<span class="n">test_wDummies</span><span class="p">[</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_wDummies</span><span class="p">[</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">test_wDummies</span><span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">]</span>
-
-<span class="n">test_wDummies</span> <span class="o">=</span> <span class="n">test_wDummies</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Height&#39;</span><span class="p">,</span> <span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">,</span> 
-                                    <span class="s1">&#39;BCS_1.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> 
-                        <span class="s1">&#39;Age_5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_&gt;20&#39;</span><span class="p">],</span> 
-                         <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="n">X_1_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">test_wDummies</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">test_wDummies</span><span class="p">),</span> <span class="mi">1</span><span class="p">))])</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">test_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">]]</span>
+    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_female&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_bcs</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_age_and_sex</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1754,28 +2040,62 @@ To do this, we need to prepare the test set. Our model uses the girth and length
 <p>We consolidated all of our manipulations of the design matrix to create the final version that we settled on in our modeling with the training set. Now we are ready to use the <span class="math notranslate nohighlight">\(\theta\)</span>s that we fitted with the training set to make weight predictions for those donkeys in the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">X_1_test</span> <span class="o">@</span> <span class="n">theta_est</span>
-<span class="n">error_rate_test</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred_test</span><span class="p">)</span><span class="o">/</span><span class="n">y_pred_test</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">X_test</span> <span class="o">@</span> <span class="n">theta_hat</span>
+<span class="n">test_set_error</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred_test</span><span class="p">)</span> <span class="o">/</span> <span class="n">y_pred_test</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell tag_remove-input docutils container">
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y_pred_test</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_set_error</span><span class="p">,</span>
+                 <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Test Set Predictions&#39;</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">xlabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;Predicted Weight&#39;</span><span class="p">)</span>
+<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;Relative Error (%)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Relative Error (%)&#39;)
+<img alt="../../_images/donkey_model_42_0.svg" src="../../_images/donkey_model_42_0.svg" /></div>
+</div>
+<p>Remember that positive relative error means underestimating weight.
+From the plot above, we see that
+all but six of the test set weights are within 10% of the predictions,
+and five of the errors that exceed 10% err on the side of underestimation.
+This makes sense given that our loss function penalized overestimation more. The scatter plot below shows the actual and predicted values.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">y_pred_test</span><span class="p">,</span> 
+                 <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Test Set Predictions with 10</span><span class="si">% E</span><span class="s2">rror Lines&quot;</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;0</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
+                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
+                         <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">66</span><span class="p">,</span> <span class="mi">220</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;10</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
+                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
+                         <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">54</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;-10</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
+                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
+                         <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)))</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">xlabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;Predicted Weight&quot;</span><span class="p">)</span>
+<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;Actual Weight&quot;</span><span class="p">)</span>
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../../_images/donkey_model_44_1.svg" src="../../_images/donkey_model_44_1.svg" /></div>
 </div>
-<p>All but six of the test set weights are within 10% of the predictions, and five of those that exceed 10% err on the side of underestimation, which makes sense given that our loss function penalized overestimation more. The scatter plot below shows the actual and predicted values.</p>
-<div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Actual Weight&#39;)
-</pre></div>
+<img alt="../../_images/donkey_model_44_0.svg" src="../../_images/donkey_model_44_0.svg" /></div>
 </div>
-<img alt="../../_images/donkey_model_46_1.svg" src="../../_images/donkey_model_46_1.svg" /></div>
-</div>
-<p>We take stock of the modeling exercise to conclude this chapter.</p>
+<p>We’ve accomplished our goal!
+We have a model that uses easy-to-get measurements, is simple enough to explain on a single page, and makes predictions within 10% of the actual donkey weight.
+In the next section, we’ll summarize our case study and reflect on our model.</p>
 </div>
 </div>
 
