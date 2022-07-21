@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>16.6. Basics of Prediction Intervals &#8212; Principles and Techniques of Data Science</title>
+    <title>16.5. Basics of Prediction Intervals &#8212; Principles and Techniques of Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -44,6 +44,8 @@
     <script src="../../_static/custom.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -53,8 +55,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="16.7. Probability Distribution for a Statistic" href="inf_pred_gen_prob.html" />
-    <link rel="prev" title="16.5. A Closer look at testing and intervals" href="inf_pred_gen_cautions.html" />
+    <link rel="next" title="16.6. A Closer look at testing and intervals" href="inf_pred_gen_cautions.html" />
+    <link rel="prev" title="16.4. Basics of Confidence Intervals" href="inf_pred_gen_CI.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -785,19 +787,19 @@
      16.4. Basics of Confidence Intervals
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="inf_pred_gen_cautions.html">
-     16.5. A Closer look at testing and intervals
-    </a>
-   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     16.6. Basics of Prediction Intervals
+     16.5. Basics of Prediction Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_cautions.html">
+     16.6. A Closer look at testing and intervals
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="inf_pred_gen_prob.html">
-     16.7. Probability Distribution for a Statistic
+     16.7. Probability, Inference, and Prediction
     </a>
    </li>
    <li class="toctree-l2">
@@ -1293,13 +1295,18 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-percentile-prediction-interval-for-bus-waiting-time">
-   16.6.1. Example: Percentile prediction interval for bus waiting time
+  <a class="reference internal nav-link" href="#example-predicting-bus-wait-times">
+   16.5.1. Example: Predicting Bus Wait Times
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-prediction-interval-for-the-weight-of-a-donkey">
-   16.6.2. Example: Prediction interval for the weight of a donkey
+  <a class="reference internal nav-link" href="#example-predicting-crab-size">
+   16.5.2. Example: Predicting Crab Size
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-prediction-the-weight-of-a-donkey">
+   16.5.3. Example: Prediction the weight of a donkey
   </a>
  </li>
 </ul>
@@ -1323,13 +1330,18 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-percentile-prediction-interval-for-bus-waiting-time">
-   16.6.1. Example: Percentile prediction interval for bus waiting time
+  <a class="reference internal nav-link" href="#example-predicting-bus-wait-times">
+   16.5.1. Example: Predicting Bus Wait Times
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-prediction-interval-for-the-weight-of-a-donkey">
-   16.6.2. Example: Prediction interval for the weight of a donkey
+  <a class="reference internal nav-link" href="#example-predicting-crab-size">
+   16.5.2. Example: Predicting Crab Size
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-prediction-the-weight-of-a-donkey">
+   16.5.3. Example: Prediction the weight of a donkey
   </a>
  </li>
 </ul>
@@ -1342,14 +1354,77 @@
               <div>
                 
   <div class="section" id="basics-of-prediction-intervals">
-<h1><span class="section-number">16.6. </span>Basics of Prediction Intervals<a class="headerlink" href="#basics-of-prediction-intervals" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="example-percentile-prediction-interval-for-bus-waiting-time">
-<h2><span class="section-number">16.6.1. </span>Example: Percentile prediction interval for bus waiting time<a class="headerlink" href="#example-percentile-prediction-interval-for-bus-waiting-time" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> models the lateness of a Seattle bus in arriving at a particular stop. We observed that the distribution was highly skewed and chose to estimate the typical lateness by the median, which was 0.74 minutes. An interval estimate is more informative than that median because it gives us a sense of the variation in times.
-Since we are using the median as an estimate, it is natural to provide a percentile-based interval.</p>
+<h1><span class="section-number">16.5. </span>Basics of Prediction Intervals<a class="headerlink" href="#basics-of-prediction-intervals" title="Permalink to this headline">¶</a></h1>
+<p>Confidence intervals convey the accuracy of an estimator, but sometimes we want the accuracy of a prediction for a future observation. For example, someone might say: half the time my bus arrives at most 3/4 of a minute late, but how bad might the wait get? As another example, the California Department of Fish and Game sets the minimum catch size for Dungeness crabs to 146 mm, and a recreational fishing company might wonder how much bigger than 146 mm their customer’s catch might be when they bring them fishing. And as yet another example, a vet estimates the weight of a donkey to be 169 kg based on its length and girth and uses this estimate to administer medication. For the donkey’s safety, the vet is keen to know how different the donkey’s real weight might be from this estimate.</p>
+<p>What these examples have in common is an interest in the prediction of a future observation, and the desire to quantify how far that future observation might be from this prediction. We are also using the observed statistic (the estimator) as the prediction in all of these scenarios. In the following sections, we will work through these examples to provide additional information about the size of the variation of observations from the predicted value.</p>
+<div class="section" id="example-predicting-bus-wait-times">
+<h2><span class="section-number">16.5.1. </span>Example: Predicting Bus Wait Times<a class="headerlink" href="#example-predicting-bus-wait-times" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> models the lateness of a Seattle bus in arriving at a particular stop. We observed that the distribution was highly skewed and chose to estimate the typical lateness by the median, which was 0.74 minutes. We reproduce the sample histogram from that chapter here.</p>
+<p>The prediction problem addresses how late might the bus be tomorrow. While the median is informative, it doesn’t provide information about the skewness of the distribution so from the median alone, we don’t know how bad the wait might get.
+The 75th percentile, or even the 95th percentile, would add useful information to consider. We compute them here:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;median:  </span><span class="si">{</span><span class="n">times</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> mins late&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;75th percentile:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">],</span> <span class="mf">75.0</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> mins late&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95th percentile:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">],</span> <span class="mf">95.0</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> mins late&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="example-prediction-interval-for-the-weight-of-a-donkey">
-<h2><span class="section-number">16.6.2. </span>Example: Prediction interval for the weight of a donkey<a class="headerlink" href="#example-prediction-interval-for-the-weight-of-a-donkey" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>median:  0.74 mins late
+75th percentile:  3.78 mins late
+95th percentile:  13.02 mins late
+</pre></div>
+</div>
+</div>
+</div>
+<p>From these statistics, we learn that while more than half the time the bus is not even a minute late, another quarter of the time it’s less than four minutes late, but it’s can easily happen that the bus is nearly a quarter of an hour late. These three values together help us make plans.</p>
+</div>
+<div class="section" id="example-predicting-crab-size">
+<h2><span class="section-number">16.5.2. </span>Example: Predicting Crab Size<a class="headerlink" href="#example-predicting-crab-size" title="Permalink to this headline">¶</a></h2>
+<p>Fishing for Dungeness crabs is highly regulated, including limiting the size of caught crabs in recreational fishing to 146 mm. To better understand the population of Dungeness crabs, the California Department of Fish and Game worked with commercial crab fishers from northern California and southern Oregon to capture, measure, and release crabs. Below is a histogram of the size a crab’s shell for the approximately 450 crabs caught.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/inf_pred_gen_PI_10_0.svg" src="../../_images/inf_pred_gen_PI_10_0.svg" /></div>
+</div>
+<p>We can summarize the distribution by the average shell size:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average crab shell width: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">crab_shell</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Average crab shell width: 146 mm
+</pre></div>
+</div>
+</div>
+</div>
+<p>The average, 146 mm, is a good prediction for the typical size of crab. However, it lacks information about how far an individual crab may vary from the average. The standard deviation can fill in this gap:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Standard deviation of crabs shell width: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">crab_shell</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Standard deviation of crabs shell width: 10 mm
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we see that the crabs routinely differ from the typical 146 mm by 10 to 20 mm. This information is helpful in developing policies around crab fishing to maintain the health of the crab population and to set expectations for the recreational fisher.</p>
+</div>
+<div class="section" id="example-prediction-the-weight-of-a-donkey">
+<h2><span class="section-number">16.5.3. </span>Example: Prediction the weight of a donkey<a class="headerlink" href="#example-prediction-the-weight-of-a-donkey" title="Permalink to this headline">¶</a></h2>
+<p>In <a class="reference internal" href="../18/donkey_intro.html#ch-donkey"><span class="std std-numref">Chapter 18</span></a>, a model was</p>
+<p>It doesn’t matter that the model is over parameterized. We are not interested in
+the fitted coefficients</p>
+<p>Nearly all (95%) of the actual weights are within 10% of the predicted weights</p>
+<p>Healthy donkey over 5 years of age</p>
+<div class="math notranslate nohighlight">
+\[predict\_weight ~=~ -175 ~+~ length ~+~ 2girth\]</div>
+<p>length 101, girth 116  prediction is</p>
 </div>
 </div>
 
@@ -1378,17 +1453,17 @@ Since we are using the median as an estimate, it is natural to provide a percent
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="inf_pred_gen_cautions.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="inf_pred_gen_CI.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">16.5. </span>A Closer look at testing and intervals</p>
+            <p class="prev-next-title"><span class="section-number">16.4. </span>Basics of Confidence Intervals</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="inf_pred_gen_prob.html" title="next page">
+    <a class='right-next' id="next-link" href="inf_pred_gen_cautions.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">16.7. </span>Probability Distribution for a Statistic</p>
+        <p class="prev-next-title"><span class="section-number">16.6. </span>A Closer look at testing and intervals</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
