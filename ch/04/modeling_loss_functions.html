@@ -1607,36 +1607,42 @@ We can see that the minimizing value <span class="math notranslate nohighlight">
 <span class="math notranslate nohighlight">\( \hat{\theta} = \text{mean} (\textbf{y})\)</span>.
 Again, this no mere coincidence; the mean of the data <em>always</em> produces the
 <span class="math notranslate nohighlight">\( \theta \)</span> that minimizes the MSE.
-We’ll show how this comes out using calculus. To minimize average loss, we
-take the derivative of the average loss with respect to <span class="math notranslate nohighlight">\( \theta \)</span>:</p>
+We’ll show how this comes out using calculus. To minimize average loss, we note that the MSE is a quadratic function of <span class="math notranslate nohighlight">\(\theta\)</span>, add and subtract <span class="math notranslate nohighlight">\(\bar{y}\)</span> in the loss function, expand the square as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 L(\theta, \textbf{y})
 &amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - \theta)^2\\
-\frac{\partial}{\partial \theta} L(\theta, \textbf{y})
-&amp;= \frac{1}{n} \sum_{i = 1}^{n} -2(y_i - \theta) \\
-&amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - \theta) \\
+&amp;= \frac{1}{n} \sum_{i = 1}^{n} [(y_i -  \bar{y}) + (\bar{y} - \theta)]^2 \\
+&amp;= \frac{1}{n} \sum_{i = 1}^{n} [(y_i -  \bar{y})^2 + 2(y_i - \bar{y})(\bar{y} - \theta) +(\bar{y} - \theta)^2]\\
 \end{aligned}
 \end{split}\]</div>
-<p>Then, we set the derivative to 0 and solve for <span class="math notranslate nohighlight">\(\hat \theta\)</span>:</p>
+<p>Next, we split the MSE into the sum of these three terms, and note that the middle term is 0, due to the simple property of the average: <span class="math notranslate nohighlight">\(\sum (y_i - \bar{y}) = 0\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-0 &amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - {\hat \theta}) \\
-{\hat \theta} &amp;= \frac{1}{n} \sum_{i = 1}^{n} y_i \\
-  &amp;= {\bar y} &amp; \text{(a shorthand for the mean)}
+&amp; \frac{1}{n} \sum_{i = 1}^{n} (y_i - \bar{y})^2 + \frac{1}{n} \sum_{i = 1}^{n}2(y_i - \bar{y})(\bar{y} - \theta) + \frac{1}{n}\sum_{i = 1}^{n}(\bar{y} - \theta)^2 \\
+ &amp;= \frac{1}{n} \sum_{i = 1}^{n} (y_i - \bar{y})^2 + 2(\bar{y} - \theta)\frac{1}{n} \sum_{i = 1}^{n}(y_i - \bar{y}) + \frac{1}{n}\sum_{i = 1}^{n}(\bar{y} - \theta)^2 \\
+&amp;= \frac{1}{n} \sum_{i = 1}^{n}  (y_i -  \bar{y})^2 + (\bar{y} - \theta)^2 \\
 \end{aligned}
 \end{split}\]</div>
-<p>Lo and behold, we see that there is a single value of <span class="math notranslate nohighlight">\(\theta\)</span> that gives the
-smallest possible MSE no matter what the dataset is. For the mean squared
-error, we have shown that <span class="math notranslate nohighlight">\({\hat \theta}= {\bar y}\)</span> <a class="footnote-reference brackets" href="#nd" id="id1">1</a>.</p>
+<p>On the remaining two terms, the first does not involve <span class="math notranslate nohighlight">\(\theta\)</span> and the second is always non-negative:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta, \textbf{y}) &amp;=
+\frac{1}{n} \sum_{i = 1}^{n}  (y_i -  \bar{y})^2 + \frac{1}{n} \sum_{i = 1}^{n}(\bar{y} - \theta)^2\\
+&amp;\geq \frac{1}{n} \sum_{i = 1}^{n} (y_i -  \bar{y})^2 
+\end{aligned}
+\end{split}\]</div>
+<p>This inequality shows us that the MSE is minimized when <span class="math notranslate nohighlight">\(\theta\)</span> is <span class="math notranslate nohighlight">\(\bar{y}\)</span>. That is, there is a single value of <span class="math notranslate nohighlight">\(\theta\)</span> that gives the
+smallest possible MSE for any dataset and that value is <span class="math notranslate nohighlight">\({\hat \theta}= {\bar y}\)</span>.</p>
 </div>
 <div class="section" id="choosing-loss-functions">
 <h2><span class="section-number">4.2.3. </span>Choosing Loss Functions<a class="headerlink" href="#choosing-loss-functions" title="Permalink to this headline">¶</a></h2>
 <p>Now that we’ve worked with loss functions, we can return to our original
 question: why would we choose the median, mean, or mode over the others? Since
-the median, mean, and mode minimize different loss functions <a class="footnote-reference brackets" href="#mode" id="id2">2</a>,
+the median, mean, and mode minimize different loss functions <a class="footnote-reference brackets" href="#mode" id="id1">1</a>,
 we can equivalently ask: what is the most appropriate loss function for our
 problem? To answer this question, we look at the context of our problem.</p>
 <p>Compared to the MAE, the MSE gives especially large loss values when the bus is
@@ -1659,11 +1665,7 @@ loss function. By thinking carefully about what we will use our model to do, we
 can pick a loss function that helps us make good decisions using data.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
-<dt class="label" id="nd"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>To be thorough, we would use a second derivative to confirm that
-<span class="math notranslate nohighlight">\(\bar{y}\)</span> is a minimizer.</p>
-</dd>
-<dt class="label" id="mode"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="mode"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>The mode minimizes a loss function called 0-1 loss. Although we
 haven’t covered this specific loss, the procedure is identical: pick
 the loss function, then find <span class="math notranslate nohighlight">\(\hat{\theta}\)</span> that minimizes the loss.</p>
