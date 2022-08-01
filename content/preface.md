@@ -1,12 +1,14 @@
-# To the Reader
+# To the Data 100 Student
 
-```{note}
-This book is currently undergoing major updates to match current iterations of
-Data 100. Thanks for your patience as we rearrange and fill in missing content.
-We have not removed content from the book entirely. Instead, we have moved
-content and marked sections as \[In Progress\] to denote new content that is
-actively being worked on.
-```
+:::{note}
+
+This book is currently undergoing major updates as we prepare it for
+publication. Thanks for your patience as we rearrange and fill in missing
+content. We have not removed content from the book entirely. Instead, we have
+moved content and marked sections as \[In Progress\] to denote new content that
+is actively being worked on.
+
+:::
 
 Data 100 aims to prepare you for real-world data analyses. In theory, drawing
 conclusions from data is simple – load a data table, make a plot, and fit a
