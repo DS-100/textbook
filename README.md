@@ -1,13 +1,14 @@
-# Principles and Techniques of Data Science
+# Learning Data Science
 
 **By [Sam Lau][sam], [Joey Gonzalez][joey], and [Deb Nolan][deb].**
 
-This is the textbook for
-[Data 100, the Principles and Techniques of Data Science course at UC Berkeley][ds100].
+Learning Data Science is an introductory textbook for data science that will
+be published with O'Reilly Media in 2023. It covers foundational skills in
+programming and statistics that encompass the data science lifecycle.
 
-Data 100 is the upper-division, semester-long data science course that follows
-[Data 8, the Foundations of Data Science][data8]. The reader's assumed
-background is detailed in the [About This Book][about] page.
+Learning Data Science was originally written as a textbook for [Data 100, the
+Principles and Techniques of Data Science course at UC Berkeley][ds100]. The
+reader's assumed background is detailed in the [About This Book][about] page.
 
 The contents of this book are licensed for free consumption under the following license:
 [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
