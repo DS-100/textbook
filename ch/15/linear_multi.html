@@ -741,18 +741,23 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="linear_case.html">
+     15.5. Example: Where is the Land of Opportunity?
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="linear_feature_eng.html">
-     15.5. Feature Engineering
+     15.6. Feature Engineering
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_summary.html">
-     15.6. Summary
+     15.7. Summary
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_exercises.html">
-     15.7. Exercises
+     15.8. Exercises
     </a>
    </li>
   </ul>
@@ -1237,8 +1242,13 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#predicting-upward-mobility-using-multiple-variables">
-   15.3.1. Predicting Upward Mobility Using Multiple Variables
+  <a class="reference internal nav-link" href="#fitting-the-multiple-linear-model">
+   15.3.1. Fitting the Multiple Linear Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-geometric-problem">
+   15.3.2. A Geometric Problem
   </a>
  </li>
 </ul>
@@ -1262,8 +1272,13 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#predicting-upward-mobility-using-multiple-variables">
-   15.3.1. Predicting Upward Mobility Using Multiple Variables
+  <a class="reference internal nav-link" href="#fitting-the-multiple-linear-model">
+   15.3.1. Fitting the Multiple Linear Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-geometric-problem">
+   15.3.2. A Geometric Problem
   </a>
  </li>
 </ul>
@@ -1361,318 +1376,127 @@ an <span class="math notranslate nohighlight">\( n \)</span>-dimensional column 
 is the model’s predictions for one observation.
 It’s easier to understand the design matrix through an example, so let’s
 return to the Opportunity data.</p>
-<div class="section" id="predicting-upward-mobility-using-multiple-variables">
-<h2><span class="section-number">15.3.1. </span>Predicting Upward Mobility Using Multiple Variables<a class="headerlink" href="#predicting-upward-mobility-using-multiple-variables" title="Permalink to this headline">¶</a></h2>
-<p>Before, we used the fraction of people with a ≤15 min commute time to predict
-the AUM for a commuting zone.
-Now, we’d like to use a combination of predictors.
-In his original analysis, Chetty created nine high-level
-predictor categories like segregation, income, and K-12 education.
-We’ll take one predictor from each of Chetty’s categories for a total of
-nine predictors, described in <a class="reference internal" href="#tbl-linear-predictors"><span class="std std-numref">Table 15.1</span></a>.</p>
-<table class="colwidths-auto table" id="tbl-linear-predictors">
-<caption><span class="caption-number">Table 15.1 </span><span class="caption-text">The nine variables we use to predict AUM</span><a class="headerlink" href="#tbl-linear-predictors" title="Permalink to this table">¶</a></caption>
-<thead>
-<tr class="row-odd"><th class="head"><p>Column name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>frac_traveltime_lt15</p></td>
-<td><p>Fraction of people with a ≤15 minute commute to work.</p></td>
-</tr>
-<tr class="row-odd"><td><p>gini</p></td>
-<td><p>Gini coefficient, an measure of wealth inequality. Values are between 0 and 1, where small values mean wealth is evenly distributed and large values mean more inequality.</p></td>
-</tr>
-<tr class="row-even"><td><p>dropout_r</p></td>
-<td><p>High school dropout rate.</p></td>
-</tr>
-<tr class="row-odd"><td><p>rel_tot</p></td>
-<td><p>Fraction of people who self-reported as religious.</p></td>
-</tr>
-<tr class="row-even"><td><p>cs_fam_wkidsinglemom</p></td>
-<td><p>Fraction of children with a single mother.</p></td>
-</tr>
-<tr class="row-odd"><td><p>taxrate</p></td>
-<td><p>Local tax rate.</p></td>
-</tr>
-<tr class="row-even"><td><p>gradrate_r</p></td>
-<td><p>College graduation rate.</p></td>
-</tr>
-<tr class="row-odd"><td><p>frac_worked1416</p></td>
-<td><p>Fraction of teenagers who are working.</p></td>
-</tr>
-<tr class="row-even"><td><p>cs_born_foreign</p></td>
-<td><p>Fraction of people born outside the US.</p></td>
-</tr>
-</tbody>
-</table>
-<p>Our original dataframe has around 40 predictors:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cz</th>
-      <th>czname</th>
-      <th>stateabbrv</th>
-      <th>aum</th>
-      <th>...</th>
-      <th>cs_fam_wkidsinglemom</th>
-      <th>cs_divorced</th>
-      <th>cs_married</th>
-      <th>incgrowth0010</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>100.0</td>
-      <td>Johnson City</td>
-      <td>TN</td>
-      <td>38.39</td>
-      <td>...</td>
-      <td>0.19</td>
-      <td>0.11</td>
-      <td>0.60</td>
-      <td>-2.28e-03</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>200.0</td>
-      <td>Morristown</td>
-      <td>TN</td>
-      <td>37.78</td>
-      <td>...</td>
-      <td>0.19</td>
-      <td>0.12</td>
-      <td>0.61</td>
-      <td>-2.15e-03</td>
-    </tr>
-  </tbody>
-</table>
-<p>2 rows × 43 columns</p>
-</div></div></div>
-</div>
-<p>We’ll subset out the design matrix into a DataFrame <code class="docutils literal notranslate"><span class="pre">X</span></code> and
-the column of outcomes into a Series <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
-<div class="cell tag_hide-cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;gini&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;dropout_r&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;rel_tot&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;cs_fam_wkidsinglemom&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;taxrate&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;gradrate_r&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;frac_worked1416&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;cs_born_foreign&#39;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">predictors</span><span class="p">]</span>
-    <span class="c1"># Some predictors are missing; we&#39;ll drop them for simplicity</span>
-    <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># Move intercept column to appear first</span>
-    <span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]]</span>
-<span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;aum&#39;</span><span class="p">]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;X: </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> matrix&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;y: </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> vector&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>X: (479, 10) matrix
-y: (479,) vector
-</pre></div>
-</div>
-</div>
-</div>
-<p>Let’s look at <code class="docutils literal notranslate"><span class="pre">X</span></code>, a dataframe that we’re using as our design matrix.
-It has 479 observations and 9 predictors plus an intercept column:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>intr</th>
-      <th>frac_traveltime_lt15</th>
-      <th>gini</th>
-      <th>dropout_r</th>
-      <th>...</th>
-      <th>taxrate</th>
-      <th>gradrate_r</th>
-      <th>frac_worked1416</th>
-      <th>cs_born_foreign</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0.33</td>
-      <td>0.47</td>
-      <td>-1.53e-02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-2.43e-03</td>
-      <td>3.75e-03</td>
-      <td>1.18e-02</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0.28</td>
-      <td>0.43</td>
-      <td>-2.35e-02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-1.01e-01</td>
-      <td>4.78e-03</td>
-      <td>2.31e-02</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>0.36</td>
-      <td>0.44</td>
-      <td>-4.63e-03</td>
-      <td>...</td>
-      <td>0.01</td>
-      <td>1.11e-01</td>
-      <td>2.89e-03</td>
-      <td>7.08e-03</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>476</th>
-      <td>1</td>
-      <td>0.45</td>
-      <td>0.36</td>
-      <td>7.07e-03</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-4.30e-02</td>
-      <td>4.33e-03</td>
-      <td>1.12e-01</td>
-    </tr>
-    <tr>
-      <th>477</th>
-      <td>1</td>
-      <td>0.65</td>
-      <td>0.36</td>
-      <td>-1.53e-02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-4.94e-02</td>
-      <td>4.30e-03</td>
-      <td>2.33e-02</td>
-    </tr>
-    <tr>
-      <th>478</th>
-      <td>1</td>
-      <td>0.47</td>
-      <td>0.44</td>
-      <td>2.61e-03</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-2.70e-01</td>
-      <td>5.46e-03</td>
-      <td>3.69e-02</td>
-    </tr>
-  </tbody>
-</table>
-<p>479 rows × 10 columns</p>
-</div></div></div>
-</div>
-<p>Notice that our design matrix is a subset of our original dataframe—we just
-selected specific variables we want to use for prediction.
-Each row of our design matrix corresponds to an observation in our original
-data, and each column corresponds to a predictor variable, as depicted in
-<a class="reference internal" href="#fig-design-matrix"><span class="std std-numref">Figure 15.1</span></a>.</p>
-<div class="figure align-default" id="fig-design-matrix">
-<img alt="../../_images/design-matrix.svg" src="../../_images/design-matrix.svg" /><p class="caption"><span class="caption-number">Fig. 15.1 </span><span class="caption-text">Each row and column of <span class="math notranslate nohighlight">\(X\)</span> represent an observation and a feature.</span><a class="headerlink" href="#fig-design-matrix" title="Permalink to this image">¶</a></p>
-</div>
-<p>One technicality: the design matrix is defined as a mathematical matrix,
-not a dataframe, and a matrix doesn’t include the column or row labels that the
-<code class="docutils literal notranslate"><span class="pre">X</span></code> dataframe has.
-But, we usually don’t have to worry about converting <code class="docutils literal notranslate"><span class="pre">X</span></code> into a matrix
-since most Python libraries for modeling treat dataframes as if
-they were matrices.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Once again, we’ll point out that people from different backgrounds use
-different terminology.
-For example, we say that each row in the design matrix <span class="math notranslate nohighlight">\(X\)</span> is an observation
-and each column is a variable.
-This is more common among people with backgrounds in statistics.
-Others say that each column of the design matrix represents a <em>feature</em>.
-Also, we say that our overall process of fitting and interpreting models
-is called <em>modeling</em>, while others call it <em>machine learning</em>.</p>
-</div>
 <p>Now that we have our data prepared for modeling, in the next section we’ll
 fit our model by finding the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss.</p>
+<div class="section" id="fitting-the-multiple-linear-model">
+<span id="sec-linear-multi-fit"></span><h2><span class="section-number">15.3.1. </span>Fitting the Multiple Linear Model<a class="headerlink" href="#fitting-the-multiple-linear-model" title="Permalink to this headline">¶</a></h2>
+<p>For a <span class="math notranslate nohighlight">\( n \times (p + 1) \)</span> design matrix <span class="math notranslate nohighlight">\( X \)</span>, a <span class="math notranslate nohighlight">\( n \)</span>-dimensional
+column vector of outcomes <span class="math notranslate nohighlight">\( y \)</span>, and a <span class="math notranslate nohighlight">\( (p + 1) \)</span>-dimensional column
+vector of model parameters <span class="math notranslate nohighlight">\( \theta \)</span>, we assume that:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+y = X \theta + \epsilon
+\end{aligned}
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\( \epsilon \)</span> is a <span class="math notranslate nohighlight">\( n \)</span>-dimensional column vector that represents the
+sampling error.
+We define the multiple linear model as:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+f_{\theta}(X) = X \theta
+\end{aligned}
+\]</div>
+<p>Similar to the simple linear model, we’ll fit <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> using
+the squared loss function.
+We want to find the model parameters <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimize the
+mean squared loss:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+L(\theta, X, y)
+ &amp;= \frac{1}{n} \left | y - f_{\theta}(X) \right|^2
+\end{aligned}
+\]</div>
+<p>Here, we’re using the notation <span class="math notranslate nohighlight">\( |v|^2 \)</span> for a vector <span class="math notranslate nohighlight">\( v \)</span> as a
+shorthand for the sum of each vector element squared <a class="footnote-reference brackets" href="#l2" id="id1">1</a>:
+<span class="math notranslate nohighlight">\( |v|^2 = \sum_i v_i^2 \)</span> .</p>
+<p>In this section, we’ll fit our model by figuring out what the
+minimizing <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is.
+One idea is to use calculus as we did for the simple linear model.
+However, this approach needs knowledge of vector calculus that we won’t
+cover in this book.
+Instead, we’ll use a geometric argument.</p>
+</div>
+<div class="section" id="a-geometric-problem">
+<h2><span class="section-number">15.3.2. </span>A Geometric Problem<a class="headerlink" href="#a-geometric-problem" title="Permalink to this headline">¶</a></h2>
+<p>Our goal is the find the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss
+function—we want to make <span class="math notranslate nohighlight">\( L(\theta, X, y) \)</span> as small as possible
+for a given <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( y \)</span>.
+The key insight is that we can restate this goal in a geometric way.
+Remember: the model predictions <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> and the true outcomes
+<span class="math notranslate nohighlight">\( y \)</span> are both vectors.
+We can treat vectors as points—for example, we can plot
+the vector <span class="math notranslate nohighlight">\( [ 2, 3 ] \)</span> at <span class="math notranslate nohighlight">\( x = 2, y = 3 \)</span> in 2D space.
+Then, minimizing <span class="math notranslate nohighlight">\( L(\theta, X, y) \)</span> is equivalent to finding
+<span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that makes <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as close as possible to
+<span class="math notranslate nohighlight">\( y \)</span> when we plot them as points.
+As depicted in <a class="reference internal" href="linear_multi_fit.html#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a>, different values of
+<span class="math notranslate nohighlight">\( \theta \)</span> give different predictions <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points).
+Then, <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is the vector of parameters that put
+<span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as close to <span class="math notranslate nohighlight">\( y \)</span> (filled point) as possible.</p>
+<div class="figure align-default" id="fig-geom-2d">
+<a class="reference internal image-reference" href="../../_images/geom-2d.svg"><img alt="../../_images/geom-2d.svg" src="../../_images/geom-2d.svg" width="250px" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.3 </span><span class="caption-text">A plot showing different values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points) and
+the outcome vector <span class="math notranslate nohighlight">\( y \)</span> (filled point).</span><a class="headerlink" href="#fig-geom-2d" title="Permalink to this image">¶</a></p>
+</div>
+<p>Next, we’ll look at the possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span>.
+In <a class="reference internal" href="linear_multi_fit.html#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a>, we showed a few possible
+<span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span>.
+Instead of just plotting a few possible points, we can
+plot <em>all</em> possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> by varying <span class="math notranslate nohighlight">\( \theta \)</span>.
+This results in a subspace of possible <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> values, as shown in
+<a class="reference internal" href="linear_multi_fit.html#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a>.</p>
+<div class="figure align-default" id="fig-geom-span">
+<a class="reference internal image-reference" href="../../_images/geom-span.svg"><img alt="../../_images/geom-span.svg" src="../../_images/geom-span.svg" width="250px" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.4 </span><span class="caption-text">A plot showing all possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as a line.</span><a class="headerlink" href="#fig-geom-span" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the above <a class="reference internal" href="linear_multi_fit.html#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a>, we drew the set of
+possible <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> values as a line.
+Since our model is <span class="math notranslate nohighlight">\( f_{\theta}(X) = X \theta \)</span>, from a property of
+matrix-vector multiplication we know that <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> is a linear
+combination of the columns of <span class="math notranslate nohighlight">\( X \)</span>, which we also call <span class="math notranslate nohighlight">\( \text{span}(X) \)</span>.
+Now, we need to figure out which point within <span class="math notranslate nohighlight">\( \text{span}(X) \)</span> lies the
+closest to <span class="math notranslate nohighlight">\( y \)</span>.</p>
+<p>As <a class="reference internal" href="linear_multi_fit.html#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a> suggests, the closest point to <span class="math notranslate nohighlight">\( y \)</span>
+is the point where the error <span class="math notranslate nohighlight">\( \epsilon = y - f_{\theta}(X) \)</span> is perpendicular
+to <span class="math notranslate nohighlight">\( \text{span}(X) \)</span>. We’ll leave the complete proof as an exercise.
+With this final fact, we can solve for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+f_\hat{\theta}(X) + \epsilon &amp;= y \\
+X \hat{\theta} + \epsilon &amp;= y \\
+X^\top X \hat{\theta} + X^\top \epsilon &amp;= X^\top y
+    &amp; (\text{left-multiply both sides by } X^\top) \\
+X^\top X \hat{\theta} &amp;= X^\top y
+    &amp; (X^\top \epsilon = 0 \text{ since } \epsilon \perp \text{span}(X)) \\
+\hat{\theta} &amp;= (X^\top X)^{-1} X^\top y
+\end{aligned}
+\end{split}\]</div>
+<p>With this derivation done, we can now write a short function to
+fit the multiple linear model using <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( y \)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that deriving <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> for the multiple linear model also gives
+us <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> for the simple linear model too. If we set
+<span class="math notranslate nohighlight">\( X \)</span> to contain the intercept column and one column of features, using the
+formula for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> gives us the intercept and slope of the best-fit
+line.</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="l2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><span class="math notranslate nohighlight">\( |v| \)</span> is also called the <span class="math notranslate nohighlight">\( \ell_2 \)</span> norm of a
+vector <span class="math notranslate nohighlight">\( v \)</span>.</p>
+</dd>
+</dl>
 </div>
 </div>
 
