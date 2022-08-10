@@ -1242,13 +1242,8 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#fitting-the-multiple-linear-model">
-   15.3.1. Fitting the Multiple Linear Model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-geometric-problem">
-   15.3.2. A Geometric Problem
+  <a class="reference internal nav-link" href="#example-a-multiple-linear-model-for-air-quality">
+   15.3.1. Example: A Multiple Linear Model for Air Quality
   </a>
  </li>
 </ul>
@@ -1272,13 +1267,8 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#fitting-the-multiple-linear-model">
-   15.3.1. Fitting the Multiple Linear Model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-geometric-problem">
-   15.3.2. A Geometric Problem
+  <a class="reference internal nav-link" href="#example-a-multiple-linear-model-for-air-quality">
+   15.3.1. Example: A Multiple Linear Model for Air Quality
   </a>
  </li>
 </ul>
@@ -1292,211 +1282,201 @@
                 
   <div class="section" id="multiple-linear-model">
 <span id="sec-linear-multi"></span><h1><span class="section-number">15.3. </span>Multiple Linear Model<a class="headerlink" href="#multiple-linear-model" title="Permalink to this headline">¶</a></h1>
-<p>So far, we’ve used a single predictor variable <span class="math notranslate nohighlight">\( x \)</span> to predict the outcome
-<span class="math notranslate nohighlight">\( y \)</span>.
-Now, we’ll introduce the <em>multiple linear model</em>, a linear model that uses
-multiple predictors to predict <span class="math notranslate nohighlight">\( y \)</span>.
+<p>So far in this chapter, we’ve used a single input variable <span class="math notranslate nohighlight">\(x\)</span> to predict the outcome
+<span class="math notranslate nohighlight">\(y\)</span>.
+Now, we introduce the <em>multiple linear model</em> that uses
+multiple features to predict (or describe or explain) <span class="math notranslate nohighlight">\(y\)</span>.
 This is useful because having multiple predictors can
-improve our model’s fit to the data and improve accuracy.
-After defining the multiple linear model, we’ll use it to predict AUM using
-a combination of variables.</p>
-<p>If we have multiple predictors, we say that <span class="math notranslate nohighlight">\( x \)</span> is a <span class="math notranslate nohighlight">\( p \)</span>-dimensional
-column vector
-<span class="math notranslate nohighlight">\( x = [ x_1, x_2, \ldots, x_p ] \)</span>. Then, for a given <span class="math notranslate nohighlight">\( x \)</span> the
-outcome <span class="math notranslate nohighlight">\( y \)</span> depends on a linear combination of <span class="math notranslate nohighlight">\( x_i \)</span>:</p>
+improve our model’s fit to the data and improve prediction.
+After defining the multiple linear model, we use it to improve the single-variable linear model from the previous section that relates the EPA and PurpleAir sensor measurements.</p>
+<p>We start by generalizing from a simple linear model to one that includes a second explanatory variable, called <span class="math notranslate nohighlight">\(v\)</span>. This model is linear in both <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(v\)</span>; meaning that for a pair of values for <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(v\)</span>, we can describe, explain, or predict <span class="math notranslate nohighlight">\(y\)</span> by the linear combination:</p>
 <div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-y = \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p + \epsilon
-\end{aligned}
-\]</div>
-<p>Similar to the simple linear model, our
-multiple linear model <span class="math notranslate nohighlight">\( f_{\theta}(x) \)</span> predicts <span class="math notranslate nohighlight">\( y \)</span> for a given <span class="math notranslate nohighlight">\( x \)</span>:</p>
+\[ y \approx \theta_0 + \theta_1 x + \theta_2 v.\]</div>
+<p>Figure X gives a representation of this model that you might find helpful.
+Notice that for a particular value of <span class="math notranslate nohighlight">\(v\)</span>, say <span class="math notranslate nohighlight">\(v^\star\)</span>, we can re-express the above equation as</p>
 <div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-f_{\theta}(x) = \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p
-\end{aligned}
-\]</div>
-<p>We can simplify this notation if we add an intercept term to <span class="math notranslate nohighlight">\( x \)</span> so that
-<span class="math notranslate nohighlight">\( x = [ 1, x_1, x_2, \ldots, x_p ] \)</span>.
-Since we also write our model parameters as a column vector
-<span class="math notranslate nohighlight">\( \theta = [ \theta_0, \theta_1, \ldots, \theta_p ] \)</span>, we can
-use the definition of the dot product to
-write our model as:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-f_{\theta}(x) &amp;= \theta_0 + \theta_1 x_1 + \ldots + \theta_p x_p \\
-&amp;= \theta \cdot x \\
-\end{aligned}
-\end{split}\]</div>
-<p>As a final simplification, we’ll use matrix notation to show how our
-models works on our entire dataset.
-Before, we said that a single observation is <span class="math notranslate nohighlight">\( (x, y) \)</span>, where <span class="math notranslate nohighlight">\( x \)</span> is a
-vector of predictor variables and <span class="math notranslate nohighlight">\( y \)</span> is the scalar outcome.
-Now, we’ll say that <span class="math notranslate nohighlight">\( X \)</span> is a matrix. Each row of <span class="math notranslate nohighlight">\( X \)</span> has the predictors
-for a single observation.
-We’ll also say that <span class="math notranslate nohighlight">\( y \)</span> is a vector (instead of scalar) with the outcomes
-for each observation:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-X = 
-\begin{bmatrix}
-1 &amp; x_{11} &amp; x_{12} &amp; \cdots &amp; x_{1p} \\
-1 &amp; x_{21} &amp; x_{22} &amp; \cdots &amp; x_{2p} \\
-  &amp;        &amp; \vdots &amp;        &amp;        \\
-1 &amp; x_{n1} &amp; x_{n2} &amp; \cdots &amp; x_{np} \\
-\end{bmatrix}
-&amp; &amp;
-y =  
-\begin{bmatrix}
-y_1 \\
-y_2 \\
-\vdots \\
-y_n
-\end{bmatrix}
-\end{aligned}
-\end{split}\]</div>
-<p>We call <span class="math notranslate nohighlight">\( X \)</span> the <em>design matrix</em>.
-It’s a <span class="math notranslate nohighlight">\( n \times (p + 1) \)</span> matrix (remember that we added an extra dimension
-for the intercept term).
-Now, we can write the predictions for the entire dataset using
-matrix multiplication:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-f_{\theta}(x) &amp;= X \theta
-\end{aligned}
-\]</div>
-<p><span class="math notranslate nohighlight">\( X \)</span> is an <span class="math notranslate nohighlight">\( n \times (p + 1) \)</span> matrix and <span class="math notranslate nohighlight">\( \theta \)</span> is a <span class="math notranslate nohighlight">\( (p + 1) \)</span>-dimensional column vector.
-This means that <span class="math notranslate nohighlight">\( X \theta \)</span> is
-an <span class="math notranslate nohighlight">\( n \)</span>-dimensional column vector. Each item in the vector
-is the model’s predictions for one observation.
-It’s easier to understand the design matrix through an example, so let’s
-return to the Opportunity data.</p>
-<p>Now that we have our data prepared for modeling, in the next section we’ll
-fit our model by finding the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss.</p>
-<div class="section" id="fitting-the-multiple-linear-model">
-<span id="sec-linear-multi-fit"></span><h2><span class="section-number">15.3.1. </span>Fitting the Multiple Linear Model<a class="headerlink" href="#fitting-the-multiple-linear-model" title="Permalink to this headline">¶</a></h2>
-<p>For a <span class="math notranslate nohighlight">\( n \times (p + 1) \)</span> design matrix <span class="math notranslate nohighlight">\( X \)</span>, a <span class="math notranslate nohighlight">\( n \)</span>-dimensional
-column vector of outcomes <span class="math notranslate nohighlight">\( y \)</span>, and a <span class="math notranslate nohighlight">\( (p + 1) \)</span>-dimensional column
-vector of model parameters <span class="math notranslate nohighlight">\( \theta \)</span>, we assume that:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-y = X \theta + \epsilon
-\end{aligned}
-\]</div>
-<p>Here, <span class="math notranslate nohighlight">\( \epsilon \)</span> is a <span class="math notranslate nohighlight">\( n \)</span>-dimensional column vector that represents the
-sampling error.
-We define the multiple linear model as:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-f_{\theta}(X) = X \theta
-\end{aligned}
-\]</div>
-<p>Similar to the simple linear model, we’ll fit <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> using
-the squared loss function.
-We want to find the model parameters <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimize the
-mean squared loss:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-L(\theta, X, y)
- &amp;= \frac{1}{n} \left | y - f_{\theta}(X) \right|^2
-\end{aligned}
-\]</div>
-<p>Here, we’re using the notation <span class="math notranslate nohighlight">\( |v|^2 \)</span> for a vector <span class="math notranslate nohighlight">\( v \)</span> as a
-shorthand for the sum of each vector element squared <a class="footnote-reference brackets" href="#l2" id="id1">1</a>:
-<span class="math notranslate nohighlight">\( |v|^2 = \sum_i v_i^2 \)</span> .</p>
-<p>In this section, we’ll fit our model by figuring out what the
-minimizing <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is.
-One idea is to use calculus as we did for the simple linear model.
-However, this approach needs knowledge of vector calculus that we won’t
-cover in this book.
-Instead, we’ll use a geometric argument.</p>
+\[ y \approx (\theta_0 + \theta_2 v^\star) ~+~ \theta_1 x.\]</div>
+<p>In other words, when we hold <span class="math notranslate nohighlight">\(v\)</span> constant at <span class="math notranslate nohighlight">\(v^*\)</span>, we have a simple linear relation between <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> with slope <span class="math notranslate nohighlight">\(\theta_1\)</span> and intercept <span class="math notranslate nohighlight">\(\theta_0 + \theta_2 v^\star\)</span>.
+For a different value of <span class="math notranslate nohighlight">\(v\)</span>, say <span class="math notranslate nohighlight">\(v^\dagger\)</span>,  we again have a simple linear relationship between <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>. The slope for <span class="math notranslate nohighlight">\(x\)</span> remains the same and the only change is the intercept, which is now <span class="math notranslate nohighlight">\(\theta_0 + \theta_2v^\dagger\)</span>.</p>
+<div class="figure align-default" id="fig-mlr">
+<a class="reference internal image-reference" href="ch/15/figures/scatterplotMLR.png"><img alt="ch/15/figures/scatterplotMLR.png" src="ch/15/figures/scatterplotMLR.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.3 </span><span class="caption-text">A scatter plot of <span class="math notranslate nohighlight">\((x_i, y_i)\)</span> pairs, the three lines fitted to these points correspond to three different values of <span class="math notranslate nohighlight">\(v\)</span>. The intercept is different for each value of <span class="math notranslate nohighlight">\(v\)</span>, but the slope remains the same.</span><a class="headerlink" href="#fig-mlr" title="Permalink to this image">¶</a></p>
 </div>
-<div class="section" id="a-geometric-problem">
-<h2><span class="section-number">15.3.2. </span>A Geometric Problem<a class="headerlink" href="#a-geometric-problem" title="Permalink to this headline">¶</a></h2>
-<p>Our goal is the find the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss
-function—we want to make <span class="math notranslate nohighlight">\( L(\theta, X, y) \)</span> as small as possible
-for a given <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( y \)</span>.
-The key insight is that we can restate this goal in a geometric way.
-Remember: the model predictions <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> and the true outcomes
-<span class="math notranslate nohighlight">\( y \)</span> are both vectors.
-We can treat vectors as points—for example, we can plot
-the vector <span class="math notranslate nohighlight">\( [ 2, 3 ] \)</span> at <span class="math notranslate nohighlight">\( x = 2, y = 3 \)</span> in 2D space.
-Then, minimizing <span class="math notranslate nohighlight">\( L(\theta, X, y) \)</span> is equivalent to finding
-<span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that makes <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as close as possible to
-<span class="math notranslate nohighlight">\( y \)</span> when we plot them as points.
-As depicted in <a class="reference internal" href="linear_multi_fit.html#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a>, different values of
-<span class="math notranslate nohighlight">\( \theta \)</span> give different predictions <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points).
-Then, <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is the vector of parameters that put
-<span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as close to <span class="math notranslate nohighlight">\( y \)</span> (filled point) as possible.</p>
-<div class="figure align-default" id="fig-geom-2d">
-<a class="reference internal image-reference" href="../../_images/geom-2d.svg"><img alt="../../_images/geom-2d.svg" src="../../_images/geom-2d.svg" width="250px" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.3 </span><span class="caption-text">A plot showing different values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points) and
-the outcome vector <span class="math notranslate nohighlight">\( y \)</span> (filled point).</span><a class="headerlink" href="#fig-geom-2d" title="Permalink to this image">¶</a></p>
-</div>
-<p>Next, we’ll look at the possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span>.
-In <a class="reference internal" href="linear_multi_fit.html#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a>, we showed a few possible
-<span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span>.
-Instead of just plotting a few possible points, we can
-plot <em>all</em> possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> by varying <span class="math notranslate nohighlight">\( \theta \)</span>.
-This results in a subspace of possible <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> values, as shown in
-<a class="reference internal" href="linear_multi_fit.html#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a>.</p>
-<div class="figure align-default" id="fig-geom-span">
-<a class="reference internal image-reference" href="../../_images/geom-span.svg"><img alt="../../_images/geom-span.svg" src="../../_images/geom-span.svg" width="250px" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.4 </span><span class="caption-text">A plot showing all possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as a line.</span><a class="headerlink" href="#fig-geom-span" title="Permalink to this image">¶</a></p>
-</div>
-<p>In the above <a class="reference internal" href="linear_multi_fit.html#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a>, we drew the set of
-possible <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> values as a line.
-Since our model is <span class="math notranslate nohighlight">\( f_{\theta}(X) = X \theta \)</span>, from a property of
-matrix-vector multiplication we know that <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> is a linear
-combination of the columns of <span class="math notranslate nohighlight">\( X \)</span>, which we also call <span class="math notranslate nohighlight">\( \text{span}(X) \)</span>.
-Now, we need to figure out which point within <span class="math notranslate nohighlight">\( \text{span}(X) \)</span> lies the
-closest to <span class="math notranslate nohighlight">\( y \)</span>.</p>
-<p>As <a class="reference internal" href="linear_multi_fit.html#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a> suggests, the closest point to <span class="math notranslate nohighlight">\( y \)</span>
-is the point where the error <span class="math notranslate nohighlight">\( \epsilon = y - f_{\theta}(X) \)</span> is perpendicular
-to <span class="math notranslate nohighlight">\( \text{span}(X) \)</span>. We’ll leave the complete proof as an exercise.
-With this final fact, we can solve for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>:</p>
+<p>With multiple linear regression, we interpret the coefficient <span class="math notranslate nohighlight">\(\theta_1\)</span> of <span class="math notranslate nohighlight">\(x\)</span> in the presence of the other variables in the model. <a class="reference internal" href="#fig-mlr"><span class="std std-numref">Figure 15.3</span></a> indicates that given the values of the other variables in the model (that’s just <span class="math notranslate nohighlight">\(v\)</span> in this case),  an increase of 1 unit in <span class="math notranslate nohighlight">\(x\)</span> corresponds to a <span class="math notranslate nohighlight">\(\theta_1\)</span> change in <span class="math notranslate nohighlight">\(y\)</span>, on average. One way to visualize this kind of multiple linear relationship is to create facets of scatter plots of <span class="math notranslate nohighlight">\((x, y)\)</span> where in each plot the values of <span class="math notranslate nohighlight">\(v\)</span> are roughly the same. We make such a scatter plot for the air quality measurements next, and provide examples of additional visualizations and statistics to examine when fitting a multiple linear model.</p>
+<div class="section" id="example-a-multiple-linear-model-for-air-quality">
+<h2><span class="section-number">15.3.1. </span>Example: A Multiple Linear Model for Air Quality<a class="headerlink" href="#example-a-multiple-linear-model-for-air-quality" title="Permalink to this headline">¶</a></h2>
+<p>The scientists studying the air quality monitors (see <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>) were looking for an improved model that incorporated weather factors. That is, they were interested in whether or not
+multiple explanatory variables, rather than just one, would make better estimates of <span class="math notranslate nohighlight">\(y\)</span>.
+One weather variable that they examined was a daily measurement for relative humidity.  Let’s consider a two-variable linear model to explain the PurpleAir measurements from the EPA sensor measurements and relative humidity. This model has the following form:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-f_\hat{\theta}(X) + \epsilon &amp;= y \\
-X \hat{\theta} + \epsilon &amp;= y \\
-X^\top X \hat{\theta} + X^\top \epsilon &amp;= X^\top y
-    &amp; (\text{left-multiply both sides by } X^\top) \\
-X^\top X \hat{\theta} &amp;= X^\top y
-    &amp; (X^\top \epsilon = 0 \text{ since } \epsilon \perp \text{span}(X)) \\
-\hat{\theta} &amp;= (X^\top X)^{-1} X^\top y
-\end{aligned}
-\end{split}\]</div>
-<p>With this derivation done, we can now write a short function to
-fit the multiple linear model using <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( y \)</span>.</p>
+\[ PA \approx \theta_0 + \theta_1 AQ + \theta_2 RH,\]</div>
+<p>where <span class="math notranslate nohighlight">\(PA\)</span>, <span class="math notranslate nohighlight">\(AQ\)</span>, and <span class="math notranslate nohighlight">\(RH\)</span> refer to the variables: PurpleAir average daily measurement, the EPA Air Quality measurement, and relative humidity, respectively.</p>
+<p>For a first step, we make a facet plot to compare the relationship between the two air quality measurements for fixed values of humidity. To do this, we transform relative humidity to a categorical variable so each facet consists of the subset of observations with the same level of category.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rh_cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">GA</span><span class="p">[</span><span class="s1">&#39;rh&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">43</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">78</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&lt;50&#39;</span><span class="p">,</span><span class="s1">&#39;50-55&#39;</span><span class="p">,</span><span class="s1">&#39;55-60&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;60&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Notice that deriving <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> for the multiple linear model also gives
-us <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> for the simple linear model too. If we set
-<span class="math notranslate nohighlight">\( X \)</span> to contain the intercept column and one column of features, using the
-formula for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> gives us the intercept and slope of the best-fit
-line.</p>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="l2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><span class="math notranslate nohighlight">\( |v| \)</span> is also called the <span class="math notranslate nohighlight">\( \ell_2 \)</span> norm of a
-vector <span class="math notranslate nohighlight">\( v \)</span>.</p>
-</dd>
-</dl>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_multi_10_0.svg" src="../../_images/linear_multi_10_0.svg" /></div>
+</div>
+<p>These four plots show a roughly linear relationship between the two sources of air quality measurements. And, the slopes appear to be similar. It’s difficult to see if the relative humidity affects the intercept much.</p>
+<p>We also want to examine the pairwise scatter plots between the three features. When we consider linear relationships in multiple regression settings, these relationships may not be uncovered in pairwise plots, but we still need to check them.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]],</span> 
+                 <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+    
+<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">diagonal_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_multi_12_0.svg" src="../../_images/linear_multi_12_0.svg" /></div>
+</div>
+<p>Indeed, the relationship between humidity and air quality does not appear particularly strong. Another pairwise measure we should examine are the correlations between features.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pm25pa</th>
+      <th>pm25aqs</th>
+      <th>rh</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>pm25pa</th>
+      <td>1.00</td>
+      <td>0.95</td>
+      <td>-0.06</td>
+    </tr>
+    <tr>
+      <th>pm25aqs</th>
+      <td>0.95</td>
+      <td>1.00</td>
+      <td>-0.24</td>
+    </tr>
+    <tr>
+      <th>rh</th>
+      <td>-0.06</td>
+      <td>-0.24</td>
+      <td>1.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>One small surprise is that relative humidity has a small negative correlation with the EPA measurement of air quality. This suggests that humidity might be helpful in the model.</p>
+<p>In the next section, we describe how to fit a multiple linear model. But for now, we use the functionality in <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code>  to fit the model without explanation as to how it’s done:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]]</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]]</span>
+
+<span class="n">model2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The coefficients of the multiple linear model, including their units, are:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> ppm, </span><span class="se">\n</span><span class="s2">EPA coefficient: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ppm/ppm,  </span><span class="se">\n</span><span class="s2">Humidity coefficient: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ppm/percent&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: -15.8 ppm, 
+EPA coefficient: 2.25 ppm/ppm,  
+Humidity coefficient: 0.21 ppm/percent
+</pre></div>
+</div>
+</div>
+</div>
+<p>The coefficient for humidity in the model adjusts the air quality prediction by 0.21 ppm for each percentage point of relative humidity.</p>
+<p>Lastly, to check the quality of the fit, we make residual plots of the predicted values, the <span class="math notranslate nohighlight">\(\hat{y}_i\)</span>, and the errors, <span class="math notranslate nohighlight">\(y_i - \hat{y}_i\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X2</span><span class="p">)</span>
+<span class="n">errors2</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#fig = px.scatter(y = errors2, x=predicted2,</span>
+<span class="c1">#                 labels={&quot;y&quot;: &quot;error&quot;, &quot;x&quot;: &quot;predicted values&quot;},</span>
+<span class="c1">#                 width=350, height=250)</span>
+
+<span class="c1">#fig.update_yaxes(range=[-12, 12])</span>
+
+<span class="c1">#fig.add_hline(0, line_color=&#39;black&#39;, line_width=2, line_dash=&#39;dash&#39;, opacity=1)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predicted2</span><span class="p">,</span> <span class="n">errors2</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;predicted&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x129fd50a0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/linear_multi_23_1.svg" src="../../_images/linear_multi_23_1.svg" /></div>
+</div>
+<p>The residual plot appears to have no clear patterns, which indicates that the model fits pretty well. Next, we compute the standard deviation of the residuals.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pm25pa    1.82
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>The residual standard deviation has been reduced from <span class="math notranslate nohighlight">\(2.8\)</span> in the one variable model to <span class="math notranslate nohighlight">\(1.8\)</span>, which is a good size reduction.</p>
+<p>Correlation doesn’t capture the strength of a linear model with more than one explanatory variable. Instead, we adapt the Average Square Error to give us a sense of model fit. In the next section, we describe how to fit the general multiple linear model and look at variations of the ASE to assess model fit.</p>
 </div>
 </div>
 

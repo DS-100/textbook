@@ -1246,16 +1246,6 @@
    15.4.1. A Geometric Problem
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#predicting-aum-using-multiple-variables">
-   15.4.2. Predicting AUM Using Multiple Variables
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interpreting-linear-models">
-   15.4.3. Interpreting Linear Models
-  </a>
- </li>
 </ul>
 
             </nav>
@@ -1281,16 +1271,6 @@
    15.4.1. A Geometric Problem
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#predicting-aum-using-multiple-variables">
-   15.4.2. Predicting AUM Using Multiple Variables
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interpreting-linear-models">
-   15.4.3. Interpreting Linear Models
-  </a>
- </li>
 </ul>
 
                         </nav>
@@ -1302,47 +1282,76 @@
                 
   <div class="section" id="fitting-the-multiple-linear-model">
 <span id="sec-linear-multi-fit"></span><h1><span class="section-number">15.4. </span>Fitting the Multiple Linear Model<a class="headerlink" href="#fitting-the-multiple-linear-model" title="Permalink to this headline">¶</a></h1>
-<p>For a <span class="math notranslate nohighlight">\( n \times (p + 1) \)</span> design matrix <span class="math notranslate nohighlight">\( X \)</span>, a <span class="math notranslate nohighlight">\( n \)</span>-dimensional
-column vector of outcomes <span class="math notranslate nohighlight">\( y \)</span>, and a <span class="math notranslate nohighlight">\( (p + 1) \)</span>-dimensional column
-vector of model parameters <span class="math notranslate nohighlight">\( \theta \)</span>, we assume that:</p>
+<p>In the previous section we considered the case of two explanatory variables by using one variable called <span class="math notranslate nohighlight">\(x\)</span> and the other <span class="math notranslate nohighlight">\(v\)</span>. Now we want to generalize the approach to <span class="math notranslate nohighlight">\(p\)</span> explanatory variables. Our approach of choosing new letters to represent additional variables fails us. Instead, we use a more formal approach that represents multiple predictors as a matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\textbf{X} = 
+\begin{bmatrix}
+1 &amp; x_{1,1} &amp; x_{1,2} &amp; \cdots &amp; x_{1,p} \\
+1 &amp; x_{2,1} &amp; x_{2,2} &amp; \cdots &amp; x_{2,p} \\
+  &amp;        &amp; \vdots &amp;        &amp;        \\
+1 &amp; x_{n,1} &amp; x_{n,2} &amp; \cdots &amp; x_{n,p} \\
+\end{bmatrix}
+\end{aligned}
+\end{split}\]</div>
+<p>We call <span class="math notranslate nohighlight">\(\textbf{X}\)</span> the <em>design matrix</em>. (Notice that <span class="math notranslate nohighlight">\(\textbf{X}\)</span> is an <span class="math notranslate nohighlight">\( n \times (p + 1)\)</span> matrix.) Each column of <span class="math notranslate nohighlight">\(\textbf{X}\)</span> represents a variable, and each row represents an observation. That is, <span class="math notranslate nohighlight">\(x_{i,j}\)</span> is the measurement taken on observation <span class="math notranslate nohighlight">\(i\)</span> of variable <span class="math notranslate nohighlight">\(j\)</span>.
+For example, for a given observation, say, the second row in <span class="math notranslate nohighlight">\(\textbf{X}\)</span>, we represent the outcome <span class="math notranslate nohighlight">\(y_2\)</span> by the linear approximation:</p>
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
-y = X \theta + \epsilon
+y_2 \approx  \theta_0 + \theta_1 x_{2,1} + \ldots + \theta_p x_{2,p} 
 \end{aligned}
 \]</div>
-<p>Here, <span class="math notranslate nohighlight">\( \epsilon \)</span> is a <span class="math notranslate nohighlight">\( n \)</span>-dimensional column vector that represents the
-sampling error.
-We define the multiple linear model as:</p>
+<p>Similar to the simple linear model, our
+multiple linear model predicts <span class="math notranslate nohighlight">\(y_2\)</span> for the given values <span class="math notranslate nohighlight">\([x_{2,1}, \ldots,x_{2,p}]\)</span>.
+But now, we have a collection of predictor (explanatory) variables.</p>
+<p>We can write the model parameters as a <span class="math notranslate nohighlight">\(p+1\)</span> column vector
+<span class="math notranslate nohighlight">\({\boldsymbol{\theta}} = [ \theta_0, \theta_1, \ldots, \theta_p ]^t\)</span>.
+We can also represent <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> as a column vector of the outcomes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbf{y} =  
+\begin{bmatrix}
+y_1 \\
+y_2 \\
+\vdots \\
+y_n
+\end{bmatrix}
+\end{aligned}
+\end{split}\]</div>
+<p>Putting these notational definitions together, we can write the vector of predictions for the entire dataset using matrix multiplication:</p>
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
-f_{\theta}(X) = X \theta
+\hat{\mathbf{y}} &amp;= {\textbf{X}} {\boldsymbol{\theta}}
 \end{aligned}
 \]</div>
-<p>Similar to the simple linear model, we’ll fit <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> using
-the squared loss function.
-We want to find the model parameters <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimize the
-mean squared loss:</p>
+<p>Checking the dimensions of <span class="math notranslate nohighlight">\(\textbf{X}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> confirms that <span class="math notranslate nohighlight">\(\hat{\mathbf{y}}\)</span> is an <span class="math notranslate nohighlight">\( n \)</span>-dimensional column vector.
+Each item in this vector is the model’s prediction for one observation.
+Additionally, the errors in using <span class="math notranslate nohighlight">\(\hat{\mathbf{y}}\)</span> to predict <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> can be expressed as the <span class="math notranslate nohighlight">\(n\)</span>-dimensional column vector:</p>
 <div class="math notranslate nohighlight">
-\[
+\[ \mathbf{e} = \mathbf{y}  - \hat{\mathbf{y}}.\]</div>
+<p>Matrix notation will help us fit the multiple linear model.</p>
+<p>Similar to the simple linear model, we fit <span class="math notranslate nohighlight">\({\textbf{X}} {\boldsymbol{\theta}}\)</span> using squared loss.
+That is, we want to find the model parameters <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\theta}}\)</span> that minimize the average squared loss:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
 \begin{aligned}
-L(\theta, X, y)
- &amp;= \frac{1}{n} \left | y - f_{\theta}(X) \right|^2
+L({\boldsymbol{\theta}}, \textbf{X}, {\mathbf{y}})
+ &amp;= \frac{1}{n} \sum_i [y_i - (\theta_0 + \theta_1 x_{i,1} + \cdots + \theta_p x_{i,p})]^2 \\
+ &amp;= \frac{1}{n}  \lVert \mathbf{y} - {\textbf{X}} {\boldsymbol{\theta}} \rVert^2
 \end{aligned}
-\]</div>
-<p>Here, we’re using the notation <span class="math notranslate nohighlight">\( |v|^2 \)</span> for a vector <span class="math notranslate nohighlight">\( v \)</span> as a
-shorthand for the sum of each vector element squared <a class="footnote-reference brackets" href="#l2" id="id1">1</a>:
-<span class="math notranslate nohighlight">\( |v|^2 = \sum_i v_i^2 \)</span> .</p>
-<p>In this section, we’ll fit our model by figuring out what the
-minimizing <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is.
-One idea is to use calculus as we did for the simple linear model.
-However, this approach needs knowledge of vector calculus that we won’t
-cover in this book.
-Instead, we’ll use a geometric argument.</p>
+\end{split}\]</div>
+<p>Here, we use the notation <span class="math notranslate nohighlight">\( \lVert \mathbf{v} \rVert^2 \)</span> for a vector <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> as a
+shorthand for the sum of each vector element squared <a class="footnote-reference brackets" href="#ell2" id="id1">1</a>:
+<span class="math notranslate nohighlight">\(\lVert \mathbf{v} \rVert^2 = \sum_i v_i^2\)</span>.</p>
+<p>We can fit our model using calculus as we did for the simple linear model.
+However, this approach can get cumbersome, and instead we use a geometric argument that is more intuitive and easily leads to useful properties of the design matrix, errors, and predicted values.</p>
 <div class="section" id="a-geometric-problem">
 <h2><span class="section-number">15.4.1. </span>A Geometric Problem<a class="headerlink" href="#a-geometric-problem" title="Permalink to this headline">¶</a></h2>
-<p>Our goal is the find the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss
+<p>Again, our goal is the find the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss
 function—we want to make <span class="math notranslate nohighlight">\( L(\theta, X, y) \)</span> as small as possible
 for a given <span class="math notranslate nohighlight">\( X \)</span> and <span class="math notranslate nohighlight">\( y \)</span>.
 The key insight is that we can restate this goal in a geometric way.
@@ -1353,34 +1362,34 @@ the vector <span class="math notranslate nohighlight">\( [ 2, 3 ] \)</span> at <
 Then, minimizing <span class="math notranslate nohighlight">\( L(\theta, X, y) \)</span> is equivalent to finding
 <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that makes <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as close as possible to
 <span class="math notranslate nohighlight">\( y \)</span> when we plot them as points.
-As depicted in <a class="reference internal" href="#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a>, different values of
+As depicted in <a class="reference internal" href="#fig-geom-2d"><span class="std std-numref">Figure 15.4</span></a>, different values of
 <span class="math notranslate nohighlight">\( \theta \)</span> give different predictions <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points).
 Then, <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> is the vector of parameters that put
 <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as close to <span class="math notranslate nohighlight">\( y \)</span> (filled point) as possible.</p>
 <div class="figure align-default" id="fig-geom-2d">
 <a class="reference internal image-reference" href="../../_images/geom-2d.svg"><img alt="../../_images/geom-2d.svg" src="../../_images/geom-2d.svg" width="250px" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.5 </span><span class="caption-text">A plot showing different values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points) and
+<p class="caption"><span class="caption-number">Fig. 15.4 </span><span class="caption-text">A plot showing different values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> (hollow points) and
 the outcome vector <span class="math notranslate nohighlight">\( y \)</span> (filled point).</span><a class="headerlink" href="#fig-geom-2d" title="Permalink to this image">¶</a></p>
 </div>
 <p>Next, we’ll look at the possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span>.
-In <a class="reference internal" href="#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a>, we showed a few possible
+In <a class="reference internal" href="#fig-geom-2d"><span class="std std-numref">Figure 15.4</span></a>, we showed a few possible
 <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span>.
 Instead of just plotting a few possible points, we can
 plot <em>all</em> possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> by varying <span class="math notranslate nohighlight">\( \theta \)</span>.
 This results in a subspace of possible <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> values, as shown in
-<a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a>.</p>
+<a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.5</span></a>.</p>
 <div class="figure align-default" id="fig-geom-span">
 <a class="reference internal image-reference" href="../../_images/geom-span.svg"><img alt="../../_images/geom-span.svg" src="../../_images/geom-span.svg" width="250px" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.6 </span><span class="caption-text">A plot showing all possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as a line.</span><a class="headerlink" href="#fig-geom-span" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 15.5 </span><span class="caption-text">A plot showing all possible values of <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> as a line.</span><a class="headerlink" href="#fig-geom-span" title="Permalink to this image">¶</a></p>
 </div>
-<p>In the above <a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a>, we drew the set of
+<p>In the above <a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.5</span></a>, we drew the set of
 possible <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> values as a line.
 Since our model is <span class="math notranslate nohighlight">\( f_{\theta}(X) = X \theta \)</span>, from a property of
 matrix-vector multiplication we know that <span class="math notranslate nohighlight">\( f_{\theta}(X) \)</span> is a linear
 combination of the columns of <span class="math notranslate nohighlight">\( X \)</span>, which we also call <span class="math notranslate nohighlight">\( \text{span}(X) \)</span>.
 Now, we need to figure out which point within <span class="math notranslate nohighlight">\( \text{span}(X) \)</span> lies the
 closest to <span class="math notranslate nohighlight">\( y \)</span>.</p>
-<p>As <a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a> suggests, the closest point to <span class="math notranslate nohighlight">\( y \)</span>
+<p>As <a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.5</span></a> suggests, the closest point to <span class="math notranslate nohighlight">\( y \)</span>
 is the point where the error <span class="math notranslate nohighlight">\( \epsilon = y - f_{\theta}(X) \)</span> is perpendicular
 to <span class="math notranslate nohighlight">\( \text{span}(X) \)</span>. We’ll leave the complete proof as an exercise.
 With this final fact, we can solve for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span>:</p>
@@ -1411,335 +1420,10 @@ us <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> for the 
 <span class="math notranslate nohighlight">\( X \)</span> to contain the intercept column and one column of features, using the
 formula for <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> gives us the intercept and slope of the best-fit
 line.</p>
-</div>
-<div class="section" id="predicting-aum-using-multiple-variables">
-<h2><span class="section-number">15.4.2. </span>Predicting AUM Using Multiple Variables<a class="headerlink" href="#predicting-aum-using-multiple-variables" title="Permalink to this headline">¶</a></h2>
-<p>Now, let’s fit a multiple linear model.
-Recall that we’re using nine variables to predict AUM, the upward mobility for
-a commuting zone.
-We have our design matrix in a dataframe <code class="docutils literal notranslate"><span class="pre">X</span></code> and a vector of outcomes in <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>intr</th>
-      <th>frac_traveltime_lt15</th>
-      <th>gini</th>
-      <th>dropout_r</th>
-      <th>...</th>
-      <th>taxrate</th>
-      <th>gradrate_r</th>
-      <th>frac_worked1416</th>
-      <th>cs_born_foreign</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0.33</td>
-      <td>0.47</td>
-      <td>-0.02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-2.43e-03</td>
-      <td>3.75e-03</td>
-      <td>0.01</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0.28</td>
-      <td>0.43</td>
-      <td>-0.02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-1.01e-01</td>
-      <td>4.78e-03</td>
-      <td>0.02</td>
-    </tr>
-  </tbody>
-</table>
-<p>2 rows × 10 columns</p>
-</div></div></div>
-</div>
-<p>As with the simple linear model, we’ll split our data into a training set and
-a test set.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="s1"> rows&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s1"> rows&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training set size: 383 rows
-    Test set size: 96 rows
-</pre></div>
-</div>
-</div>
-</div>
-<p>Let’s fit the model on the training set:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can now find the MSE on the test set:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span> <span class="o">@</span> <span class="n">theta</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">pred</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_test</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.3667257699216195
-</pre></div>
-</div>
-</div>
-</div>
-<p>To understand this error, we can start by comparing the multiple linear model
-with the simple linear model from before that only used the fraction with
-≤15 min commute time.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta_simple</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]],</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">mse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta_simple</span><span class="p">,</span> <span class="n">X_test</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]]))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12.925251956432646
-</pre></div>
-</div>
-</div>
-</div>
-<p>We see that the multiple linear model has about 60% lower error than the simple
-linear model—a big improvement!
-Let’s make residual plots for both multiple and simple linear models.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
-<span class="n">resid</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">-</span> <span class="n">pred</span>
-
-<span class="n">pred_simple</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta_simple</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]])</span>
-<span class="n">resid_simple</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">-</span> <span class="n">pred_simple</span>
-
-<span class="n">all_resid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;multi&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">:</span> <span class="n">pred</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">:</span> <span class="n">resid</span><span class="p">}),</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">:</span> <span class="n">pred_simple</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">:</span> <span class="n">resid_simple</span><span class="p">}),</span>
-<span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">all_resid</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;resid&#39;</span><span class="p">,</span> <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">,</span>
-                 <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_multi_fit_35_0.svg" src="../../_images/linear_multi_fit_35_0.svg" /></div>
-</div>
-<p>We can see that the multiple linear model’s residuals are much closer to 0
-in general, which helps to explain why the MSE is also lower.</p>
-</div>
-<div class="section" id="interpreting-linear-models">
-<h2><span class="section-number">15.4.3. </span>Interpreting Linear Models<a class="headerlink" href="#interpreting-linear-models" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have a linear model, we want to know what it says about our data.
-After fitting our simple linear model, we have:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-f_{\theta}(x) = 31.1 + 29.3 x
-\end{aligned}
-\]</div>
-<p>Here, <span class="math notranslate nohighlight">\( x \)</span> is the fraction of people with ≤15 min commute times.
-We interpret this model as saying: if we take two commuting zones, and one of
-them has 10% more people with a ≤15 min commute time, then the model predicts
-that the AUM will be 2.93 points higher on average.
-Simply put, commuting zones that have short commute times generally have
-more economic mobility or opportunity.</p>
-<p>We need to be careful about this interpretation.
-It’s tempting to say that increasing <span class="math notranslate nohighlight">\( x \)</span> by 0.1 <em>causes</em> or <em>is associated
-with</em> an AUM that’s 2.93 points higher.
-But, our model doesn’t let us make this conclusion.
-Our model really only lets us draw conclusions about average differences
-between commuting zones.
-It doesn’t let us draw conclusions about what would happen if we took a
-single commuting zone and increased its <span class="math notranslate nohighlight">\( x \)</span>.</p>
-<p>We can try interpreting the the intercept term too.
-We might say that the model predicts that commuting zones where <span class="math notranslate nohighlight">\( x = 0 \)</span> have
-an average AUM of 31.1.
-However, there aren’t actually any data points in our data that have <span class="math notranslate nohighlight">\( x = 0 \)</span>,
-so this interpretation isn’t useful.
-In general, we have to check the meaning of the intercept on a case-by-case
-basis.</p>
-<p>Now, let’s look at our multiple linear model.
-Since our model has 9 predictor variables, we’ll show the model coefficients in
-a table rather than writing out the long model equation:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]</span>
-<span class="n">display_df</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;coeff&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(),</span> <span class="mi">10</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>coeff</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>intr</th>
-      <td>40.32</td>
-    </tr>
-    <tr>
-      <th>frac_traveltime_lt15</th>
-      <td>14.73</td>
-    </tr>
-    <tr>
-      <th>gini</th>
-      <td>-1.23</td>
-    </tr>
-    <tr>
-      <th>dropout_r</th>
-      <td>-36.60</td>
-    </tr>
-    <tr>
-      <th>rel_tot</th>
-      <td>5.86</td>
-    </tr>
-    <tr>
-      <th>cs_fam_wkidsinglemom</th>
-      <td>-43.89</td>
-    </tr>
-    <tr>
-      <th>taxrate</th>
-      <td>56.97</td>
-    </tr>
-    <tr>
-      <th>gradrate_r</th>
-      <td>0.51</td>
-    </tr>
-    <tr>
-      <th>frac_worked1416</th>
-      <td>440.29</td>
-    </tr>
-    <tr>
-      <th>cs_born_foreign</th>
-      <td>6.80</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Let’s look at the coefficient for <code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>, the college graduation rate.
-For a multiple linear model, we interpret this coefficient as saying:
-if we took two commuting zones that are the same in all predictors except
-<code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>, the model predicts that the commuting zone with a 0.1 larger
-<code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code> also has a 0.051 higher AUM.
-The key difference for multiple linear models is that
-we only have a useful interpretation for a coefficient when we can
-hold the other predictors constant.</p>
-<p>Unfortunately, this is not always the case.
-As an extreme example, let’s say our model happened to have an extra
-predictor <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">gradrate_r</span></code> which doubles each value from <code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>.
-If our model had this predictor, it doesn’t make sense to talk about
-<code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>’s coefficient since we can’t hold <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">gradrate_r</span></code> constant.
-In general, we need to watch out for <em>collinearity</em>, where two predictor
-variables are highly correlated with each other.
-If our model has variables with high collinearity, we can’t make useful
-interpretations for the model coefficients.</p>
-<p>To check for collinearity, we can look at the correlations between each pair
-of predictors, as shown in the heatmap below.</p>
-<p>We see that <code class="docutils literal notranslate"><span class="pre">cs_fam_wkidsinglemom</span></code>, the fraction of families with a single mom,
-has a high correlation with several other predictors, like <code class="docutils literal notranslate"><span class="pre">gini</span></code> and
-<code class="docutils literal notranslate"><span class="pre">frac_worked1416</span></code>.
-Here, we face a central tension in modeling.
-If we want the most interpretable model, we should try to avoid collinearity.
-For instance, we could remove variables that are highly correlated with others.
-However, doing this often makes our model less accurate.
-Having an interpretable model can mean having a less accurate model.
-Is is better to have a highly interpretable model or a highly accurate one?
-It depends.
-Each modeling situation needs a different tradeoff, and it’s the
-job of the data scientist to understand and make this tradeoff.</p>
-<p>This section covered how to fit a multiple linear model using a geometric
-perspective.
-We then used our derivation to fit a multiple linear model on the
-Opportunity data and found that it has a much better fit than
-the simple linear model.
-Finally, we interpreted our model coefficients and talked about how
-it can be tricky to interpret multiple linear models.
-In the next section, we’ll introduce feature engineering techniques that
-make linear models useful for different kinds of data.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
-<dt class="label" id="l2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><span class="math notranslate nohighlight">\( |v| \)</span> is also called the <span class="math notranslate nohighlight">\( \ell_2 \)</span> norm of a
-vector <span class="math notranslate nohighlight">\( v \)</span>.</p>
+<dt class="label" id="ell2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><span class="math notranslate nohighlight">\(\lVert \mathbf{v} \rVert^2\)</span> is also called the <span class="math notranslate nohighlight">\(\ell_2\)</span> norm of a vector <span class="math notranslate nohighlight">\(\mathbf{v}\)</span>.</p>
 </dd>
 </dl>
 </div>

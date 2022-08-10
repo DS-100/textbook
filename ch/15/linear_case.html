@@ -1256,6 +1256,16 @@
    15.5.3. Interpreting Linear Models
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#one-hot-encoding">
+   15.5.4. One-Hot Encoding
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#interpreting-models-when-using-one-hot-encoding">
+   15.5.5. Interpreting Models When Using One-Hot Encoding
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -1289,6 +1299,16 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#interpreting-linear-models">
    15.5.3. Interpreting Linear Models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#one-hot-encoding">
+   15.5.4. One-Hot Encoding
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#interpreting-models-when-using-one-hot-encoding">
+   15.5.5. Interpreting Models When Using One-Hot Encoding
   </a>
  </li>
 </ul>
@@ -1497,7 +1517,7 @@ relationship between the two variables.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_case_9_0.svg" src="../../_images/linear_case_9_0.svg" /></div>
+<img alt="../../_images/linear_case_11_0.svg" src="../../_images/linear_case_11_0.svg" /></div>
 </div>
 <p>Our model is <span class="math notranslate nohighlight">\( f_{\theta}(x) = \theta_0 + \theta_1 x \)</span> where
 <span class="math notranslate nohighlight">\( x \)</span> is the <code class="docutils literal notranslate"><span class="pre">frac_traveltime_lt15</span></code> for a commuting zone and
@@ -1811,9 +1831,9 @@ It has 479 observations and 9 predictors plus an intercept column:</p>
 selected specific variables we want to use for prediction.
 Each row of our design matrix corresponds to an observation in our original
 data, and each column corresponds to a predictor variable, as depicted in
-<a class="reference internal" href="#fig-design-matrix"><span class="std std-numref">Figure 15.7</span></a>.</p>
-<div class="figure align-default" id="fig-design-matrix">
-<img alt="../../_images/design-matrix.svg" src="../../_images/design-matrix.svg" /><p class="caption"><span class="caption-number">Fig. 15.7 </span><span class="caption-text">Each row and column of <span class="math notranslate nohighlight">\(X\)</span> represent an observation and a feature.</span><a class="headerlink" href="#fig-design-matrix" title="Permalink to this image">¶</a></p>
+<a class="reference internal" href="#fig-design-matrix2"><span class="std std-numref">Figure 15.6</span></a>.</p>
+<div class="figure align-default" id="fig-design-matrix2">
+<img alt="../../_images/design-matrix.svg" src="../../_images/design-matrix.svg" /><p class="caption"><span class="caption-number">Fig. 15.6 </span><span class="caption-text">Each row and column of <span class="math notranslate nohighlight">\(X\)</span> represent an observation and a feature.</span><a class="headerlink" href="#fig-design-matrix2" title="Permalink to this image">¶</a></p>
 </div>
 <p>One technicality: the design matrix is defined as a mathematical matrix,
 not a dataframe, and a matrix doesn’t include the column or row labels that the
@@ -1834,6 +1854,178 @@ is called <em>modeling</em>, while others call it <em>machine learning</em>.</p>
 </div>
 <p>Now that we have our data prepared for modeling, in the next section we’ll
 fit our model by finding the <span class="math notranslate nohighlight">\( \hat{\theta} \)</span> that minimizes our loss.</p>
+<p>Now, let’s fit a multiple linear model.
+Recall that we’re using nine variables to predict AUM, the upward mobility for
+a commuting zone.
+We have our design matrix in a dataframe <code class="docutils literal notranslate"><span class="pre">X</span></code> and a vector of outcomes in <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>intr</th>
+      <th>frac_traveltime_lt15</th>
+      <th>gini</th>
+      <th>dropout_r</th>
+      <th>...</th>
+      <th>taxrate</th>
+      <th>gradrate_r</th>
+      <th>frac_worked1416</th>
+      <th>cs_born_foreign</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.33</td>
+      <td>0.47</td>
+      <td>-0.02</td>
+      <td>...</td>
+      <td>0.02</td>
+      <td>-2.43e-03</td>
+      <td>3.75e-03</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0.28</td>
+      <td>0.43</td>
+      <td>-0.02</td>
+      <td>...</td>
+      <td>0.02</td>
+      <td>-1.01e-01</td>
+      <td>4.78e-03</td>
+      <td>0.02</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 10 columns</p>
+</div></div></div>
+</div>
+<p>As with the simple linear model, we’ll split our data into a training set and
+a test set.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="s1"> rows&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s1"> rows&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Training set size: 383 rows
+    Test set size: 96 rows
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s fit the model on the training set:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can now find the MSE on the test set:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span> <span class="o">@</span> <span class="n">theta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">pred</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_test</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.3667257699216195
+</pre></div>
+</div>
+</div>
+</div>
+<p>To understand this error, we can start by comparing the multiple linear model
+with the simple linear model from before that only used the fraction with
+≤15 min commute time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta_simple</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]],</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">mse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta_simple</span><span class="p">,</span> <span class="n">X_test</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12.925251956432646
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that the multiple linear model has about 60% lower error than the simple
+linear model—a big improvement!
+Let’s make residual plots for both multiple and simple linear models.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
+<span class="n">resid</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">-</span> <span class="n">pred</span>
+
+<span class="n">pred_simple</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta_simple</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]])</span>
+<span class="n">resid_simple</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">-</span> <span class="n">pred_simple</span>
+
+<span class="n">all_resid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;multi&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">:</span> <span class="n">pred</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">:</span> <span class="n">resid</span><span class="p">}),</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">:</span> <span class="n">pred_simple</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">:</span> <span class="n">resid_simple</span><span class="p">}),</span>
+<span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">all_resid</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;resid&#39;</span><span class="p">,</span> <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_case_43_0.svg" src="../../_images/linear_case_43_0.svg" /></div>
+</div>
+<p>We can see that the multiple linear model’s residuals are much closer to 0
+in general, which helps to explain why the MSE is also lower.</p>
 </div>
 <div class="section" id="interpreting-linear-models">
 <h2><span class="section-number">15.5.3. </span>Interpreting Linear Models<a class="headerlink" href="#interpreting-linear-models" title="Permalink to this headline">¶</a></h2>
@@ -1970,7 +2162,7 @@ of predictors, as shown in the heatmap below.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_case_39_0.svg" src="../../_images/linear_case_39_0.svg" /></div>
+<img alt="../../_images/linear_case_56_0.svg" src="../../_images/linear_case_56_0.svg" /></div>
 </div>
 <p>We see that <code class="docutils literal notranslate"><span class="pre">cs_fam_wkidsinglemom</span></code>, the fraction of families with a single mom,
 has a high correlation with several other predictors, like <code class="docutils literal notranslate"><span class="pre">gini</span></code> and
@@ -1984,6 +2176,285 @@ Is is better to have a highly interpretable model or a highly accurate one?
 It depends.
 Each modeling situation needs a different tradeoff, and it’s the
 job of the data scientist to understand and make this tradeoff.</p>
+<p>So far, our model requires all of the predictor variables to be numeric.
+But categorical data is often useful for prediction as well.
+For example, the map below colors each state by its AUM.
+We can see that AUM varies between regions in the US—the southeast region
+of the US has much lower AUMs than the midwestern region.
+This suggests that including the region into our linear model can help
+with prediction.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;stateabbrv&#39;</span><span class="p">)[</span><span class="s1">&#39;aum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">px</span><span class="o">.</span><span class="n">choropleth</span><span class="p">(</span><span class="n">states</span><span class="p">,</span>
+              <span class="n">locations</span><span class="o">=</span><span class="s1">&#39;stateabbrv&#39;</span><span class="p">,</span> 
+              <span class="n">locationmode</span><span class="o">=</span><span class="s2">&quot;USA-states&quot;</span><span class="p">,</span> 
+              <span class="n">scope</span><span class="o">=</span><span class="s2">&quot;usa&quot;</span><span class="p">,</span>
+              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;aum&#39;</span><span class="p">,</span>
+              <span class="n">color_continuous_scale</span><span class="o">=</span><span class="s2">&quot;amp_r&quot;</span><span class="p">,</span> 
+              <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
+             <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_case_59_0.svg" src="../../_images/linear_case_59_0.svg" /></div>
+</div>
+<p>Since our model needs the design matrix <span class="math notranslate nohighlight">\( X \)</span> to only contain numeric values,
+we’ll use a <em>feature engineering</em> technique to enable our model to make use
+of the categorical US region feature.
+Feature engineering is the process of transforming data before model fitting
+so that the model can capture more kinds of patterns.
+In this case, we’ll use a technique called <em>one-hot encoding</em> to
+transform categorical data into numeric data.</p>
+</div>
+<div class="section" id="one-hot-encoding">
+<h2><span class="section-number">15.5.4. </span>One-Hot Encoding<a class="headerlink" href="#one-hot-encoding" title="Permalink to this headline">¶</a></h2>
+<p>A one-hot encoding takes a categorical feature and creates multiple numeric
+features.
+To do a one-hot encoding, we first create new features that each correspond to
+one unique category.
+In this case, we have four US Census regions:
+West, Northeast, South, and Midwest.
+Since we have four categories, we’ll create four new features in the design
+matrix <span class="math notranslate nohighlight">\( X \)</span>.
+Each row in <span class="math notranslate nohighlight">\( X \)</span> contains the value <code class="docutils literal notranslate"><span class="pre">1</span></code> if the feature matches the
+original category and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise.
+We’ve illustrated this process in <a class="reference internal" href="#fig-one-hot2"><span class="std std-numref">Figure 15.7</span></a>.</p>
+<div class="figure align-default" id="fig-one-hot2">
+<a class="reference internal image-reference" href="../../_images/one-hot.svg"><img alt="../../_images/one-hot.svg" src="../../_images/one-hot.svg" width="100%" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.7 </span><span class="caption-text">One-hot encoding for a small example dataset (left) and its resulting design matrix (right).</span><a class="headerlink" href="#fig-one-hot2" title="Permalink to this image">¶</a></p>
+</div>
+<p>After doing this transformation, we usually remove one of the new
+feature columns from the design matrix.
+If we don’t do this, then the columns of the design matrix will be linearly
+dependent after we add the intercept column, which means that we won’t have
+a useful interpretation for the model coefficients—we’ve left
+this proof as an exercise.
+We’ll talk about what removing a column means later in this section.
+For now, we’ll simply remove the first one-hot encoded column.</p>
+<p>Let’s use a one-hot encoding on the Opportunity data.
+We’ll start with a subset of the data which just has the commuting zone’s
+AUM and its US Census region:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>region</th>
+      <th>aum</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>South</td>
+      <td>38.39</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>South</td>
+      <td>37.78</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>South</td>
+      <td>39.05</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>702</th>
+      <td>West</td>
+      <td>44.12</td>
+    </tr>
+    <tr>
+      <th>703</th>
+      <td>West</td>
+      <td>41.41</td>
+    </tr>
+    <tr>
+      <th>704</th>
+      <td>West</td>
+      <td>43.20</td>
+    </tr>
+  </tbody>
+</table>
+<p>705 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>To do the encoding, we’ll use the <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> library’s
+<code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> class.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+
+<span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span>
+    <span class="c1"># categories argument sets column order</span>
+    <span class="n">categories</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;Northeast&#39;</span><span class="p">,</span> <span class="s1">&#39;West&#39;</span><span class="p">,</span> <span class="s1">&#39;Midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;South&#39;</span><span class="p">]],</span>
+    <span class="n">drop</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;region&#39;</span><span class="p">]])</span>
+<span class="n">X</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0., 0., 1.],
+       [0., 0., 1.],
+       [0., 0., 1.],
+       ...,
+       [1., 0., 0.],
+       [1., 0., 0.],
+       [1., 0., 0.]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we have a design matrix stored in the variable <code class="docutils literal notranslate"><span class="pre">X</span></code>.
+Since we’ve dropped the <code class="docutils literal notranslate"><span class="pre">Northeast</span></code> column from the design matrix,
+the three resulting features represent the
+<code class="docutils literal notranslate"><span class="pre">West</span></code>, <code class="docutils literal notranslate"><span class="pre">Midwest</span></code>, and <code class="docutils literal notranslate"><span class="pre">South</span></code> regions.
+Let’s fit a multiple linear model that predicts AUM from the one-hot encoded
+regions.
+Rather than defining our own functions, we’ll use the <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> class
+from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;aum&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although we’ve defined our own model fitting functions earlier in this chapter,
+in practice we prefer to use a library like <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> for modeling
+since its code is highly optimized.
+For example, the matrix multiplication code we wrote for fitting
+multiple linear models runs very slowly when we have many observations.
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> can handle larger datasets without issue.</p>
+</div>
+</div>
+<div class="section" id="interpreting-models-when-using-one-hot-encoding">
+<h2><span class="section-number">15.5.5. </span>Interpreting Models When Using One-Hot Encoding<a class="headerlink" href="#interpreting-models-when-using-one-hot-encoding" title="Permalink to this headline">¶</a></h2>
+<p>Using one-hot encoding gives a natural interpretation for the model parameters.
+The intercept of the model represents the expected outcome for the category
+we removed from the design matrix.
+In our case, we took out the <code class="docutils literal notranslate"><span class="pre">Northeast</span></code> column, so the model’s intercept
+parameter represents the predicted AUM for the Northeast region.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Predicted AUM for Northeast: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">intercept_</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predicted AUM for Northeast: 44.01
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, let’s look at the model parameters.
+We’ve displayed them in the table below.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;coef&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;West&#39;</span><span class="p">,</span> <span class="s1">&#39;Midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;South&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>West</th>
+      <td>1.17</td>
+    </tr>
+    <tr>
+      <th>Midwest</th>
+      <td>3.20</td>
+    </tr>
+    <tr>
+      <th>South</th>
+      <td>-3.25</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Under a one-hot encoding, each model parameter represents
+the model’s expected difference between that
+region and the Northeast.
+For instance, the West has a coefficient of 1.17, which means that the model
+predicts that commuting zones in the West will have 1.17 higher AUM than
+the Northeast on average.
+Likewise, the model predicts that the South has 3.25 lower AUM than the
+Northeast.
+In other words, the coefficients tell us how the model adjusts the
+AUM relative to the Northeast.</p>
+<p>We used a small example here to more clearly show how one-hot encoding works.
+In practice, we combine the one-hot encoded features with other features
+so that our design matrix represents both numeric and categorical features.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One-hot encoding is also known as using <em>dummy variables</em>.
+The term dummy variables is more common in statistics and econometrics.</p>
+</div>
+<p>In this section, we introduced feature engineering, where we
+transform data before fitting a model.
+We saw how using the one-hot encoding technique lets us fit linear models
+on categorical data.
+And, one-hot encoding gives us a natural interpretation for model parameters.
+There are many other kinds of feature engineering, like using polynomial
+terms.
+In general, data scientists apply their domain knowledge to figure out
+useful feature engineering steps for their models.</p>
 </div>
 </div>
 
