@@ -1251,21 +1251,6 @@
    15.5.2. Relating Upward Mobility Using Multiple Variables
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interpreting-linear-models">
-   15.5.3. Interpreting Linear Models
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#one-hot-encoding">
-   15.5.4. One-Hot Encoding
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interpreting-models-when-using-one-hot-encoding">
-   15.5.5. Interpreting Models When Using One-Hot Encoding
-  </a>
- </li>
 </ul>
 
             </nav>
@@ -1296,21 +1281,6 @@
    15.5.2. Relating Upward Mobility Using Multiple Variables
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interpreting-linear-models">
-   15.5.3. Interpreting Linear Models
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#one-hot-encoding">
-   15.5.4. One-Hot Encoding
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interpreting-models-when-using-one-hot-encoding">
-   15.5.5. Interpreting Models When Using One-Hot Encoding
-  </a>
- </li>
 </ul>
 
                         </nav>
@@ -1322,61 +1292,54 @@
                 
   <div class="section" id="example-where-is-the-land-of-opportunity">
 <span id="sec-linear-case"></span><h1><span class="section-number">15.5. </span>Example: Where is the Land of Opportunity?<a class="headerlink" href="#example-where-is-the-land-of-opportunity" title="Permalink to this headline">¶</a></h1>
-<p>The US was nicknamed “the land of opportunity” because people believed that
-even poor people in the US could end up wealthy—economists call this
+<p>The US was nicknamed “the land of opportunity” because people believed that in the US
+even people with few resources can end up wealthy—economists call this
 economic mobility.
-In a famous study, the economist Raj Chetty and his colleagues
+In a famous study, economist Raj Chetty and his colleagues
 did a large-scale data analysis on
 economic mobility in the US <span id="id1">[<a class="reference internal" href="../../references.html#id36">Chetty <em>et al.</em>, 2014</a>]</span>.
-But Chetty had a hunch that some places in the US have much higher economic
+Chetty had a hunch that some places in the US have much higher economic
 mobility than others.
 His analysis found this to be true.
-Cities like San Jose, Washington DC, and Seattle have higher
-mobility than places like Charlotte, Milwaukee, and Atlanta.
-This means that overall, more people move from low income to high
-income in San Jose compared to Charlotte.
-Chetty also used linear models to find out that social and economic
+He found that some cities, such as San Jose, Washington DC, and Seattle, have higher
+mobility than others, such as Charlotte, Milwaukee, and Atlanta.
+This means that overall, people move from low to high income brackets in San Jose
+at a higher rate compared to Charlotte.
+Chetty also used linear models to find that social and economic
 factors like segregation, income inequality, and local school systems
 are related to economic mobility.
-In this chapter, we’ll use linear models to replicate parts of his analysis.</p>
+In this chapter, we use linear models to replicate parts of his analysis.</p>
 <p>To do his analysis, Chetty used government tax records to get the incomes of
 everyone born in the US between 1980-82.
 He looked at each person’s income in 2011-12 when they were about
 30 years old, and compared it to their parents’ income when they were born.
 In total, his dataset had about 10 million people.
-To define economic mobility, Chetty took the people who were born into the
-25th income percentile and found the income percentile they ended up with
-30 years later. He called this statistic the <em>absolute upward mobility</em> (AUM).
+To measure economic mobility, Chetty took the people who were born into the
+25th income percentile and found their income percentile 30 years later.
+He calls this statistic the <em>absolute upward mobility</em> (AUM).
 If a region’s average AUM is 25, then people in the 25th percentile generally
-stay in the 25th percentile—they stay where they are.
-High AUM values mean that the region has high mobility.
-People in these regions generally make more than their parents.
+stay in the 25th percentile—they remain where their parents were when they born.
+High AUM values mean that the region has more upward mobility.
+People in these regions are generally in a higher income bracket than their parents.
 For reference, the US average AUM is about 41 at the time of this writing.
 Chetty averaged together the AUMs for regions of the US called commuting zones
 (CZ).
 Commuting zones are defined by the economy of a region and are on the
 same scale as counties.
 While individual income records can’t be publicly available because of privacy,
-the AUMs for each commuting zone are publicly available.
-Since Chetty also used commuting zone AUMs, we can replicate his analysis
-using publicly available data.</p>
-<p>So, our outcome variable <span class="math notranslate nohighlight">\( y \)</span> represents the AUM for a commuting zone.
-There are many possible predictor variables in Chetty’s data.
-For our first simple linear model, we’ll pick the predictor variable
-<span class="math notranslate nohighlight">\( x \)</span> to be the
-fraction of people who have a 15-minute or shorter commute to work.</p>
+the AUMs for each commuting zone are publicly available, and since Chetty
+used commuting zone AUMs, we can replicate his analysis.</p>
+<p>In this analysis, our outcome variable is the AUM for a commuting zone, since we are
+interested in finding features that explain AUM.
+There are many possible such features in Chetty’s data, but
+we first investigate one particular feature: the fraction of people in a CZ who have a 15-minute or shorter commute to work.</p>
 <div class="section" id="explaining-upward-mobility-using-commute-time">
 <h2><span class="section-number">15.5.1. </span>Explaining Upward Mobility using Commute Time<a class="headerlink" href="#explaining-upward-mobility-using-commute-time" title="Permalink to this headline">¶</a></h2>
 <p>Let’s take a look at the Opportunity data.
-We’ll load the data into the <code class="docutils literal notranslate"><span class="pre">df</span></code> variable.</p>
+We’ll load the data into the DataFrame called <code class="docutils literal notranslate"><span class="pre">cz_df</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/mobility.csv&#39;</span><span class="p">)</span>
-    <span class="c1"># filter out rows with NaN AUM values</span>
-    <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;not aum.isnull()&#39;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">df</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cz_df</span>
 </pre></div>
 </div>
 </div>
@@ -1399,53 +1362,53 @@ We’ll load the data into the <code class="docutils literal notranslate"><span 
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>cz</th>
-      <th>czname</th>
-      <th>stateabbrv</th>
       <th>aum</th>
+      <th>travel_lt15</th>
+      <th>gini</th>
+      <th>rel_tot</th>
       <th>...</th>
-      <th>cs_fam_wkidsinglemom</th>
-      <th>cs_divorced</th>
-      <th>cs_married</th>
-      <th>incgrowth0010</th>
+      <th>taxrate</th>
+      <th>worked_14</th>
+      <th>foreign</th>
+      <th>region</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>100.0</td>
-      <td>Johnson City</td>
-      <td>TN</td>
       <td>38.39</td>
+      <td>0.33</td>
+      <td>0.47</td>
+      <td>0.51</td>
       <td>...</td>
-      <td>0.19</td>
-      <td>0.11</td>
-      <td>0.60</td>
-      <td>-2.28e-03</td>
+      <td>0.02</td>
+      <td>3.75e-03</td>
+      <td>1.18e-02</td>
+      <td>South</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>200.0</td>
-      <td>Morristown</td>
-      <td>TN</td>
       <td>37.78</td>
+      <td>0.28</td>
+      <td>0.43</td>
+      <td>0.54</td>
       <td>...</td>
-      <td>0.19</td>
-      <td>0.12</td>
-      <td>0.61</td>
-      <td>-2.15e-03</td>
+      <td>0.02</td>
+      <td>4.78e-03</td>
+      <td>2.31e-02</td>
+      <td>South</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>301.0</td>
-      <td>Middlesborough</td>
-      <td>TN</td>
       <td>39.05</td>
+      <td>0.36</td>
+      <td>0.44</td>
+      <td>0.67</td>
       <td>...</td>
-      <td>0.21</td>
-      <td>0.11</td>
-      <td>0.59</td>
-      <td>-3.71e-03</td>
+      <td>0.01</td>
+      <td>2.89e-03</td>
+      <td>7.08e-03</td>
+      <td>South</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1460,64 +1423,181 @@ We’ll load the data into the <code class="docutils literal notranslate"><span 
       <td>...</td>
     </tr>
     <tr>
-      <th>738</th>
-      <td>39302.0</td>
-      <td>Bellingham</td>
-      <td>WA</td>
+      <th>702</th>
       <td>44.12</td>
+      <td>0.42</td>
+      <td>0.42</td>
+      <td>0.29</td>
       <td>...</td>
-      <td>0.19</td>
-      <td>0.10</td>
-      <td>0.54</td>
-      <td>-6.95e-03</td>
+      <td>0.02</td>
+      <td>4.82e-03</td>
+      <td>9.85e-02</td>
+      <td>West</td>
     </tr>
     <tr>
-      <th>739</th>
-      <td>39303.0</td>
-      <td>Port Angeles</td>
-      <td>WA</td>
+      <th>703</th>
       <td>41.41</td>
+      <td>0.49</td>
+      <td>0.41</td>
+      <td>0.26</td>
       <td>...</td>
-      <td>0.24</td>
-      <td>0.12</td>
-      <td>0.60</td>
-      <td>4.91e-05</td>
+      <td>0.01</td>
+      <td>4.39e-03</td>
+      <td>4.33e-02</td>
+      <td>West</td>
     </tr>
     <tr>
-      <th>740</th>
-      <td>39400.0</td>
-      <td>Seattle</td>
-      <td>WA</td>
+      <th>704</th>
       <td>43.20</td>
+      <td>0.24</td>
+      <td>0.42</td>
+      <td>0.32</td>
       <td>...</td>
-      <td>0.19</td>
-      <td>0.12</td>
-      <td>0.54</td>
-      <td>-1.55e-03</td>
+      <td>0.02</td>
+      <td>3.67e-03</td>
+      <td>1.13e-01</td>
+      <td>West</td>
     </tr>
   </tbody>
 </table>
-<p>709 rows × 43 columns</p>
+<p>705 rows × 9 columns</p>
 </div></div></div>
 </div>
-<p>Each row in <code class="docutils literal notranslate"><span class="pre">df</span></code> represents one commuting zone.
-The column <code class="docutils literal notranslate"><span class="pre">aum</span></code> has the average AUM metric for each commuting zone.
-There are many columns in <code class="docutils literal notranslate"><span class="pre">df</span></code> since this dataframe also has the
-covariates for each CZ.
-For our simple linear model, we want the
-<code class="docutils literal notranslate"><span class="pre">frac_traveltime_lt15</span></code> column which has the fraction of people
-in each CZ that have a 15 minute or shorter commute time.
-We’ll plot <code class="docutils literal notranslate"><span class="pre">aum</span></code> against <code class="docutils literal notranslate"><span class="pre">frac_traveltime_lt15</span></code> to see the
-relationship between the two variables.</p>
-<div class="cell docutils container">
+<p>Each row in the data frame represents one commuting zone.
+The column <code class="docutils literal notranslate"><span class="pre">aum</span></code> has the average AUM metric for the commuting zone.
+There are many columns in this data frame, but for now we focus
+on the fraction of people in a CZ that have a 15 minute or shorter commute time,
+which is called <code class="docutils literal notranslate"><span class="pre">frac_traveltime_lt15</span></code>.
+We plot AUM against this fraction to see the relationship between the two variables.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;aum&#39;</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">cz_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;travel_lt15&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;aum&#39;</span><span class="p">,</span>
            <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_case_11_0.svg" src="../../_images/linear_case_11_0.svg" /></div>
+<img alt="../../_images/linear_case_10_0.svg" src="../../_images/linear_case_10_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;aum&#39;</span><span class="p">,</span> <span class="s1">&#39;travel_lt15&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>aum</th>
+      <th>travel_lt15</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>aum</th>
+      <td>1.00</td>
+      <td>0.68</td>
+    </tr>
+    <tr>
+      <th>travel_lt15</th>
+      <td>0.68</td>
+      <td>1.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;aum&#39;</span><span class="p">]]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;travel_lt15&#39;</span><span class="p">]]</span>
+
+<span class="n">slr_aum</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">slr_aum</span><span class="o">.</span><span class="n">intercept_</span><span class="si">}</span><span class="s2">  Slope: </span><span class="si">{</span><span class="n">slr_aum</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: [31.27]  Slope: [28.66]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">slr_aum</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.46
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted_aum</span> <span class="o">=</span> <span class="n">slr_aum</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">errors</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted_aum</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>aum    4.14
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">cz_df</span><span class="p">[</span><span class="s1">&#39;aum&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.614675842001113
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x12678b970&gt;
+</pre></div>
+</div>
+<img alt="../../_images/linear_case_18_1.svg" src="../../_images/linear_case_18_1.svg" /></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1577,49 +1657,89 @@ nine predictors, described in <a class="reference internal" href="#tbl-linear-pr
 <p>Our original dataframe has around 40 predictors.
 We take a subset of the columns in the dataframe to create a design matrix <span class="math notranslate nohighlight">\(\textbf{X}\)</span> and
 we extract the column of outcomes into a Series <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>.</p>
-<div class="cell tag_hide-cell docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">,</span> <span class="s1">&#39;gini&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;dropout_r&#39;</span><span class="p">,</span> <span class="s1">&#39;rel_tot&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;cs_fam_wkidsinglemom&#39;</span><span class="p">,</span> <span class="s1">&#39;taxrate&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;gradrate_r&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_worked1416&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;cs_born_foreign&#39;</span><span class="p">,</span>
-<span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X2</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;travel_lt15&#39;</span><span class="p">,</span> <span class="s1">&#39;single_mom&#39;</span><span class="p">]]</span>
+     
+<span class="n">y</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;aum&#39;</span><span class="p">]]</span>
 
-<span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">predictors</span><span class="p">]</span>
-    <span class="c1"># Some predictors are missing; we&#39;ll drop them for simplicity</span>
-    <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># Move intercept column to appear first</span>
-    <span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]]</span>
-<span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;aum&#39;</span><span class="p">]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">model2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Design-matrix X has shape: </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Response y has length: </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, </span><span class="se">\n</span><span class="s2">travel lt 15 min coefficient: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">,  </span><span class="se">\n</span><span class="s2">fraction of single moms coefficient: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Design-matrix X has shape: (479, 10)
-Response y has length: (479,)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: 49.0, 
+travel lt 15 min coefficient: 18.10,  
+fraction of single moms coefficient: -63.98
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X2</span><span class="p">)</span>
+<span class="n">errors2</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x1268151c0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/linear_case_27_1.svg" src="../../_images/linear_case_27_1.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>aum    2.85
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.74
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Design-matrix X has shape: (705, 1)
+Response y has length: (705, 1)
 </pre></div>
 </div>
 </div>
 </div>
 <p>Let’s look at <code class="docutils literal notranslate"><span class="pre">X</span></code>, a dataframe that we’re using as our design matrix.
 It has 479 observations and 9 predictors plus an intercept column:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;travel_lt15&#39;</span><span class="p">,</span> <span class="s1">&#39;gini&#39;</span><span class="p">,</span> <span class="s1">&#39;rel_tot&#39;</span><span class="p">,</span> <span class="s1">&#39;single_mom&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;taxrate&#39;</span><span class="p">,</span> <span class="s1">&#39;worked_14&#39;</span><span class="p">,</span> <span class="s1">&#39;foreign&#39;</span>
+<span class="p">]</span>
+
+<span class="n">cz_df</span><span class="p">[([</span><span class="s1">&#39;aum&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">predictors</span><span class="p">)]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1642,53 +1762,49 @@ It has 479 observations and 9 predictors plus an intercept column:</p>
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>intr</th>
-      <th>frac_traveltime_lt15</th>
+      <th>aum</th>
+      <th>travel_lt15</th>
       <th>gini</th>
-      <th>dropout_r</th>
-      <th>...</th>
+      <th>rel_tot</th>
+      <th>single_mom</th>
       <th>taxrate</th>
-      <th>gradrate_r</th>
-      <th>frac_worked1416</th>
-      <th>cs_born_foreign</th>
+      <th>worked_14</th>
+      <th>foreign</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0.33</td>
-      <td>0.47</td>
-      <td>-1.53e-02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-2.43e-03</td>
-      <td>3.75e-03</td>
-      <td>1.18e-02</td>
+      <th>aum</th>
+      <td>1.00</td>
+      <td>0.68</td>
+      <td>-0.60</td>
+      <td>0.52</td>
+      <td>-0.77</td>
+      <td>0.35</td>
+      <td>0.65</td>
+      <td>-0.03</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0.28</td>
-      <td>0.43</td>
-      <td>-2.35e-02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-1.01e-01</td>
-      <td>4.78e-03</td>
-      <td>2.31e-02</td>
+      <th>travel_lt15</th>
+      <td>0.68</td>
+      <td>1.00</td>
+      <td>-0.56</td>
+      <td>0.40</td>
+      <td>-0.42</td>
+      <td>0.34</td>
+      <td>0.60</td>
+      <td>-0.19</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>0.36</td>
-      <td>0.44</td>
-      <td>-4.63e-03</td>
-      <td>...</td>
-      <td>0.01</td>
-      <td>1.11e-01</td>
-      <td>2.89e-03</td>
-      <td>7.08e-03</td>
+      <th>gini</th>
+      <td>-0.60</td>
+      <td>-0.56</td>
+      <td>1.00</td>
+      <td>-0.29</td>
+      <td>0.57</td>
+      <td>-0.15</td>
+      <td>-0.58</td>
+      <td>0.31</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1700,47 +1816,43 @@ It has 479 observations and 9 predictors plus an intercept column:</p>
       <td>...</td>
       <td>...</td>
       <td>...</td>
-      <td>...</td>
     </tr>
     <tr>
-      <th>476</th>
-      <td>1</td>
-      <td>0.45</td>
-      <td>0.36</td>
-      <td>7.07e-03</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-4.30e-02</td>
-      <td>4.33e-03</td>
-      <td>1.12e-01</td>
+      <th>taxrate</th>
+      <td>0.35</td>
+      <td>0.34</td>
+      <td>-0.15</td>
+      <td>0.08</td>
+      <td>-0.26</td>
+      <td>1.00</td>
+      <td>0.35</td>
+      <td>0.26</td>
     </tr>
     <tr>
-      <th>477</th>
-      <td>1</td>
+      <th>worked_14</th>
       <td>0.65</td>
-      <td>0.36</td>
-      <td>-1.53e-02</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-4.94e-02</td>
-      <td>4.30e-03</td>
-      <td>2.33e-02</td>
+      <td>0.60</td>
+      <td>-0.58</td>
+      <td>0.28</td>
+      <td>-0.60</td>
+      <td>0.35</td>
+      <td>1.00</td>
+      <td>-0.15</td>
     </tr>
     <tr>
-      <th>478</th>
-      <td>1</td>
-      <td>0.47</td>
-      <td>0.44</td>
-      <td>2.61e-03</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>-2.70e-01</td>
-      <td>5.46e-03</td>
-      <td>3.69e-02</td>
+      <th>foreign</th>
+      <td>-0.03</td>
+      <td>-0.19</td>
+      <td>0.31</td>
+      <td>-0.11</td>
+      <td>-0.04</td>
+      <td>0.26</td>
+      <td>-0.15</td>
+      <td>1.00</td>
     </tr>
   </tbody>
 </table>
-<p>479 rows × 10 columns</p>
+<p>8 rows × 8 columns</p>
 </div></div></div>
 </div>
 <p>Notice that our design matrix is a subset of our original dataframe—we just
@@ -1766,154 +1878,74 @@ a test set.</p>
 <p>To understand this error, we can start by comparing the multiple linear model
 with the simple linear model from before that only used the fraction with
 ≤15 min commute time.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta_simple</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]],</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">mse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta_simple</span><span class="p">,</span> <span class="n">X_test</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]]))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12.925251956432646
-</pre></div>
-</div>
-</div>
-</div>
 <p>We see that the multiple linear model has about 60% lower error than the simple
 linear model—a big improvement!
 Let’s make residual plots for both multiple and simple linear models.</p>
-<div class="cell tag_hide-input docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
-<span class="n">resid</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">-</span> <span class="n">pred</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X7</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[</span><span class="n">predictors</span><span class="p">]</span>
 
-<span class="n">pred_simple</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">theta_simple</span><span class="p">,</span> <span class="n">X_train</span><span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;frac_traveltime_lt15&#39;</span><span class="p">]])</span>
-<span class="n">resid_simple</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">-</span> <span class="n">pred_simple</span>
-
-<span class="n">all_resid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;multi&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">:</span> <span class="n">pred</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">:</span> <span class="n">resid</span><span class="p">}),</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">:</span> <span class="n">pred_simple</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">:</span> <span class="n">resid_simple</span><span class="p">}),</span>
-<span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">all_resid</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;resid&#39;</span><span class="p">,</span> <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">,</span>
-                 <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">model7</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X7</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted7</span> <span class="o">=</span> <span class="n">model7</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X7</span><span class="p">)</span>
+<span class="n">errors7</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted7</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x10c270790&gt;
+</pre></div>
+</div>
+<img alt="../../_images/linear_case_40_1.svg" src="../../_images/linear_case_40_1.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors7</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_case_27_0.svg" src="../../_images/linear_case_27_0.svg" /></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>aum    2.59
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">model7</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X7</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.79
+</pre></div>
+</div>
+</div>
 </div>
 <p>We can see that the multiple linear model’s residuals are much closer to 0
 in general, which helps to explain why the MSE is also lower.</p>
-</div>
-<div class="section" id="interpreting-linear-models">
-<h2><span class="section-number">15.5.3. </span>Interpreting Linear Models<a class="headerlink" href="#interpreting-linear-models" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have a linear model, we want to know what it says about our data.
-After fitting our simple linear model, we have:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-f_{\theta}(x) = 31.1 + 29.3 x
-\end{aligned}
-\]</div>
-<p>Here, <span class="math notranslate nohighlight">\( x \)</span> is the fraction of people with ≤15 min commute times.
-We interpret this model as saying: if we take two commuting zones, and one of
-them has 10% more people with a ≤15 min commute time, then the model predicts
-that the AUM will be 2.93 points higher on average.
-Simply put, commuting zones that have short commute times generally have
-more economic mobility or opportunity.</p>
-<p>We need to be careful about this interpretation.
-It’s tempting to say that increasing <span class="math notranslate nohighlight">\( x \)</span> by 0.1 <em>causes</em> or <em>is associated
-with</em> an AUM that’s 2.93 points higher.
-But, our model doesn’t let us make this conclusion.
-Our model really only lets us draw conclusions about average differences
-between commuting zones.
-It doesn’t let us draw conclusions about what would happen if we took a
-single commuting zone and increased its <span class="math notranslate nohighlight">\( x \)</span>.</p>
-<p>We can try interpreting the the intercept term too.
-We might say that the model predicts that commuting zones where <span class="math notranslate nohighlight">\( x = 0 \)</span> have
-an average AUM of 31.1.
-However, there aren’t actually any data points in our data that have <span class="math notranslate nohighlight">\( x = 0 \)</span>,
-so this interpretation isn’t useful.
-In general, we have to check the meaning of the intercept on a case-by-case
-basis.</p>
 <p>Now, let’s look at our multiple linear model.
-Since our model has 9 predictor variables, we’ll show the model coefficients in
+Since our model has 7 predictor variables, we’ll show the model coefficients in
 a table rather than writing out the long model equation:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]</span>
-<span class="n">display_df</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;coeff&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(),</span> <span class="mi">10</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model7</span><span class="o">.</span><span class="n">coef_</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>coeff</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>intr</th>
-      <td>40.32</td>
-    </tr>
-    <tr>
-      <th>frac_traveltime_lt15</th>
-      <td>14.73</td>
-    </tr>
-    <tr>
-      <th>gini</th>
-      <td>-1.23</td>
-    </tr>
-    <tr>
-      <th>dropout_r</th>
-      <td>-36.60</td>
-    </tr>
-    <tr>
-      <th>rel_tot</th>
-      <td>5.86</td>
-    </tr>
-    <tr>
-      <th>cs_fam_wkidsinglemom</th>
-      <td>-43.89</td>
-    </tr>
-    <tr>
-      <th>taxrate</th>
-      <td>56.97</td>
-    </tr>
-    <tr>
-      <th>gradrate_r</th>
-      <td>0.51</td>
-    </tr>
-    <tr>
-      <th>frac_worked1416</th>
-      <td>440.29</td>
-    </tr>
-    <tr>
-      <th>cs_born_foreign</th>
-      <td>6.80</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 12.56,  -3.67,   7.65, -52.18,  36.57, 352.18,   4.94]])
+</pre></div>
+</div>
+</div>
 </div>
 <p>Let’s look at the coefficient for <code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>, the college graduation rate.
 For a multiple linear model, we interpret this coefficient as saying:
@@ -1934,16 +1966,6 @@ If our model has variables with high collinearity, we can’t make useful
 interpretations for the model coefficients.</p>
 <p>To check for collinearity, we can look at the correlations between each pair
 of predictors, as shown in the heatmap below.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">predictors</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_case_40_0.svg" src="../../_images/linear_case_40_0.svg" /></div>
-</div>
 <p>We see that <code class="docutils literal notranslate"><span class="pre">cs_fam_wkidsinglemom</span></code>, the fraction of families with a single mom,
 has a high correlation with several other predictors, like <code class="docutils literal notranslate"><span class="pre">gini</span></code> and
 <code class="docutils literal notranslate"><span class="pre">frac_worked1416</span></code>.
@@ -1957,284 +1979,7 @@ It depends.
 Each modeling situation needs a different tradeoff, and it’s the
 job of the data scientist to understand and make this tradeoff.</p>
 <p>So far, our model requires all of the predictor variables to be numeric.
-But categorical data is often useful for prediction as well.
-For example, the map below colors each state by its AUM.
-We can see that AUM varies between regions in the US—the southeast region
-of the US has much lower AUMs than the midwestern region.
-This suggests that including the region into our linear model can help
-with prediction.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;stateabbrv&#39;</span><span class="p">)[</span><span class="s1">&#39;aum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="n">px</span><span class="o">.</span><span class="n">choropleth</span><span class="p">(</span><span class="n">states</span><span class="p">,</span>
-              <span class="n">locations</span><span class="o">=</span><span class="s1">&#39;stateabbrv&#39;</span><span class="p">,</span> 
-              <span class="n">locationmode</span><span class="o">=</span><span class="s2">&quot;USA-states&quot;</span><span class="p">,</span> 
-              <span class="n">scope</span><span class="o">=</span><span class="s2">&quot;usa&quot;</span><span class="p">,</span>
-              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;aum&#39;</span><span class="p">,</span>
-              <span class="n">color_continuous_scale</span><span class="o">=</span><span class="s2">&quot;amp_r&quot;</span><span class="p">,</span> 
-              <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-             <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_case_43_0.svg" src="../../_images/linear_case_43_0.svg" /></div>
-</div>
-<p>Since our model needs the design matrix <span class="math notranslate nohighlight">\( X \)</span> to only contain numeric values,
-we’ll use a <em>feature engineering</em> technique to enable our model to make use
-of the categorical US region feature.
-Feature engineering is the process of transforming data before model fitting
-so that the model can capture more kinds of patterns.
-In this case, we’ll use a technique called <em>one-hot encoding</em> to
-transform categorical data into numeric data.</p>
-</div>
-<div class="section" id="one-hot-encoding">
-<h2><span class="section-number">15.5.4. </span>One-Hot Encoding<a class="headerlink" href="#one-hot-encoding" title="Permalink to this headline">¶</a></h2>
-<p>A one-hot encoding takes a categorical feature and creates multiple numeric
-features.
-To do a one-hot encoding, we first create new features that each correspond to
-one unique category.
-In this case, we have four US Census regions:
-West, Northeast, South, and Midwest.
-Since we have four categories, we’ll create four new features in the design
-matrix <span class="math notranslate nohighlight">\( X \)</span>.
-Each row in <span class="math notranslate nohighlight">\( X \)</span> contains the value <code class="docutils literal notranslate"><span class="pre">1</span></code> if the feature matches the
-original category and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise.
-We’ve illustrated this process in <a class="reference internal" href="#fig-one-hot2"><span class="std std-numref">Figure 15.7</span></a>.</p>
-<div class="figure align-default" id="fig-one-hot2">
-<a class="reference internal image-reference" href="../../_images/one-hot.svg"><img alt="../../_images/one-hot.svg" src="../../_images/one-hot.svg" width="100%" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.7 </span><span class="caption-text">One-hot encoding for a small example dataset (left) and its resulting design matrix (right).</span><a class="headerlink" href="#fig-one-hot2" title="Permalink to this image">¶</a></p>
-</div>
-<p>After doing this transformation, we usually remove one of the new
-feature columns from the design matrix.
-If we don’t do this, then the columns of the design matrix will be linearly
-dependent after we add the intercept column, which means that we won’t have
-a useful interpretation for the model coefficients—we’ve left
-this proof as an exercise.
-We’ll talk about what removing a column means later in this section.
-For now, we’ll simply remove the first one-hot encoded column.</p>
-<p>Let’s use a one-hot encoding on the Opportunity data.
-We’ll start with a subset of the data which just has the commuting zone’s
-AUM and its US Census region:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>region</th>
-      <th>aum</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>South</td>
-      <td>38.39</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>South</td>
-      <td>37.78</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>South</td>
-      <td>39.05</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>702</th>
-      <td>West</td>
-      <td>44.12</td>
-    </tr>
-    <tr>
-      <th>703</th>
-      <td>West</td>
-      <td>41.41</td>
-    </tr>
-    <tr>
-      <th>704</th>
-      <td>West</td>
-      <td>43.20</td>
-    </tr>
-  </tbody>
-</table>
-<p>705 rows × 2 columns</p>
-</div></div></div>
-</div>
-<p>To do the encoding, we’ll use the <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> library’s
-<code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> class.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
-
-<span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span>
-    <span class="c1"># categories argument sets column order</span>
-    <span class="n">categories</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;Northeast&#39;</span><span class="p">,</span> <span class="s1">&#39;West&#39;</span><span class="p">,</span> <span class="s1">&#39;Midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;South&#39;</span><span class="p">]],</span>
-    <span class="n">drop</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;region&#39;</span><span class="p">]])</span>
-<span class="n">X</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0., 0., 1.],
-       [0., 0., 1.],
-       [0., 0., 1.],
-       ...,
-       [1., 0., 0.],
-       [1., 0., 0.],
-       [1., 0., 0.]])
-</pre></div>
-</div>
-</div>
-</div>
-<p>Now, we have a design matrix stored in the variable <code class="docutils literal notranslate"><span class="pre">X</span></code>.
-Since we’ve dropped the <code class="docutils literal notranslate"><span class="pre">Northeast</span></code> column from the design matrix,
-the three resulting features represent the
-<code class="docutils literal notranslate"><span class="pre">West</span></code>, <code class="docutils literal notranslate"><span class="pre">Midwest</span></code>, and <code class="docutils literal notranslate"><span class="pre">South</span></code> regions.
-Let’s fit a multiple linear model that predicts AUM from the one-hot encoded
-regions.
-Rather than defining our own functions, we’ll use the <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> class
-from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;aum&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although we’ve defined our own model fitting functions earlier in this chapter,
-in practice we prefer to use a library like <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> for modeling
-since its code is highly optimized.
-For example, the matrix multiplication code we wrote for fitting
-multiple linear models runs very slowly when we have many observations.
-<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> can handle larger datasets without issue.</p>
-</div>
-</div>
-<div class="section" id="interpreting-models-when-using-one-hot-encoding">
-<h2><span class="section-number">15.5.5. </span>Interpreting Models When Using One-Hot Encoding<a class="headerlink" href="#interpreting-models-when-using-one-hot-encoding" title="Permalink to this headline">¶</a></h2>
-<p>Using one-hot encoding gives a natural interpretation for the model parameters.
-The intercept of the model represents the expected outcome for the category
-we removed from the design matrix.
-In our case, we took out the <code class="docutils literal notranslate"><span class="pre">Northeast</span></code> column, so the model’s intercept
-parameter represents the predicted AUM for the Northeast region.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Predicted AUM for Northeast: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">intercept_</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predicted AUM for Northeast: 44.01
-</pre></div>
-</div>
-</div>
-</div>
-<p>Next, let’s look at the model parameters.
-We’ve displayed them in the table below.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;coef&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;West&#39;</span><span class="p">,</span> <span class="s1">&#39;Midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;South&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>coef</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>West</th>
-      <td>1.17</td>
-    </tr>
-    <tr>
-      <th>Midwest</th>
-      <td>3.20</td>
-    </tr>
-    <tr>
-      <th>South</th>
-      <td>-3.25</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Under a one-hot encoding, each model parameter represents
-the model’s expected difference between that
-region and the Northeast.
-For instance, the West has a coefficient of 1.17, which means that the model
-predicts that commuting zones in the West will have 1.17 higher AUM than
-the Northeast on average.
-Likewise, the model predicts that the South has 3.25 lower AUM than the
-Northeast.
-In other words, the coefficients tell us how the model adjusts the
-AUM relative to the Northeast.</p>
-<p>We used a small example here to more clearly show how one-hot encoding works.
-In practice, we combine the one-hot encoded features with other features
-so that our design matrix represents both numeric and categorical features.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>One-hot encoding is also known as using <em>dummy variables</em>.
-The term dummy variables is more common in statistics and econometrics.</p>
-</div>
-<p>In this section, we introduced feature engineering, where we
-transform data before fitting a model.
-We saw how using the one-hot encoding technique lets us fit linear models
-on categorical data.
-And, one-hot encoding gives us a natural interpretation for model parameters.
-There are many other kinds of feature engineering, like using polynomial
-terms.
-In general, data scientists apply their domain knowledge to figure out
-useful feature engineering steps for their models.</p>
+But categorical data is often useful for prediction as well.</p>
 </div>
 </div>
 
