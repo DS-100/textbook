@@ -804,7 +804,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="inf_pred_gen_prob.html">
-     16.7. Probability, Inference, and Prediction
+     16.7. Probability for Inference and Prediction
     </a>
    </li>
    <li class="toctree-l2">
@@ -1252,8 +1252,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-prediction-the-weight-of-a-donkey">
-   16.5.3. Example: Prediction the weight of a donkey
+  <a class="reference internal nav-link" href="#example-predicting-the-incremental-growth-of-a-crab">
+   16.5.3. Example: Predicting the incremental growth of a crab
   </a>
  </li>
 </ul>
@@ -1287,8 +1287,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-prediction-the-weight-of-a-donkey">
-   16.5.3. Example: Prediction the weight of a donkey
+  <a class="reference internal nav-link" href="#example-predicting-the-incremental-growth-of-a-crab">
+   16.5.3. Example: Predicting the incremental growth of a crab
   </a>
  </li>
 </ul>
@@ -1302,12 +1302,14 @@
                 
   <div class="section" id="basics-of-prediction-intervals">
 <h1><span class="section-number">16.5. </span>Basics of Prediction Intervals<a class="headerlink" href="#basics-of-prediction-intervals" title="Permalink to this headline">¶</a></h1>
-<p>Confidence intervals convey the accuracy of an estimator, but sometimes we want the accuracy of a prediction for a future observation. For example, someone might say: half the time my bus arrives at most 3/4 of a minute late, but how bad might the wait get? As another example, the California Department of Fish and Game sets the minimum catch size for Dungeness crabs to 146 mm, and a recreational fishing company might wonder how much bigger than 146 mm their customer’s catch might be when they bring them fishing. And as yet another example, a vet estimates the weight of a donkey to be 169 kg based on its length and girth and uses this estimate to administer medication. For the donkey’s safety, the vet is keen to know how different the donkey’s real weight might be from this estimate.</p>
-<p>What these examples have in common is an interest in the prediction of a future observation, and the desire to quantify how far that future observation might be from this prediction. We are also using the observed statistic (the estimator) as the prediction in all of these scenarios. In the following sections, we will work through these examples to provide additional information about the size of the variation of observations from the predicted value.</p>
+<p>Confidence intervals convey the accuracy of an estimator, but sometimes we want the accuracy of a prediction for a future observation. For example, someone might say: half the time my bus arrives at most 3/4 of a minute late, but how bad might the wait get? As another example, the California Department of Fish and Game sets the minimum catch size for Dungeness crabs to 146 mm, and a recreational fishing company might wonder how much bigger than 146 mm their customer’s catch might be when they bring them fishing. And for another example, a vet estimates the weight of a donkey to be 169 kg based on its length and girth and uses this estimate to administer medication. For the donkey’s safety, the vet is keen to know how different the donkey’s real weight might be from this estimate.</p>
+<p>What these examples have in common is an interest in the prediction of a future observation, and the desire to quantify how far that future observation might be from this prediction. Just like with confidence intervals, we compute the statistic (the estimator) and use it in making the prediction,
+but now we’re interested in typical deviations of future observations from the prediction.
+In the following sections, we work through examples of prediction intervals based on quantiles, standard deviations, and those conditional on covariates. Along the way, we provide additional information about the typical variation of observations about the prediction.</p>
 <div class="section" id="example-predicting-bus-wait-times">
 <h2><span class="section-number">16.5.1. </span>Example: Predicting Bus Wait Times<a class="headerlink" href="#example-predicting-bus-wait-times" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> models the lateness of a Seattle bus in arriving at a particular stop. We observed that the distribution was highly skewed and chose to estimate the typical lateness by the median, which was 0.74 minutes. We reproduce the sample histogram from that chapter here.</p>
-<p>The prediction problem addresses how late might the bus be tomorrow. While the median is informative, it doesn’t provide information about the skewness of the distribution so from the median alone, we don’t know how bad the wait might get.
+<p>The prediction problem addresses how late the bus might be tomorrow. While the median is informative, it doesn’t provide information about the skewness of the distribution. That is, we don’t know how bad the wait might get.
 The 75th percentile, or even the 95th percentile, would add useful information to consider. We compute them here:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1325,53 +1327,284 @@ The 75th percentile, or even the 95th percentile, would add useful information t
 </div>
 </div>
 </div>
-<p>From these statistics, we learn that while more than half the time the bus is not even a minute late, another quarter of the time it’s less than four minutes late, but it’s can easily happen that the bus is nearly a quarter of an hour late. These three values together help us make plans.</p>
+<p>From these statistics, we learn that while more than half the time the bus is not even a minute late, another quarter of the time it’s up to almost four minutes late, and with some regularity it can happen that the bus is nearly a quarter of an hour late. These three values together help us make plans.</p>
 </div>
 <div class="section" id="example-predicting-crab-size">
 <h2><span class="section-number">16.5.2. </span>Example: Predicting Crab Size<a class="headerlink" href="#example-predicting-crab-size" title="Permalink to this headline">¶</a></h2>
-<p>Fishing for Dungeness crabs is highly regulated, including limiting the size of caught crabs in recreational fishing to 146 mm. To better understand the population of Dungeness crabs, the California Department of Fish and Game worked with commercial crab fishers from northern California and southern Oregon to capture, measure, and release crabs. Below is a histogram of the size a crab’s shell for the approximately 450 crabs caught.</p>
+<p>Fishing for Dungeness crabs is highly regulated, including limiting the size to 146 mm of crabs caught for recreation. To better understand the distribution of shell size of Dungeness crabs, the California Department of Fish and Game worked with commercial crab fishers from northern California and southern Oregon to capture, measure, and release crabs. Below is a histogram of crab shell sizes for the approximately 450 crabs caught.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/inf_pred_gen_PI_10_0.svg" src="../../_images/inf_pred_gen_PI_10_0.svg" /></div>
 </div>
-<p>We can summarize the distribution by the average shell size:</p>
-<div class="cell tag_hide-input docutils container">
+<p>The distribution is somewhat skewed left, but the average and standard deviation are reasonably summary statistics of the distribution.</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average crab shell width: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">crab_shell</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">crabs</span><span class="p">[</span><span class="s1">&#39;shell&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Average crab shell width: 146 mm
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>count    452.0
+mean     132.0
+std       11.0
+         ...  
+50%      133.0
+75%      140.0
+max      155.0
+Name: shell, Length: 8, dtype: float64
 </pre></div>
 </div>
 </div>
 </div>
-<p>The average, 146 mm, is a good prediction for the typical size of crab. However, it lacks information about how far an individual crab may vary from the average. The standard deviation can fill in this gap:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Standard deviation of crabs shell width: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">crab_shell</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Standard deviation of crabs shell width: 10 mm
-</pre></div>
-</div>
-</div>
-</div>
-<p>Now we see that the crabs routinely differ from the typical 146 mm by 10 to 20 mm. This information is helpful in developing policies around crab fishing to maintain the health of the crab population and to set expectations for the recreational fisher.</p>
-</div>
-<div class="section" id="example-prediction-the-weight-of-a-donkey">
-<h2><span class="section-number">16.5.3. </span>Example: Prediction the weight of a donkey<a class="headerlink" href="#example-prediction-the-weight-of-a-donkey" title="Permalink to this headline">¶</a></h2>
-<p>In <a class="reference internal" href="../18/donkey_intro.html#ch-donkey"><span class="std std-numref">Chapter 18</span></a>, a model was</p>
-<p>It doesn’t matter that the model is over parameterized. We are not interested in
-the fitted coefficients</p>
-<p>Nearly all (95%) of the actual weights are within 10% of the predicted weights</p>
-<p>Healthy donkey over 5 years of age</p>
+<p>The average, 132 mm, is a good prediction for the typical size of crab. However, it lacks information about how far an individual crab may vary from the average. The standard deviation can fill in this gap.</p>
+<p>In addition to the variability of individual observations about the center of the distribution, we also take into account the variability in our estimate of the mean shell size. We can use the bootstrap to estimate this variability or we can use probability theory (we do this in the next section) to show that the standard deviation of the estimator is <span class="math notranslate nohighlight">\(SD(pop)/\sqrt{n}\)</span>.
+Also, in the next section, we show that these two sources of variation combine as follows:</p>
 <div class="math notranslate nohighlight">
-\[predict\_weight ~=~ -175 ~+~ length ~+~ 2girth\]</div>
-<p>length 101, girth 116  prediction is</p>
+\[
+\sqrt{SD(pop)^2 + \frac {SD(pop)^2}{n}} ~=~ SD(pop) \sqrt{1 + \frac {1}{n}}
+\]</div>
+<p>We substitute <span class="math notranslate nohighlight">\(SD(sample)\)</span> in for <span class="math notranslate nohighlight">\(SD(pop)\)</span> and apply this formula to our crabs:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred_spread</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">crabs</span><span class="p">[</span><span class="s1">&#39;shell&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">crabs</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prediction error: </span><span class="si">{</span><span class="n">pred_spread</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> mm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Prediction error: 11.1 mm
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that including the SE(sample average) increases the prediction error only slightly, since the sample is so large. We conclude that crabs routinely differ from the typical size of 132 mm by 11 to 22 mm. This information is helpful in developing policies around crab fishing to maintain the health of the crab population and to set expectations for the recreational fisher.</p>
+</div>
+<div class="section" id="example-predicting-the-incremental-growth-of-a-crab">
+<h2><span class="section-number">16.5.3. </span>Example: Predicting the incremental growth of a crab<a class="headerlink" href="#example-predicting-the-incremental-growth-of-a-crab" title="Permalink to this headline">¶</a></h2>
+<p>After Dungeness crabs mature, they continue to grow by casting off their shell and building a new larger one to grow into each year; this process is called molting. The California Department of Fish and Game, wanted a better understanding of crab growth so they could set better limits on fishing that would protect the crab population. The crabs caught in the study mentioned above were about to molt, and in addition to measuring their size, the change in shell size from before to after molting was also recorded.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">crabs</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>shell</th>
+      <th>inc</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>shell</th>
+      <td>1.0</td>
+      <td>-0.6</td>
+    </tr>
+    <tr>
+      <th>inc</th>
+      <td>-0.6</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>These two measurements are negatively correlated, meaning that the larger the crab, the less they grow when they molt. We plot the growth increment against the shell size to determine whether the relationship between these variables is roughly linear.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">crabs</span><span class="p">[</span><span class="s1">&#39;inc&#39;</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span> <span class="n">crabs</span><span class="p">[</span><span class="s1">&#39;shell&#39;</span><span class="p">],</span> 
+                 <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/inf_pred_gen_PI_21_0.svg" src="../../_images/inf_pred_gen_PI_21_0.svg" /></div>
+</div>
+<p>The relationship appears linear, and we can fit a simple linear model to explain the growth  increment by the pre-molt size of the shell. For this example, we use the <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> library, which provides prediction intervals with <code class="docutils literal notranslate"><span class="pre">get_prediction</span></code>. We first set up the design matrix and response variable, and then we use <code class="docutils literal notranslate"><span class="pre">OLS</span></code> to fit the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">crabs</span><span class="p">[</span><span class="s1">&#39;inc&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">crabs</span><span class="p">[[</span><span class="s1">&#39;shell&#39;</span><span class="p">]]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inc_model</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">inc_model</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">0.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> 
+      <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Slope: </span><span class="si">{</span><span class="n">inc_model</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">0.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: 29.796 
+Slope: -0.116
+</pre></div>
+</div>
+</div>
+</div>
+<p>The fitted line is:</p>
+<div class="math notranslate nohighlight">
+\[
+29.796 ~-~ 0.116 \times Shell~size
+\]</div>
+<p>When modeling, we create prediction intervals for given values of the explanatory variable, which we are calling <span class="math notranslate nohighlight">\(\mathbf{x}_0\)</span>.  For example, if a newly caught crab is 120 mm across, then we use our fitted model to predict its shell’s growth:</p>
+<div class="math notranslate nohighlight">
+\[
+29.796 ~-~ (0.116 \times 120) ~=~ 15.85 
+\]</div>
+<p>As in the previous example, the variability of our prediction for an individual observation, includes the variability in our estimate of the crab’s growth and the crab-to-crab variation in shell size. Again, we can use the bootstrap to estimate this variation, or we can use probability theory to show that these two sources of variation combine as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+SD(\mathbf{e}) \sqrt{1 + \mathbf{x}_0 (\textbf{X}^\top \textbf{X})^{-1}\mathbf{x}_0^\top} 
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\textbf{X}\)</span> is the design matrix that consists of the original data, <span class="math notranslate nohighlight">\(\mathbf{e}\)</span> is the <span class="math notranslate nohighlight">\(n \times 1\)</span> column vector of residuals from the regression, and <span class="math notranslate nohighlight">\(\mathbf{x}_0\)</span> is the <span class="math notranslate nohighlight">\(1 \times (p + 1)\)</span> row vector of features for the new observation (in this example these are <span class="math notranslate nohighlight">\(\left[1, 120\right]\)</span>.</p>
+<p>In this case, our <span class="math notranslate nohighlight">\(\mathbf{x}_0\)</span> is:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_X</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>const</th>
+      <th>shell</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>120.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">get_prediction</span></code> method in <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> to find a 95% prediction interval for a crab with a 120 mm shell:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="n">inc_model</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">new_X</span><span class="p">)</span>
+
+<span class="n">pred</span><span class="o">.</span><span class="n">summary_frame</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>mean_se</th>
+      <th>mean_ci_lower</th>
+      <th>mean_ci_upper</th>
+      <th>obs_ci_lower</th>
+      <th>obs_ci_upper</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>15.86</td>
+      <td>0.12</td>
+      <td>15.63</td>
+      <td>16.08</td>
+      <td>12.48</td>
+      <td>19.24</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Here we have both a confidence interval for the average shell size and a prediction interval for the growth increment of a crab with a 120 mm shell.   The prediction interval is quite a bit wider because it is taking into account the variation in crab growth. This variation is about the regression line, which we approximate by the SD of the residuals. With knowledge of the value of the crab shell size, we focus in on a narrow range of <span class="math notranslate nohighlight">\(x\)</span> values, and use the regression line to make a prediction of the growth increment. The correlation between shell size and growth increment means that the variation will be smaller than the SD of all growth increments.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Residual SD: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">inc_model</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Residual SD: 1.71
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crab growth SD: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">crabs</span><span class="p">[</span><span class="s1">&#39;inc&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Crab growth SD: 2.14
+</pre></div>
+</div>
+</div>
+</div>
+<p>These intervals rely on the normal approximation to the distribution of incremental growth about the regression line. That’s why the prediction interval endpoints are roughly twice the residual SD away from the prediction. In the next section, we dive more deeply into these calculations of standard deviations, estimators, and predictions. And we discuss some of the assumptions that we make in calculating them.</p>
 </div>
 </div>
 
