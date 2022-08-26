@@ -1292,51 +1292,42 @@
                 
   <div class="section" id="example-where-is-the-land-of-opportunity">
 <span id="sec-linear-case"></span><h1><span class="section-number">15.5. </span>Example: Where is the Land of Opportunity?<a class="headerlink" href="#example-where-is-the-land-of-opportunity" title="Permalink to this headline">¶</a></h1>
-<p>The US was nicknamed “the land of opportunity” because people believed that in the US
-even people with few resources can end up wealthy—economists call this
+<p>The US is nicknamed “the land of opportunity” because people believe that in the US
+even those with few resources can end up wealthy—economists call this
 economic mobility.
-In a famous study, economist Raj Chetty and his colleagues
-did a large-scale data analysis on
+In one study, economist Raj Chetty and his colleagues did a large-scale data analysis on
 economic mobility in the US <span id="id1">[<a class="reference internal" href="../../references.html#id36">Chetty <em>et al.</em>, 2014</a>]</span>.
-Chetty had a hunch that some places in the US have much higher economic
-mobility than others.
+His basic question was whether the US is a land of opportunity.
+To answer this question, Chetty had to find a way to measure economic mobility.</p>
+<p>Chetty accessed government tax records to get the 2011-12 incomes for everyone born in the US between 1980-82; he also obtained the incomes of their parents at the time they were born.
+In total, his dataset had about 10 million people.
+To measure economic mobility, Chetty took the subset of people born in a particular geographic region whose parents’ income was in the 25th income percentile (for that region), and he found their average income percentile in 2011. Chetty calls this statistic the <em>absolute upward mobility</em> (AUM).
+If a region’s average AUM is 25, then people born into the 25th percentile generally
+stay in the 25th percentile—they remain where their parents were when they born.
+High AUM values mean that the region has more upward mobility.
+People born in these regions generally wind up in a higher income bracket than their parents.
+For reference, the US average AUM is about 41 at the time of this writing.
+Chetty calculated the AUM for regions called commuting zones (CZ), which are roughly on the
+same scale as counties.</p>
+<p>While the granularity of the original data is an individual, the data Chetty analyzed has a granularity at the CZ level. Income records can’t be publicly available because of privacy,
+but the AUM for a commuting zone can be made available. However, even with the granularity of a commuting zone, not all commuting zones are included in the data set because with the 40 features available in the data it might be possible to identify individuals in small CZs. This limitation points to a potential coverage bias. Measurement bias is another potential problem. For example, children of parents who become extremely wealthy may not file income taxes.</p>
+<p>We also point out the limitations of working with data that are regional averages, rather than individual measurements. The relationships found between features are often more highly correlated at the aggregate level than at the individual level. This phenomenon is called <em>ecological regression</em>, and interpretations of findings from aggregated data need to be made with care.</p>
+<p>Chetty had a hunch that some places in the US have higher economic mobility than others.
 His analysis found this to be true.
 He found that some cities, such as San Jose, Washington DC, and Seattle, have higher
 mobility than others, such as Charlotte, Milwaukee, and Atlanta.
-This means that overall, people move from low to high income brackets in San Jose
+This means that, for example, people move from low to high income brackets in San Jose
 at a higher rate compared to Charlotte.
-Chetty also used linear models to find that social and economic
+Chetty used linear models to find that social and economic
 factors like segregation, income inequality, and local school systems
-are related to economic mobility.
-In this chapter, we use linear models to replicate parts of his analysis.</p>
-<p>To do his analysis, Chetty used government tax records to get the incomes of
-everyone born in the US between 1980-82.
-He looked at each person’s income in 2011-12 when they were about
-30 years old, and compared it to their parents’ income when they were born.
-In total, his dataset had about 10 million people.
-To measure economic mobility, Chetty took the people who were born into the
-25th income percentile and found their income percentile 30 years later.
-He calls this statistic the <em>absolute upward mobility</em> (AUM).
-If a region’s average AUM is 25, then people in the 25th percentile generally
-stay in the 25th percentile—they remain where their parents were when they born.
-High AUM values mean that the region has more upward mobility.
-People in these regions are generally in a higher income bracket than their parents.
-For reference, the US average AUM is about 41 at the time of this writing.
-Chetty averaged together the AUMs for regions of the US called commuting zones
-(CZ).
-Commuting zones are defined by the economy of a region and are on the
-same scale as counties.
-While individual income records can’t be publicly available because of privacy,
-the AUMs for each commuting zone are publicly available, and since Chetty
-used commuting zone AUMs, we can replicate his analysis.</p>
+are related to economic mobility.</p>
 <p>In this analysis, our outcome variable is the AUM for a commuting zone, since we are
-interested in finding features that explain AUM.
+interested in finding features that correlate with AUM.
 There are many possible such features in Chetty’s data, but
 we first investigate one particular feature: the fraction of people in a CZ who have a 15-minute or shorter commute to work.</p>
 <div class="section" id="explaining-upward-mobility-using-commute-time">
 <h2><span class="section-number">15.5.1. </span>Explaining Upward Mobility using Commute Time<a class="headerlink" href="#explaining-upward-mobility-using-commute-time" title="Permalink to this headline">¶</a></h2>
-<p>Let’s take a look at the Opportunity data.
-We’ll load the data into the DataFrame called <code class="docutils literal notranslate"><span class="pre">cz_df</span></code>.</p>
+<p>We load the data into a DataFrame called <code class="docutils literal notranslate"><span class="pre">cz_df</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cz_df</span>
@@ -1463,11 +1454,11 @@ We’ll load the data into the DataFrame called <code class="docutils literal no
 <p>705 rows × 9 columns</p>
 </div></div></div>
 </div>
-<p>Each row in the data frame represents one commuting zone.
+<p>Each row represents one commuting zone.
 The column <code class="docutils literal notranslate"><span class="pre">aum</span></code> has the average AUM metric for the commuting zone.
 There are many columns in this data frame, but for now we focus
 on the fraction of people in a CZ that have a 15 minute or shorter commute time,
-which is called <code class="docutils literal notranslate"><span class="pre">frac_traveltime_lt15</span></code>.
+which is called <code class="docutils literal notranslate"><span class="pre">travel_lt15</span></code>.
 We plot AUM against this fraction to see the relationship between the two variables.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1477,8 +1468,10 @@ We plot AUM against this fraction to see the relationship between the two variab
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_case_10_0.svg" src="../../_images/linear_case_10_0.svg" /></div>
+<img alt="../../_images/linear_case_11_0.svg" src="../../_images/linear_case_11_0.svg" /></div>
 </div>
+<p>The scatter plot shows a rough linear association between AUM and travel time.
+Indeed, we find the correlation to be quite strong.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
@@ -1525,213 +1518,102 @@ We plot AUM against this fraction to see the relationship between the two variab
 </table>
 </div></div></div>
 </div>
+<p>We fit a simple linear model, explaining AUM with commute time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;aum&#39;</span><span class="p">]]</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;travel_lt15&#39;</span><span class="p">]]</span>
 
-<span class="n">slr_aum</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">model1</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">slr_aum</span><span class="o">.</span><span class="n">intercept_</span><span class="si">}</span><span class="s2">  Slope: </span><span class="si">{</span><span class="n">slr_aum</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Intercept: </span><span class="si">{</span><span class="n">model1</span><span class="o">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;Slope: </span><span class="si">{</span><span class="n">model1</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: [31.27]  Slope: [28.66]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Intercept: 31.3
+ Slope: 28.7
 </pre></div>
 </div>
 </div>
 </div>
+<p>Interestingly, an increase in upward mobility of a CZ is associated with an increase in the fraction of people with a short commute time.</p>
+<p>We can compare the SD of the AUM measurements to the SD of the residuals. This comparison gives us a sense of how useful the model is in explaining the variation in AUM.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">slr_aum</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted1</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">errors1</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SD(errors): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors1</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;SD(AUM): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">cz_df</span><span class="p">[</span><span class="s1">&#39;aum&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.46
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted_aum</span> <span class="o">=</span> <span class="n">slr_aum</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">errors</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted_aum</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>aum    4.14
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SD(errors): aum    4.14
 dtype: float64
+ SD(AUM): 5.61
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">cz_df</span><span class="p">[</span><span class="s1">&#39;aum&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.614675842001113
-</pre></div>
-</div>
-</div>
-</div>
+<p>The size of the errors about the regression line have decreased by about 25%.</p>
+<p>Additionally, we examine the residuals for lack of linear fit since it can be easier to see curvature in a residual plot than in a plot of the original data.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x12678b970&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x11c072be0&gt;
 </pre></div>
 </div>
-<img alt="../../_images/linear_case_18_1.svg" src="../../_images/linear_case_18_1.svg" /></div>
+<img alt="../../_images/linear_case_20_1.svg" src="../../_images/linear_case_20_1.svg" /></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We’ll work with <span class="math notranslate nohighlight">\( \epsilon \)</span> more rigorously in future chapters.
-For now, the important idea to remember is that the model depends on
-<span class="math notranslate nohighlight">\( x \)</span>. For example,
-when <span class="math notranslate nohighlight">\( \theta_1 \)</span> is positive, bigger values of <span class="math notranslate nohighlight">\( x \)</span> make the
-prediction <span class="math notranslate nohighlight">\( f_{\theta}(x) \)</span> bigger.</p>
-</div>
+<p>It appears that the errors grow with AUM. We might try a transformation of the response variable, or fitting a model that is quadratic in the commute time fraction. We consider transformations and polynomials in the next section. First we see whether including additional variables offers a more accurate prediction of AUM.</p>
 </div>
 <div class="section" id="relating-upward-mobility-using-multiple-variables">
 <h2><span class="section-number">15.5.2. </span>Relating Upward Mobility Using Multiple Variables<a class="headerlink" href="#relating-upward-mobility-using-multiple-variables" title="Permalink to this headline">¶</a></h2>
-<p>Before, we used the fraction of people with a ≤15 min commute time to predict
-the AUM for a commuting zone.
-Now, we’d like to use a combination of predictors.
-In his original analysis, Chetty created nine high-level
-predictor categories like segregation, income, and K-12 education.
-We’ll take one predictor from each of Chetty’s categories for a total of
-nine predictors, described in <a class="reference internal" href="#tbl-linear-predictors"><span class="std std-numref">Table 15.1</span></a>.</p>
+<p>In his original analysis, Chetty created several high-level
+features related to segregation, income, K-12 education, etc.
+We consider eight of Chetty’s predictors as we aim to build a more informative model for explaining AUM. These are described in <a class="reference internal" href="#tbl-linear-predictors"><span class="std std-numref">Table 15.1</span></a>.</p>
 <table class="colwidths-auto table" id="tbl-linear-predictors">
-<caption><span class="caption-number">Table 15.1 </span><span class="caption-text">The nine variables we use to predict AUM</span><a class="headerlink" href="#tbl-linear-predictors" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-number">Table 15.1 </span><span class="caption-text">Potential explanatory for modeling AUM</span><a class="headerlink" href="#tbl-linear-predictors" title="Permalink to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Column name</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>frac_traveltime_lt15</p></td>
+<tr class="row-even"><td><p>travel_lt15</p></td>
 <td><p>Fraction of people with a ≤15 minute commute to work.</p></td>
 </tr>
 <tr class="row-odd"><td><p>gini</p></td>
 <td><p>Gini coefficient, an measure of wealth inequality. Values are between 0 and 1, where small values mean wealth is evenly distributed and large values mean more inequality.</p></td>
 </tr>
-<tr class="row-even"><td><p>dropout_r</p></td>
-<td><p>High school dropout rate.</p></td>
-</tr>
-<tr class="row-odd"><td><p>rel_tot</p></td>
+<tr class="row-even"><td><p>rel_tot</p></td>
 <td><p>Fraction of people who self-reported as religious.</p></td>
 </tr>
-<tr class="row-even"><td><p>cs_fam_wkidsinglemom</p></td>
+<tr class="row-odd"><td><p>single_mom</p></td>
 <td><p>Fraction of children with a single mother.</p></td>
 </tr>
-<tr class="row-odd"><td><p>taxrate</p></td>
+<tr class="row-even"><td><p>taxrate</p></td>
 <td><p>Local tax rate.</p></td>
 </tr>
-<tr class="row-even"><td><p>gradrate_r</p></td>
-<td><p>College graduation rate.</p></td>
+<tr class="row-odd"><td><p>worked_14</p></td>
+<td><p>Fraction of 14-16 year old teenagers who work.</p></td>
 </tr>
-<tr class="row-odd"><td><p>frac_worked1416</p></td>
-<td><p>Fraction of teenagers who are working.</p></td>
-</tr>
-<tr class="row-even"><td><p>cs_born_foreign</p></td>
+<tr class="row-even"><td><p>foreign</p></td>
 <td><p>Fraction of people born outside the US.</p></td>
+</tr>
+<tr class="row-odd"><td><p>region</p></td>
+<td><p>Region where the commuting zone is located (Northeast, Midwest, South, West).</p></td>
 </tr>
 </tbody>
 </table>
-<p>Our original dataframe has around 40 predictors.
-We take a subset of the columns in the dataframe to create a design matrix <span class="math notranslate nohighlight">\(\textbf{X}\)</span> and
-we extract the column of outcomes into a Series <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X2</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;travel_lt15&#39;</span><span class="p">,</span> <span class="s1">&#39;single_mom&#39;</span><span class="p">]]</span>
-     
-<span class="n">y</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;aum&#39;</span><span class="p">]]</span>
-
-<span class="n">model2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, </span><span class="se">\n</span><span class="s2">travel lt 15 min coefficient: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">,  </span><span class="se">\n</span><span class="s2">fraction of single moms coefficient: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: 49.0, 
-travel lt 15 min coefficient: 18.10,  
-fraction of single moms coefficient: -63.98
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X2</span><span class="p">)</span>
-<span class="n">errors2</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted2</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x1268151c0&gt;
-</pre></div>
-</div>
-<img alt="../../_images/linear_case_27_1.svg" src="../../_images/linear_case_27_1.svg" /></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>aum    2.85
-dtype: float64
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.74
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Design-matrix X has shape: (705, 1)
-Response y has length: (705, 1)
-</pre></div>
-</div>
-</div>
-</div>
-<p>Let’s look at <code class="docutils literal notranslate"><span class="pre">X</span></code>, a dataframe that we’re using as our design matrix.
-It has 479 observations and 9 predictors plus an intercept column:</p>
+<p>Let’s first examine the correlations between AUM and the explanatory features and between these features themselves. (In the next section, we show how to create a model that includes categorical features.)</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span>
@@ -1855,44 +1737,87 @@ It has 479 observations and 9 predictors plus an intercept column:</p>
 <p>8 rows × 8 columns</p>
 </div></div></div>
 </div>
-<p>Notice that our design matrix is a subset of our original dataframe—we just
-selected specific variables we want to use for prediction.
-Each row of our design matrix corresponds to an observation in our original
-data, and each column corresponds to a predictor variable.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Once again, we’ll point out that people from different backgrounds use
-different terminology.
-For example, we say that each row in the design matrix <span class="math notranslate nohighlight">\(X\)</span> is an observation
-and each column is a variable.
-This is more common among people with backgrounds in statistics.
-Others say that each column of the design matrix represents a <em>feature</em>.
-Also, we say that our overall process of fitting and interpreting models
-is called <em>modeling</em>, while others call it <em>machine learning</em>.</p>
-</div>
-<p>Now, let’s fit a multiple linear model.
-Recall that we’re using nine variables to predict AUM, the upward mobility for
-a commuting zone.
-As with the simple linear model, we’ll split our data into a training set and
-a test set.</p>
-<p>To understand this error, we can start by comparing the multiple linear model
-with the simple linear model from before that only used the fraction with
-≤15 min commute time.</p>
-<p>We see that the multiple linear model has about 60% lower error than the simple
-linear model—a big improvement!
-Let’s make residual plots for both multiple and simple linear models.</p>
+<p>We see that the fraction of single mothers in the commuting zone has the strongest correlation with AUM, which implies that it is also the single best feature to explain AUM.
+In addition, we see that several explanatory variables are highly correlated; the Gini coefficient is highly correlated with the fraction of teenagers who work, the fraction of single mothers, and the fraction with less than a 15-minute commute. With such highly correlated features, we need to take care in interpreting the coefficients because several different models might equally explain AUM with the covariates standing in for one another.</p>
+<p>To begin, we can consider all possible two-feature models to see which one has the smallest prediction errors. Chetty derived 40 potential variables to use as predictors, which would have us checking <span class="math notranslate nohighlight">\(40 \times 39 /2 = 780\)</span> models. Fitting models, with all pairs, triples, etc. of variables quickly grows out of control. And, can lead to finding spurious correlations. (See <a class="reference internal" href="../16/inf_pred_gen_intro.html#ch-inf-pred-theory"><span class="std std-numref">Chapter 16</span></a>.)</p>
+<p>Here, we keep things a bit simple and examine just one two-variable model that includes the travel time and single mother features. After that, we look at the model that has all 7 numeric explanatory features in our data frame.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X7</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[</span><span class="n">predictors</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X2</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;travel_lt15&#39;</span><span class="p">,</span> <span class="s1">&#39;single_mom&#39;</span><span class="p">]]</span>
+     
+<span class="n">y</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;aum&#39;</span><span class="p">]]</span>
 
-<span class="n">model7</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X7</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">model2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted7</span> <span class="o">=</span> <span class="n">model7</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X7</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Intercept: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;Fraction with under 15 minute commute: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>  
+      <span class="sa">f</span><span class="s2">&quot;Fraction of single moms: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Intercept: 49.0 
+ Fraction with under 15 minute commute: 18.10 
+ Fraction of single moms: -63.98
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that the coefficient for travel time is quite different than the coefficient for this variable in the simple linear model. That’s because the two features in our model are highly correlated. We need to keep in mind the other variables in the model when we interpret the coefficients.</p>
+<p>Next we compare the errors from the two fits.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X2</span><span class="p">)</span>
+<span class="n">errors2</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted2</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; SD(errors in model 1): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors1</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;SD(errors in model 2): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> SD(errors in model 1): aum    4.14
+dtype: float64
+ SD(errors in model 2): aum    2.85
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>The SD of the residuals have been reduced by another 30%. Adding a second variable to the model seems worth the extra complexity.</p>
+<p>Let’s again visually examine the residual. We use the same scale on the <span class="math notranslate nohighlight">\(y\)</span>-axis to make it easier to compare with the plot for the one-variable model.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x11c136520&gt;
+</pre></div>
+</div>
+<img alt="../../_images/linear_case_35_1.svg" src="../../_images/linear_case_35_1.svg" /></div>
+</div>
+<p>The larger variability in the errors for higher AUM is still present. The implications are that the estimates, <span class="math notranslate nohighlight">\(\hat{y}\)</span>, are unaffected, but confidence and prediction intervals will be too narrow for larger AUM. This problem can be addressed by <em>weighted regression</em>. See XXX if you are interested in learning more about this topic.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Once again, we point out that data scientists from different backgrounds use
+different terminology to refer to the same concept.
+For example, we say that each row in the design matrix <span class="math notranslate nohighlight">\(\textbf{X}\)</span> is an observation
+and each column is a variable.
+This terminology is more common among people with backgrounds in statistics.
+Others say that each column of the design matrix represents a <em>feature</em>.
+Also, we say that our overall process of fitting and interpreting models
+is called <em>modeling</em>, while others call it <em>machine learning</em>.</p>
+</div>
+<p>Now, let’s fit a multiple linear model that uses all seven numeric variables to explain upward mobility. After fitting the model, we again plot the errors using the same <span class="math notranslate nohighlight">\(y\)</span>-axis scale as in the previous two residual plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X7</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[</span><span class="n">predictors</span><span class="p">]</span>
+
+<span class="n">model7</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X7</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">predicted7</span> <span class="o">=</span> <span class="n">model7</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X7</span><span class="p">)</span>
 <span class="n">errors7</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted7</span>
 </pre></div>
 </div>
@@ -1900,14 +1825,15 @@ Let’s make residual plots for both multiple and simple linear models.</p>
 </div>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x10c270790&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x11c1728e0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/linear_case_40_1.svg" src="../../_images/linear_case_40_1.svg" /></div>
 </div>
+<p>The model with seven features does not appear to be much better than the two-variable model. In fact, the standard deviation of the residuals has only decreased by 8%.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors7</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors7</span><span class="p">)</span> 
 </pre></div>
 </div>
 </div>
@@ -1918,68 +1844,26 @@ dtype: float64
 </div>
 </div>
 </div>
+<p>We can compare the Multiple <span class="math notranslate nohighlight">\(R^2\)</span> for these three models. (The adjustment for the number of features in the model makes little difference for us since we have over 700 observations.)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">model7</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X7</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; R-square for 7-variable model: </span><span class="si">{</span><span class="n">model7</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X7</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+     <span class="sa">f</span><span class="s2">&quot;R-square for 2-variable model: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+     <span class="sa">f</span><span class="s2">&quot;R-square for 1-variable model: </span><span class="si">{</span><span class="n">model1</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.79
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> R-square for 7-variable model: 0.79
+ R-square for 2-variable model: 0.74
+ R-square for 1-variable model: 0.46
 </pre></div>
 </div>
 </div>
 </div>
-<p>We can see that the multiple linear model’s residuals are much closer to 0
-in general, which helps to explain why the MSE is also lower.</p>
-<p>Now, let’s look at our multiple linear model.
-Since our model has 7 predictor variables, we’ll show the model coefficients in
-a table rather than writing out the long model equation:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model7</span><span class="o">.</span><span class="n">coef_</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 12.56,  -3.67,   7.65, -52.18,  36.57, 352.18,   4.94]])
-</pre></div>
-</div>
-</div>
-</div>
-<p>Let’s look at the coefficient for <code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>, the college graduation rate.
-For a multiple linear model, we interpret this coefficient as saying:
-if we took two commuting zones that are the same in all predictors except
-<code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>, the model predicts that the commuting zone with a 0.1 larger
-<code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code> also has a 0.051 higher AUM.
-The key difference for multiple linear models is that
-we only have a useful interpretation for a coefficient when we can
-hold the other predictors constant.</p>
-<p>Unfortunately, this is not always the case.
-As an extreme example, let’s say our model happened to have an extra
-predictor <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">gradrate_r</span></code> which doubles each value from <code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>.
-If our model had this predictor, it doesn’t make sense to talk about
-<code class="docutils literal notranslate"><span class="pre">gradrate_r</span></code>’s coefficient since we can’t hold <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">gradrate_r</span></code> constant.
-In general, we need to watch out for <em>collinearity</em>, where two predictor
-variables are highly correlated with each other.
-If our model has variables with high collinearity, we can’t make useful
-interpretations for the model coefficients.</p>
-<p>To check for collinearity, we can look at the correlations between each pair
-of predictors, as shown in the heatmap below.</p>
-<p>We see that <code class="docutils literal notranslate"><span class="pre">cs_fam_wkidsinglemom</span></code>, the fraction of families with a single mom,
-has a high correlation with several other predictors, like <code class="docutils literal notranslate"><span class="pre">gini</span></code> and
-<code class="docutils literal notranslate"><span class="pre">frac_worked1416</span></code>.
-Here, we face a central tension in modeling.
-If we want the most interpretable model, we should try to avoid collinearity.
-For instance, we could remove variables that are highly correlated with others.
-However, doing this often makes our model less accurate.
-Having an interpretable model can mean having a less accurate model.
-Is is better to have a highly interpretable model or a highly accurate one?
-It depends.
-Each modeling situation needs a different tradeoff, and it’s the
-job of the data scientist to understand and make this tradeoff.</p>
-<p>So far, our model requires all of the predictor variables to be numeric.
-But categorical data is often useful for prediction as well.</p>
+<p>We confirm our earlier observations that two variables greatly improves the explanatory capability of the model, and the seven-variable model offers little improvement over the two-variable model.</p>
+<p>So far, our models have used only numeric predictor variables.
+But, categorical data is often useful for model fitting as well. Additionally, in <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 10</span></a> we transformed variables and created new variables from combinations of variables. We address how to incorporate these variables into linear models next.</p>
 </div>
 </div>
 
