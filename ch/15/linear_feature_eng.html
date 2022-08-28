@@ -1242,8 +1242,13 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#one-hot-encoding">
-   15.6.1. One-Hot Encoding
+  <a class="reference internal nav-link" href="#categorical-features">
+   15.6.1. Categorical Features
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-end">
+   15.6.2. The End
   </a>
  </li>
 </ul>
@@ -1267,8 +1272,13 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#one-hot-encoding">
-   15.6.1. One-Hot Encoding
+  <a class="reference internal nav-link" href="#categorical-features">
+   15.6.1. Categorical Features
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-end">
+   15.6.2. The End
   </a>
  </li>
 </ul>
@@ -1281,117 +1291,938 @@
               <div>
                 
   <div class="section" id="feature-engineering">
-<span id="sec-linear-feature-eng"></span><h1><span class="section-number">15.6. </span>Feature Engineering<a class="headerlink" href="#feature-engineering" title="Permalink to this headline">¶</a></h1>
-<p>Since, a few observations are quite large, we zoom into the region where measurements  are less than 20 on the more accurate sensor to see if the relationship appears linear there.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_5_0.svg" src="../../_images/linear_feature_eng_5_0.svg" /></div>
-</div>
+<h1><span class="section-number">15.6. </span>Feature Engineering<a class="headerlink" href="#feature-engineering" title="Permalink to this headline">¶</a></h1>
+<p>All of the models that we have fit so far in this chapter have used existing numeric features from a data frame. In this section, we look at two other types of explanatory variables: those that are transformations of numeric variables and categorical variables. Creating transformations of variables is called <em>feature engineering</em>.</p>
+<p>We first introduced feature engineering in <code class="xref std std-numref docutils literal notranslate"><span class="pre">Chapter</span> <span class="pre">%s</span></code> and <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 10</span></a>. There, we transformed variables so that they had more symmetric distributions.  Transformed features can capture more kinds of patterns in the data and lead to better and more accurate models.</p>
+<p>We return to the data set we used as an example in <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 10</span></a> on house sale prices in the San Francisco Bay area to demonstrate how to use transformed features in linear models. This time, we restrict the data to houses sold in 2006, when sale prices were relatively stable, so we don’t need to account for trends in price over time.</p>
+<p>We wish to model sale price. Earlier, visualizations showed us that sale price was related to several features collected in the data frame, like the size of the house, the size of the lot, number of bedrooms, and the city. We transformed both sale price and the size of the house to improve their relationship, and we saw that box plots of sale price by the number of bedrooms, and box plots by city revealed interesting relationships. In this section, we show how to include transformed numeric features, an ordinal feature (the number of bedrooms), and nominal feature (the city) in a linear model.</p>
+<p>We begin by incorporating log transformed features in a model for sale price.
+The correlation matrix tell us which of our numeric explanatory variables (original and transformed) is most strongly correlated with sale price.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#import statsmodels.formula.api as sm</span>
-<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
-<span class="kn">from</span> <span class="nn">statsmodels.api</span> <span class="kn">import</span> <span class="n">add_constant</span>
-
-<span class="c1">#model1 = sm.ols(formula=&quot;pm25pa ~ pm25aqs&quot;, data=GA).fit()</span>
-
-<span class="c1">#model2 = sm.ols(formula=&quot;pm25pa ~ pm25aqs + rh&quot;, data=GA).fit()</span>
-
-<span class="n">y</span> <span class="o">=</span> <span class="n">AK</span><span class="p">[[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">AK</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]]</span>
-
-<span class="n">Xc</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-
-<span class="n">model1</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Xc</span><span class="p">)</span>
-<span class="c1">#print(est1.fit().summary())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>price</th>
+      <th>br</th>
+      <th>lsqft</th>
+      <th>bsqft</th>
+      <th>...</th>
+      <th>log_bsqft</th>
+      <th>log_lsqft</th>
+      <th>ppsf</th>
+      <th>log_ppsf</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>price</th>
+      <td>1.00</td>
+      <td>0.45</td>
+      <td>0.59</td>
+      <td>0.79</td>
+      <td>...</td>
+      <td>0.74</td>
+      <td>0.62</td>
+      <td>0.49</td>
+      <td>0.47</td>
+    </tr>
+    <tr>
+      <th>br</th>
+      <td>0.45</td>
+      <td>1.00</td>
+      <td>0.29</td>
+      <td>0.67</td>
+      <td>...</td>
+      <td>0.71</td>
+      <td>0.38</td>
+      <td>-0.18</td>
+      <td>-0.21</td>
+    </tr>
+    <tr>
+      <th>lsqft</th>
+      <td>0.59</td>
+      <td>0.29</td>
+      <td>1.00</td>
+      <td>0.46</td>
+      <td>...</td>
+      <td>0.44</td>
+      <td>0.85</td>
+      <td>0.29</td>
+      <td>0.27</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>log_lsqft</th>
+      <td>0.62</td>
+      <td>0.38</td>
+      <td>0.85</td>
+      <td>0.52</td>
+      <td>...</td>
+      <td>0.52</td>
+      <td>1.00</td>
+      <td>0.29</td>
+      <td>0.27</td>
+    </tr>
+    <tr>
+      <th>ppsf</th>
+      <td>0.49</td>
+      <td>-0.18</td>
+      <td>0.29</td>
+      <td>-0.08</td>
+      <td>...</td>
+      <td>-0.11</td>
+      <td>0.29</td>
+      <td>1.00</td>
+      <td>0.96</td>
+    </tr>
+    <tr>
+      <th>log_ppsf</th>
+      <td>0.47</td>
+      <td>-0.21</td>
+      <td>0.27</td>
+      <td>-0.10</td>
+      <td>...</td>
+      <td>-0.14</td>
+      <td>0.27</td>
+      <td>0.96</td>
+      <td>1.00</td>
+    </tr>
+  </tbody>
+</table>
+<p>9 rows × 9 columns</p>
+</div></div></div>
 </div>
+<p>Sale price correlates most highly with house size, called <code class="docutils literal notranslate"><span class="pre">bsqft</span></code> for building square feet. We make a scatter plot of sale price against house size to confirm the association is linear.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta_hats</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;bsqft&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;price&quot;</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_8_0.svg" src="../../_images/linear_feature_eng_8_0.svg" /></div>
+<img alt="../../_images/linear_feature_eng_9_0.svg" src="../../_images/linear_feature_eng_9_0.svg" /></div>
 </div>
+<p>The relationship does look roughly linear, but the very large and expensive houses are far from the center of the distribution and can overly influence the model fit. As shown in <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 10</span></a>, the log transformation makes the distributions of price and size more symmetric (both are log base 10 to make it easier to convert the values into the original units).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">fittedvalues</span>
-<span class="n">errors</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">resid</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;log_bsqft&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;log_price&quot;</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_10_0.svg" src="../../_images/linear_feature_eng_10_0.svg" /></div>
-</div>
-<div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/linear_feature_eng_11_0.svg" src="../../_images/linear_feature_eng_11_0.svg" /></div>
 </div>
+<p>Ideally, a transformation should make sense in the context of the data. If we fit a simple linear model for log(price) based on log(size), this implies that, say, a 10% increase in house size is associated with a <span class="math notranslate nohighlight">\(\theta * 10\)</span>% change in sale price. Or, if the model relates log-transformed price to the number of bedrooms, then one additional bedroom is associated with a <span class="math notranslate nohighlight">\(\theta\)</span> percent change in sale price. Both of these models make sense in the context of house sale prices so we fit them.</p>
+<p>Let’s begin by fitting a model that explains log-transformed price by the house’s log-transformed size. But first, we note that this model is still considered a linear model. If we represent sale price by <span class="math notranslate nohighlight">\(y\)</span> and house size by <span class="math notranslate nohighlight">\(x\)</span>, then the model is</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\log(y) ~&amp;=~ \theta_0 + \theta_1\log(x) 
+\end{aligned}
+\]</div>
+<p>Note that we have ignored the variation around the line in this equation to make the linear relationship clearer. This equation may not seem linear, but, if we rename <span class="math notranslate nohighlight">\(\log(y)\)</span> to <span class="math notranslate nohighlight">\(w\)</span> and <span class="math notranslate nohighlight">\(\log(x)\)</span> to <span class="math notranslate nohighlight">\(v\)</span>, then we can express the “log-log” relationship as a linear model:</p>
+<div class="math notranslate nohighlight">
+\[
+w ~=~ \theta_0 + \theta_1 v
+\]</div>
+<p>That is, this model is linear in the log-transformed variables, <span class="math notranslate nohighlight">\(\log(y)\)</span> and <span class="math notranslate nohighlight">\(\log(x)\)</span>.</p>
+<p>Other examples of models that can be expressed as linear combinations of transformed features appear below.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\log(y) ~&amp;=~ \theta_0 + \theta_1 x \\
+y ~&amp;=~ \theta_0 + \theta_1 x + \theta_2 x^2 \\
+y ~&amp;=~ \theta_0 + \theta_1 x + \theta_2 z  + \theta_3 x z  
+\end{aligned}
+\end{split}\]</div>
+<p>Again, if we rename <span class="math notranslate nohighlight">\(\log(y)\)</span> to <span class="math notranslate nohighlight">\(w\)</span>, <span class="math notranslate nohighlight">\(x^2\)</span> to <span class="math notranslate nohighlight">\(u\)</span>, and <span class="math notranslate nohighlight">\(x z\)</span> as <span class="math notranslate nohighlight">\(t\)</span>, then we can express each of the above models as linear in these renamed features. The above models are now, in order,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+w ~&amp;=~ \theta_0 + \theta_1 x \\
+y ~&amp;=~ \theta_0 + \theta_1 x + \theta_2 u\\
+y ~&amp;=~ \theta_0 + \theta_1 x + \theta_2 z  + \theta_3 t \\ 
+\end{aligned}
+\end{split}\]</div>
+<p>In short, we think of models that include nonlinear transformations of features and/or combinations of features as linear in their derived features. In practice, we don’t rename the transformed features when we describe the model; instead, we write the model using the transformations of the original features because it’s important to keep track of the transformations, especially when interpreting the coefficients.</p>
+<p>When we refer to these models, we include mention of the transformations. That is, we call a model log-log when both the outcome and explanatory variables are log-transformed; we say it’s log-linear when the outcome is log-transformed but not the explanatory variable; we describe a model as having polynomial features of, say degree 2, when the first and second power transformation of the explanatory variable are included; and we say a model include an interaction term between two explanatory features when the product of these two features is included in the model.</p>
+<p>Let’s fit a log-log model of price on size.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">AK</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
-<span class="n">X_sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">AK</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">])</span>
-
-<span class="n">X_sqrt</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X_sqrt</span><span class="p">)</span>
-
-<span class="n">model2</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_sqrt</span><span class="p">,</span> <span class="n">X_sqrt</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X1_log</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">]]</span>    
+<span class="n">y_log</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span>
+<span class="n">model1_log_log</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X1_log</span><span class="p">,</span> <span class="n">y_log</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>The coefficients and predicted values from this model cannot be directly compared to a model fitted using linear features because the units of the variables in this model the log of dollars and log of square feet, not dollars and square feet.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model log(price) ~ log(building size):</span><span class="se">\n</span><span class="s2"> Intercept (log $): </span><span class="si">{</span><span class="n">model1_log_log</span><span class="o">.</span><span class="n">intercept_</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;Coefficient of building size (log $/log ft^2): </span><span class="si">{</span><span class="n">model1_log_log</span><span class="o">.</span><span class="n">coef_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:                 pm25pa   R-squared:                       0.969
-Model:                            OLS   Adj. R-squared:                  0.969
-Method:                 Least Squares   F-statistic:                     3932.
-Date:                Sat, 13 Aug 2022   Prob (F-statistic):           8.92e-96
-Time:                        17:43:59   Log-Likelihood:                -47.320
-No. Observations:                 126   AIC:                             98.64
-Df Residuals:                     124   BIC:                             104.3
-Df Model:                           1                                         
-Covariance Type:            nonrobust                                         
-==============================================================================
-                 coef    std err          t      P&gt;|t|      [0.025      0.975]
-------------------------------------------------------------------------------
-const         -1.1535      0.067    -17.345      0.000      -1.285      -1.022
-pm25aqs        1.6366      0.026     62.706      0.000       1.585       1.688
-==============================================================================
-Omnibus:                       40.761   Durbin-Watson:                   1.727
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              118.052
-Skew:                           1.190   Prob(JB):                     2.32e-26
-Kurtosis:                       7.101   Cond. No.                         6.02
-==============================================================================
-
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Model log(price) ~ log(building size):
+ Intercept (log $): [2.97]
+ Coefficient of building size (log $/log ft^2): [[0.9]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we compute the predicted values and residuals and examine them with a plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted</span> <span class="o">=</span> <span class="n">model1_log_log</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X1_log</span><span class="p">)</span>
+<span class="n">errors</span> <span class="o">=</span> <span class="n">y_log</span> <span class="o">-</span> <span class="n">predicted</span> 
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2</span><span class="o">.</span><span class="n">params</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;predicted&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+<span class="c1">#plt.ylim((-20, 20))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>const     -1.15
-pm25aqs    1.64
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x12b8e5dc0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/linear_feature_eng_21_1.svg" src="../../_images/linear_feature_eng_21_1.svg" /></div>
+</div>
+<p>The residual plot looks reasonable, but it contains thousands of points which makes it hard to see curvature.</p>
+<p>To see if additional variables might be helpful, we can plot the residuals from the fitted model against a variable that is not in the model. If we see patterns, that indicates we might want to include this additional feature, or a transformation of it, in the model. Earlier we saw that the distribution of price was related to the city where the house is located so let’s examine the relationship between the residuals and city with a box plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">errors1_log</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;errors1_log&#39;</span><span class="p">,</span>
+            <span class="n">category_orders</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;city&quot;</span><span class="p">:[</span><span class="s2">&quot;Piedmont&quot;</span><span class="p">,</span><span class="s2">&quot;Lamorinda&quot;</span><span class="p">,</span><span class="s2">&quot;Berkeley&quot;</span><span class="p">,</span> <span class="s2">&quot;Richmond&quot;</span><span class="p">]})</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_24_0.svg" src="../../_images/linear_feature_eng_24_0.svg" /></div>
+</div>
+<p>This plot shows us that the distribution of errors appear to be shifted  for each city. Ideally, the median of each city’s box plot lines up with 0. Instead, we see that houses sold in  Piedmont have over 75% positive errors, meaning the actual sale price is above the predicted value. And at the other extreme, roughly 75% of sale prices in Richmond fall below their predicted values. These patterns suggest that we should include location in the model. From a context point of view, it makes sense for location to impact sale price. In the next section, we show how to incorporate a nominal variable in a linear model.</p>
+<div class="section" id="categorical-features">
+<h2><span class="section-number">15.6.1. </span>Categorical Features<a class="headerlink" href="#categorical-features" title="Permalink to this headline">¶</a></h2>
+<p>The first model we fit, was the constant model that we fitted in <code class="xref std std-numref docutils literal notranslate"><span class="pre">Chapter</span> <span class="pre">%s</span></code>. There we minimized squared loss to find the best fitting constant:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_c \sum_i (y_i - c)^2
+\]</div>
+<p>We can think of including a nominal feature in a model in a similar way. That is, we find the best fitting constant to each subgroup of the data. In other words</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\min_{c_B} \sum_{i \in \textrm{Berkeley}} (y_i - c_B)^2
+~~~&amp;~~~  \min_{c_L} \sum_{i \in \textrm{Lamorinda}} (y_i - c_L)^2 \\
+ \min_{c_P} \sum_{i \in \textrm{Piedmont}} (y_i - c_P)^2 
+~~~&amp;~~~ \min_{c_R} \sum_{i \in \textrm{Richmond}} (y_i - c_R)^2 
+\end{aligned}
+\end{split}\]</div>
+<p>A much simpler way to describe this model is with <em>one hot encoding</em>.</p>
+<p>One-hot encoding takes a categorical feature and creates multiple numeric
+features that have only 0 and 1 values.
+To do a one-hot encoding, we create new features that each correspond to
+one unique category.
+In this case, we have four cities:
+Berkeley, Lamorinda, Piedmont, and Richmond.
+Since we have four categories, we create four new features in the design
+matrix <span class="math notranslate nohighlight">\( X_oh \)</span>.
+Each row in <span class="math notranslate nohighlight">\( X_oh \)</span> contains one value 1 in the column that matches the
+city, and all of the other columns are 0.
+We illustrated this process in <a class="reference internal" href="#fig-one-hot2"><span class="std std-numref">Figure 15.7</span></a>.</p>
+<div class="figure align-default" id="fig-one-hot2">
+<a class="reference internal image-reference" href="../../_images/one-hot.svg"><img alt="../../_images/one-hot.svg" src="../../_images/one-hot.svg" width="100%" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.7 </span><span class="caption-text">One-hot encoding for a small example dataset (left) and its resulting design matrix (right).</span><a class="headerlink" href="#fig-one-hot2" title="Permalink to this image">¶</a></p>
+</div>
+<p>Now we can concisely represent the model as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+y_i ~\approx~ \theta_B x_{i,B} ~+~ \theta_L x_{i,L} \\
+~~~~~~~~~~ ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
+\end{split}\]</div>
+<p>Here, we have indexed the columns of the design matrix by <span class="math notranslate nohighlight">\(B\)</span>, <span class="math notranslate nohighlight">\(L\)</span>, <span class="math notranslate nohighlight">\(P\)</span>, and <span class="math notranslate nohighlight">\(R\)</span> rather than by <span class="math notranslate nohighlight">\(j\)</span> to make it clear that each column represents a column of 0s and 1s where, say, a 1 appears for <span class="math notranslate nohighlight">\(x_{i,P}\)</span> if the <span class="math notranslate nohighlight">\(i\)</span>th house is located in Piedmont.</p>
+<p>We now minimize least square loss over the <span class="math notranslate nohighlight">\(\theta\)</span>s,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\| \mathbf{y} - \textbf{X}\boldsymbol{\theta} \|^2 &amp;=
+\sum_i (y_i - \theta_B x_{i,B} ~+~ \theta_L x_{i,L}  ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R})^2 \\
+&amp; = \sum_{i \in Berkeley} (y_i - \theta_B x_{i,B})^2 ~+~ \sum_{i \in Lamorinda} (y_i -\theta_L x_{i,L})^2 \\
+&amp; ~~+~ \sum_{i \in Piedmont} (y_i -\theta_P x_{i,P})^2 ~+~ \sum_{i \in Richmond} (y_i -\theta_R x_{i,R})^2 
+\end{aligned}
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> is the column vector <span class="math notranslate nohighlight">\([\theta_B, \theta_L, \theta_P, \theta_R]\)</span>.</p>
+<p>We use <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> to create this design matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span>
+    <span class="c1"># categories argument sets column order</span>
+    <span class="n">categories</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;Berkeley&quot;</span><span class="p">,</span> <span class="s2">&quot;Lamorinda&quot;</span><span class="p">,</span> <span class="s2">&quot;Piedmont&quot;</span><span class="p">,</span> <span class="s2">&quot;Richmond&quot;</span><span class="p">]],</span>
+   <span class="c1"># drop=&#39;first&#39;,</span>
+    <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">X_city</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;city&#39;</span><span class="p">]])</span>
+
+<span class="n">categories_city</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Berkeley&quot;</span><span class="p">,</span><span class="s2">&quot;Lamorinda&quot;</span><span class="p">,</span> <span class="s2">&quot;Piedmont&quot;</span><span class="p">,</span> <span class="s2">&quot;Richmond&quot;</span><span class="p">]</span>
+<span class="n">X_city_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_city</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">categories_city</span><span class="p">)</span>
+<span class="n">X_city_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Berkeley</th>
+      <th>Lamorinda</th>
+      <th>Piedmont</th>
+      <th>Richmond</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2664</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2665</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2666</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>2667 rows × 4 columns</p>
+</div></div></div>
+</div>
+<p>We fit a model using these one-hot encoded features.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_city_df</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And, we examine the multiple <span class="math notranslate nohighlight">\(R^2\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for city model: </span><span class="si">{</span><span class="n">model_city</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_city_df</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for city model: 0.57
+</pre></div>
+</div>
+</div>
+</div>
+<p>With knowing only the location of the house, we can do a reasonably good job of estimating the logarithm of sale price. Below are the coefficients of the fit.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city</span><span class="o">.</span><span class="n">coef_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[5.87, 6.03, 6.1 , 5.67]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>The estimated sale price (in log $) depend on the city as expected from the box plots. But, if we know the size of the house, we should be able to make an even better model. We saw earlier that the simple log-log model that explains sale price by house size does reasonably well so adding the location of the house to the model should further improve it.</p>
+<p>Such a model looks</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+y_i ~\approx~ \theta_1x_i +  \theta_B x_{i,B} ~+~ \theta_L x_{i,L} \\
+~~~~~~~~~~ ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
+\end{split}\]</div>
+<p>Notice that this model describes the relationship between log(price), which is represented as <span class="math notranslate nohighlight">\(y\)</span> and log(size), which is represented as <span class="math notranslate nohighlight">\(x\)</span>, as linear with the same slope for each city.
+But, the intercept term depends on the city.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+y_i ~&amp;\approx~ \theta_1x_i +  \theta_B x_{i,B} ~~&amp;\textrm{for houses in Berkeley} \\
+y_i ~&amp;\approx~ \theta_1x_i + \theta_L x_{i,L} ~~&amp;\textrm{for houses in Lamorinda}\\
+y_i ~&amp;\approx~ \theta_1x_i + \theta_P x_{i,P} ~~&amp;\textrm{for houses in Piedmont}\\
+y_i ~&amp;\approx~ \theta_1x_i + \theta_R x_{i,R} ~~&amp;\textrm{for houses in Richmond}
+\end{aligned}
+\end{split}\]</div>
+<p>We make a facet of scatter plots, one for each city, to see if this relationship roughly holds.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">],</span> 
+                 <span class="n">facet_col</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;city&#39;</span><span class="p">],</span> <span class="n">facet_col_wrap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
+                     <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;price (log $)&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;building size (sq ft)&quot;</span><span class="p">},)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_40_0.svg" src="../../_images/linear_feature_eng_40_0.svg" /></div>
+</div>
+<p>The shift is evident in the scatter plot, but it may be the case that the slopes are also different. We concatenate our two design matrices together to fit the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_city_log</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X1_log</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">X_city_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_city_log</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>log_bsqft</th>
+      <th>Berkeley</th>
+      <th>Lamorinda</th>
+      <th>Piedmont</th>
+      <th>Richmond</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>3.14</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.31</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.96</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2664</th>
+      <td>3.16</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2665</th>
+      <td>3.47</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2666</th>
+      <td>3.44</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>2666 rows × 5 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city_size</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_city_log</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city_size</span><span class="o">.</span><span class="n">coef_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.62, 3.89, 3.98, 4.03, 3.75]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for BR indicators and log(size): </span><span class="si">{</span><span class="n">model_city_size</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_city_log</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for BR indicators and log(size): 0.79
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X3</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;log_lsqft&#39;</span><span class="p">,</span> <span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">]]</span>
+
+<span class="n">model3</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X3</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for 2-variable model: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+     <span class="sa">f</span><span class="s2">&quot;R-square for 3-variable model: </span><span class="si">{</span><span class="n">model3</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X3</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for 2-variable model: 0.67
+ R-square for 3-variable model: 0.68
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;br&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;log_price&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_49_0.svg" src="../../_images/linear_feature_eng_49_0.svg" /></div>
+</div>
+<p>After doing this transformation, we usually remove one of the new
+feature columns from the design matrix.
+If we don’t do this, then the columns of the design matrix will be linearly
+dependent after we add the intercept column, which means that we won’t have
+a useful interpretation for the model coefficients—we’ve left
+this proof as an exercise.
+We’ll talk about what removing a column means later in this section.
+For now, we’ll simply remove the first one-hot encoded column.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span>
+    <span class="c1"># categories argument sets column order</span>
+    <span class="n">categories</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;Berkeley&quot;</span><span class="p">,</span> <span class="s2">&quot;Lamorinda&quot;</span><span class="p">,</span> <span class="s2">&quot;Piedmont&quot;</span><span class="p">,</span> <span class="s2">&quot;Richmond&quot;</span><span class="p">]],</span>
+    <span class="n">drop</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">X_city</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;city&#39;</span><span class="p">]])</span>
+<span class="n">X_city</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0., 0., 0.],
+       [0., 0., 0.],
+       [0., 0., 0.],
+       ...,
+       [0., 0., 1.],
+       [0., 0., 1.],
+       [0., 0., 1.]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">categories_city</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Lamorinda&quot;</span><span class="p">,</span> <span class="s2">&quot;Piedmont&quot;</span><span class="p">,</span> <span class="s2">&quot;Richmond&quot;</span><span class="p">]</span>
+
+<span class="n">X_city_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_city</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">categories_city</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_city_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Lamorinda</th>
+      <th>Piedmont</th>
+      <th>Richmond</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2664</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2665</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2666</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>2667 rows × 3 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_city_log</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X1_log</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">X_city_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_city_log</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>log_bsqft</th>
+      <th>Lamorinda</th>
+      <th>Piedmont</th>
+      <th>Richmond</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>3.14</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.31</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.96</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2664</th>
+      <td>3.16</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2665</th>
+      <td>3.47</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2666</th>
+      <td>3.44</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>2666 rows × 4 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city_size</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_city_log</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city_size</span><span class="o">.</span><span class="n">intercept_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([3.89])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city_size</span><span class="o">.</span><span class="n">coef_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 0.62,  0.09,  0.14, -0.15]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for BR indicators and log(size): </span><span class="si">{</span><span class="n">model_city_size</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_city_log</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for BR indicators and log(size): 0.79
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_4</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_4</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept            3.89
+city[T.Lamorinda]    0.09
+city[T.Piedmont]     0.14
+city[T.Richmond]    -0.15
+log_bsqft            0.62
 dtype: float64
 </pre></div>
 </div>
@@ -1399,127 +2230,237 @@ dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">fittedvalues</span>
-<span class="n">errors2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">resid</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_16_0.svg" src="../../_images/linear_feature_eng_16_0.svg" /></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.35226165452656866
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_5</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city - 1&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_5</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.1100565317984943
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>city[Berkeley]     3.89
+city[Lamorinda]    3.98
+city[Piedmont]     4.03
+city[Richmond]     3.75
+log_bsqft          0.62
+dtype: float64
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_5</span><span class="o">.</span><span class="n">rsquared</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:                 pm25pa   R-squared:                       0.991
-Model:                            OLS   Adj. R-squared:                  0.991
-Method:                 Least Squares   F-statistic:                 1.420e+04
-Date:                Sat, 13 Aug 2022   Prob (F-statistic):          9.34e-130
-Time:                        17:43:59   Log-Likelihood:                -272.87
-No. Observations:                 126   AIC:                             549.7
-Df Residuals:                     124   BIC:                             555.4
-Df Model:                           1                                         
-Covariance Type:            nonrobust                                         
-==============================================================================
-                 coef    std err          t      P&gt;|t|      [0.025      0.975]
-------------------------------------------------------------------------------
-const         -4.1758      0.225    -18.522      0.000      -4.622      -3.730
-pm25aqs        2.2422      0.019    119.168      0.000       2.205       2.279
-==============================================================================
-Omnibus:                       10.974   Durbin-Watson:                   1.562
-Prob(Omnibus):                  0.004   Jarque-Bera (JB):               14.838
-Skew:                           0.476   Prob(JB):                     0.000600
-Kurtosis:                       4.386   Cond. No.                         14.3
-==============================================================================
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7870009470761182
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_6</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city + log_bsqft:city&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_6</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept                      3.99
+city[T.Lamorinda]             -0.61
+city[T.Piedmont]              -0.56
+                               ... 
+log_bsqft:city[T.Lamorinda]    0.21
+log_bsqft:city[T.Piedmont]     0.21
+log_bsqft:city[T.Richmond]    -0.05
+Length: 8, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_6</span><span class="o">.</span><span class="n">rsquared</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7931404456356028
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_7</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ city + C(br)&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_7</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept            5.73
+city[T.Lamorinda]    0.11
+city[T.Piedmont]     0.20
+                     ... 
+C(br)[T.4.0]         0.24
+C(br)[T.5.0]         0.30
+C(br)[T.6.0]         0.30
+Length: 9, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_7</span><span class="o">.</span><span class="n">rsquared</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6751644900451701
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_8</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ city + C(br) + city:C(br)&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_8</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept                         5.71
+city[T.Lamorinda]                 0.20
+city[T.Piedmont]                  0.31
+                                  ... 
+city[T.Lamorinda]:C(br)[T.6.0]   -0.13
+city[T.Piedmont]:C(br)[T.6.0]    -0.09
+city[T.Richmond]:C(br)[T.6.0]    -0.11
+Length: 24, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_8</span><span class="o">.</span><span class="n">rsquared</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6814567418146753
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted_5</span> <span class="o">=</span> <span class="n">model_5</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="n">resids_5</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">predicted_5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">predicted_5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">resids_5</span><span class="p">,</span> 
+                <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
+                     <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;errors&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;predicted values&quot;</span><span class="p">},</span>
+                <span class="n">title</span> <span class="o">=</span><span class="s2">&quot;log_price ~ log_bsqft + city - 1&quot;</span><span class="p">)</span>
 
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_76_0.svg" src="../../_images/linear_feature_eng_76_0.svg" /></div>
 </div>
-<p>So far, our model requires all of the predictor variables to be numeric.
-But categorical data is often useful for prediction as well.
-For example, the map below colors each state by its AUM.
-We can see that AUM varies between regions in the US—the southeast region
-of the US has much lower AUMs than the midwestern region.
-This suggests that including the region into our linear model can help
-with prediction.</p>
-<div class="cell tag_hide-input docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">states</span> <span class="o">=</span> <span class="n">cz_df</span><span class="p">[</span><span class="s1">&#39;aum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">regions</span><span class="p">[</span><span class="s1">&#39;stateabbrv&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="n">px</span><span class="o">.</span><span class="n">choropleth</span><span class="p">(</span><span class="n">states</span><span class="p">,</span>
-              <span class="n">locations</span><span class="o">=</span><span class="s1">&#39;stateabbrv&#39;</span><span class="p">,</span> 
-              <span class="n">locationmode</span><span class="o">=</span><span class="s2">&quot;USA-states&quot;</span><span class="p">,</span> 
-              <span class="n">scope</span><span class="o">=</span><span class="s2">&quot;usa&quot;</span><span class="p">,</span>
-              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;aum&#39;</span><span class="p">,</span>
-              <span class="n">color_continuous_scale</span><span class="o">=</span><span class="s2">&quot;amp_r&quot;</span><span class="p">,</span> 
-              <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-             <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_8</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_ppsf ~ log_bsqft + city + C(br)&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_8</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_21_0.svg" src="../../_images/linear_feature_eng_21_0.svg" /></div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept            3.85
+city[T.Lamorinda]    0.08
+city[T.Piedmont]     0.14
+                     ... 
+C(br)[T.5.0]         0.02
+C(br)[T.6.0]        -0.04
+log_bsqft           -0.36
+Length: 10, dtype: float64
+</pre></div>
 </div>
-<p>Since our model needs the design matrix <span class="math notranslate nohighlight">\( X \)</span> to only contain numeric values,
-we’ll use a <em>feature engineering</em> technique to enable our model to make use
-of the categorical US region feature.
-Feature engineering is the process of transforming data before model fitting
-so that the model can capture more kinds of patterns.
-In this case, we’ll use a technique called <em>one-hot encoding</em> to
-transform categorical data into numeric data.</p>
-<div class="cell tag_remove-input docutils container">
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_8</span><span class="o">.</span><span class="n">rsquared</span>
+</pre></div>
+</div>
+</div>
 <div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_23_0.svg" src="../../_images/linear_feature_eng_23_0.svg" /></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.473517046426117
+</pre></div>
 </div>
-<div class="section" id="one-hot-encoding">
-<h2><span class="section-number">15.6.1. </span>One-Hot Encoding<a class="headerlink" href="#one-hot-encoding" title="Permalink to this headline">¶</a></h2>
-<p>A one-hot encoding takes a categorical feature and creates multiple numeric
-features.
-To do a one-hot encoding, we first create new features that each correspond to
-one unique category.
-In this case, we have four US Census regions:
-West, Northeast, South, and Midwest.
-Since we have four categories, we’ll create four new features in the design
-matrix <span class="math notranslate nohighlight">\( X \)</span>.
-Each row in <span class="math notranslate nohighlight">\( X \)</span> contains the value <code class="docutils literal notranslate"><span class="pre">1</span></code> if the feature matches the
-original category and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise.
-We’ve illustrated this process in <a class="reference internal" href="#fig-one-hot2"><span class="std std-numref">Figure 15.7</span></a>.</p>
-<div class="figure align-default" id="fig-one-hot2">
-<a class="reference internal image-reference" href="../../_images/one-hot.svg"><img alt="../../_images/one-hot.svg" src="../../_images/one-hot.svg" width="100%" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.7 </span><span class="caption-text">One-hot encoding for a small example dataset (left) and its resulting design matrix (right).</span><a class="headerlink" href="#fig-one-hot2" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted_8</span> <span class="o">=</span> <span class="n">model_8</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="n">resids_8</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_ppsf&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">predicted_8</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">predicted_8</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">resids_8</span><span class="p">,</span> 
+                <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
+                     <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;errors&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;predicted values&quot;</span><span class="p">},</span>
+                <span class="n">title</span> <span class="o">=</span><span class="s2">&quot;log_price_per_square_foot ~ log_bsqft + city + C(br})&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_81_0.svg" src="../../_images/linear_feature_eng_81_0.svg" /></div>
 </div>
 <p>After doing this transformation, we usually remove one of the new
 feature columns from the design matrix.
@@ -1534,34 +2475,6 @@ We’ll start with a subset of the data which just has the commuting zone’s
 AUM and its US Census region:</p>
 <p>To do the encoding, we’ll use the <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> library’s
 <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> class.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
-
-<span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span>
-    <span class="c1"># categories argument sets column order</span>
-    <span class="n">categories</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;Northeast&#39;</span><span class="p">,</span> <span class="s1">&#39;West&#39;</span><span class="p">,</span> <span class="s1">&#39;Midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;South&#39;</span><span class="p">]],</span>
-    <span class="n">drop</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">X_region</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">cz_df</span><span class="p">[[</span><span class="s1">&#39;region&#39;</span><span class="p">]])</span>
-<span class="n">X_region</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0., 0., 1.],
-       [0., 0., 1.],
-       [0., 0., 1.],
-       ...,
-       [1., 0., 0.],
-       [1., 0., 0.],
-       [1., 0., 0.]])
-</pre></div>
-</div>
-</div>
-</div>
 <p>Now, we have a design matrix stored in the variable <code class="docutils literal notranslate"><span class="pre">X</span></code>.
 Since we’ve dropped the <code class="docutils literal notranslate"><span class="pre">Northeast</span></code> column from the design matrix,
 the three resulting features represent the
@@ -1593,269 +2506,6 @@ The intercept of the model represents the expected outcome for the category
 we removed from the design matrix.
 In our case, we took out the <code class="docutils literal notranslate"><span class="pre">Northeast</span></code> column, so the model’s intercept
 parameter represents the predicted AUM for the Northeast region.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Predicted AUM for Northeast: </span><span class="si">{</span><span class="n">model_region</span><span class="o">.</span><span class="n">intercept_</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predicted AUM for Northeast: 44.01
-</pre></div>
-</div>
-</div>
-</div>
-<p>Next, let’s look at the model parameters.
-We’ve displayed them in the table below.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;coef&#39;</span><span class="p">:</span> <span class="n">model_region</span><span class="o">.</span><span class="n">coef_</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;West&#39;</span><span class="p">,</span> <span class="s1">&#39;Midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;South&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>coef</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>West</th>
-      <td>1.17</td>
-    </tr>
-    <tr>
-      <th>Midwest</th>
-      <td>3.20</td>
-    </tr>
-    <tr>
-      <th>South</th>
-      <td>-3.25</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Under a one-hot encoding, each model parameter represents
-the model’s expected difference between that
-region and the Northeast.
-For instance, the West has a coefficient of 1.17, which means that the model
-predicts that commuting zones in the West will have 1.17 higher AUM than
-the Northeast on average.
-Likewise, the model predicts that the South has 3.25 lower AUM than the
-Northeast.
-In other words, the coefficients tell us how the model adjusts the
-AUM relative to the Northeast.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_feature_eng_39_0.svg" src="../../_images/linear_feature_eng_39_0.svg" /></div>
-</div>
-<div class="cell tag_remove-input docutils container">
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_oh</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>travel_lt15</th>
-      <th>single_mom</th>
-      <th>West</th>
-      <th>Midwest</th>
-      <th>South</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.33</td>
-      <td>0.19</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.28</td>
-      <td>0.19</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.36</td>
-      <td>0.21</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>702</th>
-      <td>0.42</td>
-      <td>0.19</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>703</th>
-      <td>0.49</td>
-      <td>0.24</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>704</th>
-      <td>0.24</td>
-      <td>0.19</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-    </tr>
-  </tbody>
-</table>
-<p>705 rows × 5 columns</p>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_oh</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_oh</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>coef</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>travel_lt15</th>
-      <td>18.37</td>
-    </tr>
-    <tr>
-      <th>single_mom</th>
-      <td>-61.37</td>
-    </tr>
-    <tr>
-      <th>West</th>
-      <td>-2.17</td>
-    </tr>
-    <tr>
-      <th>Midwest</th>
-      <td>-0.70</td>
-    </tr>
-    <tr>
-      <th>South</th>
-      <td>-1.59</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted_oh</span> <span class="o">=</span> <span class="n">model_oh</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_oh</span><span class="p">)</span>
-<span class="n">errors_oh</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">predicted_oh</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.lines.Line2D at 0x11b6b1310&gt;
-</pre></div>
-</div>
-<img alt="../../_images/linear_feature_eng_45_1.svg" src="../../_images/linear_feature_eng_45_1.svg" /></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">errors_oh</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.7810729041310185
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square: </span><span class="si">{</span><span class="n">model_oh</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_oh</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square: 0.75
-</pre></div>
-</div>
-</div>
-</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>One-hot encoding is also known as using <em>dummy variables</em>.
@@ -1870,6 +2520,67 @@ There are many other kinds of feature engineering, like using polynomial
 terms.
 In general, data scientists apply their domain knowledge to figure out
 useful feature engineering steps for their models.</p>
+</div>
+<div class="section" id="the-end">
+<h2><span class="section-number">15.6.2. </span>The End<a class="headerlink" href="#the-end" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;br&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;errors1_log&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_92_0.svg" src="../../_images/linear_feature_eng_92_0.svg" /></div>
+</div>
+<p>Two other features that might help explain variations in house sale price are the number of bedrooms in the house and the location of the house. As we saw in <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 10</span></a>, side-by-side boxplots of price for, say, the different cities help us compare the distributions of price across cities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;log_price&quot;</span><span class="p">,</span> 
+             <span class="n">category_orders</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;city&quot;</span><span class="p">:[</span><span class="s2">&quot;Piedmont&quot;</span><span class="p">,</span><span class="s2">&quot;Lamorinda&quot;</span><span class="p">,</span><span class="s2">&quot;Berkeley&quot;</span><span class="p">,</span> <span class="s2">&quot;Richmond&quot;</span><span class="p">]})</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_94_0.svg" src="../../_images/linear_feature_eng_94_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X3</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;log_lsqft&#39;</span><span class="p">,</span> <span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">]]</span>
+
+<span class="n">model3</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X3</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for 2-variable model: </span><span class="si">{</span><span class="n">model2</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+     <span class="sa">f</span><span class="s2">&quot;R-square for 3-variable model: </span><span class="si">{</span><span class="n">model3</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X3</span><span class="p">,</span> <span class="n">y_log_price</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for 2-variable model: 0.67
+ R-square for 3-variable model: 0.68
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;br&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;log_price&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/linear_feature_eng_97_0.svg" src="../../_images/linear_feature_eng_97_0.svg" /></div>
+</div>
 </div>
 </div>
 
