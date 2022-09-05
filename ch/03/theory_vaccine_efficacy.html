@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3.3. Simulating a Randomized Trial: Vaccine Efficacy &#8212; Learning Data Science</title>
+    <title>3.3. Example: Simulating a Randomized Trial for a Vaccine &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -44,8 +44,6 @@
     <script src="../../_static/custom.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -55,8 +53,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="3.4. Measurement Error: Air Quality Variation" href="theory_measurement_error.html" />
-    <link rel="prev" title="3.2. Simulating Election Polls: Bias, Variance, and Big Data" href="theory_election.html" />
+    <link rel="next" title="3.4. Example: Measurement Error in Air Quality" href="theory_measurement_error.html" />
+    <link rel="prev" title="3.2. Example: Simulating Election Poll Bias and Variance" href="theory_election.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -217,17 +215,17 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="theory_election.html">
-     3.2. Simulating Election Polls: Bias, Variance, and Big Data
+     3.2. Example: Simulating Election Poll Bias and Variance
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     3.3. Simulating a Randomized Trial: Vaccine Efficacy
+     3.3. Example: Simulating a Randomized Trial for a Vaccine
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="theory_measurement_error.html">
-     3.4. Measurement Error: Air Quality Variation
+     3.4. Example: Measurement Error in Air Quality
     </a>
    </li>
    <li class="toctree-l2">
@@ -1242,13 +1240,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-urn-model">
-   3.3.2. The Urn Model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#vaccine-efficacy">
-   3.3.3. Vaccine Efficacy
+  <a class="reference internal nav-link" href="#the-urn-model-for-random-assignment">
+   3.3.2. The Urn Model for Random Assignment
   </a>
  </li>
 </ul>
@@ -1261,7 +1254,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Simulating a Randomized Trial: Vaccine Efficacy</h1>
+                <h1>Example: Simulating a Randomized Trial for a Vaccine</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -1277,13 +1270,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-urn-model">
-   3.3.2. The Urn Model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#vaccine-efficacy">
-   3.3.3. Vaccine Efficacy
+  <a class="reference internal nav-link" href="#the-urn-model-for-random-assignment">
+   3.3.2. The Urn Model for Random Assignment
   </a>
  </li>
 </ul>
@@ -1295,47 +1283,46 @@
             
               <div>
                 
-  <div class="section" id="simulating-a-randomized-trial-vaccine-efficacy">
-<span id="sec-theory-randomassignment"></span><h1><span class="section-number">3.3. </span>Simulating a Randomized Trial: Vaccine Efficacy<a class="headerlink" href="#simulating-a-randomized-trial-vaccine-efficacy" title="Permalink to this headline">¶</a></h1>
-<p>In a drug trial, volunteers for the trial either receive the new treatment or a placebo (a fake treatment). In an A/B test of a new feature on a Web site, visitors to the site would either see the new feature or the usual Web page.  In both examples, we control the assignment of volunteers and visitors to groups, and in a <em>randomized</em> controlled experiment, we use a chance process to make the assignment.</p>
-<p>In drug trials, scientists often essentially use an urn model model to select the subjects for the treatment, and those not selected receive the placebo. With A/B testing, we often use a systematic approach, where, for example, every other visitor to the page is shown the new feature (see the exercises to learn more about systematic sampling). We can simulate the chance mechanism of the urn to better understand variation in the outcome of an experiment and the meaning of efficacy in clinical trials.</p>
-<p>Detroit Mayor Mike Duggan made national news in March 2021 when he turned down a shipment of over 6,000 Johnson &amp; Johnson vaccine doses stating that the citiziens of his city should “get the best”. The mayor was refering to the efficacy rate of the vaccine, which was reported to be about 66%. In comparison, Moderna and Pfizer both reported efficacy rates of about 95% for their vaccines.</p>
-<p>On the surface, Duggan’s reasoning seems valid, but the scope of the three clinical trials are not comparable, meaning direct comparisons of the experiments is problematic <span id="id1">[<a class="reference internal" href="../../references.html#id19">Irfan, 2021</a>]</span>. Moreover, the Centers for Disease Control (CDC) considers a 66% efficicay rate quite good, which is why it was given emergency approval <span id="id2">[<a class="reference internal" href="../../references.html#id20">Centers for Disease Control, 2021</a>]</span>.</p>
+  <div class="section" id="example-simulating-a-randomized-trial-for-a-vaccine">
+<span id="sec-theory-randomassignment"></span><h1><span class="section-number">3.3. </span>Example: Simulating a Randomized Trial for a Vaccine<a class="headerlink" href="#example-simulating-a-randomized-trial-for-a-vaccine" title="Permalink to this headline">¶</a></h1>
+<p>In a drug trial, volunteers for the trial either receive the new treatment or a placebo (a fake treatment), and researchers control the assignment of volunteers to groups. In a <em>randomized</em> controlled experiment, they use a chance process to make the assignment.  Scientists essentially use an urn model model to select the subjects for the treatment and control (those given the  placebo).  We can simulate the chance mechanism of the urn to better understand variation in the outcome of an experiment and the meaning of efficacy in clinical trials.</p>
+<p>In March 2021, Detroit Mayor Mike Duggan made national news when he turned down a shipment of over 6,000 Johnson &amp; Johnson vaccine doses stating that the citizens of his city should “get the best”. The mayor was referring to the efficacy rate of the vaccine, which was reported to be about 66%. In comparison, Moderna and Pfizer both reported efficacy rates of about 95% for their vaccines.</p>
+<p>On the surface, Duggan’s reasoning seems valid, but the scope of the three clinical trials are not comparable, meaning direct comparisons of the experimental results is problematic <span id="id1">[<a class="reference internal" href="../../references.html#id19">Irfan, 2021</a>]</span>. Moreover, the Centers for Disease Control (CDC) considers a 66% efficacy rate quite good, which is why it was given emergency approval <span id="id2">[<a class="reference internal" href="../../references.html#id20">Centers for Disease Control, 2021</a>]</span>.</p>
 <p>We consider these points in turn, beginning with scope and then efficacy.</p>
 <div class="section" id="scope">
 <h2><span class="section-number">3.3.1. </span>Scope<a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h2>
 <p>Recall that when we evaluate the scope of the data, we consider the who, when, and where of the study. For the Johnson &amp; Johnson clinical trial, the participants:</p>
 <ul class="simple">
 <li><p>included adults 18 and over, where roughly 40% had conditions, called comorbidities, associated with an increased risk for getting severe COVID-19;</p></li>
-<li><p>enrolled in the study from October to November, 2020;</p></li>
+<li><p>enrolled in the study from October to November, 2020; and</p></li>
 <li><p>came from 8 countries across 3 continents, including the US and South Africa.</p></li>
 </ul>
-<p>The participants in the Moderna and Pfizer trials were primarily from the US, roughly 40% had comorbidities for severe COVID-19, and the trial took place earlier, over summer 2021.
+<p>The participants in the Moderna and Pfizer trials were primarily from the US, roughly 40% had comorbidities for severe COVID-19, and the trial took place earlier, over summer 2020.
 The timing and location of the trials make them difficult to compare.
 Cases of COVID-19 were at a low point in the summer in the US, but they rose rapidly in the late fall.
 Also, a variant of the virus that is more contagious was spreading rapidly in South Africa at the time of the J&amp;J trial.</p>
-<p>Each clinical trial was designed to test a vaccine against the situation of no vaccine under similar circumstances through the random assignment of subjects to treatment and control groups. While the scope from one trial to the next are quite different, the randomization within a trial keeps the scope of the treatment and control groups roughly the same, which enables meaningful comparisons between groups in the same trial. The scope was different enough across the three vaccine trials to make direct comparisons problematic.</p>
-<p>How was the trial carried out for the Johnson &amp; Johnson vaccine? To being, 43,738 people enrolled in the trial <span id="id3">[<a class="reference internal" href="../../references.html#id21">Janssen Biotech, Inc., 2021</a>]</span>. These participants were split into two groups at random. Half received the new vaccine, and the other half received a placebo, such as a saline solution. Then, everyone was followed for 28 days to see whether they contracted COVID-19.</p>
+<p>Each clinical trial was designed to test a vaccine against the situation of no vaccine under similar circumstances through the random assignment of subjects to treatment and control groups. While the scope from one trial to the next are quite different, the randomization within a trial keeps the scope of the treatment and control groups roughly the same. This enables meaningful comparisons between groups in the same trial. The scope was different enough across the three vaccine trials to make direct comparisons of the three trials problematic.</p>
+<p>How was the trial carried out for the Johnson &amp; Johnson vaccine? To begin, 43,738 people enrolled in the trial <span id="id3">[<a class="reference internal" href="../../references.html#id21">Janssen Biotech, Inc., 2021</a>]</span>. These participants were split into two groups at random. Half received the new vaccine, and the other half received a placebo, such as a saline solution. Then, everyone was followed for 28 days to see whether they contracted COVID-19.</p>
 <p>A lot of information was recorded on each patient, such as their age, race, and sex, and in addition,
 whether they caught COVID, including the severity of the disease. At the end of 28 days, they found 468 cases of COVID-19, 117 of these were in the treatment group, and 351 in the control group.</p>
 <p>The random assignment of patients to treatment and control, gives the scientists a framework to assess the effectiveness of the vaccine. The typical reasoning goes as follows:</p>
 <ul class="simple">
-<li><p>Begin with the assumption that the vaccine is ineffective</p></li>
-<li><p>So, the 468 who caught COVID-19 would have caught it whether or not they received the vaccine</p></li>
+<li><p>Begin with the assumption that the vaccine is ineffective.</p></li>
+<li><p>So, the 468 who caught COVID-19 would have caught it whether or not they received the vaccine.</p></li>
 <li><p>And, the remaining 43,270 people in the trial who did not get sick would have remained healthy whether or not they received the vaccine.</p></li>
 <li><p>The split of 117 sick people in treatment and 351 in control was solely due to the chance process in assigning participants to treatment or control.</p></li>
 </ul>
 <p>We can set up an urn model that reflects this scenario and then study, via simulation, the behavior of the experimental results.</p>
 </div>
-<div class="section" id="the-urn-model">
-<h2><span class="section-number">3.3.2. </span>The Urn Model<a class="headerlink" href="#the-urn-model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-urn-model-for-random-assignment">
+<h2><span class="section-number">3.3.2. </span>The Urn Model for Random Assignment<a class="headerlink" href="#the-urn-model-for-random-assignment" title="Permalink to this headline">¶</a></h2>
 <p>Our urn has 43,738 marbles, one for each person in the clinical trial. Since there were 468 cases of COVID-19 among them, we label 468 marbles with a 1 and the remaining 43,270 with 0. We draw half the marbles (21,869) from the urn to receive the treatment, and the remaining half receive the placebo. The results of the experiment are simply the count of the number of marbles marked 1 that were randomly drawn from the urn.</p>
-<p>We can simulate this process to get a sense of how likely it would be under these assumptios to draw only 117 marbles marked 1 from the urn. Since we draw half of the marbles from the urn, we would expect about half of the 468, or 234, to be drawn. The simulation study gives us a sense of the variation that might result from the random assignment process. That is, the simulation can tell us what proportion of the randomly trials would result in so few cases of the virus in the treatment group.</p>
+<p>We can simulate this process to get a sense of how likely it would be under these assumptions to draw at most 117 marbles marked 1 from the urn. Since we draw half of the marbles from the urn, we would expect about half of the 468, or 234, to be drawn. The simulation study gives us a sense of the variation that might result from the random assignment process. That is, the simulation can give us an approximate chance that the  trials would result in so few cases of the virus in the treatment group.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>There are several key assumptions that enter into the urn model, such as the assumption that the vaccine is ineeffective.  The random assignment of patients to treatement enables us to carry out a simulation study. It’s important to keep track of the reliance on these assumptions. Our simulation study gives us an approximation of the rarity of an outcome like the one observed only under these key assumptions.</p>
+<p>There are several key assumptions that enter into this urn model, such as the assumption that the vaccine is ineffective.  It’s important to keep track of the reliance on these assumptions because our simulation study gives us an approximation of the rarity of an outcome like the one observed only under these key assumptions.</p>
 </div>
-<p>As before, we can simulate the urm model using the hypergeometric probability distribution, rather than having to program the urn sampling from scratch.</p>
+<p>As before, we can simulate the urn model using the hypergeometric probability distribution, rather than having to program the chance process from scratch.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations_fast</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">hypergeometric</span><span class="p">(</span><span class="n">ngood</span><span class="o">=</span><span class="mi">468</span><span class="p">,</span> <span class="n">nbad</span><span class="o">=</span><span class="mi">43270</span><span class="p">,</span> <span class="n">nsample</span><span class="o">=</span><span class="mi">21869</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500000</span><span class="p">)</span>
@@ -1351,49 +1338,14 @@ whether they caught COVID, including the severity of the disease. At the end of 
 <img alt="../../_images/theory_vaccine_efficacy_10_1.png" src="../../_images/theory_vaccine_efficacy_10_1.png" />
 </div>
 </div>
-<p>In our simulation, we repeated the process of random assignment to the treatment group 500,000 times. Indeed, we found not one of the 500,000 simulations had as few as 117 cases or fewer. It would be an extremely rare event to see so few cases of COVID-19, if in fact the vaccine was not effective. A more useful computation is the vaccine’s efficiacy, which we describe next.</p>
-</div>
-<div class="section" id="vaccine-efficacy">
-<h2><span class="section-number">3.3.3. </span>Vaccine Efficacy<a class="headerlink" href="#vaccine-efficacy" title="Permalink to this headline">¶</a></h2>
-<p>Vaccine Efficacy (VE) is measured by comparing the risk of disease among vaccinated and unvaccinated persons:</p>
-<div class="math notranslate nohighlight">
-\[ \frac{\textrm{Risk among unvaccinated group} − \textrm{Risk among vaccinated group}}
- {\textrm{Risk among unvaccinated group}},\]</div>
-<p>where, the risk among the unvaccinated is the proportion of unvaccinated who contracted COVID and similarly, the risk among the vaccinated is the proportion of vaccinated who contracted COVID. Since the two groups have the same number in each, we can ignore denomiators and compute the efficacy as follows.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">351</span> <span class="o">-</span> <span class="mi">117</span><span class="p">)</span> <span class="o">/</span> <span class="mi">351</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6666666666666666
-</pre></div>
-</div>
-</div>
-</div>
-<p>The Centers for Disease Control sets a standard of 50% for VE, when deciding whether to adopt a new vaccine. This would be equivalent to how many cases in the treatment group?</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">468</span><span class="o">/</span><span class="mi">3</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>156.0
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can see from the histogram that none of the simulations yielded as few or fewer than 156 cases in the treatment group.</p>
-<p>Furthermore, many scientists argued that we should look at the efficacy for preventing severe cases of Covid. In this scenario, the J&amp;J vaccine was over 80% effective. Additionally, no deaths were observed in the treatment group.</p>
+<p>In our simulation, we repeated the process of random assignment to the treatment group 500,000 times. Indeed, we found not one of the 500,000 simulations had 117 or fewer cases. It would be an extremely rare event to see so few cases of COVID-19, if in fact the vaccine was not effective.</p>
 <p>After the problems with comparing drug trials that have different scopes and the efficacy for preventing severe cases of COVID-19 was explained, the Mayor of Detroit retracted his original statement, saying  “I have full confidence that the Johnson &amp; Johnson vaccine is both safe and effective.”</p>
 <p>This example has shown that:</p>
 <ul class="simple">
 <li><p>Using a chance process in the assignment of subjects to treatments in clinical trials can help us answer what-if scenarios;</p></li>
 <li><p>Considering data scope can help us determine whether it is reasonable to compare figures from different datasets.</p></li>
 </ul>
-<p>Another example of the usefulness of the urn model is in the measurement error.</p>
+<p>Another example of the usefulness of the urn model is with measurement error.</p>
 </div>
 </div>
 
@@ -1426,13 +1378,13 @@ whether they caught COVID, including the severity of the disease. At the end of 
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">3.2. </span>Simulating Election Polls: Bias, Variance, and Big Data</p>
+            <p class="prev-next-title"><span class="section-number">3.2. </span>Example: Simulating Election Poll Bias and Variance</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="theory_measurement_error.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">3.4. </span>Measurement Error: Air Quality Variation</p>
+        <p class="prev-next-title"><span class="section-number">3.4. </span>Example: Measurement Error in Air Quality</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

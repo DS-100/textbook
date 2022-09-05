@@ -217,17 +217,17 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_election.html">
-     3.2. Simulating Election Polls: Bias, Variance, and Big Data
+     3.2. Example: Simulating Election Poll Bias and Variance
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_vaccine_efficacy.html">
-     3.3. Simulating a Randomized Trial: Vaccine Efficacy
+     3.3. Example: Simulating a Randomized Trial for a Vaccine
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../03/theory_measurement_error.html">
-     3.4. Measurement Error: Air Quality Variation
+     3.4. Example: Measurement Error in Air Quality
     </a>
    </li>
    <li class="toctree-l2">
@@ -1265,14 +1265,13 @@
 </div>
 <div class="section" id="the-constant-model">
 <h1><span class="section-number">4.1. </span>The Constant Model<a class="headerlink" href="#the-constant-model" title="Permalink to this headline">¶</a></h1>
-<p>A transit rider named Jake often takes the northbound C bus at the 3rd &amp; Pike
+<p>A transit rider, Jake, often takes the northbound C bus at the 3rd &amp; Pike
 bus stop in downtown Seattle <a class="footnote-reference brackets" href="#jake" id="id1">1</a>. The bus is supposed to arrive every 10
 minutes, but Jake notices that he sometimes waits a long time for the bus. He
-wants to know how late the bus usually is. Washington State keeps track of both
-scheduled bus arrival times and the actual arrival times, which lets Jake
-calculate the minutes that each bus is late for his stop. We’ll use this
-dataset to introduce the constant model, which summarizes the data with a
-single number (a constant). First, we read in the data.</p>
+wants to know how late the bus usually is.
+Jake was able to acquire the scheduled arrival and actual arrival times,
+from the Washington State Transportation Center so that he can
+calculate the minutes that each bus is late for his stop. We read in these data.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/seattle_bus_times_NC.csv&#39;</span><span class="p">)</span>
@@ -1368,7 +1367,7 @@ single number (a constant). First, we read in the data.</p>
 <p>1434 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>In the table above, the <code class="docutils literal notranslate"><span class="pre">minutes_late</span></code> column records how late each bus was.
+<p>The <code class="docutils literal notranslate"><span class="pre">minutes_late</span></code> column in the data table records how late each bus was.
 Notice that some of the times are negative, which means that the bus arrived
 early. Let’s plot a histogram of the minutes each bus is late.</p>
 <div class="cell tag_hide-input docutils container">
@@ -1385,11 +1384,11 @@ early. Let’s plot a histogram of the minutes each bus is late.</p>
 buses arrive earlier than scheduled and some are well over 20 minutes late. We
 also see a clear mode (high point) at 0, meaning many buses arrive roughly on
 time.</p>
-<p>We want to understand how late the bus usually is. To do this, we’d like to
-summarize the lateness by a constant—this is a single number, like the mean,
+<p>To understand how late the bus usually is, we’d like to
+summarize the lateness by a constant—this is a statistic, a single number, like the mean,
 median, or mode. Let’s find each of these summary statistics for the
 <code class="docutils literal notranslate"><span class="pre">minutes_late</span></code> data.</p>
-<p>From the histogram, we estimate that the mode of the data is 0. We’ll use
+<p>From the histogram, we estimate the mode of the data to be 0. We use
 Python to compute the mean and median.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1407,31 +1406,30 @@ mode:    0.00 mins late
 </div>
 </div>
 </div>
-<p>After finding these three summary statistics, we naturally want to know: which
-of these numbers is best? Rather than relying on rules of thumb, we’ll take a
-more formal approach. In this example, we’re making a model for bus lateness
-that consists of a constant. Let’s call this constant <span class="math notranslate nohighlight">\( \theta \)</span>. For example,
-if we say that <span class="math notranslate nohighlight">\( \theta = 5 \)</span>, our model’s best guess is that the bus will be 5
+<p>Naturally, we want to know which of these numbers is best as a summary of lateness.
+Rather than relying on rules of thumb, we take a more formal approach. We make a constant model for bus lateness. Let’s call this constant <span class="math notranslate nohighlight">\( \theta \)</span> (in modeling, <span class="math notranslate nohighlight">\(\theta\)</span> is often referred to as a <em>parameter</em>). For example,
+if we say that <span class="math notranslate nohighlight">\( \theta = 5 \)</span>, our model’s best guess is that the bus will typically be 5
 minutes late.</p>
 <p>Now, <span class="math notranslate nohighlight">\( \theta = 5 \)</span> isn’t a particularly good guess. From the histogram of
-arrival times, we saw that there are lot more points closer to 0 than 5. But it
+arrival times, we saw that there are a lot more points closer to 0 than 5. But it
 isn’t clear that <span class="math notranslate nohighlight">\(\theta = 0\)</span> (the mode) is a better choice than
 <span class="math notranslate nohighlight">\(\theta = 0.74\)</span> (the median), <span class="math notranslate nohighlight">\( \theta = 1.92 \)</span> (the mean), or something in
 between.
-To
-make precise choices between different values of <span class="math notranslate nohighlight">\( \theta \)</span>, we would like to
+To make precise choices between different values of <span class="math notranslate nohighlight">\( \theta \)</span>, we would like to
 assign each value of <span class="math notranslate nohighlight">\(\theta\)</span> a score that measures how well the model fits the
-data. Using more formal language, we’ll use a <em>loss function</em> to pick the best
-<span class="math notranslate nohighlight">\(\theta\)</span> for our model. A loss function takes as input a value of <span class="math notranslate nohighlight">\( \theta \)</span>
+data. Using more formal language,
+we say that we use a <em>loss function</em> to pick the best parameter,
+<span class="math notranslate nohighlight">\(\theta\)</span>, for a constant model of our data.
+A loss function takes as input a value of <span class="math notranslate nohighlight">\( \theta \)</span>
 and the points in our dataset. It outputs a single number that we can use to
 select the best <span class="math notranslate nohighlight">\( \theta \)</span>. In the next section, we examine how to define and
-use loss functions to fit the constant model.</p>
+use loss functions to fit this constant model.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="jake"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>We (the authors) first learned of the bus arrival time data from an
 analysis by a data scientist named Jake VanderPlas. We’ve named the
-protagonist of this section in his honor.</p>
+protagonist of this section in his honor. <a class="reference external" href="https://jakevdp.github.io/blog/2018/09/13/waiting-time-paradox/">https://jakevdp.github.io/blog/2018/09/13/waiting-time-paradox/</a></p>
 </dd>
 </dl>
 </div>
