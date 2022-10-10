@@ -1281,16 +1281,15 @@
                 
   <div class="section" id="modeling-wait-times">
 <h1><span class="section-number">5.4. </span>Modeling Wait Times<a class="headerlink" href="#modeling-wait-times" title="Permalink to this headline">¶</a></h1>
-<p>We are interested in modeling the experience a bus rider has at a bus stop waiting for the bus to arrive. We could develop a complex model that involves the intervals between scheduled arrivals, the bus line, and the bus direction. But we will take the simpler approach of narrowing our focus to one line, one direction, and one interval length. We will examine the northbound C line stops that are scheduled for 12 minutes after the previous bus. Both approaches are legitimate. But the first is more complex and this sort of modeling is covered in Chapter 15.</p>
-<p>In the previous section we pared the data down to the northbound C line stops, and now we make the additional restriction that the scheduled arrival time is 12 minutes after the previous bus’ scheduled time.</p>
-<div class="cell docutils container">
+<p>We are interested in modeling the experience of someone waiting at a bus stop. We could develop a complex model that involves the intervals between scheduled arrivals, the bus line, and direction. Instead, we take a simpler approach and narrow the focus to one line, one direction, and one scheduled interval. We examine the northbound C line stops that are scheduled to arrive 12 minutes apart. Both the complex and the narrow approaches are legitimate, but we do not yet have the tools to approach the complex model (see <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a> for more details on modeling).</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus_c_n_12</span> <span class="o">=</span> <span class="n">bus_c_n</span><span class="p">[</span><span class="n">bus_c_n</span><span class="p">[</span><span class="s1">&#39;sched_inter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>So far, we have been examining the distribution of the number of minutes the bus is late. We can create another histogram of this delay for the subset of data that we are analyzing.</p>
+<p>So far, we have examined the distribution of the number of minutes the bus is late. We create another histogram of this delay for the subset of data that we are analyzing (northbound C line stops that are scheduled to arrive 12 minutes after the previous bus).</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">,</span> 
@@ -1303,11 +1302,32 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/bus_modeling_8_0.svg" src="../../_images/bus_modeling_8_0.svg" /></div>
+<img alt="../../_images/bus_modeling_7_0.svg" src="../../_images/bus_modeling_7_0.svg" /></div>
 </div>
-<p>However, summarizing how late these buses are does not address the experience of the person waiting for the bus. This is an example of size-biased sampling. A classic example is the difference between sampling children and asking them how big their family is (not including parents) and sampling families and asking how many children are in the family. Families with more children will be over represented in the first approach and the average family size will be larger. The bias enters because the larger families have a greater chance of being selected. However, the first approach is how the family size is experienced by the average child.</p>
-<p>Something similar is happening here with the experience of the passengers. When people arrive at a bus stop at random, they are more likely to arrive in a time interval where the bus is delayed because it is a longer interval than the planned one. This means that to answer the question of what do the people experience when waiting for a bus, we need to do more than summarize how late the bus is.</p>
-<p>We can design our own data collection process and simulated it with an urn model, like the ones in Chapter 3.  To do this, we set up a hypothetical string of bus arrivals that are 12 minutes apart. We have as many as are in our observed data.</p>
+<p>And, we calculate the minimum, maximum, and median lateness.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; smallest amount late:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;greatest amount late:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;median amount late: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> smallest amount late:  -10.20 minutes
+ greatest amount late:  57.00 minutes
+ median amount late: -0.50 minutes
+</pre></div>
+</div>
+</div>
+</div>
+<p>Interestingly, the northbound, 12 minute apart, buses on the C line are more often early than not.</p>
+<p>Let’s revisit our question to confirm that we are on track for answering it. A summary of how late the buses are does not quite address the experience of the person waiting for the bus. When someone arrives at a bus stop, they need to wait for the next bus to arrive. <a class="reference internal" href="#busdiagram"><span class="std std-numref">Figure 5.1</span></a> shows an idealization of time passing as passengers and buses arrive at the bus stop. If people are arriving at random times at the bus stop, notice that they are more likely to arrive in a time interval where the bus is delayed because it is a longer interval. This arrival pattern is an example of size-biased sampling. So, to answer the question of what do people experience when waiting for a bus, we need to do more than summarize how late the bus is.</p>
+<div class="figure align-default" id="busdiagram">
+<img alt="../../_images/BusDiagram.jpg" src="../../_images/BusDiagram.jpg" />
+<p class="caption"><span class="caption-number">Fig. 5.1 </span><span class="caption-text">This diagram shows an idealization of a timeline with buses arriving (rectangles above the timeline) and passengers arriving (circles). The time they have to wait for the next bus to arrive is indicated by the curly brackets.</span><a class="headerlink" href="#busdiagram" title="Permalink to this image">¶</a></p>
+</div>
+<p>We can design a data collection process that mimics waiting for a bus and simulate it with an urn model, like in <a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>.  To do this, we set up a string of bus arrivals that are 12 minutes apart. We have as many as are in our observed data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sched_stack</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1321,7 +1341,7 @@
 </div>
 </div>
 </div>
-<p>Then, for each scheduled arrival, we create the actual arrival time from the observed lateness of the real buses. We sort these arrival times because when a bus is really late, another may well come along before it for someone to take.</p>
+<p>Then, for each scheduled arrival, we create the actual arrival time by adding on the observed lateness of the real bus. We sort these arrival times because when a bus is super late, another may well come along before it.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">act_stack</span> <span class="o">=</span> <span class="n">sched_stack</span> <span class="o">+</span> <span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
@@ -1336,21 +1356,21 @@
 </div>
 </div>
 </div>
-<p>Now, what we want is to simulate the arrival of people at random throughout the two-month period. We can use an urn model to do this, where we put a marble in the urn with a time on it that’s runs from time 0 to the last possible bus arrival. These times can be 1 second apart, or in our case it was simpler to make the 1/100 of a minute apart.</p>
+<p>Now, we can simulate the arrival of people at random times throughout this specially constructed time period where all of the buses are scheduled to arrive 12 minutes apart. We can use an urn model to do this. We put a marble in the urn with a time on it.  These times run from time 0 to the arrival of the last bus, and we make them 1/100 of a minute apart so they match the way the bus times are measured in our data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poss_arrival_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">act_stack</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
-<span class="n">poss_arrival_times</span>
+<span class="n">poss_arrival_times</span> <span class="o">/</span> <span class="mi">100</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([      0.,       1.,       2., ..., 1719338., 1719339., 1719340.])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([    0.  ,     0.01,     0.02, ..., 17193.38, 17193.39, 17193.4 ])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Now, we’re ready to simulate draws from the urn of times to show up at the bus stop. We can draw 100,000 times from the urn, replacing the marble between draws.</p>
+<p>Now, we’re ready to simulate draws from the urn to get a random set of times people show up at the bus stop. We draw 100,000 times from the urn, replacing the marbles between draws.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sim_arrival_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">poss_arrival_times</span><span class="p">,</span> 
@@ -1366,7 +1386,7 @@
 </div>
 </div>
 </div>
-<p>To find out how long each individual waits, we look for the actual arrival that is immediately to its right, in other words, the first bus arrival after the individual gets to the bus stop. The difference between these two times is how long they wait.</p>
+<p>To find out how long each individual waits, we look for the soonest bus to arrive after our sampled time. The difference between these two times (the sampled time of the person and the soonest bus arrival after that) is how long the person waits. Notice how we have incorporated the real data in our simulation study by using the actual delays of the 12-minute apart buses.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">act_stack</span><span class="p">,</span> <span class="n">sim_arrival_times</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
@@ -1381,12 +1401,12 @@
 </div>
 </div>
 </div>
-<p>We make a histogram of these waiting times.</p>
+<p>We make a histogram of these simulated waiting times.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">sim_wait_times</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
                    <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span>
-                   <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+                   <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Simulated Wait Times for 100,000 Passengers&quot;</span><span class="p">)</span>
@@ -1396,9 +1416,9 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/bus_modeling_21_0.svg" src="../../_images/bus_modeling_21_0.svg" /></div>
+<img alt="../../_images/bus_modeling_24_0.svg" src="../../_images/bus_modeling_24_0.svg" /></div>
 </div>
-<p>As we expect, it’s a skewed distribution. And when we can model it by a constant (see Chapter4).</p>
+<p>As we expect, we find a skewed distribution.  We can model this by a constant where we use absolute loss to select the best constant. We saw in <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> that absolute loss gives us the median wait time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;median wait time: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">sim_wait_times</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes&quot;</span><span class="p">)</span>
@@ -1411,7 +1431,8 @@
 </div>
 </div>
 </div>
-<p>Absolute loss gives us a median wait time of about six and a half minutes.  This doesn’t seem to long, but the upper quartile is quite large.</p>
+<p>The median of about six and a half minutes doesn’t seem too long.
+While our model captures the typical wait time, we also  want to provide an estimate of the variability in the process. This topic is covered in <a class="reference internal" href="../16/inf_pred_gen_intro.html#ch-inf-pred-theory"><span class="std std-numref">Chapter 16</span></a>.  We can compute the upper quartile to give us a sense of variability.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;upper quartile wait time: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">sim_wait_times</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes&quot;</span><span class="p">)</span>
@@ -1424,7 +1445,7 @@
 </div>
 </div>
 </div>
-<p>It’s undoubtedly memorable when you have to wait more than 10 minutes for a bus that is supposed to arrive every 12 minutes, and this happens one quarter of the time! While our model captures the typical wait time, we also  want to provide an estimate of the variability in the process.</p>
+<p>The upper quartile is quite large. It’s undoubtedly memorable when you have to wait more than 10 minutes for a bus that is supposed to arrive every 12 minutes, and this happens one quarter of the time!</p>
 </div>
 
     <script type="text/x-thebe-config">

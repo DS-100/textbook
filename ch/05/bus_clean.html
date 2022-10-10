@@ -1281,35 +1281,14 @@
                 
   <div class="section" id="data-wrangling">
 <h1><span class="section-number">5.2. </span>Data Wrangling<a class="headerlink" href="#data-wrangling" title="Permalink to this headline">¶</a></h1>
-<p>We need to prepare the data for analysis, which entails checking the quality of the data, simplifying the structure where possible, and deriving any new features that might help us in our analysis. These actions are described in more detail in Chapter 9.</p>
-<p>The bus data are available in a CSV file, which we can load into a table to investigate (see Chapter 8 on how to read information from a CSV file and Chapter 8 on how to work with tables in Python, called data frames.)</p>
-<div class="cell docutils container">
+<p>Before we start out analysis, we check the quality of the data, simplify the structure where possible, and derive any new measurements that might help us in our analysis. These sorts of actions are described in more detail in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.</p>
+<p>The first few rows in the data table are shown here.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;~/Downloads/arrival_times.csv&#39;</span><span class="p">)</span>
 <span class="n">bus</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>The names of all features in the table are as follows.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="o">.</span><span class="n">columns</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;OPD_DATE&#39;, &#39;VEHICLE_ID&#39;, &#39;RTE&#39;, &#39;DIR&#39;, &#39;TRIP_ID&#39;, &#39;STOP_ID&#39;,
-       &#39;STOP_NAME&#39;, &#39;SCH_STOP_TM&#39;, &#39;ACT_STOP_TM&#39;],
-      dtype=&#39;object&#39;)
-</pre></div>
-</div>
-</div>
-</div>
-<p>And, the first few rows in the table are shown here.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="n">bus</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1409,8 +1388,9 @@
 <p>5 rows × 9 columns</p>
 </div></div></div>
 </div>
-<p>It looks like some of the features might be redundant, like <code class="docutils literal notranslate"><span class="pre">STOP_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">STOP_NAME</span></code>. We can find the number of unique values and their counts to confirm this.</p>
-<div class="cell docutils container">
+<p>(The raw data are available as comma separate values in a file, which we have loaded into this table; see <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapter 8</span></a> for details on this process).</p>
+<p>It looks like some of the columns in the table might be redundant, like the columns labeled <code class="docutils literal notranslate"><span class="pre">STOP_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">STOP_NAME</span></code>. We can find the number of unique values and their counts to confirm this.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[[</span><span class="s1">&#39;STOP_ID&#39;</span><span class="p">,</span><span class="s1">&#39;STOP_NAME&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 </pre></div>
@@ -1425,8 +1405,8 @@ dtype: int64
 </div>
 </div>
 </div>
-<p>There are two Third &amp; Pike names for the stop. Could they be related to the direction of the bus?</p>
-<div class="cell docutils container">
+<p>There are two Third &amp; Pike names for the stop. Could they be related to the direction of the bus? We can check the possible combinations of direction, stop ID and stop name.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[[</span><span class="s1">&#39;DIR&#39;</span><span class="p">,</span><span class="s1">&#39;STOP_ID&#39;</span><span class="p">,</span><span class="s1">&#39;STOP_NAME&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 </pre></div>
@@ -1441,9 +1421,9 @@ dtype: int64
 </div>
 </div>
 </div>
-<p>Indeed the northern direction corresponds to stop number 578 and the southern direction corresponds to stop 431. Since we are looking at only one stop in our analysis, we really need only refer to the direction with the feature called <code class="docutils literal notranslate"><span class="pre">DIR</span></code>.</p>
-<p>We can also check the number of unique route numbers with:</p>
-<div class="cell docutils container">
+<p>Indeed, the northern direction corresponds to stop number 578 and the southern direction corresponds to stop 431. Since we are looking only at one stop in our analysis, we don’t really need anything more than the direction.</p>
+<p>We can also check the number of unique route names:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;RTE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 </pre></div>
@@ -1458,16 +1438,17 @@ Name: RTE, dtype: int64
 </div>
 </div>
 </div>
-<p>We can get the route letter (C, D, and E) from the Seattle transit site, and create new features that have values that are a bit easier for us to understand as we work with the data.</p>
-<div class="cell docutils container">
+<p>These routes are numbered so they don’t match the names C, D, and E from the original description of the problem.  This issue involves another aspect of data wrangling: we need to did up information that connects the route letters and numbers. We can get this info from the Seattle transit site. Yet another part of wrangling is to translate values into ones that are easier to understand so we replace the route numbers with their letters.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;route&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;RTE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="mi">673</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">674</span><span class="p">:</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="mi">675</span><span class="p">:</span> <span class="s1">&#39;E&#39;</span><span class="p">})</span>
+
 <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;DIR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;northbound&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="s1">&#39;southbound&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>An important feature that is missing is on that measures how late the bus was. We can create this feature by finding the difference between the scheduled and actual arrival times. To do this requires some additional work with date and time measurements. We don’t go into it here, but refer you to Chapter 9.</p>
+<p>We can also create new columns in the table that help us in our investigations. For example, we can use the scheduled and actual arrival times to calculate how late a bus is. To do this requires some work with date and time formats, which is covered in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;scheduled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;OPD_DATE&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;SCH_STOP_TM&#39;</span><span class="p">])</span>
@@ -1484,7 +1465,7 @@ Name: RTE, dtype: int64
 </div>
 </div>
 </div>
-<p>Let’s examine the values of this new feature, <code class="docutils literal notranslate"><span class="pre">minutes_late</span></code>.</p>
+<p>Let’s examine the values of this new quantity to make sure that our calculations are correct.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> smallest amount late:  -12.87 minutes
@@ -1494,7 +1475,7 @@ Name: RTE, dtype: int64
 </div>
 </div>
 </div>
-<p>When the amount late is negative, that means the bus arrived earlier than scheduled. While, the median lateness is only about half a minute, some of the buses are 2.5 hours late! Let’s take a look at the histogram of the amount of minutes the bus is late.</p>
+<p>It’s a bit surprising that there are negative values for how late a bus is, but this just means the bus arrived earlier than scheduled. While, the median lateness is only about half a minute, some of the buses are 2.5 hours late! Let’s take a look at the histogram of how many minutes late the buses are.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">bus</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">,</span> 
@@ -1507,11 +1488,11 @@ Name: RTE, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/bus_clean_21_0.svg" src="../../_images/bus_clean_21_0.svg" /></div>
+<img alt="../../_images/bus_clean_19_0.svg" src="../../_images/bus_clean_19_0.svg" /></div>
 </div>
-<p>We saw a similar shaped histogram in Chapter 4. The distribution of how late the buses are is highly skewed to the right, but many arrive close to on time.</p>
-<p>Finally, we save the simplified version of the data frame, keeping only those features needed for our analysis.</p>
-<div class="cell docutils container">
+<p>We saw a similar shaped histogram in <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>. The distribution of how late the buses are is highly skewed to the right, but many arrive close to on time.</p>
+<p>Finally, our wrangling concludes with creating a simplified version of the data table. Since we only need to  keep track of the route, direction, scheduled and actual arrival time, and how late the bus is, we create a smaller table, and we give the columns names that are a bit easier to read.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[[</span><span class="s1">&#39;route&#39;</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;scheduled&#39;</span><span class="p">,</span> 
            <span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;minutes_late&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1591,7 +1572,8 @@ Name: RTE, dtype: int64
 </table>
 </div></div></div>
 </div>
-<p>We have simplified the data and created some new features to help us with our exploration and modeling. Before modeling, we want to explore and learn more about these data.</p>
+<p>The table manipulations in this section are covered in <a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-numref">Chapter 6</span></a>.</p>
+<p>Before we begin to model bus lateness, we want to explore and learn more about these data. We do that next.</p>
 </div>
 
     <script type="text/x-thebe-config">
