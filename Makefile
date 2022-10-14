@@ -1,4 +1,4 @@
-.PHONY: help build clean
+server.PHONY: help build clean
 
 CONTENT = content/_config.yml content/_toc.yml content/*.md content/ch
 
@@ -20,7 +20,7 @@ watch: ## Rebuilds book when files change (needs fswatch installed)
 
 server: ## Starts python server that serves html
 	mkdir -p $(HTML_DIR)
-	cd $(HTML_DIR) && python -m http.server 8000
+	cd $(HTML_DIR) && python -m http.server  --bind 127.0.0.1 8000
 
 serve: watch server ## Use -j2 flag to watch and serve content with one command
 
