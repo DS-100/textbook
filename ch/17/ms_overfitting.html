@@ -872,8 +872,18 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="ms_regularization.html">
+     17.4. Regularization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="ms_risk.html">
+     17.5. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="ms_summary.html">
-     17.4. Summary
+     17.6. Summary
     </a>
    </li>
   </ul>
@@ -1349,77 +1359,6 @@ Unfortunately, the notion of loss and minimizing MSE isn’t entirely helpful ei
 <div class="section" id="example-energy-consumption">
 <h2><span class="section-number">17.1.1. </span>Example: Energy Consumption<a class="headerlink" href="#example-energy-consumption" title="Permalink to this headline">¶</a></h2>
 <p>The following dataset contains the utility bills from a private residence in Minnesota. We have records of the monthly gas usage in a home (cubic feet) and the average daily temperature (degrees Farenheit)<a class="footnote-reference brackets" href="#kaplan" id="id1">1</a>.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heat_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/utilities.csv&#39;</span><span class="p">,</span> <span class="n">usecols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span><span class="s1">&#39;ccf&#39;</span><span class="p">])</span>
-<span class="n">heat_df</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>temp</th>
-      <th>ccf</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>29</td>
-      <td>166</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>31</td>
-      <td>179</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>15</td>
-      <td>224</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>96</th>
-      <td>76</td>
-      <td>11</td>
-    </tr>
-    <tr>
-      <th>97</th>
-      <td>55</td>
-      <td>32</td>
-    </tr>
-    <tr>
-      <th>98</th>
-      <td>39</td>
-      <td>91</td>
-    </tr>
-  </tbody>
-</table>
-<p>99 rows × 2 columns</p>
-</div></div></div>
-</div>
 <p>Let’s begin by looking at a scatter plot of gas consumption as a function of temperature.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1446,11 +1385,11 @@ Unfortunately, the notion of loss and minimizing MSE isn’t entirely helpful ei
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_6_0.svg" src="../../_images/ms_overfitting_6_0.svg" /></div>
 </div>
-<p>The relationship shows curvature, but when we tried to straighten it with a log transformation some curvature remains. Additionally, there are two unusual points. If we refer back to the documentation, we find that these points represent recording errors, so we remove them.</p>
+<p>The relationship shows curvature, but when we tried to straighten it with a log transformation a different curvature arises. Additionally, there are two unusual points. If we refer back to the documentation, we find that these points represent recording errors, so we remove them.</p>
 <div class="cell tag_remove-input docutils container">
 </div>
-<p>Let’s see if a quadratic curve can capture the relationship between the gas usage and temperature.
-Recall that polynomials are still considered linear models. They are linear in their polynomial features. For example, we can express a quadratic model as,</p>
+<p>Let’s see if a quadratic curve can capture the relationship between gas usage and temperature.
+Polynomials are still considered linear models. They are linear in their polynomial features. For example, we can express a quadratic model as,</p>
 <div class="math notranslate nohighlight">
 \[
 y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
@@ -1468,7 +1407,7 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 \end{matrix}
 \right\rceil
 \end{split}\]</div>
-<p>Let’s try fitting gas usage to a quadratic in temperature. We can create the polynomial features of the design matrix with the <code class="docutils literal notranslate"><span class="pre">PolynomialFeatures</span></code> tool in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
+<p>We can create the polynomial features of the design matrix with the <code class="docutils literal notranslate"><span class="pre">PolynomialFeatures</span></code> tool in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]]</span>
@@ -1494,7 +1433,7 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 </div>
 </div>
 </div>
-<p>We set the parameter <code class="docutils literal notranslate"><span class="pre">include_bias</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> because we plan to fit the polynomial with <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> method in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, which by default includes the constant term in the model.</p>
+<p>We set the parameter <code class="docutils literal notranslate"><span class="pre">include_bias</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> because we plan to fit the polynomial with the <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> method in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, and by default it includes the constant term in the model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
@@ -1513,7 +1452,7 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_17_0.svg" src="../../_images/ms_overfitting_17_0.svg" /></div>
 </div>
-<p>The quadratic captures the curve in the data a bit.  The residuals show an upward trend in the 70-80 degree range of temperature, which indicates some lack of fit.</p>
+<p>The quadratic captures the curve in the data quite well, but the residuals show a slight upward trend in the 70-80 degree range of temperature, which indicates some lack of fit.</p>
 <p>For comparison, we fit a few more models with higher degree polynomials and collectively examine the fitted curves.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1532,10 +1471,10 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 <p class="admonition-title">Warning</p>
 <p>Fitting polynomials in this way is not advisable. We have used this traditional  form of polynomials to focus on the notion of over fitting.</p>
 <p>Unfortunately, these polynomial features tend to be highly correlated. For example, the correlation between <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(x^2\)</span> for the energy data is 0.98. Highly correlated features give unstable coefficients, where a small change in an x-value can lead to a large change in the coefficients of the polynomial.
-Also, when the <span class="math notranslate nohighlight">\(x\)</span> values are large, then the normal equations will be poorly conditioned and the coefficients can be difficult to interpret and compare.</p>
+Also, when the <span class="math notranslate nohighlight">\(x\)</span> values are large, then the normal equations are poorly conditioned and the coefficients can be difficult to interpret and compare.</p>
 <p>A better practice is to use polynomials that have been constructed to be orthogonal to one another. These polynomials fill the same space as the original polynomials, but they are uncorrelated with one another and give a more stable fit.</p>
 </div>
-<p>The plot below places all of the fits on the same graph so that we can see how the higher degree polynomials tend to bend more and more oddly.</p>
+<p>The plot below places all of the fits on the same graph so that we can see how the higher degree polynomials tend to bend more and more strangely.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_23_0.svg" src="../../_images/ms_overfitting_23_0.svg" /></div>
@@ -1545,10 +1484,10 @@ Also, when the <span class="math notranslate nohighlight">\(x\)</span> values ar
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_25_0.svg" src="../../_images/ms_overfitting_25_0.svg" /></div>
 </div>
-<p>The degree 1 curve (the straight line) in the top left facet misses the curved pattern in the data. The degree 2, begins to capture it, and the degree 3 looks like an improvement but notice the upward bend at the right side of the plot. The polynomials of degree 6, 8, and 12 follow the data more and more closely, getting more and more curvy. These polynomials seem to fit spurious bumps in the data. All together, these six curves illustrate under- and over- fitting. The fitted line in the top left under fits and misses the curvature entirely. And, the degree 12 polynomial in the bottom right definitely over fits with a wiggly pattern that we don’t think makes sense for this context.</p>
+<p>The degree 1 curve (the straight line) in the top left facet misses the curved pattern in the data. The degree 2, begins to capture it, and the degree 3 looks like an improvement but notice the upward bend at the right side of the plot. The polynomials of degree 6, 8, and 12 follow the data more and more closely, as they get more and more curvy. These polynomials seem to fit spurious bumps in the data. All together, these six curves illustrate under- and over- fitting. The fitted line in the top left under-fits and misses the curvature entirely. And, the degree 12 polynomial in the bottom right definitely over-fits with a wiggly pattern that we don’t think makes sense for this context.</p>
 <p>In general, as we add more features, models get more complex and the MSE drops, but at the same time,
 the fitted model grows increasingly erratic and sensitive to the data.
-When we over-fit, the model follows the data too closely, and predictions are poor for new observations. One simple technique to assess a model is it compute the MSE for the model with new data, data that were not used in building the model. Since we don’t typically have the capacity to acquire more data, we set aside some of the original data to evaluate the fitted model. This technique is the topic of the next section.</p>
+When we over-fit, the model follows the data too closely, and predictions are poor for new observations. One simple technique to assess a fitted model is it compute the MSE on new data, data that were not used in building the model. Since we don’t typically have the capacity to acquire more data, we set aside some of the original data to evaluate the fitted model. This technique is the topic of the next section.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="kaplan"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>

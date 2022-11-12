@@ -55,7 +55,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="17.4. Summary" href="ms_summary.html" />
+    <link rel="next" title="17.4. Regularization" href="ms_regularization.html" />
     <link rel="prev" title="17.2. Train-Test Split" href="ms_train_test.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -872,8 +872,18 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="ms_regularization.html">
+     17.4. Regularization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="ms_risk.html">
+     17.5. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="ms_summary.html">
-     17.4. Summary
+     17.6. Summary
     </a>
    </li>
   </ul>
@@ -1343,14 +1353,14 @@
 </div>
 <div class="section" id="cross-validation">
 <h1><span class="section-number">17.3. </span>Cross-Validation<a class="headerlink" href="#cross-validation" title="Permalink to this headline">¶</a></h1>
-<p>We can use the train-test paradigm to help use choose a model. The idea is to further divide the train set into separate parts where we fit the model on one part and evaluate it on another. This approach is called <em>cross-validation</em>.  We describe one version of it, called <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation*. <a class="reference internal" href="#cvdiagram"><span class="std std-numref">Figure 17.3</span></a> shows the idea behind the division of the data.</p>
+<p>We can use the train-test paradigm to help use choose a model. The idea is to further divide the train set into separate parts where we fit the model on one part and evaluate it on another. This approach is called <em>cross-validation</em>.  We describe one version of it, called <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation*. <a class="reference internal" href="#cvdiagram"><span class="std std-numref">Figure 17.3</span></a> shows the idea behind this division of the data.</p>
 <div class="figure align-default" id="cvdiagram">
 <img alt="../../_images/CVDiagram.png" src="../../_images/CVDiagram.png" />
-<p class="caption"><span class="caption-number">Fig. 17.3 </span><span class="caption-text">Five-fold Cross-Validation.</span><a class="headerlink" href="#cvdiagram" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 17.3 </span><span class="caption-text">Five-fold Cross-Validation. The train set is divide into 5 parts, which are used in turn to validate models built on the remainder of the data.</span><a class="headerlink" href="#cvdiagram" title="Permalink to this image">¶</a></p>
 </div>
-<p>We use cross-validation to select the form of the model. This might be the degree of the polynomial, the number of features to include, or a cut-off for a classification (see <a class="reference internal" href="../19/classification_intro.html#ch-logistic"><span class="std std-numref">Chapter 19</span></a>).  The basic steps behind <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation go as follows.</p>
+<p>Cross-validation can help select the general form of a model. By this we mean, the degree of the polynomial, the number of features in the model, or a cut-off for a regularization penalty (see the next section). The basic steps behind <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation go as follows.</p>
 <ul class="simple">
-<li><p>Divide the train set into <span class="math notranslate nohighlight">\(k\)</span> parts of roughly the same size, each of these parts are called <em>folds</em>. Use the same technique for creating the original train and test set to divide up the train set. Typically, we divide the data at random.</p></li>
+<li><p>Divide the train set into <span class="math notranslate nohighlight">\(k\)</span> parts of roughly the same size, each of these parts are called <em>folds</em>. Use the same technique that was used to create the train and test sets to make the folds. Typically, we divide the data at random.</p></li>
 <li><p>Set one fold aside to act as a test set.</p>
 <ul>
 <li><p>Fit all models on the remainder of the train data (the training data less the particular fold).</p></li>
@@ -1360,13 +1370,18 @@
 <li><p>Repeat this process <span class="math notranslate nohighlight">\(k-1\)</span> more times, where each time you set aside one fold, use the rest of the train set to fit models, and evaluate them on the fold that was set aside.</p></li>
 <li><p>Combine the error in fitting each model across the folds, and choose the model with the smallest error.</p></li>
 </ul>
-<p>These fitted models will not have identical coefficients across folds. We combine them across folds according to the basic form of the model. In the case of fitting a polynomial, we combine the MSE for each fold according to the degree of the polynomial. In other words, we use the folds to choose the complexity of the model. Once chosen, we refit the model using all of the train set and evaluate it with the test set. (Notice that we haven’t used the test set in any of the steps in selecting the model).</p>
-<p>Typically, we use a <em>k</em> between 5 to 10.  Another choice for <span class="math notranslate nohighlight">\(k\)</span> is the number of observations in the train set. This special case is called leave-one-out cross-validation. It’s popularity stems from the simplicity in adjusting a lease squares fit to drop one observation.<br />
-Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation takes some computation time since we typically have to refit each model from scratch for each fold. The <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> library provides a convenient <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html"><code class="docutils literal notranslate"><span class="pre">sklearn.model_selection.KFold</span></code></a> class to implement <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation.</p>
+<p>These fitted models will not have identical coefficients across folds. As an example, when we fit a polynomial of, say, degree 3, we average the MSE across the <span class="math notranslate nohighlight">\(k\)</span> folds to get a value of polynomials of degree 3. Then, we do the same for polynomials of degree 4, and so on. We then compare the MSEs and choose the degree of the polynomial with the lowest MSE.  The actual coefficients for the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(x^2\)</span> and <span class="math notranslate nohighlight">\(x^3\)</span> terms in the cubic polynomial are not be the same in each fit. Once the degree is selected, we refit the model using all of the training data and evaluate it on the test set. (We haven’t used the test set in any of the earlier steps to select the model).</p>
+<p>Typically, we use between 5 or 10 folds.  Another popular choice puts one observation in each fold. This special case is called leave-one-out cross-validation. It’s popularity stems from the simplicity in adjusting a least squares fit to have one fewer observation.</p>
+<p>Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation takes some computation time since we typically have to refit each model from scratch for each fold. The <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> library provides a convenient <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html"><code class="docutils literal notranslate"><span class="pre">sklearn.model_selection.KFold</span></code></a> class to implement <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation. We provide an example of <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation to give an idea of how it works.</p>
 <div class="section" id="example-fitting-a-bent-line-model-with-cross-validation">
 <h2><span class="section-number">17.3.1. </span>Example: Fitting a Bent Line Model with Cross-validation<a class="headerlink" href="#example-fitting-a-bent-line-model-with-cross-validation" title="Permalink to this headline">¶</a></h2>
-<p>We will demonstrate <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation on the gas consumption example. However, we will fit a different set of models than polynomials. The scatter plot of the data looks like it might be fit well by two connecting line segments. For cold temperatures the relationship between gas consumption and temperature looks roughly linear with a negative slope of about <span class="math notranslate nohighlight">\(-4\)</span>cubic ft/degree. The gas consumption for warmer months appears to be roughly flat. Rather than fit a polynomial, we can fit a line with a bend in it.</p>
-<p>Suppose that we want the line to bend at 65 degrees. Then we can create a second feature that enables the points 65 and above to have a different slope. We create this feature and fit the bent line model.</p>
+<p>We demonstrate <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation on the gas consumption example. However, this time we fit a different set of models than polynomials. The original scatter plot of the data looks like the points fall along two connected line segments. In cold temperatures the relationship between gas consumption and temperature looks roughly linear with a negative slope of about <span class="math notranslate nohighlight">\(-4\)</span>cubic ft/degree, and in warmer months, the relationship appears nearly flat. So, rather than fit a polynomial, we can fit a bent line to the data.</p>
+<p>Let’s start by fitting a line with a bend at 65 degrees. To do this, we create a second feature that enables the points with temperatures above 65 to have a different slope. The model is</p>
+<div class="math notranslate nohighlight">
+\[
+y = \theta_0 + \theta_1x + \theta_2(x-65)^+
+\]</div>
+<p>Here the <span class="math notranslate nohighlight">\( (~)^+ \)</span> stands for “positive part” so when <span class="math notranslate nohighlight">\( x \)</span> is less than 65 it evaluates to 0, and when <span class="math notranslate nohighlight">\( x \)</span> is 65 or greater, it is just <span class="math notranslate nohighlight">\( x-65 \)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]]</span>
@@ -1378,7 +1393,7 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 </div>
 </div>
 </div>
-<p>We can overlay this fitted “curve” on the scatter plot to see how well it captures the shape of the data.</p>
+<p>Let’s overlay this fitted “curve” on the scatter plot to see how well it captures the shape of the data.</p>
 <div class="cell tag_remove-input docutils container">
 </div>
 <div class="cell tag_hide-input docutils container">
@@ -1403,7 +1418,7 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_cv_9_0.svg" src="../../_images/ms_cv_9_0.svg" /></div>
 </div>
-<p>This model appears to fit the data much better than the earlier polynomials. There are many bent line models possible. The line might bend at 55 degrees or 60 degrees, and so on. We can use <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation to choose the temperature value at which the line bends. Let’s consider models from 40 to 69 in increments of 1 degree. For each of these models, we need to create the additional feature to enable the line to bend.</p>
+<p>This model appears to fit the data much better than the earlier polynomials. There are many bent line models possible. The line might bend at 55 degrees or 60 degrees, and so on. We can use <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation to choose the temperature value at which the line bends. We can consider models with bends at <span class="math notranslate nohighlight">\( 40, 41, 42, \ldots, 69 \)</span> degrees. For each of these, we need to create the additional feature to enable the line to bend there.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
@@ -1533,7 +1548,7 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 <p>97 rows × 32 columns</p>
 </div></div></div>
 </div>
-<p>The first step is to create our train and test sets. We choose 22 observations at random to be placed in the test set. That leaves 75 for the train set.</p>
+<p>The first step in cross-validation is to create our train and test sets. We choose 22 observations at random to be placed in the test set. That leaves 75 for the train set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]]</span>
@@ -1587,7 +1602,7 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 </div>
 </div>
 </div>
-<p>Then we combine the validation errors across the 3-folds and plot them against the location of the bend.</p>
+<p>Then, we combine the validation errors across the 3-folds and plot them against the location of the bend.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">totals</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">validation_errors</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="p">]</span>
@@ -1595,36 +1610,14 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span><span class="mi">71</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">totals</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers+lines&#39;</span><span class="p">))</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;3-fold Cross-Validation&quot;</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
-                 <span class="n">xaxis_title</span><span class="o">=</span><span class="s1">&#39;Location of bend&#39;</span><span class="p">,</span>
-                   <span class="n">yaxis_title</span><span class="o">=</span><span class="s1">&#39;MSE&#39;</span><span class="p">)</span>
-
-
-<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
+<div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_cv_18_0.svg" src="../../_images/ms_cv_18_0.svg" /></div>
 </div>
-<p>The MSE looks quite flat for 57, 58, 59, and 60 degrees. The minimizing value occurs at 58 degrees so we will choose that particular model. To assess this model with the test set, we first we fit it using the entire train set.</p>
+<p>The MSE looks quite flat for 57, 58, 59, and 60 degrees. The minimizing value occurs at 58 degrees so we choose that particular model. To assess this model with the test set, we first we fit it using the entire train set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bend_final</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;temp58p&quot;</span><span class="p">]],</span> <span class="n">y_train</span><span class="p">)</span>
-
-<span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">bend_final</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;temp60p&quot;</span><span class="p">]])</span>
-
-<span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -1634,7 +1627,7 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 </div>
 </div>
 </div>
-<p>Then we predict the gas consumption for the test set using this model.</p>
+<p>Then we use the fitted model to predict gas consumption for the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">bend_final</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;temp60p&quot;</span><span class="p">]])</span>
@@ -1649,15 +1642,15 @@ Generally, <span class="math notranslate nohighlight">\(k\)</span>-fold cross-va
 </div>
 </div>
 </div>
-<p>We overlay the bent-line fit on the scatter plot and examine the residuals to get a quick idea as to the quality of the fit.</p>
+<p>Let’s overlay the bent-line fit on the scatter plot and examine the residuals to get a better idea as to the quality of the fit.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_cv_24_0.svg" src="../../_images/ms_cv_24_0.svg" /></div>
 </div>
 <p>The fitted curve looks reasonable, and the size of the residuals is much smaller than those from the polynomial fit.</p>
-<p>For future reference, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> has a <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html"><code class="docutils literal notranslate"><span class="pre">cross_val_predict</span></code></a> method to automatically perform cross-validation, so we don’t have to break the data into training and validation sets ourselves.</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> library has a <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_predict.html"><code class="docutils literal notranslate"><span class="pre">cross_val_predict</span></code></a> method to automatically perform cross-validation, so we don’t have to break the data into training and validation sets ourselves.</p>
 <p>Using cross-validation to manage model complexity has a couple critical limitations: typically it requires the complexity to vary discretely; and there may not be a natural way to order the models.
-Rather than changing the dimensions of a sequence of models, we can instead fit a large model and apply constraints on the coefficients. This notion is called regularization and is the topic of the next section.</p>
+Rather than changing the dimensions of a sequence of models, we can instead fit a large model and apply constraints on the size of the coefficients. This notion is called regularization and is the topic of the next section.</p>
 </div>
 </div>
 
@@ -1693,10 +1686,10 @@ Rather than changing the dimensions of a sequence of models, we can instead fit 
             <p class="prev-next-title"><span class="section-number">17.2. </span>Train-Test Split</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="ms_summary.html" title="next page">
+    <a class='right-next' id="next-link" href="ms_regularization.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">17.4. </span>Summary</p>
+        <p class="prev-next-title"><span class="section-number">17.4. </span>Regularization</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

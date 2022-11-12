@@ -872,8 +872,18 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="ms_regularization.html">
+     17.4. Regularization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="ms_risk.html">
+     17.5. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="ms_summary.html">
-     17.4. Summary
+     17.6. Summary
     </a>
    </li>
   </ul>
@@ -1318,14 +1328,14 @@
 <div class="section" id="train-test-split">
 <h1><span class="section-number">17.2. </span>Train-Test Split<a class="headerlink" href="#train-test-split" title="Permalink to this headline">¶</a></h1>
 <p>Although we want to use all of our data in building a model, we also want to get a sense of how
-the model behaves with new observations. We often do not have the luxury of collecting additional data to assess a model so, instead, we set aside a portion of our data, called the <em>test set</em> to substitute for new data. The remainder of the data is called the <em>train set</em>, and we use this portion to build the model. Then, after we have settled on a model, we pull out the test set and see how well the model (fitted to the train set) predicts the outcomes in the test set. <a class="reference internal" href="#train-test-diagram"><span class="std std-numref">Figure 17.1</span></a> demonstrates this idea.</p>
+the model behaves with new observations. We often do not have the luxury of collecting additional data to assess a model so, instead, we set aside a portion of our data, called the <em>test set</em>, to substitute for new data. The remainder of the data is called the <em>train set</em>, and we use this portion to build the model. Then, after we have settled on a model, we pull out the test set and see how well the model (fitted on the train set) predicts the outcomes in the test set. <a class="reference internal" href="#train-test-diagram"><span class="std std-numref">Figure 17.1</span></a> demonstrates this idea.</p>
 <div class="figure align-default" id="train-test-diagram">
 <img alt="../../_images/TrainTestDiagram.png" src="../../_images/TrainTestDiagram.png" />
 <p class="caption"><span class="caption-number">Fig. 17.1 </span><span class="caption-text">The train-test split divides the data into two parts. The train set is used to build the model, and the test set evaluates the model.</span><a class="headerlink" href="#train-test-diagram" title="Permalink to this image">¶</a></p>
 </div>
 <p>Typically the test set consists of 10 to 25% of the data.  What might not be clear from the diagram is that this division into two parts is often made at random so the train and tests sets are similar to each other.</p>
 <p>We can describe this process using the notion introduced in <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>.
-The design matrix, <span class="math notranslate nohighlight">\( \textbf{X} \)</span>, and outcome, <span class="math notranslate nohighlight">\( \mathbf{y} \)</span>, are each divided into two parts; the  design matrix labeled <span class="math notranslate nohighlight">\( \textbf{X}_T \)</span> and corresponding outcomes <span class="math notranslate nohighlight">\( \mathbf{y}_T \)</span> form the train set and we minimize the square loss over <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> with these data,</p>
+The design matrix, <span class="math notranslate nohighlight">\( \textbf{X} \)</span>, and outcome, <span class="math notranslate nohighlight">\( \mathbf{y} \)</span>, are each divided into two parts; the  design matrix, labeled <span class="math notranslate nohighlight">\( \textbf{X}_T \)</span>, and corresponding outcomes, <span class="math notranslate nohighlight">\( \mathbf{y}_T \)</span>, form the train set. We minimize the average squared loss over <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> with these data,</p>
 <div class="math notranslate nohighlight">
 \[
 \min_{\boldsymbol{\theta}} L({\boldsymbol{\theta}}, \textbf{X}_T, \mathbf{y}_T) = \min_{\boldsymbol{\theta}} \lVert \mathbf{y}_T - {\textbf{X}_T}{\boldsymbol{{\theta}}} \rVert^2
@@ -1390,14 +1400,13 @@ To do this, we carry out the following steps:</p>
 </div>
 </div>
 </div>
-<p>We can create a plot of the MSE as it relates to the degree of the fitted polynomial.</p>
+<p>To visualize the change in MSE, we plot MSE for each fitted polynomial against its degree.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_train_test_12_0.svg" src="../../_images/ms_train_test_12_0.svg" /></div>
 </div>
-<p>Notice that the MSE decreases with the added complexity of the model. We saw earlier that the higher order polynomials showed a wiggly behavior that we don’t think reflects the underlying structure in the data. With this in mind, we might choose a model that is simpler, but shows a large reduction in MSE. That could be degree 3, 4, or 5. Let’s go with degree 3, since the difference between these models, in terms of MSE, is quite small.</p>
-<p>Now that we have chosen our model, we provide an independent assessment of its MSE using the test set.</p>
-<p>To do this, we prepare the design matrix for the test set, and use the degree 3 polynomial fitted on the train set to predict the outcome for each row in the test set. Lastly, we compute the MSE for the test set.</p>
+<p>Notice that the MSE decreases with the additional model complexity. We saw earlier that the higher order polynomials showed a wiggly behavior that we don’t think reflects the underlying structure in the data. With this in mind, we might choose a model that is simpler, but shows a large reduction in MSE. That could be degree 3, 4, or 5. Let’s go with degree 3, since the difference between these three models, in terms of MSE, is quite small and it’s the simplest model.</p>
+<p>Now that we have chosen our model, we provide an independent assessment of its MSE using the test set. We prepare the design matrix for the test set, and use the degree 3 polynomial fitted on the train set to predict the outcome for each row in the test set. Lastly, we compute the MSE for the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly_test</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
@@ -1413,8 +1422,8 @@ To do this, we carry out the following steps:</p>
 </div>
 </div>
 </div>
-<p>Notice that the MSE for this model is quite a bit larger than the MSE computed on the training data.
-This demonstrates the problem with using the same data to fit and evaluate a model–the MSE doesn’t adequately reflect the MSE for a new observation. And, to demonstrate the problem with over-fitting, let’s compute the MSE for all of the polynomial models we fitted on the train set.</p>
+<p>The MSE for this model is quite a bit larger than the MSE computed on the training data.
+This demonstrates the problem with using the same data to fit and evaluate a model–the MSE doesn’t adequately reflect the MSE for a new observation. And, to demonstrate the problem with over-fitting, let’s compute the MSE on the train set for all of the polynomial models we fitted and plot them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> 
@@ -1424,17 +1433,16 @@ This demonstrates the problem with using the same data to fit and evaluate a mod
 </div>
 </div>
 </div>
-<p>We plot the MSE for the test and train sets for each model.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/ms_train_test_19_0.svg" src="../../_images/ms_train_test_19_0.svg" /></div>
+<img alt="../../_images/ms_train_test_18_0.svg" src="../../_images/ms_train_test_18_0.svg" /></div>
 </div>
-<p>Notice how the MSE for the test set is larger than the MSE for the train set for all models, not just the model that we selected.  More importantly, notice how the MSE for the test set initially decreases as the model goes from under fitting to one that follows the curvature in the data a bit better. Then, as the model grows in complexity, the MSE for the test set increases. These more complex models over fit the training data and lead to large errors in predicting the test set. An idealization of this phenomenon is captured in the diagram in <a class="reference internal" href="#train-test-overfit"><span class="std std-numref">Figure 17.2</span></a>.</p>
+<p>Notice how the MSE for the test set is larger than the MSE for the train set for all models, not just the model that we selected.  More importantly, notice how the MSE for the test set initially decreases as the model goes from under-fitting to one that follows the curvature in the data a bit better. Then, as the model grows in complexity, the MSE for the test set increases. These more complex models over-fit the training data and lead to large errors in predicting the test set. An idealization of this phenomenon is captured in the diagram in <a class="reference internal" href="#train-test-overfit"><span class="std std-numref">Figure 17.2</span></a>.</p>
 <div class="figure align-default" id="train-test-overfit">
 <img alt="../../_images/train-test-overfitting.png" src="../../_images/train-test-overfitting.png" />
 <p class="caption"><span class="caption-number">Fig. 17.2 </span><span class="caption-text">The train set error decrease as the model grows in complexity and fits the train set more and more closely. On the other hand, the error in the test set increases for more complex models that over fit the train set and make worse predictions for the test set.</span><a class="headerlink" href="#train-test-overfit" title="Permalink to this image">¶</a></p>
 </div>
-<p>The test data provides an assessment of the prediction error for new observations.  It is crucial to use the test set once, after we have committed to a model. Otherwise, we fall into the trap of using the same data to choose and evaluate a model. When choosing the model, we fell back on the simplicity argument because we were aware that increasingly complex models tend to over fit. However, we can extend the train-test method to help select the model as well. This is the topic of the next section.</p>
+<p>The test data provides an assessment of the prediction error for new observations.  It is crucial to use the test set only once, after we have committed to a model. Otherwise, we fall into the trap of using the same data to choose and evaluate a model. When choosing the model, we fell back on the simplicity argument because we were aware that increasingly complex models tend to over fit. However, we can extend the train-test method to help select the model as well. This is the topic of the next section.</p>
 </div>
 
     <script type="text/x-thebe-config">
