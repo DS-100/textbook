@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>20.5. Fitting a Linear Model Using Gradient Descent &#8212; Learning Data Science</title>
+    <title>20.3. Convex and Differentiable Loss Functions &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -55,8 +55,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="21. Replicable Research" href="../21/repl_intro.html" />
-    <link rel="prev" title="20.4. Stochastic Gradient Descent" href="gradient_stochastic.html" />
+    <link rel="next" title="20.4. Alternatives to Gradient Descent" href="gd_alternative.html" />
+    <link rel="prev" title="20.2. Minimizing Huber Loss" href="gd_example.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -990,8 +990,8 @@
   </ul>
  </li>
  <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="gradient_descent.html">
-   20. Gradient Descent and Numerical Optimization
+  <a class="reference internal" href="gd_intro.html">
+   20. Numerical Optimization
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/>
   <label for="toctree-checkbox-20">
@@ -1000,28 +1000,28 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="gradient_basics.html">
-     20.1. Loss Minimization Using a Program
+    <a class="reference internal" href="gd_basics.html">
+     20.1. Gradient Descent Basics
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="gradient_descent_define.html">
-     20.2. Gradient Descent
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="gradient_convexity.html">
-     20.3. Convexity
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="gradient_stochastic.html">
-     20.4. Stochastic Gradient Descent
+    <a class="reference internal" href="gd_example.html">
+     20.2. Minimizing Huber Loss
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     20.5. Fitting a Linear Model Using Gradient Descent
+     20.3. Convex and Differentiable Loss Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="gd_alternative.html">
+     20.4. Alternatives to Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="gd_summary.html">
+     20.5. Summary
     </a>
    </li>
   </ul>
@@ -1263,7 +1263,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../../_sources/ch/20/gradient_lin_reg.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../../_sources/ch/20/gd_convex.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -1289,7 +1289,7 @@
     <div class="dropdown-buttons">
         
         
-        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/20/gradient_lin_reg.ipynb&branch=master"><button type="button"
+        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/20/gd_convex.ipynb&branch=master"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch JupyterHub" data-toggle="tooltip"
                 data-placement="left"><img class="jupyterhub-button-logo"
                     src="../../_static/images/logo_jupyterhub.svg"
@@ -1305,24 +1305,6 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
-            <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
-            </div>
-            <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#derivative-of-the-mse-loss">
-   20.5.1. Derivative of the MSE Loss
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-gradient-descent">
-   20.5.2. Running Gradient Descent
-  </a>
- </li>
-</ul>
-
-            </nav>
         </div>
     </div>
 </div>
@@ -1330,258 +1312,40 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Fitting a Linear Model Using Gradient Descent</h1>
+                <h1>Convex and Differentiable Loss Functions</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#derivative-of-the-mse-loss">
-   20.5.1. Derivative of the MSE Loss
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-gradient-descent">
-   20.5.2. Running Gradient Descent
-  </a>
- </li>
-</ul>
-
-                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
-
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
-</pre></div>
+  <div class="section" id="convex-and-differentiable-loss-functions">
+<h1><span class="section-number">20.3. </span>Convex and Differentiable Loss Functions<a class="headerlink" href="#convex-and-differentiable-loss-functions" title="Permalink to this headline">¶</a></h1>
+<p>As its name suggests, the gradient descent algorithm requires the loss function to be differentiable. Choosing a differentiable loss function, <span class="math notranslate nohighlight">\( \nabla_\theta L( \boldsymbol{\theta} ) \)</span>, is a crucial part of the  algorithm. The gradient allows us to make a linear approximation to the loss function in small neighborhoods of <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>. This approximation gives us the direction of the step and as long as we don’t overshoot the minimum, <span class="math notranslate nohighlight">\( \boldsymbol{\hat{\theta}} \)</span>, we are bound to eventually reach it.  Well, as long as the loss function is also convex.</p>
+<p>The step-by-step search for the minimum relies on the loss function being convex because then it can’t have a local minimum. The function in the diagram on the left in <a class="reference internal" href="#gd-convex"><span class="std std-numref">Figure 20.4</span></a> has a local minimum, and depending on where the algorithm starts, it might converge to the local minimum and miss the real minimum entirely. The property of convexity avoids this problem, as shown in the diagram on the right in the figure. A <em>convex function</em> cannot have local minima. So, with an appropriate step size, gradient descent will find the globally optimal <span class="math notranslate nohighlight">\( \theta \)</span> for any convex function.</p>
+<div class="figure align-default" id="gd-convex">
+<img alt="../../_images/convex-diagram.png" src="../../_images/convex-diagram.png" />
+<p class="caption"><span class="caption-number">Fig. 20.4 </span><span class="caption-text">With non-convex functions, such as the function on the left, gradient descent might locate a local minimum, rather than a global minimum. This is not possible with convex functions, such as the function on the right.</span><a class="headerlink" href="#gd-convex" title="Permalink to this image">¶</a></p>
 </div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span>
-             <span class="n">alpha</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Uses gradient descent to minimize loss_fn. Returns the minimizing value of</span>
-<span class="sd">    theta once the loss changes less than 0.0001 between iterations.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;theta: </span><span class="si">{</span><span class="n">theta</span><span class="si">}</span><span class="s1"> | loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_loss_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
-        <span class="n">new_theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gradient</span>
-        <span class="n">new_loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">new_theta</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_loss</span> <span class="o">-</span> <span class="n">loss</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.0001</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">new_theta</span>
-        
-        <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">new_loss</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="fitting-a-linear-model-using-gradient-descent">
-<h1><span class="section-number">20.5. </span>Fitting a Linear Model Using Gradient Descent<a class="headerlink" href="#fitting-a-linear-model-using-gradient-descent" title="Permalink to this headline">¶</a></h1>
-<p>We want to fit a linear model that predicts the tip amount based on the total bill of the table:</p>
+<p>Formally, a function <span class="math notranslate nohighlight">\( f \)</span> is convex if for any two input values, <span class="math notranslate nohighlight">\( \boldsymbol{\theta}_a \)</span> and <span class="math notranslate nohighlight">\( \boldsymbol{\theta}_b \)</span>, and any <span class="math notranslate nohighlight">\( q \)</span> between 0 and 1:</p>
+<div class="math notranslate nohighlight">
+\[ qf(\boldsymbol{\theta}_a) + (1-q)f( \boldsymbol{\theta}_b) \geq f(q \boldsymbol{\theta}_a + (1-q) \boldsymbol{\theta}_b)\]</div>
+<p>This inequality states that all lines connecting two points of the function must reside on or above the function itself.
+Heuristically, this means that whenever we take a small enough step to the right when the gradient is negative or to the left when the gradient is positive, we will head in the direction of the function’s minimum.</p>
+<p>The formal definition of convexity gives us a precise way of determining whether a function is convex.
+And, we can use this definition to connect the convexity of the loss function <span class="math notranslate nohighlight">\( \cal{l}( \boldsymbol{\theta} ) \)</span> to the convexity of the average loss <span class="math notranslate nohighlight">\( L( \boldsymbol{\theta} ) \)</span>. We have been ignoring the fact that <span class="math notranslate nohighlight">\( L( \boldsymbol{\theta} ) \)</span> is also a function of the data, where <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span> is the loss function and the average loss is <span class="math notranslate nohighlight">\( L(\boldsymbol{\theta}) = 1/n \sum \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span>.  If <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span> is a convex function of <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>, then the average loss is also convex. We walk through a proof of this statement in the exercises.</p>
+<p>The gradient of <span class="math notranslate nohighlight">\( L(\boldsymbol{\theta}) \)</span> can also be expressed in terms of the gradient of <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
-f_\boldsymbol\theta (x) = \theta_1 x + \theta_0
+\begin{aligned}
+\nabla_{\theta} L(\boldsymbol{\theta}, \textbf{X}, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^{n} \nabla_{\theta} {\cal l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i),
+\end{aligned}
 \]</div>
-<p>In order to optimize <span class="math notranslate nohighlight">\( \theta_1 \)</span> and <span class="math notranslate nohighlight">\( \theta_0 \)</span>, we need to first choose a loss function. We will choose the mean squared error loss function:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-L(\boldsymbol\theta, \textbf{x}, \textbf{y})
-&amp;= \frac{1}{n} \sum_{i = 1}^{n}(y_i - f_\boldsymbol\theta (x_i))^2\\
-\end{aligned}
-\end{split}\]</div>
-<p>Note that we have modified our loss function to reflect the addition of an explanatory variable in our new model. Now, <span class="math notranslate nohighlight">\( \textbf{x} \)</span> is a vector containing the individual total bills, <span class="math notranslate nohighlight">\( \textbf{y} \)</span> is a vector containing the individual tip amounts, and <span class="math notranslate nohighlight">\( \boldsymbol\theta \)</span> is a vector: <span class="math notranslate nohighlight">\( \boldsymbol\theta = [ \theta_1, \theta_0 ] \)</span>.</p>
-<p>Using a linear model with the squared error also goes by the name of least-squares linear regression. We can use gradient descent to find the <span class="math notranslate nohighlight">\( \boldsymbol\theta \)</span> that minimizes the loss.</p>
-<p><strong>An Aside on Using Correlation</strong></p>
-<p>If you have seen least-squares linear regression before, you may recognize that we can compute the correlation coefficient and use it to determine <span class="math notranslate nohighlight">\( \theta_1 \)</span> and <span class="math notranslate nohighlight">\( \theta_0 \)</span>. This is simpler and faster to compute than using gradient descent for this specific problem, similar to how computing the mean was simpler than using gradient descent to fit a constant model. We will use gradient descent anyway because it is a general-purpose method of loss minimization that still works when we later introduce models that do not have analytic solutions. In fact, in many real-world scenarios, we will use gradient descent even when an analytic solution exists because computing the analytic solution can take longer than gradient descent, especially on large datasets.</p>
-<div class="section" id="derivative-of-the-mse-loss">
-<h2><span class="section-number">20.5.1. </span>Derivative of the MSE Loss<a class="headerlink" href="#derivative-of-the-mse-loss" title="Permalink to this headline">¶</a></h2>
-<p>In order to use gradient descent, we have to compute the derivative of the MSE loss with respect to <span class="math notranslate nohighlight">\( \boldsymbol\theta \)</span>. Now that <span class="math notranslate nohighlight">\( \boldsymbol\theta \)</span> is a vector of length 2 instead of a scalar, <span class="math notranslate nohighlight">\( \nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{x}, \textbf{y}) \)</span> will also be a vector of length 2.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\nabla_{\boldsymbol\theta} L(\boldsymbol\theta, \textbf{x}, \textbf{y})
-&amp;= \nabla_{\boldsymbol\theta} \left[ \frac{1}{n} \sum_{i = 1}^{n}(y_i - f_\boldsymbol\theta (x_i))^2 \right] \\
-&amp;= \frac{1}{n} \sum_{i = 1}^{n}2 (y_i - f_\boldsymbol\theta (x_i))(- \nabla_{\boldsymbol\theta} f_\boldsymbol\theta (x_i))\\
-&amp;= -\frac{2}{n} \sum_{i = 1}^{n}(y_i - f_\boldsymbol\theta (x_i))(\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (x_i))\\
-\end{aligned}
-\end{split}\]</div>
-<p>We know:</p>
-<div class="math notranslate nohighlight">
-\[
-f_\boldsymbol\theta (x) = \theta_1 x + \theta_0
-\]</div>
-<p>We now need to compute <span class="math notranslate nohighlight">\( \nabla_{\boldsymbol\theta} f_\boldsymbol\theta (x_i) \)</span> which is a length 2 vector.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (x_i)
-&amp;= \begin{bmatrix}
-     \frac{\partial}{\partial \theta_0} f_\boldsymbol\theta (x_i)\\
-     \frac{\partial}{\partial \theta_1} f_\boldsymbol\theta (x_i)
-   \end{bmatrix} \\
-&amp;= \begin{bmatrix}
-     \frac{\partial}{\partial \theta_0} [\theta_1 x_i + \theta_0]\\
-     \frac{\partial}{\partial \theta_1} [\theta_1 x_i + \theta_0]
-   \end{bmatrix} \\
-&amp;= \begin{bmatrix}
-     1 \\
-     x_i
-   \end{bmatrix} \\
-\end{aligned}
-\end{split}\]</div>
-<p>Finally, we plug back into our formula above to get</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\nabla_{\boldsymbol\theta} L(\theta, \textbf{x}, \textbf{y})
-&amp;= -\frac{2}{n} \sum_{i = 1}^{n}(y_i - f_\boldsymbol\theta (x_i))(\nabla_{\boldsymbol\theta} f_\boldsymbol\theta (x_i))\\
-&amp;= -\frac{2}{n} \sum_{i = 1}^{n} (y_i - f_\boldsymbol\theta (x_i)) \begin{bmatrix} 1 \\ x_i \end{bmatrix} \\
-&amp;= -\frac{2}{n} \sum_{i = 1}^{n} \begin{bmatrix}
-    (y_i - f_\boldsymbol\theta (x_i)) \\
-    (y_i - f_\boldsymbol\theta (x_i)) x_i
-    \end{bmatrix} \\
-\end{aligned}
-\end{split}\]</div>
-<p>This is a length 2 vector since <span class="math notranslate nohighlight">\( (y_i - f_\boldsymbol\theta (x_i)) \)</span> is scalar.</p>
-</div>
-<div class="section" id="running-gradient-descent">
-<h2><span class="section-number">20.5.2. </span>Running Gradient Descent<a class="headerlink" href="#running-gradient-descent" title="Permalink to this headline">¶</a></h2>
-<p>Now, let’s fit a linear model on the tips dataset to predict the tip amount from the total table bill.</p>
-<p>First, we define a Python function to compute the loss:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simple_linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Returns predictions by a linear model on x_vals.&#39;&#39;&#39;</span>
-    <span class="k">return</span> <span class="n">thetas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">thetas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_vals</span>
-
-<span class="k">def</span> <span class="nf">mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">simple_linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Then, we define a function to compute the gradient of the loss:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">grad_mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">):</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_vals</span><span class="p">)</span>
-    <span class="n">grad_0</span> <span class="o">=</span> <span class="n">y_vals</span> <span class="o">-</span> <span class="n">simple_linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">)</span>
-    <span class="n">grad_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_vals</span> <span class="o">-</span> <span class="n">simple_linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">))</span> <span class="o">*</span> <span class="n">x_vals</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_1</span><span class="p">)])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">x_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
-<span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">grad_mse_loss</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We’ll use the previously defined <code class="docutils literal notranslate"><span class="pre">minimize</span></code> function that runs gradient descent, accounting for our new explanatory variable. It has the function signature (body omitted):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">minimize</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">grad_loss_fn</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Finally, we run gradient descent!</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
-
-<span class="n">thetas</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">mse_loss</span><span class="p">,</span> <span class="n">grad_mse_loss</span><span class="p">,</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;total_bill&#39;</span><span class="p">],</span> <span class="n">tips</span><span class="p">[</span><span class="s1">&#39;tip&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>theta: [0. 0.] | cost: 10.896283606557377
-theta: [0.   0.07] | cost: 3.8937622006094705
-theta: [0.  0.1] | cost: 1.9359443267168215
-theta: [0.01 0.12] | cost: 1.388538448286097
-theta: [0.01 0.13] | cost: 1.235459416905535
-theta: [0.01 0.14] | cost: 1.1926273731479433
-theta: [0.01 0.14] | cost: 1.1806184944517062
-theta: [0.01 0.14] | cost: 1.177227251696266
-theta: [0.01 0.14] | cost: 1.1762453624313751
-theta: [0.01 0.14] | cost: 1.1759370980989148
-theta: [0.01 0.14] | cost: 1.175817178966766
-CPU times: user 272 ms, sys: 67.3 ms, total: 339 ms
-Wall time: 792 ms
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can see that gradient descent converges to the theta values of <span class="math notranslate nohighlight">\(\hat\theta_0 = 0.01\)</span> and <span class="math notranslate nohighlight">\(\hat\theta_1 = 0.14\)</span>. Our linear model is:</p>
-<div class="math notranslate nohighlight">
-\[y = 0.14x + 0.01\]</div>
-<p>We can use our estimated thetas to make and plot our predictions alongside the original data points.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">55</span><span class="p">])</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;total_bill&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;tip&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tips</span><span class="p">,</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">simple_linear_model</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;goldenrod&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Tip amount vs. Total Bill&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Total Bill&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Tip Amount&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/gradient_lin_reg_16_0.png" src="../../_images/gradient_lin_reg_16_0.png" />
-</div>
-</div>
-<p>We can see that if a table’s bill is <span class="math notranslate nohighlight">\(\$10\)</span>, our model will predict that the waiter gets around <span class="math notranslate nohighlight">\(\$1.50\)</span> in tip. Similarly, if a table’s bill is <span class="math notranslate nohighlight">\(\$40\)</span>, our model will predict a tip of around <span class="math notranslate nohighlight">\(\$6.00\)</span>.</p>
-</div>
+<p>where <span class="math notranslate nohighlight">\( \textbf{X} \)</span> is an <span class="math notranslate nohighlight">\( n \times p \)</span> design matrix, and <span class="math notranslate nohighlight">\( \mathbf{x}_i \)</span> is the <span class="math notranslate nohighlight">\(i\)</span>th row of the design matrix, which corresponds to the <span class="math notranslate nohighlight">\( i \)</span>th observation in the data set. With a large amount of data, calculating <span class="math notranslate nohighlight">\( \theta^{(t)}\)</span> can be computationally expensive since it involves the average of the gradient <span class="math notranslate nohighlight">\( \nabla_{\theta} {\cal l} \)</span> over all the <span class="math notranslate nohighlight">\( (\textbf{x}_i, y_i) \)</span>. We consider alternatives to gradient descent that can be computationally faster because they don’t average over all of the data.</p>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1609,17 +1373,17 @@ Wall time: 792 ms
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="gradient_stochastic.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="gd_example.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">20.4. </span>Stochastic Gradient Descent</p>
+            <p class="prev-next-title"><span class="section-number">20.2. </span>Minimizing Huber Loss</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../21/repl_intro.html" title="next page">
+    <a class='right-next' id="next-link" href="gd_alternative.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">21. </span>Replicable Research</p>
+        <p class="prev-next-title"><span class="section-number">20.4. </span>Alternatives to Gradient Descent</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
