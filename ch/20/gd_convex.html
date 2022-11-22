@@ -55,7 +55,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="20.4. Alternatives to Gradient Descent" href="gd_alternative.html" />
+    <link rel="next" title="20.4. Variants of Gradient Descent" href="gd_alternative.html" />
     <link rel="prev" title="20.2. Minimizing Huber Loss" href="gd_example.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -1016,7 +1016,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="gd_alternative.html">
-     20.4. Alternatives to Gradient Descent
+     20.4. Variants of Gradient Descent
     </a>
    </li>
    <li class="toctree-l2">
@@ -1325,27 +1325,33 @@
                 
   <div class="section" id="convex-and-differentiable-loss-functions">
 <h1><span class="section-number">20.3. </span>Convex and Differentiable Loss Functions<a class="headerlink" href="#convex-and-differentiable-loss-functions" title="Permalink to this headline">¶</a></h1>
-<p>As its name suggests, the gradient descent algorithm requires the loss function to be differentiable. Choosing a differentiable loss function, <span class="math notranslate nohighlight">\( \nabla_\theta L( \boldsymbol{\theta} ) \)</span>, is a crucial part of the  algorithm. The gradient allows us to make a linear approximation to the loss function in small neighborhoods of <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>. This approximation gives us the direction of the step and as long as we don’t overshoot the minimum, <span class="math notranslate nohighlight">\( \boldsymbol{\hat{\theta}} \)</span>, we are bound to eventually reach it.  Well, as long as the loss function is also convex.</p>
-<p>The step-by-step search for the minimum relies on the loss function being convex because then it can’t have a local minimum. The function in the diagram on the left in <a class="reference internal" href="#gd-convex"><span class="std std-numref">Figure 20.4</span></a> has a local minimum, and depending on where the algorithm starts, it might converge to the local minimum and miss the real minimum entirely. The property of convexity avoids this problem, as shown in the diagram on the right in the figure. A <em>convex function</em> cannot have local minima. So, with an appropriate step size, gradient descent will find the globally optimal <span class="math notranslate nohighlight">\( \theta \)</span> for any convex function.</p>
+<p>As its name suggests, the gradient descent algorithm requires the function being minimized to be differentiable. The gradient,  <span class="math notranslate nohighlight">\( \nabla_\theta L( \boldsymbol{\theta} ) \)</span>, allows us to make a linear approximation to the average loss in small neighborhoods of <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>. This approximation gives us the direction (and size) of the step, and as long as we don’t overshoot the minimum, <span class="math notranslate nohighlight">\( \boldsymbol{\hat{\theta}} \)</span>, we are bound to eventually reach it.  Well, as long as the loss function is also convex.</p>
+<p>The step-by-step search for the minimum also relies on the loss function being convex. The function in the diagram on the left in <a class="reference internal" href="#gd-convex"><span class="std std-numref">Figure 20.4</span></a> is convex, but the function on the right is not. The function on the right has a local minimum, and depending on where the algorithm starts, it might converge to this local minimum and miss the real minimum entirely. The property of convexity avoids this problem. A <em>convex function</em> avoids the problem of local minima. So, with an appropriate step size, gradient descent finds the globally optimal <span class="math notranslate nohighlight">\( \theta \)</span> for any convex, differentiable function.</p>
 <div class="figure align-default" id="gd-convex">
 <img alt="../../_images/convex-diagram.png" src="../../_images/convex-diagram.png" />
-<p class="caption"><span class="caption-number">Fig. 20.4 </span><span class="caption-text">With non-convex functions, such as the function on the left, gradient descent might locate a local minimum, rather than a global minimum. This is not possible with convex functions, such as the function on the right.</span><a class="headerlink" href="#gd-convex" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 20.4 </span><span class="caption-text">With non-convex functions, such as the function on the right, gradient descent might locate a local minimum, rather than a global minimum. This is not possible with convex functions, such as the function on the left.</span><a class="headerlink" href="#gd-convex" title="Permalink to this image">¶</a></p>
 </div>
 <p>Formally, a function <span class="math notranslate nohighlight">\( f \)</span> is convex if for any two input values, <span class="math notranslate nohighlight">\( \boldsymbol{\theta}_a \)</span> and <span class="math notranslate nohighlight">\( \boldsymbol{\theta}_b \)</span>, and any <span class="math notranslate nohighlight">\( q \)</span> between 0 and 1:</p>
 <div class="math notranslate nohighlight">
 \[ qf(\boldsymbol{\theta}_a) + (1-q)f( \boldsymbol{\theta}_b) \geq f(q \boldsymbol{\theta}_a + (1-q) \boldsymbol{\theta}_b)\]</div>
-<p>This inequality states that all lines connecting two points of the function must reside on or above the function itself.
-Heuristically, this means that whenever we take a small enough step to the right when the gradient is negative or to the left when the gradient is positive, we will head in the direction of the function’s minimum.</p>
+<p>This inequality implies any line segment that connects two points of the function must reside on or above the function itself.  Heuristically, this means that whenever we take a small enough step to the right when the gradient is negative or to the left when the gradient is positive, we will head in the direction of the function’s minimum.</p>
 <p>The formal definition of convexity gives us a precise way of determining whether a function is convex.
-And, we can use this definition to connect the convexity of the loss function <span class="math notranslate nohighlight">\( \cal{l}( \boldsymbol{\theta} ) \)</span> to the convexity of the average loss <span class="math notranslate nohighlight">\( L( \boldsymbol{\theta} ) \)</span>. We have been ignoring the fact that <span class="math notranslate nohighlight">\( L( \boldsymbol{\theta} ) \)</span> is also a function of the data, where <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span> is the loss function and the average loss is <span class="math notranslate nohighlight">\( L(\boldsymbol{\theta}) = 1/n \sum \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span>.  If <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span> is a convex function of <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>, then the average loss is also convex. We walk through a proof of this statement in the exercises.</p>
-<p>The gradient of <span class="math notranslate nohighlight">\( L(\boldsymbol{\theta}) \)</span> can also be expressed in terms of the gradient of <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span>,</p>
+And, we can use this definition to connect the convexity of the average loss <span class="math notranslate nohighlight">\( L( \boldsymbol{\theta} ) \)</span> to the loss function <span class="math notranslate nohighlight">\( \cal{l}( \boldsymbol{\theta} ) \)</span>. We have so far in this chapter simplified the representation of <span class="math notranslate nohighlight">\( L( \boldsymbol{\theta} ) \)</span> by not mentioning the data. Recall</p>
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
-\nabla_{\theta} L(\boldsymbol{\theta}, \textbf{X}, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^{n} \nabla_{\theta} {\cal l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i),
+L(\boldsymbol{\theta}, \textbf{X}, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^{n} {\cal l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i),
 \end{aligned}
 \]</div>
-<p>where <span class="math notranslate nohighlight">\( \textbf{X} \)</span> is an <span class="math notranslate nohighlight">\( n \times p \)</span> design matrix, and <span class="math notranslate nohighlight">\( \mathbf{x}_i \)</span> is the <span class="math notranslate nohighlight">\(i\)</span>th row of the design matrix, which corresponds to the <span class="math notranslate nohighlight">\( i \)</span>th observation in the data set. With a large amount of data, calculating <span class="math notranslate nohighlight">\( \theta^{(t)}\)</span> can be computationally expensive since it involves the average of the gradient <span class="math notranslate nohighlight">\( \nabla_{\theta} {\cal l} \)</span> over all the <span class="math notranslate nohighlight">\( (\textbf{x}_i, y_i) \)</span>. We consider alternatives to gradient descent that can be computationally faster because they don’t average over all of the data.</p>
+<p>where <span class="math notranslate nohighlight">\( \textbf{X} \)</span> is an <span class="math notranslate nohighlight">\( n \times p \)</span> design matrix, and <span class="math notranslate nohighlight">\( \mathbf{x}_i \)</span> is the <span class="math notranslate nohighlight">\(i\)</span>th row of the design matrix, which corresponds to the <span class="math notranslate nohighlight">\( i \)</span>th observation in the data set. This means that the gradient can be expressed as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\nabla_{\theta} L(\boldsymbol{\theta}, \textbf{X}, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^{n} \nabla_{\theta} {\cal l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i).
+\end{aligned}
+\]</div>
+<p>If <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span> is a convex function of <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>, then the average loss is also convex. And, similarly for the derivative: the derivative of  <span class="math notranslate nohighlight">\( \cal{l}(\boldsymbol{\theta}, \mathbf{x}_i, y_i) \)</span> is averaged over the data to evaluate the derivative of <span class="math notranslate nohighlight">\( L(\boldsymbol{\theta}, \textbf{X}, \mathbf{y}) \)</span>.  We walk through a proof of the convexity property in the exercises.</p>
+<p>Now, with a large amount of data, calculating <span class="math notranslate nohighlight">\( \theta^{(t)}\)</span> can be computationally expensive since it involves the average of the gradient <span class="math notranslate nohighlight">\( \nabla_{\theta} {\cal l} \)</span> over all the <span class="math notranslate nohighlight">\( (\textbf{x}_i, y_i) \)</span>. We next consider variants of gradient descent that can be computationally faster because they don’t average over all of the data.</p>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1383,7 +1389,7 @@ And, we can use this definition to connect the convexity of the loss function <s
     <a class='right-next' id="next-link" href="gd_alternative.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">20.4. </span>Alternatives to Gradient Descent</p>
+        <p class="prev-next-title"><span class="section-number">20.4. </span>Variants of Gradient Descent</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
