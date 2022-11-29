@@ -1401,49 +1401,49 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
+# Ignore numpy dtype warnings. These warnings are caused by an interaction
+# between numpy and Cython and can be safely ignored.
+# Reference: https://stackoverflow.com/a/40846742
+warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
+warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+%matplotlib inline
+import ipywidgets as widgets
+from ipywidgets import interact, interactive, fixed, interact_manual
+import nbinteract as nbi
 
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+sns.set()
+sns.set_context(&#39;talk&#39;)
+np.set_printoptions(threshold=20, precision=2, suppress=True)
+pd.options.display.max_rows = 7
+pd.options.display.max_columns = 8
+pd.set_option(&#39;precision&#39;, 2)
+# This option stops scientific notation for pandas
+# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Outputs sliders that show rows and columns of df</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
-        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
-                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
-                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def df_interact(df, nrows=7, ncols=7):
+    &#39;&#39;&#39;
+    Outputs sliders that show rows and columns of df
+    &#39;&#39;&#39;
+    def peek(row=0, col=0):
+        return df.iloc[row:row + nrows, col:col + ncols]
+    if len(df.columns) &lt;= ncols:
+        interact(peek, row=(0, len(df) - nrows, nrows), col=fixed(0))
+    else:
+        interact(peek,
+                 row=(0, len(df) - nrows, nrows),
+                 col=(0, len(df.columns) - ncols))
+    print(&#39;({} rows, {} columns) total&#39;.format(df.shape[0], df.shape[1]))
 </pre></div>
 </div>
 </div>
@@ -1494,31 +1494,31 @@
 <p>We will use the complete model selection process, including cross-validation, to select a model that predicts ice cream ratings from ice cream sweetness. The complete ice cream dataset and a scatter plot of the overall rating versus ice cream sweetness are shown below.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ice</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;icecream.csv&#39;</span><span class="p">)</span>
-<span class="n">transformer</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ice = pd.read_csv(&#39;icecream.csv&#39;)
+transformer = PolynomialFeatures(degree=2)
+X = transformer.fit_transform(ice[[&#39;sweetness&#39;]])
 
-<span class="n">clf</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;overall&#39;</span><span class="p">]])</span>
-<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">rating_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+clf = LinearRegression(fit_intercept=False).fit(X, ice[[&#39;overall&#39;]])
+xs = np.linspace(3.5, 12.5, 300).reshape(-1, 1)
+rating_pred = clf.predict(transformer.transform(xs))
 
-<span class="n">temp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">])</span>
-<span class="n">temp</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rating_pred</span>
+temp = pd.DataFrame(xs, columns = [&#39;sweetness&#39;])
+temp[&#39;overall&#39;] = rating_pred
 
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">x_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">))</span>
-<span class="n">y_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">))</span>
-<span class="n">temp</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_devs</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">temp</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_devs</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+np.random.seed(42)
+x_devs = np.random.normal(scale=0.2, size=len(temp))
+y_devs = np.random.normal(scale=0.2, size=len(temp))
+temp[&#39;sweetness&#39;] = np.round(temp[&#39;sweetness&#39;] + x_devs, decimals=2)
+temp[&#39;overall&#39;] = np.round(temp[&#39;overall&#39;] + y_devs, decimals=2)
 
-<span class="n">ice</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">temp</span><span class="p">,</span> <span class="n">ice</span><span class="p">])</span>
+ice = pd.concat([temp, ice])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ice</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ice
 </pre></div>
 </div>
 </div>
@@ -1588,10 +1588,10 @@
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ice</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">],</span> <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Ice Cream Rating vs. Sweetness&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Sweetness&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Rating&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.scatter(ice[&#39;sweetness&#39;], ice[&#39;overall&#39;], s=10)
+plt.title(&#39;Ice Cream Rating vs. Sweetness&#39;)
+plt.xlabel(&#39;Sweetness&#39;)
+plt.ylabel(&#39;Rating&#39;);
 </pre></div>
 </div>
 </div>
@@ -1602,43 +1602,43 @@
 <p>Using degree 10 polynomial features on 9 random points from the dataset result in a perfectly accurate model for those data points. Unfortunately, this model fails to generalize to previously unseen data from the population.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
 
-<span class="n">ice2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;icecream.csv&#39;</span><span class="p">)</span>
-<span class="n">trans_ten</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">X_ten</span> <span class="o">=</span> <span class="n">trans_ten</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ice2</span><span class="p">[[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]])</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">ice2</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span>
+ice2 = pd.read_csv(&#39;icecream.csv&#39;)
+trans_ten = PolynomialFeatures(degree=10)
+X_ten = trans_ten.fit_transform(ice2[[&#39;sweetness&#39;]])
+y = ice2[&#39;overall&#39;]
 
-<span class="n">clf_ten</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_ten</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+clf_ten = LinearRegression(fit_intercept=False).fit(X_ten, y)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">x_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ice2</span><span class="p">))</span>
-<span class="n">y_devs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ice2</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(1)
+x_devs = np.random.normal(scale=0.4, size=len(ice2))
+y_devs = np.random.normal(scale=0.4, size=len(ice2))
 
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+plt.figure(figsize=(10, 5))
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ice2</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">],</span> <span class="n">ice2</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">])</span>
-<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">ys</span> <span class="o">=</span> <span class="n">clf_ten</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">trans_ten</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Degree 10 polynomial fit&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+plt.subplot(121)
+plt.scatter(ice2[&#39;sweetness&#39;], ice2[&#39;overall&#39;])
+xs = np.linspace(3.5, 12.5, 1000).reshape(-1, 1)
+ys = clf_ten.predict(trans_ten.transform(xs))
+plt.plot(xs, ys)
+plt.title(&#39;Degree 10 polynomial fit&#39;)
+plt.ylim(3, 7);
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
-<span class="n">ys</span> <span class="o">=</span> <span class="n">clf_ten</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">trans_ten</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ice2</span><span class="p">[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x_devs</span><span class="p">,</span>
-            <span class="n">ice2</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_devs</span><span class="p">,</span>
-            <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Degree 10 poly, second set of data&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+plt.subplot(122)
+ys = clf_ten.predict(trans_ten.transform(xs))
+plt.plot(xs, ys)
+plt.scatter(ice2[&#39;sweetness&#39;] + x_devs,
+            ice2[&#39;overall&#39;] + y_devs,
+            c=&#39;g&#39;)
+plt.title(&#39;Degree 10 poly, second set of data&#39;)
+plt.ylim(3, 7);
 </pre></div>
 </div>
 </div>
@@ -1649,16 +1649,16 @@
 <p>Instead of the above method, we first partition our data into training, validation, and test datasets using <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html"><code class="docutils literal notranslate"><span class="pre">sklearn.model_selection.train_test_split</span></code></a> method to perform a 70/30% train-test split.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.model_selection import train_test_split
 
-<span class="n">test_size</span> <span class="o">=</span> <span class="mi">92</span>
+test_size = 92
 
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
-    <span class="n">ice</span><span class="p">[[</span><span class="s1">&#39;sweetness&#39;</span><span class="p">]],</span> <span class="n">ice</span><span class="p">[</span><span class="s1">&#39;overall&#39;</span><span class="p">],</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+X_train, X_test, y_train, y_test = train_test_split(
+    ice[[&#39;sweetness&#39;]], ice[&#39;overall&#39;], test_size=test_size, random_state=0)
 
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+print(f&#39;  Training set size: {len(X_train)}&#39;)
+print(f&#39;      Test set size: {len(X_test)}&#39;)
 </pre></div>
 </div>
 </div>
@@ -1672,17 +1672,17 @@
 <p>We now fit polynomial regression models using the training set, one for each polynomial degree from 1 to 10.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
-<span class="c1"># First, we add polynomial features to X_train</span>
-<span class="n">transformers</span> <span class="o">=</span> <span class="p">[</span><span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">deg</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
-<span class="n">X_train_polys</span> <span class="o">=</span> <span class="p">[</span><span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-                 <span class="k">for</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="n">transformers</span><span class="p">]</span>
+# First, we add polynomial features to X_train
+transformers = [PolynomialFeatures(degree=deg)
+                for deg in range(1, 11)]
+X_train_polys = [transformer.fit_transform(X_train)
+                 for transformer in transformers]
 
-<span class="c1"># Display the X_train with degree 5 polynomial features</span>
-<span class="n">X_train_polys</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+# Display the X_train with degree 5 polynomial features
+X_train_polys[4]
 </pre></div>
 </div>
 </div>
@@ -1708,53 +1708,53 @@
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.model_selection import KFold
 
-<span class="k">def</span> <span class="nf">mse_cost</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_actual</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_pred</span> <span class="o">-</span> <span class="n">y_actual</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+def mse_cost(y_pred, y_actual):
+    return np.mean((y_pred - y_actual) ** 2)
 
-<span class="k">def</span> <span class="nf">compute_CV_error</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">):</span>
-    <span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">validation_errors</span> <span class="o">=</span> <span class="p">[]</span>
+def compute_CV_error(model, X_train, Y_train):
+    kf = KFold(n_splits=5)
+    validation_errors = []
     
-    <span class="k">for</span> <span class="n">train_idx</span><span class="p">,</span> <span class="n">valid_idx</span> <span class="ow">in</span> <span class="n">kf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X_train</span><span class="p">):</span>
-        <span class="c1"># split the data</span>
-        <span class="n">split_X_train</span><span class="p">,</span> <span class="n">split_X_valid</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">train_idx</span><span class="p">],</span> <span class="n">X_train</span><span class="p">[</span><span class="n">valid_idx</span><span class="p">]</span>
-        <span class="n">split_Y_train</span><span class="p">,</span> <span class="n">split_Y_valid</span> <span class="o">=</span> <span class="n">Y_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">],</span> <span class="n">Y_train</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">valid_idx</span><span class="p">]</span>
+    for train_idx, valid_idx in kf.split(X_train):
+        # split the data
+        split_X_train, split_X_valid = X_train[train_idx], X_train[valid_idx]
+        split_Y_train, split_Y_valid = Y_train.iloc[train_idx], Y_train.iloc[valid_idx]
 
-        <span class="c1"># Fit the model on the training split</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">split_X_train</span><span class="p">,</span><span class="n">split_Y_train</span><span class="p">)</span>
+        # Fit the model on the training split
+        model.fit(split_X_train,split_Y_train)
         
-        <span class="c1"># Compute the RMSE on the validation split</span>
-        <span class="n">error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">split_Y_valid</span><span class="p">,</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">split_X_valid</span><span class="p">))</span>
+        # Compute the RMSE on the validation split
+        error = mse_cost(split_Y_valid,model.predict(split_X_valid))
         
-        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+        validation_errors.append(error)
     
-    <span class="c1">#average validation errors</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">)</span>
+    #average validation errors
+    return np.mean(validation_errors)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We train a linear regression classifier for each featurized dataset and perform cross-validation</span>
-<span class="c1"># We set fit_intercept=False for our linear regression classifier since </span>
-<span class="c1"># the PolynomialFeatures transformer adds the bias column for us.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># We train a linear regression classifier for each featurized dataset and perform cross-validation
+# We set fit_intercept=False for our linear regression classifier since 
+# the PolynomialFeatures transformer adds the bias column for us.
 
-<span class="n">cross_validation_errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">compute_CV_error</span><span class="p">(</span><span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">X_train_poly</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-                     <span class="k">for</span> <span class="n">X_train_poly</span> <span class="ow">in</span> <span class="n">X_train_polys</span><span class="p">]</span>
+cross_validation_errors = [compute_CV_error(LinearRegression(fit_intercept=False), X_train_poly, y_train)
+                     for X_train_poly in X_train_polys]
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">:</span> <span class="n">cross_validation_errors</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
-<span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Degree&#39;</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="n">display</span><span class="p">(</span><span class="n">cv_df</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>cv_df = pd.DataFrame({&#39;Validation Error&#39;: cross_validation_errors}, index=range(1, 11))
+cv_df.index.name = &#39;Degree&#39;
+pd.options.display.max_rows = 20
+display(cv_df)
+pd.options.display.max_rows = 7
 </pre></div>
 </div>
 </div>
@@ -1832,24 +1832,24 @@
 <p>We can see that as we use higher degree polynomial features, the validation error decreases and increases again.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.figure(figsize=(10, 5))
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Validation Error vs. Polynomial Degree&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Polynomial Degree&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">);</span>
+plt.subplot(121)
+plt.plot(cv_df.index, cv_df[&#39;Validation Error&#39;])
+plt.scatter(cv_df.index, cv_df[&#39;Validation Error&#39;])
+plt.title(&#39;Validation Error vs. Polynomial Degree&#39;)
+plt.xlabel(&#39;Polynomial Degree&#39;)
+plt.ylabel(&#39;Validation Error&#39;);
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">cv_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">[</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.044925</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Zoomed In&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Polynomial Degree&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Validation Error&#39;</span><span class="p">)</span>
+plt.subplot(122)
+plt.plot(cv_df.index, cv_df[&#39;Validation Error&#39;])
+plt.scatter(cv_df.index, cv_df[&#39;Validation Error&#39;])
+plt.ylim(0.044925, 0.05)
+plt.title(&#39;Zoomed In&#39;)
+plt.xlabel(&#39;Polynomial Degree&#39;)
+plt.ylabel(&#39;Validation Error&#39;)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+plt.tight_layout();
 </pre></div>
 </div>
 </div>
@@ -1860,17 +1860,17 @@
 <p>Examining the validation errors reveals that the most accurate model only used degree 2 polynomial features. Thus, we select the degree 2 polynomial model as our final model and fit it on the all of the training data at once. Then, we compute its error on the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">best_trans</span> <span class="o">=</span> <span class="n">transformers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">best_model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_train</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>best_trans = transformers[1]
+best_model = LinearRegression(fit_intercept=False).fit(X_train_polys[1], y_train)
 
-<span class="n">training_error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">best_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">validation_error</span> <span class="o">=</span> <span class="n">cross_validation_errors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">test_error</span> <span class="o">=</span> <span class="n">mse_cost</span><span class="p">(</span><span class="n">best_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">best_trans</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)),</span> <span class="n">y_test</span><span class="p">)</span>
+training_error = mse_cost(best_model.predict(X_train_polys[1]), y_train)
+validation_error = cross_validation_errors[1]
+test_error = mse_cost(best_model.predict(best_trans.transform(X_test)), y_test)
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Degree 2 polynomial&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Training error: </span><span class="si">{</span><span class="n">training_error</span><span class="si">:</span><span class="s1">0.5f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Validation error: </span><span class="si">{</span><span class="n">validation_error</span><span class="si">:</span><span class="s1">0.5f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Test error: </span><span class="si">{</span><span class="n">test_error</span><span class="si">:</span><span class="s1">0.5f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+print(&#39;Degree 2 polynomial&#39;)
+print(f&#39;  Training error: {training_error:0.5f}&#39;)
+print(f&#39;Validation error: {validation_error:0.5f}&#39;)
+print(f&#39;      Test error: {test_error:0.5f}&#39;)
 </pre></div>
 </div>
 </div>

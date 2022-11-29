@@ -1327,10 +1327,10 @@
 <p>The first few rows in the data table are shown here.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;~/Downloads/arrival_times.csv&#39;</span><span class="p">)</span>
-<span class="n">bus</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus = pd.read_csv(&#39;~/Downloads/arrival_times.csv&#39;)
+bus = bus.dropna(axis=0, how=&#39;any&#39;)
 
-<span class="n">bus</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+bus.head()
 </pre></div>
 </div>
 </div>
@@ -1434,7 +1434,7 @@
 <p>It looks like some of the columns in the table might be redundant, like the columns labeled <code class="docutils literal notranslate"><span class="pre">STOP_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">STOP_NAME</span></code>. We can find the number of unique values and their counts to confirm this.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[[</span><span class="s1">&#39;STOP_ID&#39;</span><span class="p">,</span><span class="s1">&#39;STOP_NAME&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus[[&#39;STOP_ID&#39;,&#39;STOP_NAME&#39;]].value_counts()
 </pre></div>
 </div>
 </div>
@@ -1450,7 +1450,7 @@ dtype: int64
 <p>There are two Third &amp; Pike names for the stop. Could they be related to the direction of the bus? We can check the possible combinations of direction, stop ID and stop name.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[[</span><span class="s1">&#39;DIR&#39;</span><span class="p">,</span><span class="s1">&#39;STOP_ID&#39;</span><span class="p">,</span><span class="s1">&#39;STOP_NAME&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus[[&#39;DIR&#39;,&#39;STOP_ID&#39;,&#39;STOP_NAME&#39;]].value_counts()
 </pre></div>
 </div>
 </div>
@@ -1467,7 +1467,7 @@ dtype: int64
 <p>We can also check the number of unique route names:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;RTE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus[&#39;RTE&#39;].value_counts()
 </pre></div>
 </div>
 </div>
@@ -1483,9 +1483,9 @@ Name: RTE, dtype: int64
 <p>These routes are numbered so they don’t match the names C, D, and E from the original description of the problem.  This issue involves another aspect of data wrangling: we need to did up information that connects the route letters and numbers. We can get this info from the Seattle transit site. Yet another part of wrangling is to translate values into ones that are easier to understand so we replace the route numbers with their letters.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;route&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;RTE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="mi">673</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">674</span><span class="p">:</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="mi">675</span><span class="p">:</span> <span class="s1">&#39;E&#39;</span><span class="p">})</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus[&#39;route&#39;] = bus[&#39;RTE&#39;].replace({673: &#39;C&#39;, 674: &#39;D&#39;, 675: &#39;E&#39;})
 
-<span class="n">bus</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;DIR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;northbound&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span> <span class="s1">&#39;southbound&#39;</span><span class="p">})</span>
+bus[&#39;direction&#39;] = bus[&#39;DIR&#39;].replace({&#39;N&#39;: &#39;northbound&#39;, &#39;S&#39;: &#39;southbound&#39;})
 </pre></div>
 </div>
 </div>
@@ -1493,16 +1493,16 @@ Name: RTE, dtype: int64
 <p>We can also create new columns in the table that help us in our investigations. For example, we can use the scheduled and actual arrival times to calculate how late a bus is. To do this requires some work with date and time formats, which is covered in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;scheduled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;OPD_DATE&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;SCH_STOP_TM&#39;</span><span class="p">])</span>
-<span class="n">bus</span><span class="p">[</span><span class="s1">&#39;actual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;OPD_DATE&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;ACT_STOP_TM&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus[&#39;scheduled&#39;] = pd.to_datetime(bus[&#39;OPD_DATE&#39;] + &#39; &#39; + bus[&#39;SCH_STOP_TM&#39;])
+bus[&#39;actual&#39;] = pd.to_datetime(bus[&#39;OPD_DATE&#39;] + &#39; &#39; + bus[&#39;ACT_STOP_TM&#39;])
 
-<span class="n">minute</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
-<span class="n">hour</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">minute</span>
-<span class="n">diff_hrs</span> <span class="o">=</span> <span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;actual&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;scheduled&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">hour</span>
-<span class="n">bus</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">diff_hrs</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;actual&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">24</span> <span class="o">*</span> <span class="n">hour</span>
-<span class="n">bus</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">diff_hrs</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;actual&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">24</span> <span class="o">*</span> <span class="n">hour</span>
+minute = np.timedelta64(1, &#39;m&#39;)
+hour = 60 * minute
+diff_hrs = (bus[&#39;actual&#39;] - bus[&#39;scheduled&#39;]) / hour
+bus.loc[diff_hrs &gt; 20, &#39;actual&#39;] -= 24 * hour
+bus.loc[diff_hrs &lt; -20, &#39;actual&#39;] += 24 * hour
 
-<span class="n">bus</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;actual&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;scheduled&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">minute</span>
+bus[&#39;minutes_late&#39;] = (bus[&#39;actual&#39;] - bus[&#39;scheduled&#39;]) / minute
 </pre></div>
 </div>
 </div>
@@ -1520,12 +1520,12 @@ Name: RTE, dtype: int64
 <p>It’s a bit surprising that there are negative values for how late a bus is, but this just means the bus arrived earlier than scheduled. While, the median lateness is only about half a minute, some of the buses are 2.5 hours late! Let’s take a look at the histogram of how many minutes late the buses are.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">bus</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">,</span> 
-                   <span class="n">nbins</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.histogram(bus, x=&#39;minutes_late&#39;, 
+                   nbins=120, width=350, height=250)
 
-<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">13</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+fig.update_xaxes(range=[-13, 40])
 
-<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+fig.show()
 </pre></div>
 </div>
 </div>
@@ -1536,10 +1536,10 @@ Name: RTE, dtype: int64
 <p>Finally, our wrangling concludes with creating a simplified version of the data table. Since we only need to  keep track of the route, direction, scheduled and actual arrival time, and how late the bus is, we create a smaller table, and we give the columns names that are a bit easier to read.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[[</span><span class="s1">&#39;route&#39;</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;scheduled&#39;</span><span class="p">,</span> 
-           <span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;minutes_late&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus = bus[[&#39;route&#39;, &#39;direction&#39;, &#39;scheduled&#39;, 
+           &#39;actual&#39;, &#39;minutes_late&#39;]].copy()
 
-<span class="n">bus</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+bus.head()
 </pre></div>
 </div>
 </div>

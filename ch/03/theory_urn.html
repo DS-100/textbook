@@ -1326,8 +1326,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-hypergeometric">
-   3.1.4. The Hypergeometric
+  <a class="reference internal nav-link" href="#the-hypergeometric-distribution">
+   3.1.4. The Hypergeometric Distribution
   </a>
  </li>
 </ul>
@@ -1366,8 +1366,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-hypergeometric">
-   3.1.4. The Hypergeometric
+  <a class="reference internal nav-link" href="#the-hypergeometric-distribution">
+   3.1.4. The Hypergeometric Distribution
   </a>
  </li>
 </ul>
@@ -1381,40 +1381,105 @@
                 
   <div class="section" id="the-urn-model">
 <span id="sec-theory-urn"></span><h1><span class="section-number">3.1. </span>The Urn Model<a class="headerlink" href="#the-urn-model" title="Permalink to this headline">¶</a></h1>
-<p>The urn model is a simple abstraction of a chance mechanism. But, we can extend the randomness in the selection process of drawing marbles from an urn to many chance processes in real-life examples, and we can simulate this random behavior and use our findings to better understand the accuracy of our data. To explain the urn model, we use a small example with seven marbles. The urn is small enough that we can list all possible outcomes that might result from drawing marbles from the urn.</p>
-<p>We use the SpaceX Starship prototypes as a made-up example. The prototypes are called <span class="math notranslate nohighlight">\(SN1\)</span>, <span class="math notranslate nohighlight">\(SN2\)</span>, …, where <span class="math notranslate nohighlight">\(SN\)</span> stands for “serial number”. In the first half of 2020, seven of these prototypes were built. Before deploying them a few were pressure tested. Suppose we want to select three of the seven Starship prototypes for pressure testing. (While this example is made up, the context is based on the actual SpaceX program; pressure tests were made on the Starship prototypes.)</p>
-<p>We can set up the urn model to represent the selection process as follows: write a unique label on each of seven marbles, place all the marbles in the urn, mix them well, and draw three without looking and without replacing marbles between draws. The urn is small enough that we can list all possible samples of three marbles that can be drawn:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
- &amp;ABC ~~ ABD ~~ ABE ~~ ABF ~~ ABG ~~ ACD ~~ ACE ~~ ACF ~~ ACG ~~ ADE ~~ ADF ~~ ADG \\ 
-&amp;AEF ~~ AEG ~~ AFG ~~ BCD ~~ BCE ~~ BCF ~~ BCG ~~ BDE ~~ BDF ~~ BDG ~~ BEF ~~ BEG \\ 
-&amp;BFG ~~CDE ~~ CDF ~~ CDG ~~ CEF ~~ CEG ~~ CFG ~~ DEF ~~ DEG ~~ DFG ~~ EFG ~~~~~\\
-\end{aligned}
-\end{split}\]</div>
-<p>We use the labels <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, etc. rather than <span class="math notranslate nohighlight">\(SN1\)</span>, <span class="math notranslate nohighlight">\(SN2\)</span>, etc. because they are shorter and easier to distinguish. Our list shows that we could wind up with any one of the <span class="math notranslate nohighlight">\( 35 \)</span> unique sets of three of the seven marbles.</p>
+<p>The urn model was developed by Jacob Bernoulli in the early 1700’s as a way to model the process of selecting items from a population. The urn model, describes the process of randomly sampling colored marbles from an urn – a kind of vase or container.</p>
+<div class="highlight-Figure notranslate"><div class="highlight"><pre><span></span>A picture of a clay urn would make this part more fun.
+
+We need figure illustrating 3 black and 2 white marbles in an urn and a &quot;sample on the side&quot;
+</pre></div>
+</div>
+<p>To use the urn model, we first need to make a few decisions:</p>
+<ul class="simple">
+<li><p>the number of marbles in the urn;</p></li>
+<li><p>the color (or label) of each marble;</p></li>
+<li><p>and the number of marbles drawn from the urn.</p></li>
+</ul>
+<p>Finally, we also need to decide the sampling process. As we select each marble for our sample, we could choose to record the color and return the marble to a random location in the urn (with replacement), or discard the marble so it cannot be sampled again (without replacement).</p>
+<p>The answers to these questions are the parameters of our model. We can adapt the urn model to describe many real-world situations by our choice for these parameters.</p>
+<p>To illustrate the urn model, consider a simple example of sampling 2 marbles from an urn containing 3 black marbles and 2 white marbles. We simulate the draw of two marbles from our urn without replacement between draws using numpy’s <code class="docutils literal notranslate"><span class="pre">random.choice</span></code> method. Notice that we set <code class="docutils literal notranslate"><span class="pre">replace</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> to indicate that once we sample a marble we don’t return it to the urn.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>urn = [&quot;⚫&quot;, &quot;⚫&quot;, &quot;⚫&quot;, &quot;⚪&quot;, &quot;⚪&quot;]
+print(&quot;Sample 1:&quot;, np.random.choice(urn, size=2, replace=False))
+print(&quot;Sample 2:&quot;, np.random.choice(urn, size=2, replace=False))
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sample 1: [&#39;⚫&#39; &#39;⚪&#39;]
+Sample 2: [&#39;⚪&#39; &#39;⚫&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this basic setup, we can now ask fundamental questions about the kinds of samples we would expect to see. What is the chance that our contains marbles of only one color? What if we sample more marbles? What if we return each marble after selecting it? What happens if we repeat the process many times?</p>
+<p>The answers to these questions are fundamental to our understanding of data collection. Furthermore, by developing the skills to reason about and simulate from the urn model, we will be building the skills needed to apply simulation to many real-world problems that can’t be easily described by classic statistical equations.</p>
+<p>For example, we can use simulation to easily estimate the fraction of samples where both marbles have a matching color.  In the following code we simulate 10,000 rounds of sampling two marbles from our urn. Using these simulated samples we can directly compute the proportion of the samples with matching marbles:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>n_samples = 10_000
+samples = [np.random.choice(urn, size=2, replace=False)
+           for n in range(n_samples)]
+is_matching = [s[0] == s[1] for s in samples]
+print(&quot;Proportion of samples with matching marbles:&quot;, 
+      np.mean(is_matching))
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Proportion of samples with matching marbles: 0.4032
+</pre></div>
+</div>
+</div>
+</div>
+<p>What would happen if we increased the number of samples? What if we changed the number of marbles in the urn? These are all questions we could study through simulation. While this might seem like a contrived example (it is…), replace the marbles with people on a dating service, colors with more complex attributes, and perhaps a neural network scoring a match and you can start to see the foundation of much more sophisticated analysis.</p>
+<p>So far we have been focused on the sample, but we are often interested in the relationship between the samples we would observe and what they can tell us about the “population” of marbles that were originally in the urn.</p>
 <p>We can draw an analogy to data scope from <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a>: a set of marbles drawn from the urn is a <em>sample</em>, and the collection of all marbles placed in the urn is the <em>population</em>.  This particular urn model prescribes a particular selection method, called the <em>Simple Random Sample (SRS)</em>. We describe the SRS and other sampling techniques based on the SRS in the next section.</p>
 <div class="section" id="sampling-designs">
 <h2><span class="section-number">3.1.1. </span>Sampling Designs<a class="headerlink" href="#sampling-designs" title="Permalink to this headline">¶</a></h2>
-<p>The urn model for the SpaceX prototypes reduced to a few basics. We specified:</p>
-<ul class="simple">
-<li><p>the number of marbles in the urn;</p></li>
-<li><p>what is written on each marble;</p></li>
-<li><p>the number of marbles drawn from the urn; and</p></li>
-<li><p>whether or not marbles are replaced between draws.</p></li>
-</ul>
-<p>This process is equivalent to a Simple Random Sample. Our example is a SRS of three draws from a population of seven, and by design, each of the <span class="math notranslate nohighlight">\( 35 \)</span> samples is equally likely to be chosen because the marbles are indistinguishable and well mixed. This means the chance of any one particular sample must be <span class="math notranslate nohighlight">\(1/35\)</span>,</p>
+<p>The process of drawing marbles without replacement from an urn is equivalent to a Simple Random Sample (SRS).  <em>In a <em>Simple Random Sample</em> (SRS), every sample has the same chance of being selected.</em>
+While the Simple Random Sample has the word <em>“simple”</em> in the name, constructing a simple random sample is often anything but simple and in many cases is also the best sampling procedure.  And, if we are honest, it can also be a little confusing.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Many people mistakingly think that the defining property of a Simple Random Sample (SRS) is that every unit has an equal chance of being in the sample. However, this is not the case. A SRS of <span class="math notranslate nohighlight">\(n\)</span> units from a population of <span class="math notranslate nohighlight">\(N\)</span> means that every possible subset of <span class="math notranslate nohighlight">\(n\)</span> units has the same chance of being selected.</p>
+</div>
+<p>To better understand the SRS we can return to the urn model. In this example, we will consider an urn with 7 marbles. Rather than color the marbles, we will label each with the letters <code class="docutils literal notranslate"><span class="pre">A</span></code> through <code class="docutils literal notranslate"><span class="pre">G</span></code>. Because each marble has a different label, we can more clearly see all possible samples that can be constructed.</p>
+<p>A Simple Random Sample (SRS) implies that every possible sample is equally like. For example, if we select 3 marbles from the urn, it would be an SRS because all possible combinations of three marbles are equally likely.</p>
+<p>Here we use the <code class="docutils literal notranslate"><span class="pre">itertools</span></code> library to generate the list of all combinations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from itertools import combinations
+all_samples = [&quot;&quot;.join(x) for x in combinations(&quot;ABCDEFG&quot;, 3)]
+print(all_samples)
+print(&quot;Number of Samples:&quot;, len(all_samples))
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;ABC&#39;, &#39;ABD&#39;, &#39;ABE&#39;, &#39;ABF&#39;, &#39;ABG&#39;, &#39;ACD&#39;, &#39;ACE&#39;, &#39;ACF&#39;, &#39;ACG&#39;, &#39;ADE&#39;, &#39;ADF&#39;, &#39;ADG&#39;, &#39;AEF&#39;, &#39;AEG&#39;, &#39;AFG&#39;, &#39;BCD&#39;, &#39;BCE&#39;, &#39;BCF&#39;, &#39;BCG&#39;, &#39;BDE&#39;, &#39;BDF&#39;, &#39;BDG&#39;, &#39;BEF&#39;, &#39;BEG&#39;, &#39;BFG&#39;, &#39;CDE&#39;, &#39;CDF&#39;, &#39;CDG&#39;, &#39;CEF&#39;, &#39;CEG&#39;, &#39;CFG&#39;, &#39;DEF&#39;, &#39;DEG&#39;, &#39;DFG&#39;, &#39;EFG&#39;]
+Number of Samples: 35
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our list shows that there are <span class="math notranslate nohighlight">\( 35 \)</span> unique sets of three marbles. We could sample each of these sets 6 different ways. For example the set <span class="math notranslate nohighlight">\(\{A, B, C\}\)</span> can be sampled:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from itertools import permutations
+print([&quot;&quot;.join(x) for x in permutations(&quot;ABC&quot;)])
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;ABC&#39;, &#39;ACB&#39;, &#39;BAC&#39;, &#39;BCA&#39;, &#39;CAB&#39;, &#39;CBA&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>In this simple example, we get a complete picture of all the ways in which we can draw three marbles from the urn.</p>
+<p>Our example is a SRS of three draws from a population of seven so the chance of any one particular sample must be <span class="math notranslate nohighlight">\(1/35\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[{\mathbb{P}}(ABC) = {\mathbb{P}}(\textrm{ABD}) = \cdots = {\mathbb{P}}(\textrm{EFG}) = \frac{1}{35}.\]</div>
 <p>We use the special symbol <span class="math notranslate nohighlight">\({\mathbb{P}}\)</span> to stand for “probability” or “chance”, and we read the statement <span class="math notranslate nohighlight">\({\mathbb{P}}(ABC)\)</span> as the “chance the sample contains the marbles labeled A, B, and C in any order.”</p>
-<p>The urn model gives us a more formal definition of “representative data” that is very useful:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="n">a</span> <span class="o">*</span><span class="n">Simple</span> <span class="n">Random</span> <span class="n">Sample</span><span class="o">*</span><span class="p">,</span> <span class="n">every</span> <span class="n">sample</span> <span class="n">has</span> <span class="n">the</span> <span class="n">same</span> <span class="n">chance</span> <span class="n">of</span> <span class="n">being</span> <span class="n">selected</span><span class="o">.</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Many people mistakingly think that the defining property of a SRS is that every unit has an equal chance of being in the sample. However, this is not the case. A SRS of <span class="math notranslate nohighlight">\(n\)</span> units from a population of <span class="math notranslate nohighlight">\(N\)</span> means that every possible subset of <span class="math notranslate nohighlight">\(n\)</span> units has the same chance of being selected.</p>
-</div>
 <p>We can use the enumeration of all of the possible samples from the urn to answer additional questions about this chance process. For example, to find the chance that marble <span class="math notranslate nohighlight">\(A\)</span> is in the sample, we can add up the chance of all samples that contain <span class="math notranslate nohighlight">\(A\)</span>. There are 15 of them so the chance is:</p>
 <div class="math notranslate nohighlight">
 \[{\mathbb{P}}({A~is~in~the~sample}) = \frac{15}{35} = \frac{3}{7}.\]</div>
@@ -1428,8 +1493,17 @@
 </div>
 <div class="section" id="sampling-distribution-of-a-statistic">
 <h2><span class="section-number">3.1.2. </span>Sampling Distribution of a Statistic<a class="headerlink" href="#sampling-distribution-of-a-statistic" title="Permalink to this headline">¶</a></h2>
-<p>Suppose we are interested in whether or not the prototypes can pass a pressure test. It’s expensive to carry out the pressure test, so we first test only a sample of prototypes. We can use the urn model to choose the protoypes to be pressure tested, and then, we can summarize our test results by, say, the proportion of prototypes that fail the test. The urn model provides us the knowledge that each of the 35 possible samples has the same chance of being selected and so the pressure test results are representative of the population.</p>
-<p>For concreteness, suppose prototypes <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, <span class="math notranslate nohighlight">\(D\)</span>, and <span class="math notranslate nohighlight">\(F\)</span> would fail the pressure test, if chosen. For each sample of three marbles, we can find the proportion of failures according to how many of these four defective prototypes are in the sample. We give a few examples of this calculation.</p>
+<p>Suppose we are interested in testing the failure pressure of a new fuel tank design for a rocket? It’s expensive to carry out the pressure tests since we will need to destroy the fuel tank and we may need to test more than one fuel tank to address variations in manufacturing.</p>
+<p>We can use the urn model to choose how many prototypes need to be tested. We can summarize our test results by, say, the proportion of prototypes that fail the test. The urn model provides us the knowledge that each of the samples has the same chance of being selected and so the pressure test results are representative of the population.</p>
+<p>Suppose we have 7 fuel tanks corresponding to our 7 labeled marbles from before. Furthermore, suppose we knew that the tanks <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, <span class="math notranslate nohighlight">\(D\)</span>, and <span class="math notranslate nohighlight">\(F\)</span> would fail the pressure test, if chosen. We will color those marbles red and the remaining marbles blue.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>urn =[&quot;A⚫&quot;, &quot;B⚫&quot;, &quot;C⚪&quot;, &quot;D⚫&quot;, &quot;E⚪&quot;, &quot;F⚫&quot;, &quot;G⚪&quot;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>For each sample of three marbles, we can find the proportion of failures according to how many of these four defective prototypes are in the sample. We give a few examples of this calculation.</p>
 <table class="colwidths-auto table">
 <thead>
 <tr class="row-odd"><th class="text-align:left head"><p></p></th>
@@ -1465,19 +1539,19 @@
 <tbody>
 <tr class="row-even"><td class="text-align:center"><p>1</p></td>
 <td class="text-align:center"><p>4</p></td>
-<td class="text-align:center"><p>4/35</p></td>
+<td class="text-align:center"><p>4/35 <span class="math notranslate nohighlight">\(\approx 0.11\)</span></p></td>
 </tr>
 <tr class="row-odd"><td class="text-align:center"><p>2/3</p></td>
 <td class="text-align:center"><p>18</p></td>
-<td class="text-align:center"><p>18/35</p></td>
+<td class="text-align:center"><p>18/35 <span class="math notranslate nohighlight">\(\approx 0.51\)</span></p></td>
 </tr>
 <tr class="row-even"><td class="text-align:center"><p>1/3</p></td>
 <td class="text-align:center"><p>12</p></td>
-<td class="text-align:center"><p>12/35</p></td>
+<td class="text-align:center"><p>12/35 <span class="math notranslate nohighlight">\(\approx 0.34\)</span></p></td>
 </tr>
 <tr class="row-odd"><td class="text-align:center"><p>0</p></td>
 <td class="text-align:center"><p>1</p></td>
-<td class="text-align:center"><p>1/35</p></td>
+<td class="text-align:center"><p>1/35 <span class="math notranslate nohighlight">\(\approx 0.03\)</span></p></td>
 </tr>
 <tr class="row-even"><td class="text-align:center"><p>Total</p></td>
 <td class="text-align:center"><p>35</p></td>
@@ -1490,108 +1564,119 @@ The table of the simulated proportions should come close to our distribution tab
 </div>
 <div class="section" id="simulating-the-sampling-distribution">
 <h2><span class="section-number">3.1.3. </span>Simulating the Sampling Distribution<a class="headerlink" href="#simulating-the-sampling-distribution" title="Permalink to this headline">¶</a></h2>
-<p>Our original urn had seven marbles marked <span class="math notranslate nohighlight">\(A\)</span> through <span class="math notranslate nohighlight">\(G\)</span>. However, since we care only whether the prototype fails or passes the test, we can re-label each marble as ‘fail’ or ‘pass’.  We create this revised urn as an array.</p>
+<p>Simulation can be a powerful tool to understand complex random processes.  In our earlier example of 7 fuel tanks, we were able to consider all possible samples from the corresponding urn model.  However, in situations with large populations, samples, and more complex sampling processes, it may not be tractable to directly compute the chance of certain outcomes.  In these situations, we often turn to simulation to provide accurate estimates of the quantities we can’t compute directly.</p>
+<p>However, before we simulate complex processes, let’s first examine how simulation performs on our simple example of 7 fuel tanks. We will ignore the labels and focus on the colors indicating the success or failure of the test and we will code the colors at <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>.  Because we are interested in failures we will use <code class="docutils literal notranslate"><span class="pre">1</span></code> to indicated a failure and <code class="docutils literal notranslate"><span class="pre">0</span></code> to indicate a success. Thus we have an urn that looks like:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">urn</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fail&#39;</span><span class="p">,</span> <span class="s1">&#39;fail&#39;</span><span class="p">,</span> <span class="s1">&#39;fail&#39;</span><span class="p">,</span> <span class="s1">&#39;fail&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>urn = [1, 1, 0, 1, 0, 1, 0]
 </pre></div>
 </div>
 </div>
 </div>
-<p>Then, we simulate the draw of three marbles from our urn without replacement between draws using numpy’s ‘random.choice’ method.</p>
+<p>Since we have encoded our marbles colors using 1 for fail and 0 for pass, we can take the <code class="docutils literal notranslate"><span class="pre">mean</span></code> of the sample to get the proportion of failures in a single sample</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">urn</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sample = np.random.choice(urn, size=3, replace=False)
+print(&quot;Sample:&quot;, sample)
+print(&quot;Prop Failures:&quot;, sample.mean())
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([&#39;pass&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sample: [1 0 0]
+Prop Failures: 0.3333333333333333
 </pre></div>
 </div>
 </div>
 </div>
-<p>Let’s take a few more sample from our urn to see what the results might look like.</p>
+<p>In a simulation, we would repeat the sampling process thousands of times to estimate the distribution of outcomes.  Here we can construct 10,000 samples:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">urn</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>samples = [np.random.choice(urn, size=3, replace=False) 
+           for i in range(10_000)] 
+prop_failures = [s.mean() for s in samples]
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can study these 10,000 sample proportions and match our findings against what we calculated already using the complete enumeration of all 35 possible samples. We expect the simulation results to be close to our earlier calculations because we have repeated the sampling process many many times. That is, we want to compare the fraction of the 100,000 sample proportion that are <span class="math notranslate nohighlight">\( 0 \)</span>, <span class="math notranslate nohighlight">\(1/3\)</span>, <span class="math notranslate nohighlight">\(2/3\)</span>, and <span class="math notranslate nohighlight">\( 1 \)</span> to those in the table. These fractions should be, approximately, <span class="math notranslate nohighlight">\(1/35\)</span>, <span class="math notranslate nohighlight">\(12/35\)</span>, <span class="math notranslate nohighlight">\(18/35\)</span>, and <span class="math notranslate nohighlight">\(4/35\)</span>, or about  <span class="math notranslate nohighlight">\(0.03\)</span>, <span class="math notranslate nohighlight">\(0.34\)</span>, <span class="math notranslate nohighlight">\(0.51\)</span>, and <span class="math notranslate nohighlight">\(0.11\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>unique_els, counts_els = np.unique(prop_failures, 
+                                   return_counts=True)
+pd.DataFrame({&quot;Proportion of Failures&quot;: unique_els, 
+              &quot;Fraction of Samples&quot;: counts_els/10_000})
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[array([&#39;fail&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;pass&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;pass&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;pass&#39;, &#39;fail&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;fail&#39;, &#39;fail&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;),
- array([&#39;fail&#39;, &#39;fail&#39;, &#39;pass&#39;], dtype=&#39;&lt;U4&#39;)]
-</pre></div>
-</div>
-</div>
-</div>
-<p>Since we simply want to count the number of failures in the sample, it’s easier if the marbles are labeled 1 for fail and 0 for pass. This way, we can sum the results of the three draws to get the number of failures in the sample. We re-label the marbles in the urn again, and compute the fraction of fails in a sample.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">urn</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">urn</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">/</span><span class="mi">3</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6666666666666666
-</pre></div>
-</div>
-</div>
-</div>
-<p>We have stream-lined the process and we’re now ready to carry out the simulation study. Let’s repeat the process 100,000 times.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">urn</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">/</span> <span class="mi">3</span>
-               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">)]</span> 
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can study these 100,000 sample proportions and match our findings against what we calculated already using the complete enumeration of all 35 possible samples. We expect the simulation results to be close to our earlier calculations because we have repeated the sampling process many many times. That is, we want to compare the fraction of the 100,000 sample proportion that are <span class="math notranslate nohighlight">\( 0 \)</span>, <span class="math notranslate nohighlight">\(1/3\)</span>, <span class="math notranslate nohighlight">\(2/3\)</span>, and <span class="math notranslate nohighlight">\( 1 \)</span> to those in the table. These fractions should be, approximately, <span class="math notranslate nohighlight">\(1/35\)</span>, <span class="math notranslate nohighlight">\(12/35\)</span>, <span class="math notranslate nohighlight">\(18/35\)</span>, and <span class="math notranslate nohighlight">\(4/35\)</span>, or about  <span class="math notranslate nohighlight">\(0.03\)</span>, <span class="math notranslate nohighlight">\(0.34\)</span>, <span class="math notranslate nohighlight">\(0.51\)</span>, and <span class="math notranslate nohighlight">\(0.11\)</span>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unique_els</span><span class="p">,</span> <span class="n">counts_els</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations</span><span class="p">),</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">unique_els</span><span class="p">,</span> <span class="n">counts_els</span><span class="o">/</span><span class="mi">10000</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.  , 0.33, 0.67, 1.  ],
-       [0.03, 0.34, 0.52, 0.11]])
-</pre></div>
-</div>
-</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Proportion of Failures</th>
+      <th>Fraction of Samples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.00</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.33</td>
+      <td>0.35</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.67</td>
+      <td>0.51</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.00</td>
+      <td>0.11</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>The simulation results closely match the table.</p>
-<p>This simulation study does not <em>prove</em>, say, that we expect 18/35 samples to have two fails, but it does give us excellent approximations to our earlier calculations, which is reassuring. More importantly, when we have a more complex setting where it might be difficult to list all possibilities, a simulation study can offer valuable insights.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A simulation study repeats a random process many many times.  A summary of the patterns that result from the simulation can approximate the theoretical properties of the chance process. This summary is not the same as proving the theoretical properties, but often the guidance we get from the simulation is adequate for our purposes.</p>
+<p>Simulation studies leverage random number generators to sample many outcomes from a random process. In a sense, simulation studies convert complex random processes into data that we can readily analyze using the broad set of computational tools we cover in this book. While simulation studies typically do not provide definitive proof of a particular hypothesis, they can provide important evidence. In many situations, simulation is the most accurate estimation process we have.</p>
 </div>
-<p>Drawing marbles from an urn with 0s and 1s is such a popular framework for understanding randomness that this chance process has been given a formal name, the hypergeometric. And, most software provide functionality to rapidly carry out simulations of the hypergeomtric. We can redo our simulation using the hypergeometric.</p>
+<p>Drawing marbles from an urn with 0s and 1s is such a popular framework for understanding randomness that this chance process has been given a formal name, the hypergeometric distribution. And, most software provide functionality to rapidly carry out simulations of the hypergeometric. We can redo our simulation using the hypergeometric.</p>
 </div>
-<div class="section" id="the-hypergeometric">
-<h2><span class="section-number">3.1.4. </span>The Hypergeometric<a class="headerlink" href="#the-hypergeometric" title="Permalink to this headline">¶</a></h2>
-<p>The version of the urn model where we count the number of marbles of a certain type (in our case ‘fail’ marbles) is so common that there is a random chance process named for it: the hypergeometric.
-Instead of using <code class="docutils literal notranslate"><span class="pre">random.choice</span></code>, we can use numpy’s <code class="docutils literal notranslate"><span class="pre">random.hypergeometric</span></code> to simulate drawing marbles from the urn and counting the number of <code class="docutils literal notranslate"><span class="pre">fails</span></code>. The <code class="docutils literal notranslate"><span class="pre">random.hypergeometric</span></code> method is optimzed for the 0-1 urn and allows us to ask for 10,000 simulations in one call. For completeness, we repeat our simulation study and calculate the empirical proportions.</p>
+<div class="section" id="the-hypergeometric-distribution">
+<h2><span class="section-number">3.1.4. </span>The Hypergeometric Distribution<a class="headerlink" href="#the-hypergeometric-distribution" title="Permalink to this headline">¶</a></h2>
+<p>Instead of using <code class="docutils literal notranslate"><span class="pre">random.choice</span></code>, we can use numpy’s <code class="docutils literal notranslate"><span class="pre">random.hypergeometric</span></code> to simulate drawing marbles from the urn and counting the number of <code class="docutils literal notranslate"><span class="pre">fails</span></code>. The <code class="docutils literal notranslate"><span class="pre">random.hypergeometric</span></code> method is optimized for the 0-1 urn and allows us to ask for 10,000 simulations in one call. For completeness, we repeat our simulation study and calculate the empirical proportions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations_fast</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">hypergeometric</span><span class="p">(</span><span class="n">ngood</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">nbad</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nsample</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations_fast = np.random.hypergeometric(
+    ngood=4, nbad=3, nsample=3, size=10_000)
+print(simulations_fast)
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[1 1 2 ... 1 2 2]
 </pre></div>
 </div>
 </div>
@@ -1599,46 +1684,125 @@ Instead of using <code class="docutils literal notranslate"><span class="pre">ra
 <p>Note: we don’t think that a pass is “bad”; it’s just a naming convention to call the type you want to count “good” and the other “bad”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unique_els</span><span class="p">,</span> <span class="n">counts_els</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="n">simulations_fast</span> <span class="p">),</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">unique_els</span><span class="p">,</span> <span class="n">counts_els</span><span class="o">/</span><span class="mi">10000</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>unique_els, counts_els = np.unique(simulations_fast, return_counts=True)
+pd.DataFrame({&quot;Number of Failures&quot;: unique_els, 
+              &quot;Fraction of Samples&quot;: counts_els/10_000})
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.  , 1.  , 2.  , 3.  ],
-       [0.03, 0.34, 0.52, 0.11]])
-</pre></div>
-</div>
-</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Number of Failures</th>
+      <th>Fraction of Samples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0.34</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>0.52</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>0.11</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>You might have asked yourself already - since the hypergeometric is so popular, why not provide the exact distribution of the possible values. In fact, these are available, and we show how to calculate them below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">hypergeom</span>
-
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="n">hypergeom</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import hypergeom
+num_failures = [0, 1, 2, 3]
+pd.DataFrame(
+    {&quot;Number of Failures&quot;: num_failures, 
+     &quot;Fraction of Samples&quot;: hypergeom.pmf(num_failures, 7, 4, 3)})
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.03, 0.34, 0.51, 0.11])
-</pre></div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Number of Failures</th>
+      <th>Fraction of Samples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0.34</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>0.51</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>0.11</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
-</div>
-</div>
-<p>Perhaps the two most common chance processes are those that arise from counting the number of 1s drawn from a 0-1 urn: drawing without replacement is the <em>hypergeometric</em> and drawing with replacement is the <em>binomial</em>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Whenever possible, it’s a good idea to use the functionality provided in a third party package for simulating from a named distribution, rather than writing your own function, such as the random number generators offered in numpy. It’s best to take advanatge of efficient and accurate code that others have  devloped.</p>
+<p>Whenever possible, it’s a good idea to use the functionality provided in a third party package for simulating from a named distribution, rather than writing your own function, such as the random number generators offered in numpy. It’s best to take advantage of efficient and accurate code that others have developed.</p>
 </div>
-<p>While this simulation was simple, so simple that we could have used <code class="docutils literal notranslate"><span class="pre">hypergeom.pmf</span></code> to complete our distribution, we wanted to demonstrate the intuition that a simulation study can reveal.  The approach we take in this book is to develop understanding about chance processes based on simulation studies. However, we do formalize the notion of a probability distribution of a statistic (like the proportion of fails in a sample) in
+<p>Perhaps the two most common chance processes are those that arise from counting the number of 1s drawn from a 0-1 urn: drawing without replacement is the <em>hypergeometric</em> distribution and drawing with replacement is the <em>binomial</em> distribution.</p>
+<p>While this simulation was simple, so simple that we could have used <code class="docutils literal notranslate"><span class="pre">hypergeom.pmf</span></code> to directly compute our distribution, we wanted to demonstrate the intuition that a simulation study can reveal.  The approach we take in this book is to develop understanding about chance processes based on simulation studies. However, we do formalize the notion of a probability distribution of a statistic (like the proportion of fails in a sample) in
 <a class="reference internal" href="../16/inf_pred_gen_intro.html#ch-inf-pred-theory"><span class="std std-numref">Chapter 16</span></a>.</p>
 <p>Now that we have simulation as a tool for understanding accuracy, we can revisit the election example from <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a> and carry out a post-election study of what might have gone wrong with the voter polls. This simulation study imitates drawing more than a thousand marbles (voters who participate in the poll) from an urn of six million. We can examine potential sources of bias and the variation in the polling results, and carry out a what-if analysis, where we examine how the predictions might have gone if even a larger number of draws from the urn were taken.</p>
 </div>

@@ -1405,139 +1405,139 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
+# Ignore numpy dtype warnings. These warnings are caused by an interaction
+# between numpy and Cython and can be safely ignored.
+# Reference: https://stackoverflow.com/a/40846742
+warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
+warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+%matplotlib inline
+import ipywidgets as widgets
+from ipywidgets import interact, interactive, fixed, interact_manual
+import nbinteract as nbi
 
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
+sns.set()
+sns.set_context(&#39;talk&#39;)
+np.set_printoptions(threshold=20, precision=2, suppress=True)
+pd.options.display.max_rows = 7
+pd.options.display.max_columns = 8
+pd.set_option(&#39;precision&#39;, 2)
+# This option stops scientific notation for pandas
+# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Outputs sliders that show rows and columns of df</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
-        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
-                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
-                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def df_interact(df, nrows=7, ncols=7):
+    &#39;&#39;&#39;
+    Outputs sliders that show rows and columns of df
+    &#39;&#39;&#39;
+    def peek(row=0, col=0):
+        return df.iloc[row:row + nrows, col:col + ncols]
+    if len(df.columns) &lt;= ncols:
+        interact(peek, row=(0, len(df) - nrows, nrows), col=fixed(0))
+    else:
+        interact(peek,
+                 row=(0, len(df) - nrows, nrows),
+                 col=(0, len(df.columns) - ncols))
+    print(&#39;({} rows, {} columns) total&#39;.format(df.shape[0], df.shape[1]))
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;water_large.csv&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df = pd.read_csv(&#39;water_large.csv&#39;)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="n">Curve</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Curve&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;xs&#39;</span><span class="p">,</span> <span class="s1">&#39;ys&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from collections import namedtuple
+Curve = namedtuple(&#39;Curve&#39;, [&#39;xs&#39;, &#39;ys&#39;])
 
-<span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span> <span class="k">return</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">subseq</span> <span class="ow">in</span> <span class="n">seq</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">subseq</span><span class="p">]</span>
+def flatten(seq): return [item for subseq in seq for item in subseq]
 
-<span class="k">def</span> <span class="nf">make_curve</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">x_start</span><span class="o">=-</span><span class="mi">50</span><span class="p">,</span> <span class="n">x_end</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
-    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x_start</span><span class="p">,</span> <span class="n">x_end</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">Curve</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+def make_curve(clf, x_start=-50, x_end=50):
+    xs = np.linspace(x_start, x_end, num=100)
+    ys = clf.predict(xs.reshape(-1, 1))
+    return Curve(xs, ys)
 
-<span class="k">def</span> <span class="nf">plot_data</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+def plot_data(df=df, ax=plt, **kwargs):
+    ax.scatter(df.iloc[:, 0], df.iloc[:, 1], s=50, **kwargs)
 
-<span class="k">def</span> <span class="nf">plot_curve</span><span class="p">(</span><span class="n">curve</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="n">curve</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+def plot_curve(curve, ax=plt, **kwargs):
+    ax.plot(curve.xs, curve.ys, **kwargs)
     
-<span class="k">def</span> <span class="nf">plot_curves</span><span class="p">(</span><span class="n">curves</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Deg </span><span class="si">{</span><span class="n">deg</span><span class="si">}</span><span class="s1"> poly&#39;</span> <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="n">degrees</span><span class="p">]</span>
-    <span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">curves</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span><span class="p">))</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
-                             <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">curve</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">axes</span><span class="p">),</span> <span class="n">curves</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-        <span class="n">plot_data</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Training data&#39;</span><span class="p">)</span>
-        <span class="n">plot_curve</span><span class="p">(</span><span class="n">curve</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">5e10</span><span class="p">,</span> <span class="mf">170e10</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+def plot_curves(curves, cols=2, labels=None):
+    if labels is None:
+        labels = [f&#39;Deg {deg} poly&#39; for deg in degrees]
+    rows = int(np.ceil(len(curves) / cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(10, 8),
+                             sharex=True, sharey=True)
+    for ax, curve, label in zip(flatten(axes), curves, labels):
+        plot_data(ax=ax, label=&#39;Training data&#39;)
+        plot_curve(curve, ax=ax, label=label)
+        ax.set_ylim(-5e10, 170e10)
+        ax.legend()
         
-    <span class="c1"># add a big axes, hide frame</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="c1"># hide tick and tick label of the big axes</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelcolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
-                    <span class="n">left</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Polynomial Regression&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Water Level Change (m)&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Water Flow (Liters)&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    # add a big axes, hide frame
+    fig.add_subplot(111, frameon=False)
+    # hide tick and tick label of the big axes
+    plt.tick_params(labelcolor=&#39;none&#39;, top=&#39;off&#39;, bottom=&#39;off&#39;,
+                    left=&#39;off&#39;, right=&#39;off&#39;)
+    plt.grid(False)
+    plt.title(&#39;Polynomial Regression&#39;)
+    plt.xlabel(&#39;Water Level Change (m)&#39;)
+    plt.ylabel(&#39;Water Flow (Liters)&#39;)
+    plt.tight_layout()
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">coefs</span><span class="p">(</span><span class="n">clf</span><span class="p">):</span>
-    <span class="n">reg</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;reg&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">intercept_</span><span class="p">,</span> <span class="n">reg</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def coefs(clf):
+    reg = clf.named_steps[&#39;reg&#39;]
+    return np.append(reg.intercept_, reg.coef_)
 
-<span class="k">def</span> <span class="nf">coef_table</span><span class="p">(</span><span class="n">clf</span><span class="p">):</span>
-    <span class="n">vals</span> <span class="o">=</span> <span class="n">coefs</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Coefficient Value&#39;</span><span class="p">:</span> <span class="n">vals</span><span class="p">})</span>
-            <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;degree&#39;</span><span class="p">))</span>
+def coef_table(clf):
+    vals = coefs(clf)
+    return (pd.DataFrame({&#39;Coefficient Value&#39;: vals})
+            .rename_axis(&#39;degree&#39;))
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X = df.iloc[:, [0]].as_matrix()
+y = df.iloc[:, 1].as_matrix()
 
-<span class="n">degrees</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
-<span class="n">clfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;poly&#39;</span><span class="p">,</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
-                  <span class="p">(</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">LinearRegression</span><span class="p">())])</span>
-        <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="n">degrees</span><span class="p">]</span>
+degrees = [1, 2, 8, 12]
+clfs = [Pipeline([(&#39;poly&#39;, PolynomialFeatures(degree=deg, include_bias=False)),
+                  (&#39;reg&#39;, LinearRegression())])
+        .fit(X, y)
+        for deg in degrees]
 
-<span class="n">curves</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_curve</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span> <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="n">clfs</span><span class="p">]</span>
+curves = [make_curve(clf) for clf in clfs]
 
-<span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
+alphas = [0.01, 0.1, 1.0, 10.0]
 
-<span class="n">ridge_clfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pipeline</span><span class="p">([(</span><span class="s1">&#39;poly&#39;</span><span class="p">,</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
-                        <span class="p">(</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">))])</span>
-        <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">deg</span> <span class="ow">in</span> <span class="n">degrees</span><span class="p">]</span>
+ridge_clfs = [Pipeline([(&#39;poly&#39;, PolynomialFeatures(degree=deg, include_bias=False)),
+                        (&#39;reg&#39;, RidgeCV(alphas=alphas, normalize=True))])
+        .fit(X, y)
+        for deg in degrees]
 
-<span class="n">ridge_curves</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_curve</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span> <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="n">ridge_clfs</span><span class="p">]</span>
+ridge_curves = [make_curve(clf) for clf in ridge_clfs]
 </pre></div>
 </div>
 </div>
@@ -1590,8 +1590,8 @@ L(\hat{\theta}, X, y)
 <p>Notice that the regularization term <span class="math notranslate nohighlight">\( \lambda \sum_{j = 1}^{p} \hat{\theta_j}^2 \)</span> penalizes each <span class="math notranslate nohighlight">\( \hat{\theta_j} \)</span> equally. However, the effect of each <span class="math notranslate nohighlight">\( \hat{\theta_j} \)</span> differs depending on the data itself. Consider this section of the water flow dataset after adding degree 8 polynomial features:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clfs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;poly&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]),</span>
-             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;deg_</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">_feat&#39;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pd.DataFrame(clfs[2].named_steps[&#39;poly&#39;].transform(X[:5]),
+             columns=[f&#39;deg_{n}_feat&#39; for n in range(8)])
 </pre></div>
 </div>
 </div>
@@ -1677,7 +1677,7 @@ L(\hat{\theta}, X, y)
 <p>We have previously used polynomial features to fit polynomials of degree 2, 8, and 12 to water flow data. The original data and resulting model predictions are repeated below.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df
 </pre></div>
 </div>
 </div>
@@ -1747,7 +1747,7 @@ L(\hat{\theta}, X, y)
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_curves</span><span class="p">(</span><span class="n">curves</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_curves(curves)
 </pre></div>
 </div>
 </div>
@@ -1758,13 +1758,13 @@ L(\hat{\theta}, X, y)
 <p>To conduct ridge regression, we first extract the data matrix and the vector of outcomes from the data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;X: &#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y: &#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X = df.iloc[:, [0]].as_matrix()
+y = df.iloc[:, 1].as_matrix()
+print(&#39;X: &#39;)
+print(X)
+print()
+print(&#39;y: &#39;)
+print(y)
 </pre></div>
 </div>
 </div>
@@ -1787,13 +1787,13 @@ y:
 <p>Then, we apply a degree 12 polynomial transform to <code class="docutils literal notranslate"><span class="pre">X</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.preprocessing import PolynomialFeatures
 
-<span class="c1"># We need to specify include_bias=False since sklearn&#39;s classifiers</span>
-<span class="c1"># automatically add the intercept term.</span>
-<span class="n">X_poly_8</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;First two rows of transformed X:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">X_poly_8</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+# We need to specify include_bias=False since sklearn&#39;s classifiers
+# automatically add the intercept term.
+X_poly_8 = PolynomialFeatures(degree=8, include_bias=False).fit_transform(X)
+print(&#39;First two rows of transformed X:&#39;)
+print(X_poly_8[0:2])
 </pre></div>
 </div>
 </div>
@@ -1810,15 +1810,15 @@ y:
 <p>We specify <code class="docutils literal notranslate"><span class="pre">alpha</span></code> values that <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> will select from using cross-validation, then use the <code class="docutils literal notranslate"><span class="pre">RidgeCV</span></code> classifier to fit the transformed data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">RidgeCV</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import RidgeCV
 
-<span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
+alphas = [0.01, 0.1, 1.0, 10.0]
 
-<span class="c1"># Remember to set normalize=True to normalize data</span>
-<span class="n">clf</span> <span class="o">=</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_poly_8</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+# Remember to set normalize=True to normalize data
+clf = RidgeCV(alphas=alphas, normalize=True).fit(X_poly_8, y)
 
-<span class="c1"># Display the chosen alpha value:</span>
-<span class="n">clf</span><span class="o">.</span><span class="n">alpha_</span>
+# Display the chosen alpha value:
+clf.alpha_
 </pre></div>
 </div>
 </div>
@@ -1831,18 +1831,18 @@ y:
 <p>Finally, we plot the model predictions for the base degree 8 polynomial classifier next to the regularized degree 8 classifier:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plt.figure(figsize=(10, 5))
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
-<span class="n">plot_data</span><span class="p">()</span>
-<span class="n">plot_curve</span><span class="p">(</span><span class="n">curves</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Base degree 8 polynomial&#39;</span><span class="p">)</span>
+plt.subplot(121)
+plot_data()
+plot_curve(curves[2])
+plt.title(&#39;Base degree 8 polynomial&#39;)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
-<span class="n">plot_data</span><span class="p">()</span>
-<span class="n">plot_curve</span><span class="p">(</span><span class="n">ridge_curves</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Regularized degree 8 polynomial&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+plt.subplot(122)
+plot_data()
+plot_curve(ridge_curves[2])
+plt.title(&#39;Regularized degree 8 polynomial&#39;)
+plt.tight_layout()
 </pre></div>
 </div>
 </div>
@@ -1854,12 +1854,12 @@ y:
 <p>Comparing the coefficients of the non-regularized and regularized models shows that ridge regression favors placing model weights on the lower degree polynomial terms:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base</span> <span class="o">=</span> <span class="n">coef_table</span><span class="p">(</span><span class="n">clfs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Coefficient Value&#39;</span><span class="p">:</span> <span class="s1">&#39;Base&#39;</span><span class="p">})</span>
-<span class="n">ridge</span> <span class="o">=</span> <span class="n">coef_table</span><span class="p">(</span><span class="n">ridge_clfs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Coefficient Value&#39;</span><span class="p">:</span> <span class="s1">&#39;Regularized&#39;</span><span class="p">})</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>base = coef_table(clfs[2]).rename(columns={&#39;Coefficient Value&#39;: &#39;Base&#39;})
+ridge = coef_table(ridge_clfs[2]).rename(columns={&#39;Coefficient Value&#39;: &#39;Regularized&#39;})
 
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="n">display</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ridge</span><span class="p">))</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+pd.options.display.max_rows = 20
+display(base.join(ridge))
+pd.options.display.max_rows = 7
 </pre></div>
 </div>
 </div>
@@ -1944,20 +1944,20 @@ y:
 <p>Repeating the process for degree 12 polynomial features results in a similar result:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = plt.figure(figsize=(10, 5))
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
-<span class="n">plot_data</span><span class="p">()</span>
-<span class="n">plot_curve</span><span class="p">(</span><span class="n">curves</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Base degree 12 polynomial&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">5e10</span><span class="p">,</span> <span class="mf">170e10</span><span class="p">)</span>
+plt.subplot(121)
+plot_data()
+plot_curve(curves[3])
+plt.title(&#39;Base degree 12 polynomial&#39;)
+plt.ylim(-5e10, 170e10)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
-<span class="n">plot_data</span><span class="p">()</span>
-<span class="n">plot_curve</span><span class="p">(</span><span class="n">ridge_curves</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Regularized degree 12 polynomial&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">5e10</span><span class="p">,</span> <span class="mf">170e10</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+plt.subplot(122)
+plot_data()
+plot_curve(ridge_curves[3])
+plt.title(&#39;Regularized degree 12 polynomial&#39;)
+plt.ylim(-5e10, 170e10)
+plt.tight_layout()
 </pre></div>
 </div>
 </div>
@@ -1968,17 +1968,17 @@ y:
 <p>Increasing the regularization parameter results in progressively simpler models. The plot below demonstrates the effects of increasing the regularization amount from 0.001 to 100.0.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>alphas = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
 
-<span class="n">alpha_clfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">&#39;poly&#39;</span><span class="p">,</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">))]</span>
-<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">]</span>
+alpha_clfs = [Pipeline([
+    (&#39;poly&#39;, PolynomialFeatures(degree=12, include_bias=False)),
+    (&#39;reg&#39;, Ridge(alpha=alpha, normalize=True))]
+).fit(X, y) for alpha in alphas]
 
-<span class="n">alpha_curves</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_curve</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span> <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="n">alpha_clfs</span><span class="p">]</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;$</span><span class="se">\\</span><span class="s1">lambda = </span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s1">$&#39;</span> <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">]</span>
+alpha_curves = [make_curve(clf) for clf in alpha_clfs]
+labels = [f&#39;$\\lambda = {alpha}$&#39; for alpha in alphas]
 
-<span class="n">plot_curves</span><span class="p">(</span><span class="n">alpha_curves</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+plot_curves(alpha_curves, cols=3, labels=labels)
 </pre></div>
 </div>
 </div>

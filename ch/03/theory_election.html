@@ -1371,9 +1371,9 @@
                 
   <div class="section" id="example-simulating-election-poll-bias-and-variance">
 <span id="sec-theory-electionpolls"></span><h1><span class="section-number">3.2. </span>Example: Simulating Election Poll Bias and Variance<a class="headerlink" href="#example-simulating-election-poll-bias-and-variance" title="Permalink to this headline">¶</a></h1>
-<p>The President of the US is chosen by the Electoral College, and not solely by popular vote.
-Each state is alotted a certan number of votes to cast in the Electoral College, according to the size of their population. Typically, whomever wins the popular vote in a state receives all of the electoral college votes for that state. With the aid of polls conducted in advance of the election, pundits identify “battleground” states where the election is expected to be close and the electoral college votes might swing the election.</p>
-<p>In 2016, nearly every prediction for the outcome of the election was wrong. Pollsters correctly predicted the election outcome in 46 of the 50 states. For those 46 states, Trump received 231 and Clinton received 232 electoral college votes. The remaining 4 states, Florida, Michigan, Pennsylvania, and Wisconsin, were identified as battleground states and accounted for a total of 75 votes.  The margins of the popular vote in these four states were narrow. For example, in Pennsylvania, Trump received 48.18% and Clinton received 47.46% of the 6,165,478 votes cast. Such narrow margins can make it hard to predict the outcome given the sample sizes that the polls used.</p>
+<p>In 2016, nearly every prediction for the outcome of the United States Presidential election was wrong. This was an historic level of prediction error that shocked the statistics and data science communities and would ultimately leave many questioning their sanity. In this chapter, we will examine why nearly every political poll was so confident and yet also so wrong. This story will both illustrate the power of simulation and also reveal the hubris of data and the challenge of bias.</p>
+<p>The President of the United States is chosen by the Electoral College, and not solely by popular vote. Each state is allotted a certain number of votes to cast in the Electoral College, according to the size of their population. Typically, whomever wins the popular vote in a state receives all of the electoral college votes for that state. With the aid of polls conducted in advance of the election, pundits identify “battleground” states where the election is expected to be close and the electoral college votes might swing the election.</p>
+<p>In 2016, pollsters <em>correctly</em> predicted the election outcome in 46 of the 50 states. Not bad! After all, for those 46 states, Trump received 231 and Clinton received 232 electoral college votes. Nearly a tie with Clinton having a very narrow lead. Unfortunately, the remaining 4 states, Florida, Michigan, Pennsylvania, and Wisconsin, were identified as battleground states and accounted for a total of 75 votes.  The margins of the popular vote in these four states were narrow. For example, in Pennsylvania, Trump received 48.18% and Clinton received 47.46% of the 6,165,478 votes cast. Such narrow margins can make it hard to predict the outcome given the sample sizes that the polls used. But there was an even greater challenge hidden in the sampling process itself.</p>
 <p>Many experts have studied the 2016 election results to dissect and identify what went wrong. According to the American Association for Public Opinion Research<a class="footnote-reference brackets" href="#aapor" id="id1">1</a>, one online, opt-in poll adjusted their polling results for the education of the respondents but used only three broad categories (high school or less, some college, and college graduate). They found that if they had separated out those with advanced degrees from those with college degrees, then they would have reduced Clinton’s margin by 0.5 percentage points. In other words, after the fact they were able to identify an education bias where highly educated voters tended to be more willing to participate in polls. This bias matters because these voters also tended to prefer Clinton over Trump.</p>
 <p>Now that we know how people actually voted, we can carry out a simulation study that imitates election polling under different scenarios to help develop intuition for accuracy, bias, and variance<a class="footnote-reference brackets" href="#grotenhuis" id="id2">2</a>. We will simulate the polls for Pennsylvania under two scenarios:</p>
 <ol class="simple">
@@ -1383,15 +1383,15 @@ Each state is alotted a certan number of votes to cast in the Electoral College,
 <p>Our ultimate goal is to understand the frequency that a poll incorrectly calls the election for Hillary Clinton when a sample is collected with absolutely no bias and also when there is a small amount of non-response bias. We begin by setting up the urn model for the first scenario.</p>
 <div class="section" id="the-pennsylvania-urn-model">
 <h2><span class="section-number">3.2.1. </span>The Pennsylvania Urn Model<a class="headerlink" href="#the-pennsylvania-urn-model" title="Permalink to this headline">¶</a></h2>
-<p>Our urn model for carrying out a poll of Pennsylvania voters is an after-the-fact situation where we use the outcome of the election. The urn has 6,165,478 marbles in it, one for each voter. Like with our tiny population, we  write on each marble the candidate that they voted for, draw 1500 marbles from the urn (1500 is about the typical size of the polls), and tally up the votes for Trump, Clinton, and any other candidate. From the tally, we can calculate Trump’s lead over Clinton.</p>
+<p>Our urn model for carrying out a poll of Pennsylvania voters is an after-the-fact situation where we use the outcome of the election. The urn has 6,165,478 marbles in it, one for each voter. Like with our tiny population, we write on each marble the candidate that they voted for, draw 1500 marbles from the urn (1500 is about the typical size of the polls), and tally up the votes for Trump, Clinton, and any other candidate. From the tally, we can calculate Trump’s lead over Clinton.</p>
 <p>To set up our simulation, we figure out what the urn looks like. We need to know the number of votes cast for each of the candidates. Since we care only about Trump’s lead over Clinton, we can lump together all votes for other candidates together. This way each marble has one of three possible votes: Trump, Clinton, and Other. We can’t ignore the “Other” category, because it impacts the size of the lead.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proportions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4818</span><span class="p">,</span> <span class="mf">0.4746</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.4818</span> <span class="o">+</span> <span class="mf">0.4746</span><span class="p">)])</span>               
-<span class="n">n</span> <span class="o">=</span> <span class="mi">1_500</span>
-<span class="n">N</span> <span class="o">=</span> <span class="mi">6_165_478</span>
-<span class="n">votes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">proportions</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<span class="n">votes</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>proportions = np.array([0.4818, 0.4746, 1 - (0.4818 + 0.4746)])               
+n = 1_500 
+N = 6_165_478
+votes = np.trunc(N * proportions).astype(int)
+votes
 </pre></div>
 </div>
 </div>
@@ -1404,14 +1404,14 @@ Each state is alotted a certan number of votes to cast in the Electoral College,
 <p>This version of the urn model has three types of marbles in it. It is a bit more complex than the hypergeometric, but still common enough to have a named distribution: the <em>multivariate hypergeometric</em>. In Python, the urn model with more than two types of marbles is implemented as the <code class="docutils literal notranslate"><span class="pre">scipy.stats.multivariate_hypergeom.rvs</span></code> method. The function returns the number of each type of marbel drawn from the urn. We call the function as follows.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_hypergeom</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import multivariate_hypergeom
 
-<span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+multivariate_hypergeom.rvs(votes, n)
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([747, 681,  72])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([756, 691,  53])
 </pre></div>
 </div>
 </div>
@@ -1419,12 +1419,12 @@ Each state is alotted a certan number of votes to cast in the Electoral College,
 <p>As before, each time we call <code class="docutils literal notranslate"><span class="pre">multivariate_hypergeom.rvs</span></code> we get a different sample and counts.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>multivariate_hypergeom.rvs(votes, n)
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([749, 697,  54])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([725, 714,  61])
 </pre></div>
 </div>
 </div>
@@ -1434,16 +1434,16 @@ Each state is alotted a certan number of votes to cast in the Electoral College,
 we can simulate the chance process of drawing from the urn over and over and examine the values that we get in return. Below we simulate 100,000 polls of 1500 voters from the votes cast in Pennsylvania.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">trump_advantage</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-    <span class="n">sample_votes</span> <span class="o">=</span> <span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">sample_votes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">sample_votes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">n</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def trump_advantage(votes, n):
+    sample_votes = multivariate_hypergeom.rvs(votes, n)
+    return (sample_votes[0] - sample_votes[1]) / n
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations = [trump_advantage(votes, n) for _ in range(100000)] 
 </pre></div>
 </div>
 </div>
@@ -1451,12 +1451,12 @@ we can simulate the chance process of drawing from the urn over and over and exa
 <p>On average, the polling results show Trump with close to a 0.7% lead, as expected given the composition of the six-plus million votes cast.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">simulations</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.mean(simulations)
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.007210106666666665
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.007151273333333334
 </pre></div>
 </div>
 </div>
@@ -1469,18 +1469,18 @@ The vertical dashed line at 0 shows that more often than not, Trump is called, b
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Trump Lead in the Sample&#39;)
 </pre></div>
 </div>
-<img alt="../../_images/theory_election_16_1.png" src="../../_images/theory_election_16_1.png" />
+<img alt="../../_images/theory_election_18_1.png" src="../../_images/theory_election_18_1.png" />
 </div>
 </div>
 <p>In the 100,0000 simulated polls, we find Trump a victor about 60% of the time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.count_nonzero(np.array(simulations) &gt; 0) / 100000
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.60797
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.60586
 </pre></div>
 </div>
 </div>
@@ -1495,8 +1495,8 @@ The vertical dashed line at 0 shows that more often than not, Trump is called, b
 We adjust the proportions of marbles in the urn to reflect this bias.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proportions_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4818</span> <span class="o">-</span> <span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.4747</span> <span class="o">+</span> <span class="mf">0.005</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.4818</span> <span class="o">+</span> <span class="mf">0.4746</span><span class="p">)</span> <span class="p">])</span>
-<span class="n">proportions_bias</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>proportions_bias = np.array([0.4818 - 0.005, 0.4747 + 0.005, 1 - (0.4818 + 0.4746) ])
+proportions_bias
 </pre></div>
 </div>
 </div>
@@ -1508,8 +1508,8 @@ We adjust the proportions of marbles in the urn to reflect this bias.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">votes_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">proportions_bias</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<span class="n">votes_bias</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>votes_bias = np.trunc(N * proportions_bias).astype(int)
+votes_bias
 </pre></div>
 </div>
 </div>
@@ -1522,7 +1522,7 @@ We adjust the proportions of marbles in the urn to reflect this bias.</p>
 <p>When we carry out the simulation study again, this time with the biased urn, we find a different result.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations_bias</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes_bias</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations_bias = [trump_advantage(votes_bias, n) for i in range(100000)] 
 </pre></div>
 </div>
 </div>
@@ -1532,17 +1532,17 @@ We adjust the proportions of marbles in the urn to reflect this bias.</p>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Trump Lead in the Sample&#39;)
 </pre></div>
 </div>
-<img alt="../../_images/theory_election_25_1.png" src="../../_images/theory_election_25_1.png" />
+<img alt="../../_images/theory_election_27_1.png" src="../../_images/theory_election_27_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations_bias</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.count_nonzero(np.array(simulations_bias) &gt; 0) / 100000
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.44742
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.44896
 </pre></div>
 </div>
 </div>
@@ -1554,22 +1554,22 @@ We adjust the proportions of marbles in the urn to reflect this bias.</p>
 <p>With our simulation study we can gain insight on the impact of a larger poll on the sample lead. For example, we can try a sample size of 12,000, eight times the size of the actual poll, and run 100,000 simulations for both scenarios: the unbiased and the biased.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations_big</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="mi">12000</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
-<span class="n">simulations_bias_big</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes_bias</span><span class="p">,</span> <span class="mi">12000</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations_big = [trump_advantage(votes, 12000) for i in range(100000)] 
+simulations_bias_big = [trump_advantage(votes_bias, 12000) for i in range(100000)] 
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scenario_no_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations_big</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
-<span class="n">scenario_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations_bias_big</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">scenario_no_bias</span><span class="p">,</span> <span class="n">scenario_bias</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>scenario_no_bias = np.count_nonzero(np.array(simulations_big) &gt; 0) / 100000
+scenario_bias = np.count_nonzero(np.array(simulations_bias_big) &gt; 0) / 100000
+print(scenario_no_bias, scenario_bias)
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.78664 0.37131
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.78856 0.37078
 </pre></div>
 </div>
 </div>
@@ -1580,7 +1580,7 @@ We adjust the proportions of marbles in the urn to reflect this bias.</p>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Trump Lead in the Sample&#39;)
 </pre></div>
 </div>
-<img alt="../../_images/theory_election_32_1.png" src="../../_images/theory_election_32_1.png" />
+<img alt="../../_images/theory_election_34_1.png" src="../../_images/theory_election_34_1.png" />
 </div>
 </div>
 <p>After the fact, with multiple polls for the same election, we can detect bias. In a post-election analysis of over 4,000 polls for 600 state-level, gubernatorial, senatorial, and presidential elections, <span id="id4">[<a class="reference internal" href="../../references.html#id18">Shirani-Mehr <em>et al.</em>, 2018</a>]</span> found that on average election polls exhibit a bias of about 1.5 percentage points.</p>

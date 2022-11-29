@@ -1366,10 +1366,10 @@ The American Presidency Project makes these speeches available online <a class="
 <p>We’ll start by opening the file that has all of the speeches.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from pathlib import Path
 
-<span class="k">with</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/stateoftheunion1790-2022.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+with Path(&#39;data/stateoftheunion1790-2022.txt&#39;).open(mode=&quot;r&quot;) as f:
+    text = f.read()
 </pre></div>
 </div>
 </div>
@@ -1380,9 +1380,9 @@ We can use a regular expression to count the number of times the
 string <code class="docutils literal notranslate"><span class="pre">***</span></code> appears.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="n">num_speeches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\*\*\*&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="n">num_speeches</span><span class="si">}</span><span class="s1"> speeches total&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import re
+num_speeches = len(re.findall(r&quot;\*\*\*&quot;, text))
+print(f&#39;There are {num_speeches} speeches total&#39;)
 </pre></div>
 </div>
 </div>
@@ -1397,7 +1397,7 @@ to analyze. Here, each speech is a document.
 We’ll split apart the <code class="docutils literal notranslate"><span class="pre">text</span></code> variable into its individual documents.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">records</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;***&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>records = text.split(&quot;***&quot;)
 </pre></div>
 </div>
 </div>
@@ -1405,18 +1405,18 @@ We’ll split apart the <code class="docutils literal notranslate"><span class="
 <p>Then, we can put the speeches into a dataframe:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">extract_parts</span><span class="p">(</span><span class="n">speech</span><span class="p">):</span>
-    <span class="n">speech</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
-    <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="o">*</span><span class="n">lines</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech</span>
-    <span class="n">body</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">body</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def extract_parts(speech):
+    speech = speech.strip().split(&#39;\n&#39;)[1:]
+    [name, date, *lines] = speech
+    body = &#39;\n&#39;.join(lines).strip()
+    return [name, date, body]
 
-<span class="k">def</span> <span class="nf">read_speeches</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">extract_parts</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">records</span><span class="p">[</span><span class="mi">1</span><span class="p">:]],</span>
-                        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">])</span>
+def read_speeches():
+    return pd.DataFrame([extract_parts(l) for l in records[1:]],
+                        columns = [&quot;name&quot;, &quot;date&quot;, &quot;text&quot;])
 
-<span class="n">df</span> <span class="o">=</span> <span class="n">read_speeches</span><span class="p">()</span>
-<span class="n">df</span>
+df = read_speeches()
+df
 </pre></div>
 </div>
 </div>
@@ -1520,17 +1520,17 @@ This regex matches any character that isn’t a lowercase letter
 </ol>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-    <span class="n">bracket_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[[^\]]+\]&#39;</span><span class="p">)</span>
-    <span class="n">not_a_word_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^a-z\s]&#39;</span><span class="p">)</span>
-    <span class="n">cleaned</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">bracket_re</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-               <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">not_a_word_re</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">cleaned</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def clean_text(df):
+    bracket_re = re.compile(r&#39;\[[^\]]+\]&#39;)
+    not_a_word_re = re.compile(r&#39;[^a-z\s]&#39;)
+    cleaned = (df[&#39;text&#39;].str.lower()
+               .str.replace(bracket_re, &#39;&#39;)
+               .str.replace(not_a_word_re, &#39; &#39;))
+    return df.assign(text=cleaned)
 
-<span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">read_speeches</span><span class="p">()</span>
-      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">clean_text</span><span class="p">))</span>
-<span class="n">df</span>
+df = (read_speeches()
+      .pipe(clean_text))
+df
 </pre></div>
 </div>
 </div>
@@ -1639,28 +1639,28 @@ description of the transform and an implementation we’ll use.</p>
 vector.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
-<span class="kn">from</span> <span class="nn">nltk.stem.porter</span> <span class="kn">import</span> <span class="n">PorterStemmer</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import nltk
+from nltk.stem.porter import PorterStemmer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-<span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">corpus</span><span class="o">.</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">))</span>
-<span class="n">porter_stemmer</span> <span class="o">=</span> <span class="n">PorterStemmer</span><span class="p">()</span>
+stop_words = set(nltk.corpus.stopwords.words(&#39;english&#39;))
+porter_stemmer = PorterStemmer()
 
-<span class="k">def</span> <span class="nf">stemming_tokenizer</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">porter_stemmer</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">words</span>
+def stemming_tokenizer(document):
+    return [porter_stemmer.stem(word)
+            for word in nltk.word_tokenize(document)
+            if word not in stop_words]
+    return words
 
-<span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">stemming_tokenizer</span><span class="p">)</span>
-<span class="n">speech_vectors</span> <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+tfidf = TfidfVectorizer(tokenizer=stemming_tokenizer)
+speech_vectors = tfidf.fit_transform(df[&#39;text&#39;])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">speech_vectors</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>speech_vectors.shape
 </pre></div>
 </div>
 </div>
@@ -1683,37 +1683,37 @@ Points that are close together represent similar speeches, and
 points that are far away represent dissimilar speeches.</p>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.sparse.linalg import svds
 
-<span class="k">def</span> <span class="nf">compute_pcs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-    <span class="n">centered</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">centered</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+def compute_pcs(data, k):
+    centered = data - data.mean(axis=0)
+    U, s, Vt = svds(centered, k=k)
+    return U @ np.diag(s)
 
-<span class="c1"># Setting the random seed doesn&#39;t affect svds(), so re-running this code</span>
-<span class="c1"># might flip the points along the x or y-axes.</span>
-<span class="n">pcs</span> <span class="o">=</span> <span class="n">compute_pcs</span><span class="p">(</span><span class="n">speech_vectors</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+# Setting the random seed doesn&#39;t affect svds(), so re-running this code
+# might flip the points along the x or y-axes.
+pcs = compute_pcs(speech_vectors, k=2)
 
-<span class="c1"># So we&#39;ll use a hack: we make sure the first row&#39;s PCs are both positive to get</span>
-<span class="c1"># the same plot each time.</span>
-<span class="k">if</span> <span class="n">pcs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="k">if</span> <span class="n">pcs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+# So we&#39;ll use a hack: we make sure the first row&#39;s PCs are both positive to get
+# the same plot each time.
+if pcs[0, 0] &lt; 0:
+    pcs[:, 0] *= -1
+if pcs[0, 1] &lt; 0:
+    pcs[:, 1] *= -1
 
-<span class="n">with_pcs1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
-                      <span class="n">pc1</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pc2</span><span class="o">=</span><span class="n">pcs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+with_pcs1 = df.assign(year=df[&#39;date&#39;].str[-4:].astype(int),
+                      pc1=pcs[:, 0], pc2=pcs[:, 1])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">with_pcs1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pc1&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pc2&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
-           <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
-           <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">coloraxis_colorbar_thickness</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">fig</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.scatter(with_pcs1, x=&#39;pc1&#39;, y=&#39;pc2&#39;, color=&#39;year&#39;,
+           hover_data=[&#39;name&#39;],
+           width=550, height=350)
+fig.update_layout(coloraxis_colorbar_thickness=15)
+fig
 </pre></div>
 </div>
 </div>

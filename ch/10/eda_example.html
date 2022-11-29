@@ -1438,8 +1438,8 @@ the dataset.</p>
 that the file indeed consists of comma-separated-values.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The file has 521494 lines</span>
-<span class="o">!</span>wc data/sfhousing.csv
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># The file has 521494 lines
+!wc data/sfhousing.csv
 </pre></div>
 </div>
 </div>
@@ -1451,8 +1451,8 @@ that the file indeed consists of comma-separated-values.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The file is 45M large, which is reasonable to read into pandas</span>
-<span class="o">!</span>du -shH data/sfhousing.csv
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># The file is 45M large, which is reasonable to read into pandas
+!du -shH data/sfhousing.csv
 </pre></div>
 </div>
 </div>
@@ -1464,7 +1464,7 @@ that the file indeed consists of comma-separated-values.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head -n <span class="m">4</span> data/sfhousing.csv
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>!head -n 4 data/sfhousing.csv
 </pre></div>
 </div>
 </div>
@@ -1480,10 +1480,10 @@ Alameda County,Alameda,94501,1001 Shoreline Drive \#102,393000,2,39353,1360,1970
 <p>With this, we expect that we can read the file into a DataFrame:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some rows in the csv have extra commas, but since there are only a few, we</span>
-<span class="c1"># drop them when reading in the data.</span>
-<span class="n">sfh_all</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/sfhousing.csv&#39;</span><span class="p">,</span> <span class="n">error_bad_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">sfh_all</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Some rows in the csv have extra commas, but since there are only a few, we
+# drop them when reading in the data.
+sfh_all = pd.read_csv(&#39;data/sfhousing.csv&#39;, error_bad_lines=False)
+sfh_all
 </pre></div>
 </div>
 </div>
@@ -1639,7 +1639,7 @@ b&#39;Skipping line 343819: expected 11 fields, saw 12\n&#39;
 can determine the features and their types by inspection.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh_all</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sfh_all.info()
 </pre></div>
 </div>
 </div>
@@ -1680,10 +1680,10 @@ skewness. The median is closer to the lower quartile than to the upper
 quartile. Also the maximum is more than 40 times as large as the median.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This option stops scientific notation for pandas</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.float_format&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># This option stops scientific notation for pandas
+pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
 
-<span class="n">display_df</span><span class="p">(</span><span class="n">sfh_all</span><span class="p">[[</span><span class="s1">&#39;price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">(),</span> <span class="n">rows</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+display_df(sfh_all[[&#39;price&#39;]].describe(), rows=8)
 </pre></div>
 </div>
 </div>
@@ -1751,9 +1751,9 @@ whether there are many houses that sold at such a high price. We can zoom in on
 the right tail of the distribution and compute a few high percentiles.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">percs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">95</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">98</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mf">99.5</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">]</span>
-<span class="n">prices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">sfh_all</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">],</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="n">prices</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">percs</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>percs = [95, 97, 98, 99, 99.5, 99.9]
+prices = np.percentile(sfh_all[&#39;price&#39;], percs, interpolation=&#39;lower&#39;)
+pd.DataFrame({&#39;price&#39;: prices}, index=percs)
 </pre></div>
 </div>
 </div>
@@ -1813,8 +1813,8 @@ a rarity. Let’s examine the histogram of sale prices below <span class="math n
 Fewer than 1 in 1,000 sales exceeded <span class="math notranslate nohighlight">\(\$4M\)</span>. Is the distribution skewed?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">under_4m</span> <span class="o">=</span> <span class="n">sfh_all</span><span class="p">[</span><span class="n">sfh_all</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4_000_000</span><span class="p">]</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">under_4m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>under_4m = sfh_all[sfh_all[&#39;price&#39;] &lt; 4_000_000]
+sns.histplot(data=under_4m, x=&#39;price&#39;, binwidth=100000)
 </pre></div>
 </div>
 </div>
@@ -1831,8 +1831,8 @@ Next, we plot the histogram of the logarithm transformed sale price,
 which is roughly symmetric:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_prices</span> <span class="o">=</span> <span class="n">under_4m</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_price</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">under_4m</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">log_prices</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>log_prices = under_4m.assign(log_price=np.log10(under_4m[&#39;price&#39;]))
+sns.histplot(data=log_prices, x=&#39;log_price&#39;, binwidth=0.1)
 </pre></div>
 </div>
 </div>
@@ -1880,12 +1880,12 @@ contains large and expensive houses, but not outrageously so.   Later, we
 further restrict our exploration to a few cities of interest.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4_000_000</span><span class="p">)</span> <span class="o">&amp;</span>
-                  <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">12_000</span><span class="p">)]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def subset(df):
+    return df.loc[(df[&#39;price&#39;] &lt; 4_000_000) &amp;
+                  (df[&#39;bsqft&#39;] &lt; 12_000)]
 
-<span class="n">sfh</span> <span class="o">=</span> <span class="n">sfh_all</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
-<span class="n">sfh</span>
+sfh = sfh_all.pipe(subset)
+sfh
 </pre></div>
 </div>
 </div>
@@ -2031,16 +2031,16 @@ nearly symmetric, although it maintains a slight skew. The same is the case for
 the distribution of lot size.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 4))
 
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;bsqft&#39;</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Building size (ft^2)&#39;</span><span class="p">)</span>
+sns.histplot(data=sfh, x=&#39;bsqft&#39;, binwidth=200, ax=ax1)
+ax1.set_xlabel(&#39;Building size (ft^2)&#39;)
 
-<span class="n">log_bsq</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_bsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">]))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">log_bsq</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Building size (ft^2, log10)&#39;</span><span class="p">)</span>
+log_bsq = sfh.assign(log_bsqft=np.log10(sfh[&#39;bsqft&#39;]))
+sns.histplot(data=log_bsq, x=&#39;log_bsqft&#39;, binwidth=0.05, ax=ax2)
+ax2.set_xlabel(&#39;Building size (ft^2, log10)&#39;)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+plt.tight_layout()
 </pre></div>
 </div>
 </div>
@@ -2060,17 +2060,17 @@ and there appears to be a slight positive log-log linear association between
 lot and building size.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 4))
 
-<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;bsqft&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;lsqft&#39;</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+sns.scatterplot(data=sfh, x=&#39;bsqft&#39;, y=&#39;lsqft&#39;,
+                alpha=0.1, s=20, ax=ax1)
 
-<span class="n">loglog</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_bsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">]),</span> 
-                    <span class="n">log_lsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;lsqft&#39;</span><span class="p">]))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">loglog</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_lsqft&#39;</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
+loglog = sfh.assign(log_bsqft=np.log10(sfh[&#39;bsqft&#39;]), 
+                    log_lsqft=np.log10(sfh[&#39;lsqft&#39;]))
+sns.scatterplot(data=loglog, x=&#39;log_bsqft&#39;, y=&#39;log_lsqft&#39;,
+                alpha=0.1, s=20, ax=ax2)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+plt.tight_layout()
 </pre></div>
 </div>
 </div>
@@ -2082,9 +2082,9 @@ lot and building size.</p>
 value:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">percs</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-<span class="n">lots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;lsqft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;lot_size&#39;</span><span class="p">:</span> <span class="n">lots</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">percs</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>percs = [0.5, 1, 1.5, 2, 2.5, 3]
+lots = np.percentile(sfh[&#39;lsqft&#39;].dropna(), percs, interpolation=&#39;lower&#39;)
+pd.DataFrame({&#39;lot_size&#39;: lots}, index=percs)
 </pre></div>
 </div>
 </div>
@@ -2153,9 +2153,9 @@ the right idea. However, we find that there are some houses with as many as 60
 bedrooms!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;br&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.figure(figsize=(12, 2))
+sns.countplot(data=sfh, x=&#39;br&#39;)
+plt.xticks(rotation=45);
 </pre></div>
 </div>
 </div>
@@ -2173,9 +2173,9 @@ is nearly symmetric with a peak at 3, nearly the same proportion of houses have
 with a few houses having 6 or more bedrooms.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eight_up</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;br&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-<span class="n">new_bed</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;br&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">eight_up</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">br</span><span class="o">=</span><span class="n">new_bed</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;br&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>eight_up = sfh.loc[sfh[&#39;br&#39;] &gt;= 8, &#39;br&#39;].unique()
+new_bed = sfh[&#39;br&#39;].replace(eight_up, 8)
+sns.countplot(data=sfh.assign(br=new_bed), x=&#39;br&#39;)
 </pre></div>
 </div>
 </div>
@@ -2195,23 +2195,23 @@ lot size, and saw that this small lot size appeared for many building sizes.</p>
 <p>Before we proceed, we’ll save the transformations done thus far into <code class="docutils literal notranslate"><span class="pre">sfh</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_vals</span><span class="p">(</span><span class="n">sfh</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_price</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]),</span>
-                      <span class="n">log_bsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">]),</span>
-                      <span class="n">log_lsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;lsqft&#39;</span><span class="p">]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def log_vals(sfh):
+    return sfh.assign(log_price=np.log10(sfh[&#39;price&#39;]),
+                      log_bsqft=np.log10(sfh[&#39;bsqft&#39;]),
+                      log_lsqft=np.log10(sfh[&#39;lsqft&#39;]))
 
-<span class="k">def</span> <span class="nf">clip_br</span><span class="p">(</span><span class="n">sfh</span><span class="p">):</span>
-    <span class="n">eight_up</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;br&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-    <span class="n">new_bed</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;br&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">eight_up</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">br</span><span class="o">=</span><span class="n">new_bed</span><span class="p">)</span>
+def clip_br(sfh):
+    eight_up = sfh.loc[sfh[&#39;br&#39;] &gt;= 8, &#39;br&#39;].unique()
+    new_bed = sfh[&#39;br&#39;].replace(eight_up, 8)
+    return sfh.assign(br=new_bed)
 
-<span class="n">sfh</span> <span class="o">=</span> <span class="p">(</span><span class="n">sfh_all</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">log_vals</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">clip_br</span><span class="p">)</span>
-<span class="p">)</span>
+sfh = (sfh_all
+ .pipe(subset)
+ .pipe(log_vals)
+ .pipe(clip_br)
+)
        
-<span class="n">sfh</span>
+sfh
 </pre></div>
 </div>
 </div>
@@ -2345,7 +2345,7 @@ to 5 bedrooms, and for the largest houses (those with 6, 7, and 8+ bedrooms),
 there is nearly the same distribution of log-transformed sale price.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;br&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sns.boxplot(data=sfh, x=&#39;br&#39;, y=&#39;log_price&#39;);
 </pre></div>
 </div>
 </div>
@@ -2368,31 +2368,31 @@ plot has an added smooth curve that reflects the local average price or price
 per square foot) for buildings of roughly the same size. What do you see?</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.nonparametric.smoothers_lowess</span> <span class="kn">import</span> <span class="n">lowess</span>
-<span class="n">color1</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">color2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from statsmodels.nonparametric.smoothers_lowess import lowess
+color1 = sns.color_palette()[1]
+color2 = sns.color_palette()[2]
 
-<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 4))
 
-<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
-<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">curve</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">],</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">],</span> <span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span>
-               <span class="n">xvals</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">return_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">curve</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color1</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+sns.scatterplot(data=sfh, x=&#39;log_bsqft&#39;, y=&#39;log_price&#39;,
+                alpha=0.1, s=20, ax=ax1)
+xs = np.linspace(2.5, 4, 100)
+curve = lowess(sfh[&#39;log_price&#39;], sfh[&#39;log_bsqft&#39;], frac=1/10,
+               xvals=xs, return_sorted=False)
+ax1.plot(xs, curve, color=color1, linewidth=3)
 
-<span class="n">ppsf</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-    <span class="n">ppsf</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">],</span> 
-    <span class="n">log_ppsf</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ppsf&#39;</span><span class="p">]))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ppsf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;bsqft&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_ppsf&#39;</span><span class="p">,</span>
-                <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;br&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
-<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">6_000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">curve</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">ppsf</span><span class="p">[</span><span class="s1">&#39;log_ppsf&#39;</span><span class="p">],</span> <span class="n">ppsf</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">],</span> <span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span>
-               <span class="n">xvals</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">return_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">curve</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color2</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+ppsf = sfh.assign(
+    ppsf=sfh[&#39;price&#39;] / sfh[&#39;bsqft&#39;], 
+    log_ppsf=lambda df: np.log10(df[&#39;ppsf&#39;]))
+sns.scatterplot(data=ppsf, x=&#39;bsqft&#39;, y=&#39;log_ppsf&#39;,
+                hue=&#39;br&#39;, legend=False,
+                alpha=0.05, s=20, ax=ax2)
+xs = np.linspace(200, 6_000, 100)
+curve = lowess(ppsf[&#39;log_ppsf&#39;], ppsf[&#39;bsqft&#39;], frac=1/10,
+               xvals=xs, return_sorted=False)
+ax2.plot(xs, curve, color=color2, linewidth=3)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+plt.tight_layout()
 </pre></div>
 </div>
 </div>
@@ -2412,19 +2412,19 @@ further and examine relationships for a few cities.</p>
 <p>Before we proceed, we’ll save the price per square foot transforms into <code class="docutils literal notranslate"><span class="pre">sfh</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_ppsf</span><span class="p">(</span><span class="n">sfh</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-    <span class="n">ppsf</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">],</span> 
-    <span class="n">log_ppsf</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ppsf&#39;</span><span class="p">]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def compute_ppsf(sfh):
+    return sfh.assign(
+    ppsf=sfh[&#39;price&#39;] / sfh[&#39;bsqft&#39;], 
+    log_ppsf=lambda df: np.log10(df[&#39;ppsf&#39;]))
 
-<span class="n">sfh</span> <span class="o">=</span> <span class="p">(</span><span class="n">sfh_all</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">log_vals</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">clip_br</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">compute_ppsf</span><span class="p">)</span>
-<span class="p">)</span>
+sfh = (sfh_all
+ .pipe(subset)
+ .pipe(log_vals)
+ .pipe(clip_br)
+ .pipe(compute_ppsf)
+)
 
-<span class="n">sfh</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+sfh.head(2)
 </pre></div>
 </div>
 </div>
@@ -2497,23 +2497,23 @@ and Orinda, three neighboring bedroom communities), and Piedmont.
 We start by combining cities to create Lamorinda:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_lamorinda</span><span class="p">(</span><span class="n">sfh</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">sfh</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span>
-        <span class="s1">&#39;city&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;Lafayette&#39;</span><span class="p">:</span> <span class="s1">&#39;Lamorinda&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Moraga&#39;</span><span class="p">:</span> <span class="s1">&#39;Lamorinda&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Orinda&#39;</span><span class="p">:</span> <span class="s1">&#39;Lamorinda&#39;</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">})</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def make_lamorinda(sfh):
+    return sfh.replace({
+        &#39;city&#39;: {
+            &#39;Lafayette&#39;: &#39;Lamorinda&#39;,
+            &#39;Moraga&#39;: &#39;Lamorinda&#39;,
+            &#39;Orinda&#39;: &#39;Lamorinda&#39;,
+        }
+    })
 
-<span class="n">sfh</span> <span class="o">=</span> <span class="p">(</span><span class="n">sfh_all</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">log_vals</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">clip_br</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">compute_ppsf</span><span class="p">)</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">make_lamorinda</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">sfh</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+sfh = (sfh_all
+ .pipe(subset)
+ .pipe(log_vals)
+ .pipe(clip_br)
+ .pipe(compute_ppsf)
+ .pipe(make_lamorinda)
+)
+sfh.head(2)
 </pre></div>
 </div>
 </div>
@@ -2582,13 +2582,13 @@ and Piedmont tend to have more expensive homes and Richmond has the least
 expensive, but there is overlap in sale price for all areas.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cities</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Richmond&#39;</span><span class="p">,</span> <span class="s1">&#39;El Cerrito&#39;</span><span class="p">,</span> <span class="s1">&#39;Albany&#39;</span><span class="p">,</span> <span class="s1">&#39;Berkeley&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;Walnut Creek&#39;</span><span class="p">,</span> <span class="s1">&#39;Lamorinda&#39;</span><span class="p">,</span> <span class="s1">&#39;Piedmont&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>cities = [&#39;Richmond&#39;, &#39;El Cerrito&#39;, &#39;Albany&#39;, &#39;Berkeley&#39;,
+          &#39;Walnut Creek&#39;, &#39;Lamorinda&#39;, &#39;Piedmont&#39;]
 
-<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;city in @cities&#39;</span><span class="p">),</span>
-            <span class="n">x</span><span class="o">=</span><span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">)</span>
+sns.boxplot(data=sfh.query(&#39;city in @cities&#39;),
+            x=&#39;city&#39;, y=&#39;log_price&#39;)
 
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">);</span>
+plt.xticks(rotation=45);
 </pre></div>
 </div>
 </div>
@@ -2601,11 +2601,11 @@ size. How does this plot help you think about the importance of location to
 home value?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">four_cities</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Berkeley&#39;</span><span class="p">,</span> <span class="s1">&#39;Lamorinda&#39;</span><span class="p">,</span> <span class="s1">&#39;Piedmont&#39;</span><span class="p">,</span> <span class="s1">&#39;Richmond&#39;</span><span class="p">]</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;city in @four_cities&#39;</span><span class="p">),</span>
-           <span class="n">x</span><span class="o">=</span><span class="s1">&#39;bsqft&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_ppsf&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;city&#39;</span><span class="p">,</span>
-           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
-           <span class="n">ci</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>four_cities = [&#39;Berkeley&#39;, &#39;Lamorinda&#39;, &#39;Piedmont&#39;, &#39;Richmond&#39;]
+sns.lmplot(data=sfh.query(&#39;city in @four_cities&#39;),
+           x=&#39;bsqft&#39;, y=&#39;log_ppsf&#39;, hue=&#39;city&#39;,
+           scatter_kws={&#39;s&#39;: 20, &#39;alpha&#39;: 0.1},
+           ci=False);
 </pre></div>
 </div>
 </div>
@@ -2638,25 +2638,25 @@ April 2003 so they all begin at 1. (A value of 1.5 for the 90th percentile in
 2003.)</p>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_dates</span><span class="p">(</span><span class="n">sfh</span><span class="p">):</span>
-    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">dates</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def parse_dates(sfh):
+    dates = pd.to_datetime(sfh[&#39;date&#39;], infer_datetime_format=True)
+    return sfh.assign(date=dates).set_index(&#39;date&#39;)
 
-<span class="n">percs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
+percs = [10, 30, 50, 70, 90]
 
-<span class="k">def</span> <span class="nf">find_percentiles</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
-    <span class="n">prices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">percs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">percs</span><span class="p">)</span>
+def find_percentiles(series):
+    prices = np.percentile(series, percs, interpolation=&#39;lower&#39;)
+    return pd.Series(prices, index=percs)
 
-<span class="n">monthly_percentiles</span> <span class="o">=</span> <span class="p">(</span><span class="n">sfh_all</span>
- <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_dates</span><span class="p">)</span>
- <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
- <span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
- <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">find_percentiles</span><span class="p">)</span>
- <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
- <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;level_1&#39;</span><span class="p">:</span> <span class="s1">&#39;percentile&#39;</span><span class="p">})</span>
-<span class="p">)</span>
-<span class="n">monthly_percentiles</span>
+monthly_percentiles = (sfh_all
+ .pipe(parse_dates)
+ .resample(&#39;M&#39;)
+ [&#39;price&#39;]
+ .apply(find_percentiles)
+ .reset_index()
+ .rename(columns={&#39;level_1&#39;: &#39;percentile&#39;})
+)
+monthly_percentiles
 </pre></div>
 </div>
 </div>
@@ -2734,14 +2734,14 @@ April 2003 so they all begin at 1. (A value of 1.5 for the 90th percentile in
 </div>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rel_prices</span> <span class="o">=</span> <span class="p">(</span><span class="n">monthly_percentiles</span>
- <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;percentile&#39;</span><span class="p">)</span>
- <span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
- <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rel_prices = (monthly_percentiles
+ .groupby(&#39;percentile&#39;)
+ [&#39;price&#39;]
+ .transform(lambda s: s / s.iloc[0])
+)
 
-<span class="n">rel_percentiles</span> <span class="o">=</span> <span class="n">monthly_percentiles</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">rel_price</span><span class="o">=</span><span class="n">rel_prices</span><span class="p">)</span>
-<span class="n">rel_percentiles</span>
+rel_percentiles = monthly_percentiles.assign(rel_price=rel_prices)
+rel_percentiles
 </pre></div>
 </div>
 </div>
@@ -2827,9 +2827,9 @@ April 2003 so they all begin at 1. (A value of 1.5 for the 90th percentile in
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">rel_percentiles</span><span class="p">,</span>
-             <span class="n">x</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;rel_price&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;percentile&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.03</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">borderaxespad</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sns.lineplot(data=rel_percentiles,
+             x=&#39;date&#39;, y=&#39;rel_price&#39;, hue=&#39;percentile&#39;)
+plt.legend(bbox_to_anchor=(1.03, 1), borderaxespad=0);
 </pre></div>
 </div>
 </div>

@@ -1407,24 +1407,24 @@ losses for overestimating the weight compared to underestimating the weight.</p>
 The plot below shows the asymmetry for the relative error: <span class="math notranslate nohighlight">\(100(y - \hat{y})/\hat{y}\)</span>, where <span class="math notranslate nohighlight">\(y\)</span> is the true value and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the prediction. For this plot, -10 on the x-axis reflects overestimating the weight by 10%.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">anes_loss</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def anes_loss(x):
+    w = (x &gt;= 0) + 3 * (x &lt; 0)
+    return np.square(x) * w
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">anes_loss</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>xs = np.linspace(-40, 40, 500)
+loss = anes_loss(xs)
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Modified Quadratic Loss&#39;</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+fig = px.line(x=xs, y=loss, title=&#39;Modified Quadratic Loss&#39;,
+              width=350, height=250)
 
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">xlabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;relative error (%)&#39;</span><span class="p">)</span>
-<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;loss&#39;</span><span class="p">)</span>
+margin(fig, t=30)
+xlabel(fig, &#39;relative error (%)&#39;)
+ylabel(fig, &#39;loss&#39;)
 </pre></div>
 </div>
 </div>
@@ -1445,9 +1445,9 @@ create a design matrix <span class="math notranslate nohighlight">\( X \)</span>
 We’ll also create the <span class="math notranslate nohighlight">\(y\)</span> vector of observed donkey weights.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">train_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">]]</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">train_set</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
-<span class="n">X</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X = train_set.assign(intr=1)[[&#39;intr&#39;, &#39;Girth&#39;]]
+y = train_set[&#39;Weight&#39;]
+X
 </pre></div>
 </div>
 </div>
@@ -1523,25 +1523,25 @@ To make things simpler, this time we’ll instead use the
 algorithm to find <span class="math notranslate nohighlight">\( \theta_0 \)</span> and <span class="math notranslate nohighlight">\( \theta_1 \)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.optimize import minimize
 
-<span class="k">def</span> <span class="nf">training_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-        <span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span> <span class="o">/</span> <span class="n">predicted</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">loss</span>
+def training_loss(X, y):
+    def loss(theta):
+        predicted = X @ theta
+        return np.mean(anes_loss(100 * (y - predicted) / predicted))
+    return loss
 
-<span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-<span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+results = minimize(training_loss(X, y), np.ones(2))
+theta_hat = results[&#39;x&#39;]
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;After fitting:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;θ₀ = </span><span class="si">{</span><span class="n">theta_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">&gt;7.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;θ₁ = </span><span class="si">{</span><span class="n">theta_hat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">&gt;7.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(&#39;After fitting:&#39;)
+print(f&#39;θ₀ = {theta_hat[0]:&gt;7.2f}&#39;)
+print(f&#39;θ₁ = {theta_hat[1]:&gt;7.2f}&#39;)
 </pre></div>
 </div>
 </div>
@@ -1559,12 +1559,12 @@ then look at the residual plot.
 The plot below shows the model error as a percentage of the predicted value.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_hat</span>
-<span class="n">resids</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span> <span class="o">/</span> <span class="n">predicted</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predicted = X @ theta_hat
+resids = 100 * (y - predicted) / predicted
 
-<span class="n">resid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;predicted weight&#39;</span><span class="p">:</span> <span class="n">predicted</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">:</span> <span class="n">resids</span><span class="p">})</span>
-<span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;predicted weight&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
-           <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+resid = pd.DataFrame({&#39;predicted weight&#39;: predicted, &#39;% error&#39;: resids})
+px.scatter(resid, x=&#39;predicted weight&#39;, y=&#39;% error&#39;,
+           width=350, height=250)
 </pre></div>
 </div>
 </div>
@@ -1580,14 +1580,14 @@ We have three numeric variables: <code class="docutils literal notranslate"><spa
 There are 7 total ways to combine these variables:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import itertools
 
-<span class="n">numeric_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Height&#39;</span><span class="p">]</span>
+numeric_vars = [&#39;Girth&#39;, &#39;Length&#39;, &#39;Height&#39;]
 
-<span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
-          <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-          <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">numeric_vars</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span>
-<span class="n">models</span>
+models = [list(subset)
+          for n in [1, 2, 3]
+          for subset in itertools.combinations(numeric_vars, n)]
+models
 </pre></div>
 </div>
 </div>
@@ -1607,16 +1607,16 @@ There are 7 total ways to combine these variables:</p>
 Then, we can look at how well each model does on the training set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_error</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">train_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="p">]]</span>
-    <span class="n">theta_hat</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-    <span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_hat</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span><span class="o">/</span> <span class="n">predicted</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def training_error(model):
+    X = train_set.assign(intr=1)[[&#39;intr&#39;, *model]]
+    theta_hat = minimize(training_loss(X, y), np.ones(X.shape[1]))[&#39;x&#39;]
+    predicted = X @ theta_hat
+    return np.mean(anes_loss(100 * (y - predicted)/ predicted))
 
-<span class="n">model_risks</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">training_error</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span>
-<span class="p">]</span>
+model_risks = [
+    training_error(model)
+    for model in models
+]
 </pre></div>
 </div>
 </div>
@@ -1748,13 +1748,13 @@ We can then see which categorical variables improve on our
 previous two-variable model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_one_hot</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">train_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">]]</span>
-    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_female&#39;</span><span class="p">])</span>
-<span class="p">)</span>
-<span class="n">X_one_hot</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X_one_hot = (
+    train_set.assign(intr=1)
+    [[&#39;intr&#39;, &#39;Length&#39;, &#39;Girth&#39;, &#39;BCS&#39;, &#39;Age&#39;, &#39;Sex&#39;]]
+    .pipe(pd.get_dummies, columns=[&#39;BCS&#39;, &#39;Age&#39;, &#39;Sex&#39;])
+    .drop(columns=[&#39;BCS_3.0&#39;, &#39;Age_5-10&#39;, &#39;Sex_female&#39;])
+)
+X_one_hot
 </pre></div>
 </div>
 </div>
@@ -1885,11 +1885,11 @@ including the intercept term <code class="docutils literal notranslate"><span cl
 <p>We fit the model that includes the dummies from all three categorical features, along with <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and <code class="docutils literal notranslate"><span class="pre">Length</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X_one_hot</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X_one_hot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-<span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_one_hot</span> <span class="o">@</span> <span class="n">theta_hat</span>
-<span class="n">training_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">)))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training error: </span><span class="si">{</span><span class="n">training_error</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>results = minimize(training_loss(X_one_hot, y), np.ones(X_one_hot.shape[1]))
+theta_hat = results[&#39;x&#39;]
+y_pred = X_one_hot @ theta_hat
+training_error = (np.mean(anes_loss(100 * (y - y_pred)/ y_pred)))
+print(f&#39;Training error: {training_error:.2f}&#39;)
 </pre></div>
 </div>
 </div>
@@ -1905,25 +1905,25 @@ To do this, we’ll look at the coefficients for each of the dummy variables,
 as shown in the plot below.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bcs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_2.0&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_2.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_3.5&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS_4.0&#39;</span><span class="p">]</span>
-<span class="n">age_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Age_&lt;2&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_2-5&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_&gt;20&#39;</span><span class="p">]</span>
-<span class="n">sex_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Sex_gelding&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_stallion&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bcs_vars = [&#39;BCS_1.5&#39;, &#39;BCS_2.0&#39;, &#39;BCS_2.5&#39;, &#39;BCS_3.5&#39;, &#39;BCS_4.0&#39;]
+age_vars = [&#39;Age_&lt;2&#39;, &#39;Age_2-5&#39;, &#39;Age_10-15&#39;, &#39;Age_15-20&#39;, &#39;Age_&gt;20&#39;]
+sex_vars = [&#39;Sex_gelding&#39;, &#39;Sex_stallion&#39;]
 
-<span class="n">thetas</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;var&#39;</span><span class="p">:</span> <span class="n">X_one_hot</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;theta_hat&#39;</span><span class="p">:</span> <span class="n">theta_hat</span><span class="p">})</span>
-          <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">))</span>
+thetas = (pd.DataFrame({&#39;var&#39;: X_one_hot.columns, &#39;theta_hat&#39;: theta_hat})
+          .set_index(&#39;var&#39;))
 
-<span class="n">f1</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bcs_vars</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;theta_hat&#39;</span><span class="p">)</span>
-<span class="n">f2</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sex_vars</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;theta_hat&#39;</span><span class="p">)</span>
-<span class="n">f3</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">age_vars</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;theta_hat&#39;</span><span class="p">)</span>
+f1 = px.scatter(thetas.loc[bcs_vars].reset_index(), x=&#39;var&#39;, y=&#39;theta_hat&#39;)
+f2 = px.scatter(thetas.loc[sex_vars].reset_index(), x=&#39;var&#39;, y=&#39;theta_hat&#39;)
+f3 = px.scatter(thetas.loc[age_vars].reset_index(), x=&#39;var&#39;, y=&#39;theta_hat&#39;)
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plots_in_row</span><span class="p">([</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">],</span>
-                   <span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span>
-                   <span class="n">shared_yaxes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                   <span class="n">column_widths</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+fig = plots_in_row([f1, f2, f3],
+                   width=700,
+                   shared_yaxes=True,
+                   column_widths=[0.3, 0.2, 0.5])
 
-<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;theta_hat&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">tickangle</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+ylabel(fig, &#39;theta_hat&#39;, row=1, col=1)
+fig.update_xaxes(tickangle=45)
+fig.update_traces(marker_size=10)
 </pre></div>
 </div>
 </div>
@@ -1934,30 +1934,30 @@ as shown in the plot below.</p>
 <p>We update the design matrix in view of these findings and refit the simpler model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">combine_bcs</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
-    <span class="n">new_bcs_2</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">X</span><span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;BCS_2.0&#39;</span><span class="p">:</span> <span class="n">new_bcs_2</span><span class="p">})</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS_1.5&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def combine_bcs(X):
+    new_bcs_2 = X[&#39;BCS_2.0&#39;] + X[&#39;BCS_1.5&#39;]
+    return X.assign(**{&#39;BCS_2.0&#39;: new_bcs_2}).drop(columns=[&#39;BCS_1.5&#39;])
 
-<span class="k">def</span> <span class="nf">combine_age_and_sex</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Age_10-15&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_15-20&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_&gt;20&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;Sex_gelding&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_stallion&#39;</span><span class="p">])</span>
+def combine_age_and_sex(X):
+    return X.drop(columns=[&#39;Age_10-15&#39;, &#39;Age_15-20&#39;, &#39;Age_&gt;20&#39;,
+                           &#39;Sex_gelding&#39;, &#39;Sex_stallion&#39;])
 
-<span class="n">X_one_hot_simple</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">X_one_hot</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_bcs</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_age_and_sex</span><span class="p">)</span>
-<span class="p">)</span>
+X_one_hot_simple = (
+    X_one_hot.pipe(combine_bcs)
+    .pipe(combine_age_and_sex)
+)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X_one_hot_simple</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
-                   <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X_one_hot_simple</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-<span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
-<span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_one_hot_simple</span> <span class="o">@</span> <span class="n">theta_hat</span>
-<span class="n">training_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">)))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training error: </span><span class="si">{</span><span class="n">training_error</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>results = minimize(training_loss(X_one_hot_simple, y),
+                   np.ones(X_one_hot_simple.shape[1]))
+theta_hat = results[&#39;x&#39;]
+y_pred = X_one_hot_simple @ theta_hat
+training_error = (np.mean(anes_loss(100 * (y - y_pred)/ y_pred)))
+print(f&#39;Training error: {training_error:.2f}&#39;)
 </pre></div>
 </div>
 </div>
@@ -2054,16 +2054,16 @@ as shown in the plot below.</p>
 To do this, we need to prepare the test set. Our model uses the girth and length of the donkey, as well as dummy variables for the donkey’s age and body condition score.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_test</span> <span class="o">=</span> <span class="n">test_set</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y_test = test_set[&#39;Weight&#39;]
 
-<span class="n">X_test</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">test_set</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">intr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="p">[[</span><span class="s1">&#39;intr&#39;</span><span class="p">,</span> <span class="s1">&#39;Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Girth&#39;</span><span class="p">,</span> <span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">]]</span>
-    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BCS_3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;Age_5-10&#39;</span><span class="p">,</span> <span class="s1">&#39;Sex_female&#39;</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_bcs</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_age_and_sex</span><span class="p">)</span>
-<span class="p">)</span>
+X_test = (
+    test_set.assign(intr=1)
+    [[&#39;intr&#39;, &#39;Length&#39;, &#39;Girth&#39;, &#39;BCS&#39;, &#39;Age&#39;, &#39;Sex&#39;]]
+    .pipe(pd.get_dummies, columns=[&#39;BCS&#39;, &#39;Age&#39;, &#39;Sex&#39;])
+    .drop(columns=[&#39;BCS_3.0&#39;, &#39;Age_5-10&#39;, &#39;Sex_female&#39;])
+    .pipe(combine_bcs)
+    .pipe(combine_age_and_sex)
+)
 </pre></div>
 </div>
 </div>
@@ -2071,22 +2071,22 @@ To do this, we need to prepare the test set. Our model uses the girth and length
 <p>We consolidated all of our manipulations of the design matrix to create the final version that we settled on in our modeling with the training set. Now we are ready to use the <span class="math notranslate nohighlight">\(\theta\)</span>s that we fitted with the training set to make weight predictions for those donkeys in the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">X_test</span> <span class="o">@</span> <span class="n">theta_hat</span>
-<span class="n">test_set_error</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred_test</span><span class="p">)</span> <span class="o">/</span> <span class="n">y_pred_test</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y_pred_test = X_test @ theta_hat
+test_set_error = 100 * (y_test - y_pred_test) / y_pred_test
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y_pred_test</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_set_error</span><span class="p">,</span>
-                 <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Test Set Predictions&#39;</span><span class="p">,</span>
-                 <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">xlabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;Predicted Weight&#39;</span><span class="p">)</span>
-<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;Relative Error (%)&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.scatter(x=y_pred_test, y=test_set_error,
+                 title=&#39;Test Set Predictions&#39;,
+                 width=350, height=250)
+fig.add_hline(10, line_width=3, line_color=&#39;green&#39;)
+fig.add_hline(-10, line_width=3, line_color=&#39;green&#39;)
+margin(fig, t=30)
+xlabel(fig, &#39;Predicted Weight&#39;)
+ylabel(fig, &#39;Relative Error (%)&#39;)
 </pre></div>
 </div>
 </div>
@@ -2100,24 +2100,24 @@ and five of the errors that exceed 10% err on the side of underestimation.
 This makes sense given that our loss function penalized overestimation more. The scatter plot below shows the actual and predicted values.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">y_pred_test</span><span class="p">,</span> 
-                 <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Test Set Predictions with 10</span><span class="si">% E</span><span class="s2">rror Lines&quot;</span><span class="p">,</span>
-                 <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.scatter(y=y_test, x=y_pred_test, 
+                 title=&quot;Test Set Predictions with 10% Error Lines&quot;,
+                 width=350, height=350)
 
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;0</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
-                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
-                         <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">66</span><span class="p">,</span> <span class="mi">220</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;10</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
-                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
-                         <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">54</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;-10</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
-                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
-                         <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)))</span>
+fig.add_trace(go.Scatter(x=[60, 200], y=[60, 200], name=&#39;0% error&#39;,
+                         mode=&#39;lines&#39;,
+                         marker=dict(color=&#39;green&#39;)))
+fig.add_trace(go.Scatter(x=[60, 200], y=[66, 220], name=&#39;10% error&#39;,
+                         mode=&#39;lines&#39;,
+                         marker=dict(color=&#39;red&#39;)))
+fig.add_trace(go.Scatter(x=[60, 200], y=[54, 180], name=&#39;-10% error&#39;,
+                         mode=&#39;lines&#39;,
+                         marker=dict(color=&#39;red&#39;)))
 
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">xlabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;Predicted Weight&quot;</span><span class="p">)</span>
-<span class="n">ylabel</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;Actual Weight&quot;</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+fig.update_layout(showlegend=False)
+xlabel(fig, &quot;Predicted Weight&quot;)
+ylabel(fig, &quot;Actual Weight&quot;)
+margin(fig, t=30)
 </pre></div>
 </div>
 </div>
