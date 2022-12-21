@@ -1268,9 +1268,9 @@
                 
   <div class="section" id="example-measuring-air-quality">
 <span id="sec-theory-measurementerror"></span><h1><span class="section-number">3.4. </span>Example: Measuring Air Quality<a class="headerlink" href="#example-measuring-air-quality" title="Permalink to this headline">¶</a></h1>
-<p>Across the US, sensors to measure air pollution are widely used by individuals, community groups, and state and local air monitoring agencies <span id="id1">[<a class="reference internal" href="../../references.html#id14">Hug, 2020</a>, <a class="reference internal" href="../../references.html#id13">Owyang, 2020</a>]</span>. For example, on two days in September, 2020, approximately 600,000 Californians and 500,000 Oregonians viewed PurpleAir’s map as fire spread through their states and evacuations were planned. (PurpleAir creates air quality maps from crowd-sourced data that streams in from their sensors.)</p>
-<p>The sensors measure the amount of particulate matter in the air that have a diameter smaller than 2.5 micrometers (the unit of measurement is micrograms per cubic meter: μg/m3). These measurements are 2-minute averages. The level of particulate matter changes over the course of a day as, for example, people commute to and from work. But at certain times of the day, such as midnight, we expect the 2-minute averages to change little in a half-hour so we can get a sense of the variability in the instrument and in the mixing of particles in the air, if we examine the measurements taken during these times of the day.</p>
-<p>We can access sensor measurements from PurpleAir’s site, where they provide a data download tool; the data are available for any sensor that appears on the PurpleAir map. We downloaded data from one sensor over a 24-hour period and selected three half-hour time intervals spread  throughout the day where the readings were roughly flat over each 30-minute period. This gives us three sets of 15 two-minute averages for a total of 45 measurements.</p>
+<p>Across the US, sensors to measure air pollution are widely used by individuals, community groups, and state and local air monitoring agencies <a class="footnote-reference brackets" href="#owyang" id="id1">1</a>. For example, on two days in September, 2020, approximately 600,000 Californians and 500,000 Oregonians viewed PurpleAir’s map as fire spread through their states and evacuations were planned. (PurpleAir creates air quality maps from crowd-sourced data that streams in from their sensors.)</p>
+<p>The sensors measure the amount of particulate matter in the air that have a diameter smaller than 2.5 micrometers (the unit of measurement is micrograms per cubic meter: μg/m3). The measurements recorded are the average concentrations over 2-minutes. While the level of particulate matter changes over the course of a day as, for example, people commute to and from work, at certain times of the day, like midnight, we expect the 2-minute averages to change little in a half-hour. If we examine the measurements taken during these times of the day, we can get a sense of the combined variability from the instrument recording and the mixing of particles in the air,</p>
+<p>Anyone can access sensor measurements from PurpleAir’s site. The site provides a download tool, and data are available for any sensor that appears on their map. We downloaded data from one sensor over a 24-hour period and selected three half-hour time intervals spread  throughout the day where the readings were roughly flat over the 30-minute period. This gives us three sets of 15 two-minute averages for a total of 45 measurements.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pm = pd.read_csv(&#39;~/pm30.csv&#39;)
@@ -1366,22 +1366,35 @@ pm
 <p>45 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>A line plot can gives us a sense of variation in the measurements. We expect the measurements to be roughly the same so we can get a sense of the variability in the air and in the instrument.</p>
+<p>A line plot can gives us a sense of variation in the measurements. We expect the measurements to be roughly the same with the exception of minor variations from the particles moving in the air and measurement error of the instrument.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/theory_measurement_error_6_0.svg" src="../../_images/theory_measurement_error_6_0.svg" /></div>
 </div>
-<p>The plot shows us how the air quality worsens throughout the day, but in these particular half-hour intervals, the air quality is roughly 5.4, 6.6, and 8.6 at midnight, eleven in the morning, and seven in the evening, respectively.  We can think of the data scope as follows: at this particular location in a half-hour time interval, there is a true average particle concentration in the air surrounding the sensor. This concentration is our target, and our instrument, the sensor, takes many measurements that form a sample from the access frame (the dart board). If the instrument is working properly, the measurements are centered around the bullseye, and the true 30-minute average coincides with the bullseye.</p>
+<p>The plot shows us how the air quality worsens throughout the day, but in each of these particular half-hour intervals, the air quality is roughly constant at 5.4, 6.6, and 8.6 at midnight, eleven in the morning, and seven in the evening, respectively.  We can think of the data scope as follows: at this particular location in a specific half-hour time interval, there is a true average particle concentration in the air surrounding the sensor. This concentration is our target, and our instrument, the sensor, takes many measurements that form a sample from the access frame. (See <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a> for the dart board analogy of this process). If the instrument is working properly, the measurements are centered around the target–the true 30-minute average.</p>
 <p>To get a better sense of the variation in a half hour interval, we can examine the differences of the measurements from the median for the corresponding half-hour. The distribution of these “errors” appears below.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Deviation from Hourly Median&#39;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Deviation from 30-Minute Median&#39;)
 </pre></div>
 </div>
 <img alt="../../_images/theory_measurement_error_9_1.svg" src="../../_images/theory_measurement_error_9_1.svg" /></div>
 </div>
-<p>The histogram shows us the typical fluctuations in measurements are about 1 μg/m3. Given the hourly measurements range from 4 to 13 μg/m3, the instrument is reasonably accurate.</p>
-<p>We can use the urn model to simulate the variability in measurement process. We place in the urn the deviations of the measurements from their 30-minute averages, and we can create simulated 30-minute measurements by drawing deviations from the urn and adding a constant that represents the true 30-minute average to them.</p>
+<p>The histogram shows us the typical fluctuations in measurements are often less than 0.5 μg/m3 and rarely greater than 1 μg/m3. With instruments, we often consider their relative standard error, which is the standard deviation as a percentage of the mean.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.std(pm[&#39;diff30&#39;])
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6870817156282193
+</pre></div>
+</div>
+</div>
+</div>
+<p>Given the hourly measurements range from 5 to 9 μg/m3, the relative error is 8% to 12%, which is reasonably accurate.</p>
+<p>We can use the urn model to simulate the variability in this measurement process. We place in the urn the deviations of the measurements from their 30-minute averages for all 45 readings, and we simulate a 30-minute air quality sequence of measurements by drawing 15 times with replacement from the urn and adding the deviations drawn to a “true” 30-minute average.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>urn = pm[&quot;diff30&quot;]
@@ -1398,12 +1411,21 @@ aq_imitate = 11 + sample
 </div>
 </div>
 </div>
-<p>We can add this artificial set of measurements to the line plot and compare it to the other three real line plots.</p>
+<p>We can make a line plot for this artificial set of measurements, and add it three real line plots for comparison.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/theory_measurement_error_15_0.svg" src="../../_images/theory_measurement_error_15_0.svg" /></div>
+<img alt="../../_images/theory_measurement_error_17_0.svg" src="../../_images/theory_measurement_error_17_0.svg" /></div>
 </div>
-<p>The shape of the artificial line plot is similar to the others, which indicates that our model for the measurement process is reasonable.  Unfortunately, what we don’t know is whether the measurements are close to the true air quality. To detect bias in the instrument, we need to make comparisons against a more accurate instrument or take measurements in a protected environment where the air has a known quantity of particulate matter. In fact, researchers have found that low humidity can distort the readings so that they are too high <span id="id2">[<a class="reference internal" href="../../references.html#id14">Hug, 2020</a>]</span>. In <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>, carry out a more comprehensive analysis of the PurpleAir sensor measurement error, including bias, and we calibrate these instruments to improve their accuracy.</p>
+<p>The shape of the line plot from the simulated data is similar to the others, which indicates that our model for the measurement process is reasonable.  Unfortunately, what we don’t know is whether the measurements are close to the true air quality. To detect bias in the instrument, we need to make comparisons against a more accurate instrument or take measurements in a protected environment where the air has a known quantity of particulate matter. In fact, researchers have found that low humidity can distort the readings so that they are too high <a class="footnote-reference brackets" href="#hug" id="id2">2</a>. In <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>, we carry out a more comprehensive analysis of the PurpleAir sensor data and calibrate the instruments to improve their accuracy.</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="owyang"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://web-strategist.com/blog/2020/09/20/how-the-crowd-provides-air-quality-data/">https://web-strategist.com/blog/2020/09/20/how-the-crowd-provides-air-quality-data/</a></p>
+</dd>
+<dt class="label" id="hug"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="https://thebolditalic.com/understanding-purpleair-vs-airnow-gov-measurements-of-wood-smoke-pollution-562923a55226">https://thebolditalic.com/understanding-purpleair-vs-airnow-gov-measurements-of-wood-smoke-pollution-562923a55226</a></p>
+</dd>
+</dl>
 </div>
 
     <script type="text/x-thebe-config">
