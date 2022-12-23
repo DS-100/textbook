@@ -1,6 +1,10 @@
-'''
+"""
 Renames chapter folders so that the numbering is always incrementing starting
 from 01.
+
+For example, to insert a new chapter between ch/20 and ch/21, add a new folder
+ch/20a and update _toc.yml to include it. Then this script will rename
+the folders (20a -> 21, 21 -> 22, etc.) and update _toc.yml to match.
 
 Jupyter Book automatically numbers chapters in the order they appear in
 _toc.yml, but we also number the folder names, e.g. ch/05/sql_subsetting. When
@@ -19,7 +23,7 @@ Usage:
 
 Options:
   -c --commit  Renames folders in ch/ and paths in _toc.yml
-'''
+"""
 # %%
 from pathlib import Path
 from docopt import docopt
@@ -27,11 +31,11 @@ from ruamel.yaml import YAML
 from collections import namedtuple
 
 # Use RoundTrip loader to preserve old formatting
-yaml = YAML(typ='rt')
+yaml = YAML(typ="rt")
 
-content_path = Path('.') / 'content'
-ch_path = content_path / 'ch'
-toc_path = content_path / '_toc.yml'
+content_path = Path(".") / "content"
+ch_path = content_path / "ch"
+toc_path = content_path / "_toc.yml"
 
 
 # %%
@@ -42,29 +46,29 @@ def load_toc():
 
 toc = load_toc()
 
-TocLoc = namedtuple('TocLoc', 'part, ch')
+TocLoc = namedtuple("TocLoc", "part, ch")
 
 
 def chapter(tocloc):
     part, ch = tocloc
-    return toc['parts'][part]['chapters'][ch]
+    return toc["parts"][part]["chapters"][ch]
 
 
 def get_folder(chap):
-    intro_file = chap['file']
-    [_, folder_name, *_] = intro_file.split('/')
+    intro_file = chap["file"]
+    [_, folder_name, *_] = intro_file.split("/")
     return folder_name
 
 
 def set_folder(chap, new_folder):
     def set_path(path):
-        parts = path.split('/')
+        parts = path.split("/")
         parts[1] = new_folder
-        return '/'.join(parts)
+        return "/".join(parts)
 
-    chap['file'] = set_path(chap['file'])
-    for section in chap.get('sections', []):
-        section['file'] = set_path(section['file'])
+    chap["file"] = set_path(chap["file"])
+    for section in chap.get("sections", []):
+        section["file"] = set_path(section["file"])
     return chap
 
 
@@ -72,20 +76,20 @@ def set_folder(chap, new_folder):
 def make_folder_counter():
     num = 1
     while True:
-        yield f'{num:02}'
+        yield f"{num:02}"
         num += 1
 
 
-Change = namedtuple('Change', 'loc, current, desired')
+Change = namedtuple("Change", "loc, current, desired")
 
 
 def all_changes():
     changes = []
     new_folders = make_folder_counter()
-    for part_pos, part in enumerate(toc['parts']):
-        if not part.get('numbered'):
+    for part_pos, part in enumerate(toc["parts"]):
+        if not part.get("numbered"):
             continue
-        for ch_pos, chap in enumerate(part['chapters']):
+        for ch_pos, chap in enumerate(part["chapters"]):
             loc = TocLoc(part_pos, ch_pos)
             current = get_folder(chap)
             desired = next(new_folders)
@@ -100,18 +104,18 @@ changes
 
 # %%
 def process_toc_changes(changes):
-    '''Danger! Irreversibly changes _toc.yml'''
+    """Danger! Irreversibly changes _toc.yml"""
     for loc, _, desired in changes:
         set_folder(chapter(loc), desired)
-    with toc_path.open('w') as f:
+    with toc_path.open("w") as f:
         yaml.dump(toc, f)
 
 
 # %%
 def process_folder_changes(changes):
-    '''Danger! Irreversibly changes ch/ folders'''
+    """Danger! Irreversibly changes ch/ folders"""
     # Process in two passes since we need to avoid folder name conflicts
-    temp_suffix = '__temp'
+    temp_suffix = "__temp"
 
     for _, current, desired in changes:
         folder = ch_path / current
@@ -125,24 +129,24 @@ def process_folder_changes(changes):
 # %%
 def renumber_chapters(commit=False):
     changes = all_changes()
-    print(f'Will renumber these {len(changes)} folders:')
+    print(f"Will renumber these {len(changes)} folders:")
     for _, current, desired in changes:
-        print(f'  {current:>4} -> {desired:<4}')
+        print(f"  {current:>4} -> {desired:<4}")
 
     if not commit:
-        print('Rerun with -c to commit changes to disk')
+        print("Rerun with -c to commit changes to disk")
         return
 
-    print('Renaming folders in content/ch/...')
+    print("Renaming folders in content/ch/...")
     process_folder_changes(changes)
 
-    print('Updating content/_toc.yml...')
+    print("Updating content/_toc.yml...")
     process_toc_changes(changes)
 
-    print('Done!')
+    print("Done!")
 
 
 # %%
-if __name__ == '__main__':
-    arguments = docopt(__doc__, version='1.0')
-    renumber_chapters(arguments['--commit'])
+if __name__ == "__main__":
+    arguments = docopt(__doc__, version="1.0")
+    renumber_chapters(arguments["--commit"])
