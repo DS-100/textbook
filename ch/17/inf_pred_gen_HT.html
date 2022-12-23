@@ -1,0 +1,1694 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>17.2. Basics of Hypothesis Testing &#8212; Learning Data Science</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="17.3. Bootstrapping for Inference" href="inf_pred_gen_boot.html" />
+    <link rel="prev" title="17.1. Distributions: Population, Empirical, Sampling" href="inf_pred_gen_dist.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-113006011-1', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Learning Data Science</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <p class="caption">
+ <span class="caption-text">
+  Frontmatter
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../preface.html">
+   To the Data 100 Student
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../prereqs.html">
+   Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notation.html">
+   Notation
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  The Data Science Lifecycle
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../01/lifecycle_intro.html">
+   1. The Data Science Lifecycle
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_cycle.html">
+     1.1. The Stages of the Lifecycle
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_map.html">
+     1.2. Examples of the Lifecycle
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../01/lifecycle_summary.html">
+     1.3. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../02/data_scope_intro.html">
+   2. Questions and Data Scope
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_big_data_hubris.html">
+     2.1. Big Data and New Opportunities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_construct.html">
+     2.2. Target Population, Access Frame, Sample
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_protocols.html">
+     2.3. Instruments and Protocols
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_natural.html">
+     2.4. Measuring Natural Phenomenon
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_accuracy.html">
+     2.5. Accuracy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../02/data_scope_summary.html">
+     2.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../03/theory_intro.html">
+   3. Simulation and Data Design
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_urn.html">
+     3.1. The Urn Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_election.html">
+     3.2. Example: Simulating Election Poll Bias and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_vaccine_efficacy.html">
+     3.3. Example: Simulating a Randomized Trial for a Vaccine
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_measurement_error.html">
+     3.4. Example: Measuring Air Quality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../03/theory_summary.html">
+     3.5. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../04/modeling_intro.html">
+   4. Modeling with Summary Statistics
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_simple.html">
+     4.1. The Constant Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_loss_functions.html">
+     4.2. Loss Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../04/modeling_summary.html">
+     4.3. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../05/bus_intro.html">
+   5. Case Study: Why is my Bus Always Late?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../05/bus_scope.html">
+     5.1. Question and Scope
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../05/bus_clean.html">
+     5.2. Data Wrangling
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../05/bus_eda.html">
+     5.3. Exploring Bus Times
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../05/bus_modeling.html">
+     5.4. Modeling Wait Times
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../05/bus_summary.html">
+     5.5. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Rectangular Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../06/pandas_intro.html">
+   6. Working With Dataframes Using pandas
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_subsetting.html">
+     6.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_aggregating.html">
+     6.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_joining.html">
+     6.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_transforming.html">
+     6.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_other_reps.html">
+     6.5. How are Dataframes Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../06/pandas_summary.html">
+     6.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../07/sql_intro.html">
+   7. Working With Relations Using SQL
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_subsetting.html">
+     7.1. Subsetting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_aggregating.html">
+     7.2. Aggregating
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_joining.html">
+     7.3. Joining
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_transforming.html">
+     7.4. Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_other_reps.html">
+     7.5. How are Relations Different from Other Data Representations?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../07/sql_summary.html">
+     7.6. Conclusion
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Understanding The Data
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../08/files_intro.html">
+   8. Wrangling Files
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_datasets.html">
+     8.1. Data Source Examples
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_formats.html">
+     8.2. File Formats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_size.html">
+     8.3. File Size
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_command_line.html">
+     8.4. The Shell and Command Line Tools
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_granularity.html">
+     8.5. Table Shape and Granularity
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../08/files_summary.html">
+     8.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../09/wrangling_intro.html">
+   9. Wrangling Dataframes
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_co2.html">
+     9.1. Example: Wrangling CO2 Measurements from Mauna Loa Observatory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_checks.html">
+     9.2. Quality Checks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_missing.html">
+     9.3. Missing Values and Records
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_transformations.html">
+     9.4. Transformations and Timestamps
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_structure.html">
+     9.5. Modifying Structure
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_restaurants.html">
+     9.6. Example: Wrangling Restaurant Safety Violations
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../09/wrangling_summary.html">
+     9.7. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../10/eda_intro.html">
+   10. Exploratory Data Analysis
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_feature_types.html">
+     10.1. Feature Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_distributions.html">
+     10.2. What to Look For in a Distribution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_relationships.html">
+     10.3. What to Look For in a Relationship?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_guidelines.html">
+     10.4. Guidelines for Exploration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_example.html">
+     10.5. Example: Sale Prices for Houses
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../10/eda_summary.html">
+     10.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../11/viz_intro.html">
+   11. Data Visualization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_scale.html">
+     11.1. Choosing Scale to Reveal Structure
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_smoothing.html">
+     11.2. Smoothing and Aggregating Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_comparisons.html">
+     11.3. Facilitating Meaningful Comparisons
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_data_design.html">
+     11.4. Incorporating the Data Design
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_context.html">
+     11.5. Adding Context
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_plotly.html">
+     11.6. Creating Plots Using
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       plotly
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_other_tools.html">
+     11.7. Other Tools for Visualization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../11/viz_summary.html">
+     11.8. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../12/pa_intro.html">
+   12. Case Study: Data Science for Accurate and Timely Air Quality Measurements
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/pa_collocated.html">
+     12.1. Finding Collocated Sensors
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/pa_cleaning_aqs.html">
+     12.2. Exploring and Cleaning AQS Sensor Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/pa_cleaning_purpleair.html">
+     12.3. Exploring and Cleaning PurpleAir Sensor Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/pa_modeling.html">
+     12.4. Creating a Model to Correct PurpleAir Measurements
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../12/pa_conclusion.html">
+     12.5. In Conclusion
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Other Data Sources
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../13/text_intro.html">
+   13. Working with Text
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_examples.html">
+     13.1. Examples of Text and Tasks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_strings.html">
+     13.2. String Manipulation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_regex.html">
+     13.3. Regular Expressions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_sotu.html">
+     13.4. Text Analysis
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../13/text_summary.html">
+     13.5. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../14/web_intro.html">
+   14. Web Technologies
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_http.html">
+     14.1. HTTP
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_rest.html">
+     14.2. [In Progress] REST
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../14/web_html.html">
+     14.3. [In Progress] XPath and HTML
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Linear Modeling
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../15/linear_intro.html">
+   15. Linear Models
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+  <label for="toctree-checkbox-15">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_simple.html">
+     15.1. Simple Linear Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_simple_fit.html">
+     15.2. Fitting the Simple Linear Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_multi.html">
+     15.3. Multiple Linear Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_multi_fit.html">
+     15.4. Fitting the Multiple Linear Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_case.html">
+     15.5. Example: Where is the Land of Opportunity?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_feature_eng.html">
+     15.6. Feature Engineering for Numeric Measurements
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_categorical.html">
+     15.7. Feature Engineering for Categorical Measurements
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_summary.html">
+     15.8. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../16/ms_intro.html">
+   16. Model Selection
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+  <label for="toctree-checkbox-16">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/ms_overfitting.html">
+     16.1. Overfitting
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/ms_train_test.html">
+     16.2. Train-Test Split
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/ms_cv.html">
+     16.3. Cross-Validation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/ms_regularization.html">
+     16.4. Regularization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/ms_risk.html">
+     16.5. Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../16/ms_summary.html">
+     16.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="inf_pred_gen_intro.html">
+   17. Theory for Inference and Prediction
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+  <label for="toctree-checkbox-17">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_dist.html">
+     17.1. Distributions: Population, Empirical, Sampling
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     17.2. Basics of Hypothesis Testing
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_boot.html">
+     17.3. Bootstrapping for Inference
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_CI.html">
+     17.4. Basics of Confidence Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_PI.html">
+     17.5. Basics of Prediction Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_prob.html">
+     17.6. Probability for Inference and Prediction
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="inf_pred_gen_summary.html">
+     17.7. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../18/donkey_intro.html">
+   18. Case Study: How to Weigh a Donkey
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+  <label for="toctree-checkbox-18">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_scope.html">
+     18.1. Donkey Study Question and Scope
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_clean.html">
+     18.2. Wrangling and Transforming
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_eda.html">
+     18.4. Exploring
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_model.html">
+     18.5. Modeling a Donkey’s Weight
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../18/donkey_summary.html">
+     18.6. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Classification
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../19/classification_intro.html">
+   19. Classification
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+  <label for="toctree-checkbox-19">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_prob.html">
+     19.1. Regression on Probabilities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_log_model.html">
+     19.2. The Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_cost.html">
+     19.3. A Loss Function for the Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_log_reg.html">
+     19.4. Using Logistic Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_cost_justification.html">
+     19.5. Approximating the Empirical Probability Distribution
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_sgd.html">
+     19.6. Fitting a Logistic Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_sensitivity_specificity.html">
+     19.7. Evaluating Logistic Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../19/classification_multiclass.html">
+     19.8. Multiclass Classification
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../20/gd_intro.html">
+   20. Numerical Optimization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/>
+  <label for="toctree-checkbox-20">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/gd_basics.html">
+     20.1. Gradient Descent Basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/gd_example.html">
+     20.2. Minimizing Huber Loss
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/gd_convex.html">
+     20.3. Convex and Differentiable Loss Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/gd_alternative.html">
+     20.4. Variants of Gradient Descent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../20/gd_summary.html">
+     20.5. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../21/fake_news_intro.html">
+   21. Case Study: Detecting Fake News
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/>
+  <label for="toctree-checkbox-21">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/fake_news_question.html">
+     21.1. Question and Scope
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/fake_news_data.html">
+     21.2. Obtaining and Wrangling the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/fake_news_exploring.html">
+     21.3. Exploring the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/fake_news_modeling.html">
+     21.4. Modeling
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../21/fake_news_summary.html">
+     21.5. Summary
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Extra Topics
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../22/repl_intro.html">
+   22. Replicable Research
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/>
+  <label for="toctree-checkbox-22">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../22/repl_phacking.html">
+     22.1. P-hacking
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../23/pca_intro.html">
+   23. Dimensionality Reduction and PCA
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/>
+  <label for="toctree-checkbox-23">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../23/pca_dims.html">
+     23.1. Dimensions of a Data Table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../23/pca_svd.html">
+     23.2. PCA using the Singular Value Decomposition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../23/pca_in_practice.html">
+     23.3. PCA in Practice
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../24/dtrees_intro.html">
+   24. Decision Trees and Random Forests
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../25/clustering_intro.html">
+   25. Clustering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Appendices
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a01/prob_review.html">
+   Probability Review
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a02/vector_space_review.html">
+   Vector Space Review
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a03/hyp_intro.html">
+   Statistical Inference Review
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/>
+  <label for="toctree-checkbox-24">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction.html">
+     Hypothesis Testing and Confidence Intervals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a03/hyp_introduction_part2.html">
+     Permutation Test
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a04/ref_intro.html">
+   Reference Tables
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/>
+  <label for="toctree-checkbox-25">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_pandas.html">
+     pandas
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_seaborn.html">
+     Seaborn
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_matplotlib.html">
+     matplotlib
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a04/ref_sklearn.html">
+     scikit-learn
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a05/bias_intro.html">
+   The Bias-Variance Tradeoff
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/>
+  <label for="toctree-checkbox-26">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a05/bias_risk.html">
+     Risk and Loss Minimization
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a05/bias_modeling.html">
+     Model Bias and Variance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a05/bias_cv.html">
+     Cross-Validation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../a06/reg_intro.html">
+   Regularization
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-27" name="toctree-checkbox-27" type="checkbox"/>
+  <label for="toctree-checkbox-27">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a06/reg_intuition.html">
+     Regularization Intuition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a06/reg_ridge.html">
+     L2 Regularization: Ridge Regression
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../a06/reg_lasso.html">
+     L1 Regularization: Lasso Regression
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../a07/contributors.html">
+   Contributors
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../references.html">
+   References
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/ch/17/inf_pred_gen_HT.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        
+        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/17/inf_pred_gen_HT.ipynb&branch=master"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch JupyterHub" data-toggle="tooltip"
+                data-placement="left"><img class="jupyterhub-button-logo"
+                    src="../../_static/images/logo_jupyterhub.svg"
+                    alt="Interact on JupyterHub">JupyterHub</button></a>
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-a-rank-test-to-compare-productivity-of-wikipedia-contributors">
+   17.2.1. Example: A Rank-test to Compare Productivity of Wikipedia Contributors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-a-test-of-proportions-for-vaccine-efficacy">
+   17.2.2. Example: A test of proportions for vaccine efficacy
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Basics of Hypothesis Testing</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-a-rank-test-to-compare-productivity-of-wikipedia-contributors">
+   17.2.1. Example: A Rank-test to Compare Productivity of Wikipedia Contributors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-a-test-of-proportions-for-vaccine-efficacy">
+   17.2.2. Example: A test of proportions for vaccine efficacy
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="basics-of-hypothesis-testing">
+<h1><span class="section-number">17.2. </span>Basics of Hypothesis Testing<a class="headerlink" href="#basics-of-hypothesis-testing" title="Permalink to this headline">¶</a></h1>
+<p>A hypothesis test can offer support for your model, and it can help formally refute some other understanding of the world. There are four basic steps to hypothesis testing:</p>
+<ol class="simple">
+<li><p>Set up: You have your data, and you want to test whether a particular model is reasonably consistent with the data. So, you specify a statistic, <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>, such as the sample average, fraction of zeros in a sample, or fitted regression coefficient, with the goal of comparing your data’s statistic to what might have been produced under the model.</p></li>
+<li><p>Model: You spell out the model that you want to test in the form of a data generation mechanism, along with any specific assumptions about the population. This model typically includes specifying <span class="math notranslate nohighlight">\(\theta^*\)</span>, which may be the population mean, the proportion of zeros, or a regression coefficient. The sampling distribution of the statistic under this model is referred to as the null distribution, and the model itself is called the <em>Null Hypothesis</em>.</p></li>
+<li><p>Compute: How likely, according to the null model in Step 2, is it to get data (and the resulting statistic) at least as extreme as what you actually got in Step 1?  In formal inference, this probability is called the <span class="math notranslate nohighlight">\(p\)</span>-<em>value</em>. To approximate the <span class="math notranslate nohighlight">\(p\)</span>-value, we often use the computer to generate a large number of repeated random trials using the assumptions in the model and find the fraction of samples that give a value of the statistic at least as extreme as our observed value. At other times we use mathematical theory to find the <span class="math notranslate nohighlight">\(p\)</span>-value.</p></li>
+<li><p>Interpret: The p-value is used as a measure of surprise.  If the model that you spelled out in Step 2 is believable, how surprised should you be to get the data (and summary statistic) that you actually got?  A moderate sized p-value means that the observed statistic is pretty much what you would expect to get for data generated by the null model.  A tiny p-value raises doubts about the null model. In other words, if the model is correct (or approximately correct), then it would be very unusual to get such an extreme value of the test statistic from data generated by the model.  In this case, either the null model is wrong or a very unlikely outcome has occurred. Statistical logic says to conclude that the pattern is real; that it is more than just coincidence.  Then, it’s up to you to explain why the data generation process led to such an unusual value. This is when a careful consideration of the scope is important.</p></li>
+</ol>
+<p>Let’s demonstrate these steps in the testing process with a few examples.</p>
+<div class="section" id="example-a-rank-test-to-compare-productivity-of-wikipedia-contributors">
+<h2><span class="section-number">17.2.1. </span>Example: A Rank-test to Compare Productivity of Wikipedia Contributors<a class="headerlink" href="#example-a-rank-test-to-compare-productivity-of-wikipedia-contributors" title="Permalink to this headline">¶</a></h2>
+<p>Recall the Wikipedia example from <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a>, where a randomly selected set of 200 contributors were chosen from among the top 1% of contributors who were active in the past 30 days on the English-language Wikipedia and who had never received an informal  “barnstar” award.  These 200 contributors were divided at random into two groups of 100. The contributors in one group, the treatment group, were each awarded a barnstar, while no one in the other group was given an award. All 200 contributors were followed for 90 days and their activity on Wikipedia recorded.</p>
+<p>It has been conjectured that informal awards have a reinforcing effect on volunteer work, and this experiment was designed to formally study this conjecture. We carry out a hypothesis test based on the rankings of the data.</p>
+<p>First, we read the data into a data frame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>wiki = pd.read_csv(&quot;data/Wikipedia.csv&quot;)
+wiki.shape
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(200, 2)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>wiki.describe()[3:]
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>experiment</th>
+      <th>postproductivity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>min</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>0.0</td>
+      <td>57.5</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>0.5</td>
+      <td>250.5</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>1.0</td>
+      <td>608.0</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>1.0</td>
+      <td>2344.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The data frame has 200 rows, one for each contributor. The feature <code class="docutils literal notranslate"><span class="pre">experiment</span></code> is either 0 or 1, depending on whether the contributor was in the control or treatment group, respectively; and <code class="docutils literal notranslate"><span class="pre">postproductivity</span></code> is a count of the edits made by the contributor in the 90 days after the barnstars were awarded. The gap between the quartiles (lower, middle, and upper) suggest the distribution of productivity is skewed. We make a histogram to confirm.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<img alt="../../_images/inf_pred_gen_HT_7_0.svg" src="../../_images/inf_pred_gen_HT_7_0.svg" /></div>
+</div>
+<p>Indeed, the histogram of post-award productivity is highly skewed, with a spike near zero. The skewness suggests a statistics based on the ordering of the values from the two samples.</p>
+<p>To compute our statistic, we order all productivity values (from both groups) from smallest to largest. The smallest value has rank 1, the second smallest rank 2, and so on up to the largest value which has a rank of 200. We use these ranks to compute our statistic, <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>, which is the average rank of the treatment group. We chose this statistic because it is insensitive to highly skewed distributions. For example, whether the largest value is 700 or 700,000, it still receives the same rank, namely 200. If the informal award incentivizes contributors, then we would expect the average rank of the treatment group to be typically higher than the control.</p>
+<p>The null model assumes that an informal award has <em>no</em> effect on productivity and any difference observed between the treatment and control groups is due to the chance process in assigning contributors to groups. The Null Hypothesis is set up for the status quo to be rejected; that is, we hope to find a surprise in assuming no effect.</p>
+<p>The Null Hypothesis can be represented by 100 draws from an urn with 200 marbles, marked 1, 2, 3, …, 200. In this case, the average rank would be <span class="math notranslate nohighlight">\((1 + 200)/2 = 100.5\)</span></p>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">rankdata</span></code> method in <code class="docutils literal notranslate"><span class="pre">scipy.stats</span></code> to rank the 200 values and compute the sum of ranks in the treatment group.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import rankdata
+ranks = rankdata(wiki[&#39;postproductivity&#39;], &#39;average&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s confirm that the average rank of the 200 values is 100.5.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.average(ranks)
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100.5
+</pre></div>
+</div>
+</div>
+</div>
+<p>And, find the average rank of the 100 productivity scores in the treatment group:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.average(ranks[100:])
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>113.68
+</pre></div>
+</div>
+</div>
+</div>
+<p>The average rank in the treatment group is higher than expected, but we want to figure out if it is an unusually high value. We can use simulation to find the sampling distribution for this statistic to see if 113 is a routine value or a surprising one.</p>
+<p>To carry out this simulation, we set up the urn as the <code class="docutils literal notranslate"><span class="pre">ranks</span></code> array from the data. Shuffling the 200 values in the array and taking the first 100 represents a randomly sampled treatment group. We write a function to shuffle the array of ranks and find the average of the first 100.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def rank_avg(ranks, n):
+    rng.shuffle(ranks)
+    return np.average(ranks[n:])      
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our simulation  “mixes the marbles in the urn and draws 100 times”, computes the average rank for the 100 draws, and repeats this 100,000 times.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rng = np.random.default_rng(42)
+rank_avg_simulation = [rank_avg(ranks, 100) for _ in range(100000)] 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Average Rank of the Treatment Group&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/inf_pred_gen_HT_20_1.svg" src="../../_images/inf_pred_gen_HT_20_1.svg" /></div>
+</div>
+<p>As we expected, the sampling distribution of the average rank is centered on 100 (100.5 actually) and is bell-shaped. The center of this distribution reflects the assumptions of the treatment having no effect. Our observed statistic looks well outside the typical range of simulated average ranks, and we use this simulated sampling distribution to find the approximate <span class="math notranslate nohighlight">\(p\)</span>-value for observing a statistic at least as big as ours.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>len([elem for elem in rank_avg_simulation if elem &gt;= 113.68]) / 100000
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00052
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is a big surprise. Under the null, the chance of seeing an average rank at least as large as ours is about 5 in 10,000.</p>
+<p>This test raises doubt about the null model. Statistical logic has us conclude that the pattern is real. How do we interpret this? The experiment was well designed. The 200 contributors were selected at random from the top 1%, and then they were divided at random into two groups. These chance processes say that we can rely on the sample of 200 being representative of top contributors, and on the treatment and control groups being similar to each other in every way except for the application of the treatment. Given the careful design, we conclude that informal awards have a positive effect on productivity for top contributors.</p>
+<p>Although, we carried out a simulation to find the <span class="math notranslate nohighlight">\(p\)</span>-value for our observed statistic, rank tests are commonly used and made available in most statistical software.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import ranksums
+
+ranksums(x=treatment[&#39;postproductivity&#39;], y=control[&#39;postproductivity&#39;])
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RanksumsResult(statistic=3.220386553232206, pvalue=0.0012801785007519996)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(p\)</span>-value here is twice the <span class="math notranslate nohighlight">\(p\)</span>-value we computed because we considered only values greater than the observed, whereas the <code class="docutils literal notranslate"><span class="pre">ranksums</span></code> test computed the the <span class="math notranslate nohighlight">\(p\)</span>-value for both sides of the distribution. In our example, we are only interested in an increase in productivity, and so use a one-sided <span class="math notranslate nohighlight">\(p\)</span>-value, which is half the reported value above (0.0006) and close to our simulated value.</p>
+<p>This somewhat unusual test statistic that uses ranks, rather than the actual data values, was developed in the 1950s and 1960s, before today’s era of powerful laptop computers. The mathematical properties of rank statistics is well developed and the sampling distribution is well behaved (it is symmetric and shaped like the bell curve even for small data sets). However, rank tests remain popular for A/B testing where samples tend to be highly skewed and it is common to carry out many, many tests, where <span class="math notranslate nohighlight">\(p\)</span>-values can be compluted rapidly from the normal distribution.</p>
+<p>The next example, revisits the vaccine efficacy example from <a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>. There, we encountered a hypothesis test without actually calling it that.</p>
+</div>
+<div class="section" id="example-a-test-of-proportions-for-vaccine-efficacy">
+<h2><span class="section-number">17.2.2. </span>Example: A test of proportions for vaccine efficacy<a class="headerlink" href="#example-a-test-of-proportions-for-vaccine-efficacy" title="Permalink to this headline">¶</a></h2>
+<p>Recall the randomized clinical trial of the J&amp;J vaccine (<a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>), where 43,738 people enrolled in the trial, were randomly split into equal groups, and the treatment group was administered the vaccine while the control group was given a fake vaccine, called a placebo. Over the next month, 117 people in the treatment group fell ill, and 351 in the control group.</p>
+<p>We want to compare the proportion of sick individuals in each group. To do this, we use vaccine efficacy,</p>
+<div class="math notranslate nohighlight">
+\[ \hat{\theta} = \frac {\hat{p}_{C} - \hat{p}_T} {\hat{p}_C} = 1 - \frac {\hat{p}_T} {\hat{p}_C}, \]</div>
+<p>Where <span class="math notranslate nohighlight">\(\hat{p}_{C}\)</span> and <span class="math notranslate nohighlight">\(\hat{p}_T\)</span> are the observed proportion of sick people in the control and treatment groups, respectively. The observed value of vaccine efficacy in the J&amp;J trial is,</p>
+<div class="math notranslate nohighlight">
+\[ 1 - \frac{117/21869} {351/21869} 
+   = 1- \frac{117}{351} = 0.667\]</div>
+<p>The CDC set a standard of 50% for vaccine efficacy, meaning that the efficacy has to exceed 50% to be approved for distribution. The null model assumes that vaccine efficacy is 50% (<span class="math notranslate nohighlight">\(\theta^* = 0.5\)</span>, and any difference of the observed value from the expected is due to the chance process in assigning people to groups. Again, we set the Null hypothesis to be the status quo that the vaccine isn’t effective enough to warrant approval, and we hope to find a surprise and reject the Null.</p>
+<p>With a little algebra, the null model <span class="math notranslate nohighlight">\(0.5 = 1 - p_T / p_C\)</span> reduces to <span class="math notranslate nohighlight">\(p_T = 0.5 p_C\)</span>.  That is, the null hypothesis implies the proportion of ill people among those receiving the treatment is at most half that of the control. Notice that the actual values for the two risks (<span class="math notranslate nohighlight">\(p_T\)</span> and <span class="math notranslate nohighlight">\(p_C\)</span>) are not assumed in the null.  That is, the model doesn’t assume the treatment doesn’t work, rather that its efficacy is no larger than 0.5.</p>
+<p>Our urn model in this situation is a bit different than what we set up in <a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>.  The urn still has 43,738 marbles in it, corresponding to the enrolless in the experiment. But now, each marble has two numbers on it, which for simplicity appear in a pair, such as <span class="math notranslate nohighlight">\((0, 1)\)</span>. The number on the left is the response if the person receives the treatment, and the number on the right corresponds to the response to no treatment (the control). As usual, 1 means they become ill, and 0 means they stay healthy.</p>
+<p>The null model assumes that the proportion of ones on the left of the pair is half the proportion on the right. Since we don’t know these two proportions, we can use the data to estimate them. There are three types of marbles in the urn <span class="math notranslate nohighlight">\((0,0)\)</span>, <span class="math notranslate nohighlight">\((0,1)\)</span> and <span class="math notranslate nohighlight">\((1, 1)\)</span>. We assume that <span class="math notranslate nohighlight">\((1, 0)\)</span>, which corresponds to a person getting ill under treatment and not under control, is not possible.  We observed 351 people getting sick in control and 117 in treatment. With the assumption that the treatment rate of illness is  half that of the control, we can tray a scenario for the makeup of the urn. For example, we can study the case where 117 people in treatment didn’t get sick, but would have if in control so all combined 585 (<span class="math notranslate nohighlight">\(351 + 117 + 117\)</span>) people would get the virus if they didn’t receive the vaccine, and half of them would not get the virus if they received treatment. Table {numref}vacc-urn shows these counts.</p>
+<table class="colwidths-auto table" id="vacc-urn">
+<caption><span class="caption-number">Table 17.1 </span><span class="caption-text">Vaccine Trial Urn</span><a class="headerlink" href="#vacc-urn" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Label</p></th>
+<th class="head"><p>Count</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>(0, 0)</p></td>
+<td><p>43,152</p></td>
+</tr>
+<tr class="row-odd"><td><p>(0, 1)</p></td>
+<td><p>293</p></td>
+</tr>
+<tr class="row-even"><td><p>(1, 0)</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>(1, 1)</p></td>
+<td><p>293</p></td>
+</tr>
+<tr class="row-even"><td><p>Total</p></td>
+<td><p>43,738</p></td>
+</tr>
+</tbody>
+</table>
+<p>We can use these counts to carry out a simulation of the clinical trial and compute vaccine efficacy. As shown in <a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a> the multivariate hypergeometric function simulates draws from an urn when there are more than two kinds of marbles.
+We set this urn and sampling process up here.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>N = 43738
+n_samp = 21869
+N_groups = np.array([293, 293, (N-586)])
+
+from scipy.stats import multivariate_hypergeom
+
+def vacc_eff(N_groups, n_samp):
+    treat = multivariate_hypergeom.rvs(N_groups, n_samp)
+    ill_t = treat[1]
+    ill_c = N_groups[0] - treat[0] + N_groups[1] - treat[1]
+    return (ill_c - ill_t) / ill_c
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we can simulate the clinical trial 100,000 times and calculate the vaccine efficacy for each trial.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sim_vacc_eff = [vacc_eff(N_groups, n_samp) for _ in range(100000)] 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Vaccine Efficacy&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/inf_pred_gen_HT_34_1.svg" src="../../_images/inf_pred_gen_HT_34_1.svg" /></div>
+</div>
+<p>The sampling distribution is centered at 0.5, which agrees with our model assumptions. We see that 0.667 is far out in the tail of this distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>len([elem for elem in sim_vacc_eff if elem &gt;= 0.667]) 
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2
+</pre></div>
+</div>
+</div>
+</div>
+<p>A handful of the 100,000 simulations have a vaccine efficacy as large as the observed 0.667. This is a rare event, and that’s why the CDC approved the Johnson &amp; Johnson vaccine for distribution.</p>
+<p>In this example of hypothesis testing, we were not able to completely specify the model and we had to provide approximate values for <span class="math notranslate nohighlight">\(p_C\)</span> and <span class="math notranslate nohighlight">\(p_T\)</span> based on our observed values of <span class="math notranslate nohighlight">\(\hat{p}_C\)</span> and <span class="math notranslate nohighlight">\(\hat{p}_T\)</span>. At times the null model isn’t entirely specified, and we must rely on the data to set up the model.
+The next section introduces a general approach, called the bootstrap, to approximate the model using the data.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./ch/17"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="inf_pred_gen_dist.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">17.1. </span>Distributions: Population, Empirical, Sampling</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="inf_pred_gen_boot.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">17.3. </span>Bootstrapping for Inference</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By Sam Lau, Joey Gonzalez, and Deb Nolan<br/>
+    
+        &copy; Copyright 2023.<br/>
+      <div class="extra_footer">
+        <p>
+License: CC BY-NC-ND 4.0
+</p>
+
+      </div>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>
