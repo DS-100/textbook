@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1383,62 +1383,62 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
-# Ignore numpy dtype warnings. These warnings are caused by an interaction
-# between numpy and Cython and can be safely ignored.
-# Reference: https://stackoverflow.com/a/40846742
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-%matplotlib inline
-import ipywidgets as widgets
-from ipywidgets import interact, interactive, fixed, interact_manual
-import nbinteract as nbi
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-sns.set()
-sns.set_context(&#39;talk&#39;)
-np.set_printoptions(threshold=20, precision=2, suppress=True)
-pd.options.display.max_rows = 7
-pd.options.display.max_columns = 8
-pd.set_option(&#39;precision&#39;, 2)
-# This option stops scientific notation for pandas
-# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.feature_extraction import DictVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="kn">import</span> <span class="n">DictVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
 
-emails=pd.read_csv(&#39;selected_emails.csv&#39;, index_col=0)
+<span class="n">emails</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;selected_emails.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def words_in_texts(words, texts):
-    &#39;&#39;&#39;
-    Args:
-        words (list-like): words to find
-        texts (Series): strings to search in
-    
-    Returns:
-        NumPy array of 0s and 1s with shape (n, p) where n is the
-        number of texts and p is the number of words.
-    &#39;&#39;&#39;
-    indicator_array = np.array([texts.str.contains(word) * 1 for word in words]).T
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">words_in_texts</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        words (list-like): words to find</span>
+<span class="sd">        texts (Series): strings to search in</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        NumPy array of 0s and 1s with shape (n, p) where n is the</span>
+<span class="sd">        number of texts and p is the number of words.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">indicator_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">texts</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 
-    # YOUR CODE HERE
-    return indicator_array
+    <span class="c1"># YOUR CODE HERE</span>
+    <span class="k">return</span> <span class="n">indicator_array</span>
 </pre></div>
 </div>
 </div>
@@ -1449,7 +1449,7 @@ emails=pd.read_csv(&#39;selected_emails.csv&#39;, index_col=0)
 <p>Suppose we have a dataset of 1000 emails that are labeled as spam or ham (not spam) and our goal is to build a classifier that distinguishes future spam emails from ham emails. The data is contained in the <code class="docutils literal notranslate"><span class="pre">emails</span></code> DataFrame displayed below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>emails
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">emails</span>
 </pre></div>
 </div>
 </div>
@@ -1528,37 +1528,37 @@ emails=pd.read_csv(&#39;selected_emails.csv&#39;, index_col=0)
 <p>The following code block displays the accuracies of the classifiers. Model creation and training are omitted for brevity.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>words_list = [&#39;please&#39;, &#39;click&#39;, &#39;money&#39;, &#39;business&#39;, &#39;remove&#39;]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;please&#39;</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;money&#39;</span><span class="p">,</span> <span class="s1">&#39;business&#39;</span><span class="p">,</span> <span class="s1">&#39;remove&#39;</span><span class="p">]</span>
 
-X = pd.DataFrame(words_in_texts(words_list, emails[&#39;body&#39;].str.lower())).as_matrix()
-y = emails[&#39;spam&#39;].as_matrix()
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">words_in_texts</span><span class="p">(</span><span class="n">words_list</span><span class="p">,</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">emails</span><span class="p">[</span><span class="s1">&#39;spam&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
 
-# Train-test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, random_state=41, test_size=0.2
-)
+<span class="c1"># Train-test split</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">41</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span>
+<span class="p">)</span>
 
-#Fit the model
-words_list_model = LogisticRegression(fit_intercept=True)
-words_list_model.fit(X_train, y_train)
+<span class="c1">#Fit the model</span>
+<span class="n">words_list_model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">words_list_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
-y_prediction_words_list = words_list_model.predict(X_test)
-y_prediction_ham_only = np.zeros(len(y_test))
-y_prediction_spam_only = np.ones(len(y_test))
+<span class="n">y_prediction_words_list</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_prediction_ham_only</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">))</span>
+<span class="n">y_prediction_spam_only</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.metrics import accuracy_score
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
 
-# Our selected words
-words_list = [&#39;please&#39;, &#39;click&#39;, &#39;money&#39;, &#39;business&#39;]
+<span class="c1"># Our selected words</span>
+<span class="n">words_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;please&#39;</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="s1">&#39;money&#39;</span><span class="p">,</span> <span class="s1">&#39;business&#39;</span><span class="p">]</span>
 
-print(f&#39;ham_only test set accuracy: {np.round(accuracy_score(y_prediction_ham_only, y_test), 3)}&#39;)
-print(f&#39;spam_only test set accuracy: {np.round(accuracy_score(y_prediction_spam_only, y_test), 3)}&#39;)
-print(f&#39;words_list_model test set accuracy: {np.round(accuracy_score(y_prediction_words_list, y_test), 3)}&#39;)
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ham_only test set accuracy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_prediction_ham_only</span><span class="p">,</span><span class="w"> </span><span class="n">y_test</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spam_only test set accuracy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_prediction_spam_only</span><span class="p">,</span><span class="w"> </span><span class="n">y_test</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;words_list_model test set accuracy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_prediction_words_list</span><span class="p">,</span><span class="w"> </span><span class="n">y_test</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1586,59 +1586,59 @@ words_list_model test set accuracy: 0.96
 <p>We will use scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html#sklearn.metrics.confusion_matrix">confusion matrix function</a> to construct confusion matrices for the three models on the training data set. The <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> confusion matrix is shown below:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title=&#39;Confusion matrix&#39;,
-                          cmap=plt.cm.Blues):
-    &quot;&quot;&quot;
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    &quot;&quot;&quot;
-    import itertools
-    if normalize:
-        cm = cm.astype(&#39;float&#39;) / cm.sum(axis=1)[:, np.newaxis]
-#         print(&quot;Normalized confusion matrix&quot;)
-#     else:
-#         print(&#39;Confusion matrix, without normalization&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span>
+                          <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion matrix&#39;</span><span class="p">,</span>
+                          <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function prints and plots the confusion matrix.</span>
+<span class="sd">    Normalization can be applied by setting `normalize=True`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">itertools</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="c1">#         print(&quot;Normalized confusion matrix&quot;)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         print(&#39;Confusion matrix, without normalization&#39;)</span>
 
-#     print(cm)
+<span class="c1">#     print(cm)</span>
 
-    plt.imshow(cm, interpolation=&#39;nearest&#39;, cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">tick_marks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">tick_marks</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">tick_marks</span><span class="p">,</span> <span class="n">classes</span><span class="p">)</span>
 
-    fmt = &#39;.2f&#39; if normalize else &#39;d&#39;
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment=&quot;center&quot;,
-                 color=&quot;white&quot; if cm[i, j] &gt; thresh else &quot;black&quot;)
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;.2f&#39;</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="s1">&#39;d&#39;</span>
+    <span class="n">thresh</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">format</span><span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">fmt</span><span class="p">),</span>
+                 <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                 <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span> <span class="k">if</span> <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="k">else</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
 
-    plt.tight_layout()
-    plt.ylabel(&#39;True label&#39;)
-    plt.xlabel(&#39;Predicted label&#39;)
-    plt.grid(False)
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;True label&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted label&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-ham_only_y_pred = np.zeros(len(y_train))
-spam_only_y_pred = np.ones(len(y_train))
-words_list_model_y_pred = words_list_model.predict(X_train)
+<span class="n">ham_only_y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
+<span class="n">spam_only_y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
+<span class="n">words_list_model_y_pred</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.metrics import confusion_matrix
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
 
-class_names = [&#39;Spam&#39;, &#39;Ham&#39;]
+<span class="n">class_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Spam&#39;</span><span class="p">,</span> <span class="s1">&#39;Ham&#39;</span><span class="p">]</span>
 
-ham_only_cnf_matrix = confusion_matrix(y_train, ham_only_y_pred, labels=[1, 0])
+<span class="n">ham_only_cnf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">ham_only_y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
-plot_confusion_matrix(ham_only_cnf_matrix, classes=class_names,
-                      title=&#39;ham_only Confusion Matrix&#39;)
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">ham_only_cnf_matrix</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ham_only Confusion Matrix&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1659,10 +1659,10 @@ plot_confusion_matrix(ham_only_cnf_matrix, classes=class_names,
 <p>We can see that <code class="docutils literal notranslate"><span class="pre">ham_only</span></code> had a high accuracy of <span class="math notranslate nohighlight">\(\left(\frac{758}{800} \approx .95\right)\)</span> because there are 758 ham emails in the training dataset out of 800 total emails.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>spam_only_cnf_matrix = confusion_matrix(y_train, spam_only_y_pred, labels=[1, 0])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spam_only_cnf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">spam_only_y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
-plot_confusion_matrix(spam_only_cnf_matrix, classes=class_names,
-                      title=&#39;spam_only Confusion Matrix&#39;)
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">spam_only_cnf_matrix</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;spam_only Confusion Matrix&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1674,10 +1674,10 @@ plot_confusion_matrix(spam_only_cnf_matrix, classes=class_names,
 <p>Our main interest is the confusion matrix for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>words_list_model_cnf_matrix = confusion_matrix(y_train, words_list_model_y_pred, labels=[1, 0])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list_model_cnf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_model_y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
-plot_confusion_matrix(words_list_model_cnf_matrix, classes=class_names,
-                      title=&#39;words_list_model Confusion Matrix&#39;)
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">words_list_model_cnf_matrix</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;words_list_model Confusion Matrix&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1723,14 +1723,14 @@ plot_confusion_matrix(words_list_model_cnf_matrix, classes=class_names,
 <p>Raising the threshold to <span class="math notranslate nohighlight">\(C = .70\)</span>, meaning we label an email <span class="math notranslate nohighlight">\(x\)</span> as spam if the probability <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x)\)</span> is greater than .70, results in the following confusion matrix:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>words_list_prediction_probabilities = words_list_model.predict_proba(X_train)[:, 1]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list_prediction_probabilities</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
 
-words_list_predictions = [1 if pred &gt;= .70 else 0 for pred in words_list_prediction_probabilities]
+<span class="n">words_list_predictions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">pred</span> <span class="o">&gt;=</span> <span class="mf">.70</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">words_list_prediction_probabilities</span><span class="p">]</span>
 
-high_classification_threshold = confusion_matrix(y_train, words_list_predictions, labels=[1, 0])
+<span class="n">high_classification_threshold</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_predictions</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
-plot_confusion_matrix(high_classification_threshold, classes=class_names,
-                      title=&#39;words_list_model Confusion Matrix $C = .70$&#39;)
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">high_classification_threshold</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;words_list_model Confusion Matrix $C = .70$&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1747,12 +1747,12 @@ plot_confusion_matrix(high_classification_threshold, classes=class_names,
 <p>Lowering the threshold to <span class="math notranslate nohighlight">\(C = .30\)</span>, meaning we label an email <span class="math notranslate nohighlight">\(x\)</span> as spam if the probability <span class="math notranslate nohighlight">\(f_{\hat{\theta}}(x)\)</span> is greater than .30, results in the following confusion matrix:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>words_list_predictions = [1 if pred &gt;= .30 else 0 for pred in words_list_prediction_probabilities]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_list_predictions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">pred</span> <span class="o">&gt;=</span> <span class="mf">.30</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">words_list_prediction_probabilities</span><span class="p">]</span>
 
-low_classification_threshold = confusion_matrix(y_train, words_list_predictions, labels=[1, 0])
+<span class="n">low_classification_threshold</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_predictions</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
-plot_confusion_matrix(low_classification_threshold, classes=class_names,
-                      title=&#39;words_list_model Confusion Matrix $C = .30$&#39;)
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">low_classification_threshold</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;words_list_model Confusion Matrix $C = .30$&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1777,21 +1777,21 @@ plot_confusion_matrix(low_classification_threshold, classes=class_names,
 <p>The ROC curve for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> is calculated below using scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html">ROC curve function</a>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.metrics import roc_curve
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_curve</span>
 
-words_list_model_probabilities = words_list_model.predict_proba(X_train)[:, 1]
-false_positive_rate_values, sensitivity_values, thresholds = roc_curve(y_train, words_list_model_probabilities, pos_label=1)
+<span class="n">words_list_model_probabilities</span> <span class="o">=</span> <span class="n">words_list_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">false_positive_rate_values</span><span class="p">,</span> <span class="n">sensitivity_values</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_model_probabilities</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.step(false_positive_rate_values, sensitivity_values, color=&#39;b&#39;, alpha=0.2,
-         where=&#39;post&#39;)
-plt.xlabel(&#39;False Positive Rate (1 - Specificity)&#39;)
-plt.ylabel(&#39;Sensitivity&#39;)
-plt.title(&#39;words_list_model ROC Curve&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">false_positive_rate_values</span><span class="p">,</span> <span class="n">sensitivity_values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+         <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate (1 - Specificity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Sensitivity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;words_list_model ROC Curve&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1813,11 +1813,11 @@ plt.title(&#39;words_list_model ROC Curve&#39;)
 <p>A classifier that randomly predicts classes has a diagonal ROC curve containing all points where sensitivity and the false positive rate are equal:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.step(np.arange(0, 1, 0.001), np.arange(0, 1, 0.001), color=&#39;b&#39;, alpha=0.2,
-         where=&#39;post&#39;)
-plt.xlabel(&#39;False Positive Rate (1 - Specificity)&#39;)
-plt.ylabel(&#39;Sensitivity&#39;)
-plt.title(&#39;Random Classifier ROC Curve&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+         <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate (1 - Specificity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Sensitivity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Random Classifier ROC Curve&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1836,12 +1836,12 @@ plt.title(&#39;Random Classifier ROC Curve&#39;)
 <p>The <strong>Area Under Curve (AUC)</strong> is the area under the ROC curve and serves as a single number performance summary of the classifier. The AUC for <code class="docutils literal notranslate"><span class="pre">words_list_model</span></code> is shaded below and calculating using scikit-learn’s <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score">AUC function</a>:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.fill_between(false_positive_rate_values, sensitivity_values, step=&#39;post&#39;, alpha=0.2,
-                 color=&#39;b&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">false_positive_rate_values</span><span class="p">,</span> <span class="n">sensitivity_values</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                 <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
 
-plt.xlabel(&#39;False Positive Rate (1 - Specificity)&#39;)
-plt.ylabel(&#39;Sensitivity&#39;)
-plt.title(&#39;words_list_model ROC Curve&#39;)
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate (1 - Specificity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Sensitivity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;words_list_model ROC Curve&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1854,9 +1854,9 @@ plt.title(&#39;words_list_model ROC Curve&#39;)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.metrics import roc_auc_score
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
 
-roc_auc_score(y_train, words_list_model_probabilities)
+<span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">words_list_model_probabilities</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

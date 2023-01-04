@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1433,12 +1433,12 @@ Since this section focuses on modeling, we’ve left it as an exercise to
 understand what the code does.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>csv_file = &#39;data/cleaned_purpleair_aqs/Full24hrdataset.csv&#39;
-usecols = [&#39;Date&#39;, &#39;ID&#39;, &#39;region&#39;, &#39;PM25FM&#39;, &#39;PM25cf1&#39;, &#39;TempC&#39;, &#39;RH&#39;, &#39;Dewpoint&#39;]
-full = (pd.read_csv(csv_file, usecols=usecols, parse_dates=[&#39;Date&#39;])
-        .dropna())
-full.columns = [&#39;date&#39;, &#39;id&#39;, &#39;region&#39;, &#39;pm25aqs&#39;, &#39;pm25pa&#39;, &#39;temp&#39;, &#39;rh&#39;, &#39;dew&#39;]
-full
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">csv_file</span> <span class="o">=</span> <span class="s1">&#39;data/cleaned_purpleair_aqs/Full24hrdataset.csv&#39;</span>
+<span class="n">usecols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;PM25FM&#39;</span><span class="p">,</span> <span class="s1">&#39;PM25cf1&#39;</span><span class="p">,</span> <span class="s1">&#39;TempC&#39;</span><span class="p">,</span> <span class="s1">&#39;RH&#39;</span><span class="p">,</span> <span class="s1">&#39;Dewpoint&#39;</span><span class="p">]</span>
+<span class="n">full</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+<span class="n">full</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">,</span> <span class="s1">&#39;dew&#39;</span><span class="p">]</span>
+<span class="n">full</span>
 </pre></div>
 </div>
 </div>
@@ -1593,16 +1593,16 @@ We’ll start by making some simple visualizations.
 First, we’ll make a plot of the weekly average AQS PM2.5 over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.figure(figsize=(8, 4))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-(full.set_index(&#39;date&#39;)
- .resample(&#39;W&#39;)
- [&#39;pm25aqs&#39;]
- .mean()
- .plot()
-)
+<span class="p">(</span><span class="n">full</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="p">)</span>
 
-plt.ylabel(&#39;Weekly avg PM2.5 (AQS)&#39;);
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Weekly avg PM2.5 (AQS)&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1614,23 +1614,23 @@ plt.ylabel(&#39;Weekly avg PM2.5 (AQS)&#39;);
 <p>Next, we’ll plot the distribution of both AQS and PurpleAir PM2.5 readings.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot_dist(col):
-    # We need to make sure the x- and y-axes have the same limits for both plots,
-    # or else the plots will be difficult to compare
-    sns.displot(data=full, x=col, stat=&#39;density&#39;,
-            kde=True, aspect=3, height=3)
-    plt.xlim([0, 60])
-    plt.ylim([0, 0.11])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_dist</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
+    <span class="c1"># We need to make sure the x- and y-axes have the same limits for both plots,</span>
+    <span class="c1"># or else the plots will be difficult to compare</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">,</span>
+            <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># We need to make sure the x- and y-axes have the same limits for both plots,
-# or else the plots will be difficult to compare
-plot_dist(&#39;pm25aqs&#39;)
-plot_dist(&#39;pm25pa&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We need to make sure the x- and y-axes have the same limits for both plots,</span>
+<span class="c1"># or else the plots will be difficult to compare</span>
+<span class="n">plot_dist</span><span class="p">(</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">)</span>
+<span class="n">plot_dist</span><span class="p">(</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1643,9 +1643,9 @@ plot_dist(&#39;pm25pa&#39;)
 <p>Lastly, we’ll plot PurpleAir against AQS readings.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sns.relplot(data=full, x=&#39;pm25aqs&#39;, y=&#39;pm25pa&#39;, s=30, aspect=1, height=4);
-plt.xlim([0, 80])
-plt.ylim([0, 80]);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
@@ -1681,18 +1681,18 @@ estimator for the model’s real-world performance.</p>
 <p>We’ll set aside 1000 observations aside for the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(42)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 
-n = len(full)
-test_n = 1000
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">full</span><span class="p">)</span>
+<span class="n">test_n</span> <span class="o">=</span> <span class="mi">1000</span>
 
-# Shuffle the row labels
-shuffled = np.random.choice(n, size=n, replace=False)
+<span class="c1"># Shuffle the row labels</span>
+<span class="n">shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-# Split the data
-test  = full.iloc[shuffled[:test_n]]
-train = full.iloc[shuffled[test_n:]]
-train
+<span class="c1"># Split the data</span>
+<span class="n">test</span>  <span class="o">=</span> <span class="n">full</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[:</span><span class="n">test_n</span><span class="p">]]</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">full</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">shuffled</span><span class="p">[</span><span class="n">test_n</span><span class="p">:]]</span>
+<span class="n">train</span>
 </pre></div>
 </div>
 </div>
@@ -1812,8 +1812,8 @@ train
 so we’ll define a function to compute the RMSE of a set of predictions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def rmse(predictions):
-    return np.sqrt(np.mean((test[&#39;pm25aqs&#39;] - predictions)**2))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">predictions</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">test</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">predictions</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1846,13 +1846,13 @@ f_\hat{\theta}(x) = \text{mean(aqs)}
 \]</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def model_1(train):
-    &#39;&#39;&#39;f(x) = θ&#39;&#39;&#39;
-    mean = train[&#39;pm25aqs&#39;].mean()
-    def predict(data):
-        return np.repeat(mean, len(data))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_1</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;f(x) = θ&#39;&#39;&#39;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
     
-    return predict
+    <span class="k">return</span> <span class="n">predict</span>
 </pre></div>
 </div>
 </div>
@@ -1861,8 +1861,8 @@ f_\hat{\theta}(x) = \text{mean(aqs)}
 test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>predict = model_1(train)
-rmse(predict(test))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predict</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+<span class="n">rmse</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">test</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1879,10 +1879,10 @@ We can see this when we mark the mean on the distribution
 of AQS readings.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mean = train[&#39;pm25aqs&#39;].mean()
-plot_dist(&#39;pm25aqs&#39;)
-plt.axvline(mean, c=&#39;red&#39;, linestyle=&#39;-.&#39;);
-# Most points are within 5.36 µg m⁻³ away from the mean
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">plot_dist</span><span class="p">(</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">);</span>
+<span class="c1"># Most points are within 5.36 µg m⁻³ away from the mean</span>
 </pre></div>
 </div>
 </div>
@@ -1929,7 +1929,7 @@ We’ve left the derivation as an exercise for the reader.
 After fitting on the training data, we have <span class="math notranslate nohighlight">\( \hat{\theta} = -4.86 \)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.mean(train[&#39;pm25aqs&#39;] - train[&#39;pm25pa&#39;])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1942,13 +1942,13 @@ After fitting on the training data, we have <span class="math notranslate nohigh
 <p>With this, we can implement our second model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def model_2(train):
-    &#39;&#39;&#39;f(x) = PA + θ&#39;&#39;&#39;
-    mean_diff = np.mean(train[&#39;pm25aqs&#39;] - train[&#39;pm25pa&#39;])
-    def predict(data):
-        return data[&#39;pm25pa&#39;] + mean_diff
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_2</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;f(x) = PA + θ&#39;&#39;&#39;</span>
+    <span class="n">mean_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">mean_diff</span>
     
-    return predict
+    <span class="k">return</span> <span class="n">predict</span>
 </pre></div>
 </div>
 </div>
@@ -1959,7 +1959,7 @@ We’ll call this function to compare the results of the two models we’ve
 defined thus far.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model_results([model_1, model_2])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_results</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -2011,9 +2011,9 @@ predictions from the actual observed AQS values.
 These differences are called the <em>residuals</em>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def residuals(model):
-    predict = model(train)
-    return test[&#39;pm25aqs&#39;] - predict(test)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="n">predict</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">test</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">predict</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2021,25 +2021,25 @@ These differences are called the <em>residuals</em>.</p>
 <p>Let’s plot the residuals for both models and compare.</p>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot_residuals(models):
-    model_names = pd.Index([model.__name__ for model in models], name=&#39;model&#39;)
-    resids = (pd.concat(
-        [test.assign(resid=residuals(model)) for model in models],
-        keys=model_names).reset_index(level=0))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_residuals</span><span class="p">(</span><span class="n">models</span><span class="p">):</span>
+    <span class="n">model_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+    <span class="n">resids</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">test</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">resid</span><span class="o">=</span><span class="n">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">))</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">],</span>
+        <span class="n">keys</span><span class="o">=</span><span class="n">model_names</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
     
-    g = sns.relplot(data=resids, x=&#39;pm25pa&#39;, y=&#39;resid&#39;,
-                    col=&#39;model&#39;, col_wrap=3, aspect=0.8,
-                    s=30)
-    g.map(lambda **k: plt.axhline(y=0, color=&#39;black&#39;, linestyle=&quot;:&quot;))
-    g.set_xlabels(&#39;PA&#39;)
-    g.set_ylabels(&#39;residuals&#39;)
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">resids</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;resid&#39;</span><span class="p">,</span>
+                    <span class="n">col</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                    <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">**</span><span class="n">k</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">))</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">set_xlabels</span><span class="p">(</span><span class="s1">&#39;PA&#39;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">set_ylabels</span><span class="p">(</span><span class="s1">&#39;residuals&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_residuals([model_1, model_2])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_residuals</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -2144,29 +2144,29 @@ see <span id="id1">[<a class="reference internal" href="../../references.html#id
 <p>Now, let’s define the model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import LinearRegression
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
 
-def model_3(train):
-    &#39;&#39;&#39;f(x) = θ₀ + θ₁PA&#39;&#39;&#39;
-    # Fit calibration model using sklearn
-    X, y = train[[&#39;pm25aqs&#39;]], train[&#39;pm25pa&#39;]
-    model = LinearRegression().fit(X, y)
-    m, b = model.coef_[0], model.intercept_
+<span class="k">def</span> <span class="nf">model_3</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;f(x) = θ₀ + θ₁PA&#39;&#39;&#39;</span>
+    <span class="c1"># Fit calibration model using sklearn</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]],</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span>
     
-    # Invert model
-    theta_1 = 1 / m
-    theta_0 = - b / m
+    <span class="c1"># Invert model</span>
+    <span class="n">theta_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">m</span>
+    <span class="n">theta_0</span> <span class="o">=</span> <span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">m</span>
     
-    def predict(data):
-        return theta_0 + theta_1 * data[&#39;pm25pa&#39;]
-    return predict
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">theta_0</span> <span class="o">+</span> <span class="n">theta_1</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">predict</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model_results([model_1, model_2, model_3])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_results</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_3</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -2218,7 +2218,7 @@ other models we’ve done.
 This is reflected in the residuals:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_residuals([model_1, model_2, model_3])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_residuals</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_3</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -2273,29 +2273,29 @@ more than one variable to make predictions.</p>
 <span class="math notranslate nohighlight">\( \hat \theta_2 = - \frac{\hat m_2}{\hat m_1} \)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def model_4(train):
-    &#39;&#39;&#39;f(x) = θ₀ + θ₁PA + θ₂RH&#39;&#39;&#39;
-    # Fit calibration model using sklearn
-    X, y = train[[&#39;pm25aqs&#39;, &#39;rh&#39;]], train[&#39;pm25pa&#39;]
-    model = LinearRegression().fit(X, y)
-    [m1, m2], b = model.coef_, model.intercept_
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_4</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;f(x) = θ₀ + θ₁PA + θ₂RH&#39;&#39;&#39;</span>
+    <span class="c1"># Fit calibration model using sklearn</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]],</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">],</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span>
     
-    # Invert to find parameters
-    theta_0 = - b / m1
-    theta_1 = 1 / m1
-    theta_2 = - m2 / m1
+    <span class="c1"># Invert to find parameters</span>
+    <span class="n">theta_0</span> <span class="o">=</span> <span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">m1</span>
+    <span class="n">theta_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">m1</span>
+    <span class="n">theta_2</span> <span class="o">=</span> <span class="o">-</span> <span class="n">m2</span> <span class="o">/</span> <span class="n">m1</span>
     
-    def predict(data):
-        return theta_0 + theta_1 * data[&#39;pm25pa&#39;] + theta_2 * data[&#39;rh&#39;]
-        return (data[&#39;pm25pa&#39;] - data[&#39;rh&#39;] * m2 - b) / m1
-    return predict
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">theta_0</span> <span class="o">+</span> <span class="n">theta_1</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">theta_2</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;rh&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;rh&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">m2</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">m1</span>
+    <span class="k">return</span> <span class="n">predict</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model_results([model_1, model_2, model_3, model_4])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_results</span><span class="p">([</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_3</span><span class="p">,</span> <span class="n">model_4</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -2351,7 +2351,7 @@ relative humidity performs the best.
 This is also reflected in its residual plot.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_residuals([model_3, model_4])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_residuals</span><span class="p">([</span><span class="n">model_3</span><span class="p">,</span> <span class="n">model_4</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>

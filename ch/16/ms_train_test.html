@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1338,16 +1338,16 @@ To do this, we carry out the following steps:</p>
 <p>For the first step, we divide the data with the <code class="docutils literal notranslate"><span class="pre">train_test_split</span></code> method in scikit learn, and set aside 22 observations for model evaluation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.model_selection import train_test_split
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 
-test_size = 22
+<span class="n">test_size</span> <span class="o">=</span> <span class="mi">22</span>
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=test_size, random_state=42)
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 
 
-print(f&#39;  Training set size: {len(X_train)}&#39;)
-print(f&#39;      Test set size: {len(X_test)}&#39;)
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1361,11 +1361,11 @@ print(f&#39;      Test set size: {len(X_test)}&#39;)
 <p>As in the previous section, we fit models of gas consumption to various polynomials in temperature. But this time, we use only the training data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>poly = PolynomialFeatures(degree=12, include_bias=False)
-poly_train = poly.fit_transform(X_train)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">poly_train</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
 
-mods = [LinearRegression().fit(poly_train[ :, :j], y_train)
-        for j in range(1,13)]
+<span class="n">mods</span> <span class="o">=</span> <span class="p">[</span><span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">poly_train</span><span class="p">[</span> <span class="p">:,</span> <span class="p">:</span><span class="n">j</span><span class="p">],</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">13</span><span class="p">)]</span>
 </pre></div>
 </div>
 </div>
@@ -1373,11 +1373,11 @@ mods = [LinearRegression().fit(poly_train[ :, :j], y_train)
 <p>We find the MSE for each of these models.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.metrics import mean_squared_error
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
 
-error_train = [mean_squared_error(y_train, 
-                                  mods[j].predict(poly_train[: , :(j+1)]))
-         for j in range(12)]
+<span class="n">error_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> 
+                                  <span class="n">mods</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">poly_train</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
+         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">)]</span>
 </pre></div>
 </div>
 </div>
@@ -1391,10 +1391,10 @@ error_train = [mean_squared_error(y_train,
 <p>Now that we have chosen our model, we provide an independent assessment of its MSE using the test set. We prepare the design matrix for the test set, and use the degree 3 polynomial fitted on the train set to predict the outcome for each row in the test set. Lastly, we compute the MSE for the test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>poly_test = poly.fit_transform(X_test)
-y_hat =  mods[2].predict(poly_test[: , :3])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly_test</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_hat</span> <span class="o">=</span>  <span class="n">mods</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">poly_test</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">])</span>
 
-mean_squared_error(y_test, y_hat)                              
+<span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">)</span>                              
 </pre></div>
 </div>
 </div>
@@ -1408,9 +1408,9 @@ mean_squared_error(y_test, y_hat)
 This demonstrates the problem with using the same data to fit and evaluate a model–the MSE doesn’t adequately reflect the MSE for a new observation. And, to demonstrate the problem with over-fitting, let’s compute the MSE on the train set for all of the polynomial models we fitted and plot them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>error_test = [mean_squared_error(y_test, 
-                                 mods[j].predict(poly_test[: , :(j+1)]))
-         for j in range(12)]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> 
+                                 <span class="n">mods</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">poly_test</span><span class="p">[:</span> <span class="p">,</span> <span class="p">:(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
+         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">)]</span>
 </pre></div>
 </div>
 </div>

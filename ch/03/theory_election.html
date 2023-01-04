@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1369,11 +1369,11 @@
 <p>Since we care only about Trump’s lead over Clinton, we can lump together all votes for other candidates. This way each marble has one of three possible votes: Trump, Clinton, and Other. We can’t ignore the “Other” category, because it impacts the size of the lead.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>proportions = np.array([0.4818, 0.4746, 1 - (0.4818 + 0.4746)])               
-n = 1_500 
-N = 6_165_478
-votes = np.trunc(N * proportions).astype(int)
-votes
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proportions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4818</span><span class="p">,</span> <span class="mf">0.4746</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.4818</span> <span class="o">+</span> <span class="mf">0.4746</span><span class="p">)])</span>               
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1_500</span> 
+<span class="n">N</span> <span class="o">=</span> <span class="mi">6_165_478</span>
+<span class="n">votes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">proportions</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">votes</span>
 </pre></div>
 </div>
 </div>
@@ -1386,9 +1386,9 @@ votes
 <p>This version of the urn model has three types of marbles in it. It is a bit more complex than the hypergeometric, but still common enough to have a named distribution: the <em>multivariate hypergeometric</em>. In Python, the urn model with more than two types of marbles is implemented as the <code class="docutils literal notranslate"><span class="pre">scipy.stats.multivariate_hypergeom.rvs</span></code> method. The function returns the number of each type of marbel drawn from the urn. We call the function as follows.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import multivariate_hypergeom
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_hypergeom</span>
 
-multivariate_hypergeom.rvs(votes, n)
+<span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1401,7 +1401,7 @@ multivariate_hypergeom.rvs(votes, n)
 <p>As before, each time we call <code class="docutils literal notranslate"><span class="pre">multivariate_hypergeom.rvs</span></code> we get a different sample and counts.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>multivariate_hypergeom.rvs(votes, n)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1416,16 +1416,16 @@ multivariate_hypergeom.rvs(votes, n)
 we can simulate the chance process of drawing from the urn over and over and examine the values that we get in return. Below we simulate 100,000 polls of 1500 voters from the votes cast in Pennsylvania.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def trump_advantage(votes, n):
-    sample_votes = multivariate_hypergeom.rvs(votes, n)
-    return (sample_votes[0] - sample_votes[1]) / n
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">trump_advantage</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">sample_votes</span> <span class="o">=</span> <span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sample_votes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">sample_votes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">n</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations = [trump_advantage(votes, n) for _ in range(100000)] 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
 </pre></div>
 </div>
 </div>
@@ -1433,7 +1433,7 @@ we can simulate the chance process of drawing from the urn over and over and exa
 <p>On average, the polling results show Trump with close to a 0.7% lead, as expected given the composition of the six-plus million votes cast.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.mean(simulations)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">simulations</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1453,7 +1453,7 @@ The vertical dashed line at 0 shows that more often than not, Trump is called, b
 <p>In the 100,0000 simulated polls, we find Trump a victor about 60% of the time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.count_nonzero(np.array(simulations) &gt; 0) / 100000
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
 </pre></div>
 </div>
 </div>
@@ -1473,9 +1473,9 @@ The vertical dashed line at 0 shows that more often than not, Trump is called, b
 We adjust the proportions of marbles in the urn to reflect this bias.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>proportions_bias = np.array([0.4818 - 0.005, 0.4747 + 0.005, 
-                             1 - (0.4818 + 0.4746) ])
-proportions_bias
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proportions_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4818</span> <span class="o">-</span> <span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.4747</span> <span class="o">+</span> <span class="mf">0.005</span><span class="p">,</span> 
+                             <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.4818</span> <span class="o">+</span> <span class="mf">0.4746</span><span class="p">)</span> <span class="p">])</span>
+<span class="n">proportions_bias</span>
 </pre></div>
 </div>
 </div>
@@ -1487,8 +1487,8 @@ proportions_bias
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>votes_bias = np.trunc(N * proportions_bias).astype(int)
-votes_bias
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">votes_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">proportions_bias</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">votes_bias</span>
 </pre></div>
 </div>
 </div>
@@ -1501,7 +1501,7 @@ votes_bias
 <p>When we carry out the simulation study again, this time with the biased urn, we find a quite different result.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations_bias = [trump_advantage(votes_bias, n) for i in range(100000)] 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations_bias</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes_bias</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
 </pre></div>
 </div>
 </div>
@@ -1512,7 +1512,7 @@ votes_bias
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.count_nonzero(np.array(simulations_bias) &gt; 0) / 100000
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations_bias</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
 </pre></div>
 </div>
 </div>
@@ -1529,17 +1529,17 @@ votes_bias
 <p>With our simulation study we can gain insight on the impact of a larger poll on the sample lead. For example, we can try a sample size of 12,000, eight times the size of the actual poll, and run 100,000 simulations for both scenarios: the unbiased and the biased.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simulations_big = [trump_advantage(votes, 12000) for i in range(100000)] 
-simulations_bias_big = [trump_advantage(votes_bias, 12000) for i in range(100000)] 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simulations_big</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes</span><span class="p">,</span> <span class="mi">12000</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+<span class="n">simulations_bias_big</span> <span class="o">=</span> <span class="p">[</span><span class="n">trump_advantage</span><span class="p">(</span><span class="n">votes_bias</span><span class="p">,</span> <span class="mi">12000</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>scenario_no_bias = np.count_nonzero(np.array(simulations_big) &gt; 0) / 100000
-scenario_bias = np.count_nonzero(np.array(simulations_bias_big) &gt; 0) / 100000
-print(scenario_no_bias, scenario_bias)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scenario_no_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations_big</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
+<span class="n">scenario_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">simulations_bias_big</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">scenario_no_bias</span><span class="p">,</span> <span class="n">scenario_bias</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

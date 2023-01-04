@@ -247,7 +247,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1331,59 +1331,59 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
-# Ignore numpy dtype warnings. These warnings are caused by an interaction
-# between numpy and Cython and can be safely ignored.
-# Reference: https://stackoverflow.com/a/40846742
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-%matplotlib inline
-import ipywidgets as widgets
-from ipywidgets import interact, interactive, fixed, interact_manual
-import nbinteract as nbi
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-sns.set()
-sns.set_context(&#39;talk&#39;)
-np.set_printoptions(threshold=20, precision=2, suppress=True)
-pd.options.display.max_rows = 7
-pd.options.display.max_columns = 8
-pd.set_option(&#39;precision&#39;, 2)
-# This option stops scientific notation for pandas
-# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def df_interact(df, nrows=7, ncols=7):
-    &#39;&#39;&#39;
-    Outputs sliders that show rows and columns of df
-    &#39;&#39;&#39;
-    def peek(row=0, col=0):
-        return df.iloc[row:row + nrows, col:col + ncols]
-    if len(df.columns) &lt;= ncols:
-        interact(peek, row=(0, len(df) - nrows, nrows), col=fixed(0))
-    else:
-        interact(peek,
-                 row=(0, len(df) - nrows, nrows),
-                 col=(0, len(df.columns) - ncols))
-    print(&#39;({} rows, {} columns) total&#39;.format(df.shape[0], df.shape[1]))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
+                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
+                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def jitter_df(df, x_col, y_col):
-    x_jittered = df[x_col] + np.random.normal(scale=0, size=len(df))
-    y_jittered = df[y_col] + np.random.normal(scale=0.05, size=len(df))
-    return df.assign(**{x_col: x_jittered, y_col: y_jittered})
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">jitter_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">):</span>
+    <span class="n">x_jittered</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x_col</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="n">y_jittered</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y_col</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">x_col</span><span class="p">:</span> <span class="n">x_jittered</span><span class="p">,</span> <span class="n">y_col</span><span class="p">:</span> <span class="n">y_jittered</span><span class="p">})</span>
 </pre></div>
 </div>
 </div>
@@ -1395,8 +1395,8 @@ pd.set_option(&#39;precision&#39;, 2)
 <p>LeBron plays in the National Basketball Association (NBA), the United States’s premier basketball league. We’ve collected a dataset of all of LeBron’s attempts in the 2017 NBA Playoff Games using the NBA statistics website (<a class="reference external" href="https://stats.nba.com/">https://stats.nba.com/</a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lebron = pd.read_csv(&#39;lebron.csv&#39;)
-lebron
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lebron</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;lebron.csv&#39;</span><span class="p">)</span>
+<span class="n">lebron</span>
 </pre></div>
 </div>
 </div>
@@ -1519,12 +1519,12 @@ lebron
 <p>We plot the shot attempts below, showing the distance from the basket on the x-axis and whether he made the shot on the y-axis. Jittering the points slightly on the y-axis mitigates overplotting.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(42)
-sns.lmplot(x=&#39;shot_distance&#39;, y=&#39;shot_made&#39;,
-           data=jitter_df(lebron, &#39;shot_distance&#39;, &#39;shot_made&#39;),
-           fit_reg=False,
-           scatter_kws={&#39;alpha&#39;: 0.3})
-plt.title(&#39;LeBron Shot Make vs. Shot Distance&#39;);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">jitter_df</span><span class="p">(</span><span class="n">lebron</span><span class="p">,</span> <span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_made&#39;</span><span class="p">),</span>
+           <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;LeBron Shot Make vs. Shot Distance&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1535,12 +1535,12 @@ plt.title(&#39;LeBron Shot Make vs. Shot Distance&#39;);
 <p>We can see that LeBron tends to make most shots when he is within five feet of the basket. A simple least squares linear regression model fit on this data produces the following predictions:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(42)
-sns.lmplot(x=&#39;shot_distance&#39;, y=&#39;shot_made&#39;,
-           data=jitter_df(lebron, &#39;shot_distance&#39;, &#39;shot_made&#39;),
-           ci=None,
-           scatter_kws={&#39;alpha&#39;: 0.4})
-plt.title(&#39;Simple Linear Regression&#39;);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">jitter_df</span><span class="p">(</span><span class="n">lebron</span><span class="p">,</span> <span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_made&#39;</span><span class="p">),</span>
+           <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Simple Linear Regression&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1552,13 +1552,13 @@ plt.title(&#39;Simple Linear Regression&#39;);
 <p>We draw the cutoff below as a green dashed line. According to this cutoff, our model predicts that LeBron will make a shot if he is within 15 feet of the basket.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(42)
-sns.lmplot(x=&#39;shot_distance&#39;, y=&#39;shot_made&#39;,
-           data=jitter_df(lebron, &#39;shot_distance&#39;, &#39;shot_made&#39;),
-           ci=None,
-           scatter_kws={&#39;alpha&#39;: 0.4})
-plt.axhline(y=0.5, linestyle=&#39;--&#39;, c=&#39;g&#39;)
-plt.title(&#39;Cutoff for Classification&#39;);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">jitter_df</span><span class="p">(</span><span class="n">lebron</span><span class="p">,</span> <span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_made&#39;</span><span class="p">),</span>
+           <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Cutoff for Classification&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>

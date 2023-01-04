@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1358,7 +1358,7 @@
 <p>A market research project for a pharmaceutical company wanted to model consumer interest in purchasing a cold sore healthcare product. They gathered data from 1023 consumers. Each consumer was asked to rate on a 10-point Likert scale 35 factors according to whether the factor matters to them when considering purchasing a cold sore treatment. They also rated their interest in purchasing the product.<a class="footnote-reference brackets" href="#lipovetsky" id="id1">1</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ma_df = pd.read_csv(&#39;data/market-analysis.csv&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ma_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/market-analysis.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1506,7 +1506,7 @@
 <p>Some of these 35 features appear to be measuring similar aspects of desirability, based on their labels. We can compute the correlations between the explanatory variables to confirm this observation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ma_df.corr()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ma_df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1634,12 +1634,12 @@
 <p>Before we start to fit regularized models, we set up the design matrix and output vector and split the data into train and test sets. We set aside 200 observations for the train set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y = ma_df[[&#39;y&#39;]]
-X = ma_df.drop([&#39;y&#39;], axis=1)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">ma_df</span><span class="p">[[</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ma_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-test_size = 200
+<span class="n">test_size</span> <span class="o">=</span> <span class="mi">200</span>
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1647,11 +1647,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, r
 <p>As mentioned earlier, we need to standardize the features. We standardize the train set, and then, when we go to test the model, we use the train set standardization on the test set. The <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> method helps us with this process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.preprocessing import StandardScaler
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 
-scalerX = StandardScaler().fit(X_train) 
-X_train_scaled = scalerX.transform(X_train)
-X_test_scaled = scalerX.transform(X_test)
+<span class="n">scalerX</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span> 
+<span class="n">X_train_scaled</span> <span class="o">=</span> <span class="n">scalerX</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test_scaled</span> <span class="o">=</span> <span class="n">scalerX</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1659,7 +1659,7 @@ X_test_scaled = scalerX.transform(X_test)
 <p>The means of each of the 35 features in the train set are all 0 and the SDs are all 1.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.mean(X_train_scaled, axis=0)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1671,7 +1671,7 @@ X_test_scaled = scalerX.transform(X_test)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.std(X_train_scaled, axis=0)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1684,7 +1684,7 @@ X_test_scaled = scalerX.transform(X_test)
 <p>This is not the case for the test set, because we have used the averages and SDs from train set to standardize them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.mean(X_test_scaled, axis=0)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_test_scaled</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1697,12 +1697,12 @@ X_test_scaled = scalerX.transform(X_test)
 <p>We perform a LASSO regression on the train set, setting <span class="math notranslate nohighlight">\(\lambda\)</span> (represented as the parameter <code class="docutils literal notranslate"><span class="pre">alpha</span></code> in the call)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import Lasso
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span>
 
-lasso_model1 = Lasso(alpha=0.1)
-lasso_model1.fit(X_train_scaled, y_train)
+<span class="n">lasso_model1</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">lasso_model1</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
-lasso_model1.coef_[0:20]
+<span class="n">lasso_model1</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1716,7 +1716,7 @@ lasso_model1.coef_[0:20]
 <p>We see that several of the coefficients are 0. This is a property of LASSO regression that many find appealing. The nature of <span class="math notranslate nohighlight">\(L_1\)</span> distance leads to coefficients being zeroed out, which can be viewed as a model selection technique.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sum(lasso_model1.coef_ &gt; 0)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">lasso_model1</span><span class="o">.</span><span class="n">coef_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1730,17 +1730,17 @@ lasso_model1.coef_[0:20]
 <p>Let’s see how the coefficients change with <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lasso_model = Lasso()
-coefs = []
-mses = []
-alphas = np.arange(0.01, 2, 0.01)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lasso_model</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">()</span>
+<span class="n">coefs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">mses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
 
-for a in alphas:
-    lasso_model.set_params(alpha = a)
-    lasso_model.fit(X_train_scaled,y_train)
-    coefs.append(lasso_model.coef_)
-    mses.append(mean_squared_error(y_test, 
-                    lasso_model.predict(X_test_scaled)))
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">:</span>
+    <span class="n">lasso_model</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">lasso_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+    <span class="n">coefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lasso_model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+    <span class="n">mses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> 
+                    <span class="n">lasso_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_scaled</span><span class="p">)))</span>
 </pre></div>
 </div>
 </div>
@@ -1752,13 +1752,13 @@ for a in alphas:
 <p>As <span class="math notranslate nohighlight">\( \lambda \)</span> increases, the model fitting is penalized more heavily and many coefficients shrink to 0. The left hand side of the plot shows greater model complexity, corresponds to small <span class="math notranslate nohighlight">\( \lambda \)</span>. The model that we first fit was for <span class="math notranslate nohighlight">\( \lambda = 0.1 \)</span>, and we can see from this plot which coefficients are non-zero. The largest coefficients are for “x12”, “x30”, “x5”, “x15”, “x31”, “x28”, and “x7”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.line(x = alphas, y = mses,
-             labels={&quot;x&quot;: &quot;lambda&quot;,
-                     &quot;y&quot;: &quot;MSE&quot;
-                 })
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">mses</span><span class="p">,</span>
+             <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;lambda&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;MSE&quot;</span>
+                 <span class="p">})</span>
 
-fig.update_layout(width=350, height=250)
-fig.show()
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1768,17 +1768,17 @@ fig.show()
 <p>By the time <span class="math notranslate nohighlight">\( \lambda \)</span> is about 1.25, the penalty is so large that the LASSO regression is fitting a constant model to the data, and so the MSE remains the same. We are again faced with a model selection question, but this time it’s in the form of deciding which <span class="math notranslate nohighlight">\( \lambda \)</span>. We can use cross-validation to help us.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import LassoCV
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LassoCV</span>
 
-lasso_cv_model = LassoCV(alphas = np.arange(0.01, 1, 0.01), 
-                         cv = 5, max_iter = 100000)
+<span class="n">lasso_cv_model</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">(</span><span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span> 
+                         <span class="n">cv</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lasso_best = lasso_cv_model.fit(X_train_scaled, np.squeeze(y_train))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lasso_best</span> <span class="o">=</span> <span class="n">lasso_cv_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1786,7 +1786,7 @@ lasso_cv_model = LassoCV(alphas = np.arange(0.01, 1, 0.01),
 <p>The penalty for the cross-validated model is:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lasso_best.alpha_
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lasso_best</span><span class="o">.</span><span class="n">alpha_</span>
 </pre></div>
 </div>
 </div>
@@ -1799,8 +1799,8 @@ lasso_cv_model = LassoCV(alphas = np.arange(0.01, 1, 0.01),
 <p>And we can compute the MSE for predictions in the test set using the cross-validated model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y_test_pred = lasso_best.predict(X_test_scaled)
-mean_squared_error(y_test,y_test_pred)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_test_pred</span> <span class="o">=</span> <span class="n">lasso_best</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_scaled</span><span class="p">)</span>
+<span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">y_test_pred</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1812,7 +1812,7 @@ mean_squared_error(y_test,y_test_pred)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sum(lasso_best.coef_ &gt; 0)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">lasso_best</span><span class="o">.</span><span class="n">coef_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1826,16 +1826,16 @@ mean_squared_error(y_test,y_test_pred)
 <p>Next, let’s try using an <span class="math notranslate nohighlight">\( L_2 \)</span> penalty and perform Ridge regression. We’ll make a plot of the coefficients as <span class="math notranslate nohighlight">\( \lambda \)</span> varies.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import Ridge
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span>
 
-ridge = Ridge( )
-coefsR = []
-alphasR = np.arange(1, 1001, 25)
+<span class="n">ridge</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span> <span class="p">)</span>
+<span class="n">coefsR</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">alphasR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
 
-for a in alphasR:
-    ridge.set_params(alpha = a)
-    ridge.fit(X_train_scaled, y_train)
-    coefsR.append(ridge.coef_)
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alphasR</span><span class="p">:</span>
+    <span class="n">ridge</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">ridge</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">coefsR</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ridge</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1847,10 +1847,10 @@ for a in alphasR:
 <p>This plot shows a very different shape compared to the LASSO coefficient plot. The coefficients do not disappear entirely. The plots do have an important similarity in that as the penalty increases the coefficients shrink.  In a way, with Ridge regression, we are using all of the variables a little bit. Again, we are faced with the question of which <span class="math notranslate nohighlight">\( \lambda \)</span> to use, and we turn to cross-validation to help.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import RidgeCV
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">RidgeCV</span>
 
-ridgecv = RidgeCV(alphas = alphasR, cv=10)
-ridgecv.fit(X_train_scaled, y_train)
+<span class="n">ridgecv</span> <span class="o">=</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span> <span class="o">=</span> <span class="n">alphasR</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ridgecv</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1863,9 +1863,9 @@ ridgecv.fit(X_train_scaled, y_train)
 <p>We use the cross-validated choice for <span class="math notranslate nohighlight">\( \lambda \)</span> to fit the Ridge regression.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ridge_best = Ridge(alpha = ridgecv.alpha_)
-ridge_best.fit(X_train_scaled, y_train)
-mean_squared_error(y_test, ridge_best.predict(X_test_scaled))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ridge_best</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">ridgecv</span><span class="o">.</span><span class="n">alpha_</span><span class="p">)</span>
+<span class="n">ridge_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_scaled</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">ridge_best</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_scaled</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1878,7 +1878,7 @@ mean_squared_error(y_test, ridge_best.predict(X_test_scaled))
 <p>The MSE is larger than the MSE for LASSO. Many coefficients, while not 0, are quite small. We can count the number of coefficients larger than 0.05.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sum(np.squeeze(ridge_best.coef_ &gt; 0.05))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">ridge_best</span><span class="o">.</span><span class="n">coef_</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1891,7 +1891,7 @@ mean_squared_error(y_test, ridge_best.predict(X_test_scaled))
 <p>Similar to LASSO, roughly 20 of the features have tiny coefficients. We can compare the coefficients from the two regularized models.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>ridge_best.coef_
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ridge_best</span><span class="o">.</span><span class="n">coef_</span>
 </pre></div>
 </div>
 </div>
@@ -1903,7 +1903,7 @@ mean_squared_error(y_test, ridge_best.predict(X_test_scaled))
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lasso_best.coef_[: 20]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lasso_best</span><span class="o">.</span><span class="n">coef_</span><span class="p">[:</span> <span class="mi">20</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>

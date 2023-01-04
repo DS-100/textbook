@@ -247,7 +247,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1308,7 +1308,7 @@
 <p>We are interested in modeling the experience of someone waiting at a bus stop. We could develop a complex model that involves the intervals between scheduled arrivals, the bus line, and direction. Instead, we take a simpler approach and narrow the focus to one line, one direction, and one scheduled interval. We examine the northbound C line stops that are scheduled to arrive 12 minutes apart. Both the complex and the narrow approaches are legitimate, but we do not yet have the tools to approach the complex model (see <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a> for more details on modeling).</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>bus_c_n_12 = bus_c_n[bus_c_n[&#39;sched_inter&#39;] == 12].copy()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus_c_n_12</span> <span class="o">=</span> <span class="n">bus_c_n</span><span class="p">[</span><span class="n">bus_c_n</span><span class="p">[</span><span class="s1">&#39;sched_inter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1316,12 +1316,12 @@
 <p>So far, we have examined the distribution of the number of minutes the bus is late. We create another histogram of this delay for the subset of data that we are analyzing (northbound C line stops that are scheduled to arrive 12 minutes after the previous bus).</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.histogram(bus_c_n_12, x=&#39;minutes_late&#39;, 
-                   nbins=120, width=450, height=300)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">,</span> 
+                   <span class="n">nbins</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
-fig.update_xaxes(range=[-13, 40])
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">13</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
 
-fig.show()
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1331,9 +1331,9 @@ fig.show()
 <p>And, we calculate the minimum, maximum, and median lateness.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(f&quot; smallest amount late:  {np.min(bus_c_n_12[&#39;minutes_late&#39;]):.2f} minutes\n&quot;,
-      f&quot;greatest amount late:  {np.max(bus_c_n_12[&#39;minutes_late&#39;]):.2f} minutes\n&quot;,
-      f&quot;median amount late: {np.median(bus_c_n_12[&#39;minutes_late&#39;]):.2f} minutes\n&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; smallest amount late:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;greatest amount late:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;median amount late: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1354,8 +1354,8 @@ fig.show()
 <p>We can design a simulation that mimics waiting for a bus over the course of one day, like in <a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>.  To do this, we set up a string of scheduled bus arrivals that are 12 minutes apart from 6 am to midnight.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>scheduled = 12 * np.arange(91)
-scheduled
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scheduled</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">91</span><span class="p">)</span>
+<span class="n">scheduled</span>
 </pre></div>
 </div>
 </div>
@@ -1368,9 +1368,9 @@ scheduled
 <p>Then, for each scheduled arrival, we simulate its actual arrival time by adding on a random amount of minutes each bus is late. To do this, we choose the minutes late from the distribution of observed lateness of the actual buses. Notice how we have incorporated the real data in our simulation study by using the distribution of actual delays of the 12-minute apart buses.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>minutes_late = bus_c_n_12[&#39;minutes_late&#39;].to_numpy()
-actual = scheduled + np.random.choice(minutes_late, 
-                                     size = 91, replace=True)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">minutes_late</span> <span class="o">=</span> <span class="n">bus_c_n_12</span><span class="p">[</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">actual</span> <span class="o">=</span> <span class="n">scheduled</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">minutes_late</span><span class="p">,</span> 
+                                     <span class="n">size</span> <span class="o">=</span> <span class="mi">91</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1378,8 +1378,8 @@ actual = scheduled + np.random.choice(minutes_late,
 <p>We need to sort these arrival times because when a bus is super late, another may well come along before it.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>actual.sort()
-actual
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">actual</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">actual</span>
 </pre></div>
 </div>
 </div>
@@ -1392,8 +1392,8 @@ actual
 <p>We also need to simulate the arrival of people at the bus stop at random times throughout the day. We can use another, different, urn model for the passenger arrivals.  For the passengers, we put a marble in the urn with a time on it.  These times run from time 0, which stands for 6 am, to the arrival of the last bus at midnight, which is 1068 minutes past 6 am, and to match the way the bus times are measured in our data, we make the times 1/100 of a minute apart.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pass_arrival_times = np.arange(100*1068)
-pass_arrival_times / 100
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pass_arrival_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="mi">1068</span><span class="p">)</span>
+<span class="n">pass_arrival_times</span> <span class="o">/</span> <span class="mi">100</span>
 </pre></div>
 </div>
 </div>
@@ -1406,10 +1406,10 @@ pass_arrival_times / 100
 <p>Now, we can simulate the arrival of, say, 500 people, at the bus stop throughout the day.  We draw 500 times from this urn, replacing the marbles between draws.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sim_arrival_times = np.random.choice(pass_arrival_times, 
-                                     size = 500, replace=True)/100
-sim_arrival_times.sort()
-sim_arrival_times
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sim_arrival_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pass_arrival_times</span><span class="p">,</span> 
+                                     <span class="n">size</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span>
+<span class="n">sim_arrival_times</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">sim_arrival_times</span>
 </pre></div>
 </div>
 </div>
@@ -1422,9 +1422,9 @@ sim_arrival_times
 <p>To find out how long each individual waits, we look for the soonest bus to arrive after their sampled time. The difference between these two times (the sampled time of the person and the soonest bus arrival after that) is how long the person waits.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>i = np.searchsorted(actual, sim_arrival_times, side=&#39;right&#39;)
-sim_wait_times = actual[i] - sim_arrival_times
-sim_wait_times
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">sim_arrival_times</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="n">sim_wait_times</span> <span class="o">=</span> <span class="n">actual</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sim_arrival_times</span>
+<span class="n">sim_wait_times</span>
 </pre></div>
 </div>
 </div>
@@ -1437,17 +1437,17 @@ sim_wait_times
 <p>We can set up a complete simulation where we simulate, say, 200 days of bus arrivals and for each day, we simulate 500 people arriving at the bus stop at random times throughout the day. In total, that’s 100,000 simulated wait times.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sim_wait_times = [ ]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sim_wait_times</span> <span class="o">=</span> <span class="p">[</span> <span class="p">]</span>
 
-for day in np.arange(0, 200, 1):
-    bus_late = np.random.choice(minutes_late, size = 91, replace=True)
-    actual = scheduled + bus_late
-    actual.sort()
-    sim_arrival_times = np.random.choice(pass_arrival_times, 
-                                     size = 500, replace=True)/100
-    sim_arrival_times.sort()
-    i = np.searchsorted(actual, sim_arrival_times, side=&#39;right&#39;)
-    sim_wait_times = np.append(sim_wait_times, actual[i] - sim_arrival_times)
+<span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">bus_late</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">minutes_late</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">91</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">actual</span> <span class="o">=</span> <span class="n">scheduled</span> <span class="o">+</span> <span class="n">bus_late</span>
+    <span class="n">actual</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">sim_arrival_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pass_arrival_times</span><span class="p">,</span> 
+                                     <span class="n">size</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span>
+    <span class="n">sim_arrival_times</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="n">sim_arrival_times</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+    <span class="n">sim_wait_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_wait_times</span><span class="p">,</span> <span class="n">actual</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sim_arrival_times</span><span class="p">)</span>
     
 </pre></div>
 </div>
@@ -1456,14 +1456,14 @@ for day in np.arange(0, 200, 1):
 <p>We make a histogram of these simulated waiting times to examine the distribution.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig = px.histogram(x=sim_wait_times, nbins=40,
-                   histnorm=&#39;probability density&#39;,
-                   width=450, height=300)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">sim_wait_times</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+                   <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span>
+                   <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
 
-fig.update_xaxes(title=&quot;Simulated Wait Times for 100,000 Passengers&quot;)
-fig.update_yaxes(title=&quot;Proportion&quot;)
-fig.show()
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Simulated Wait Times for 100,000 Passengers&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Proportion&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1473,7 +1473,7 @@ fig.show()
 <p>As we expect, we find a skewed distribution.  We can model this by a constant where we use absolute loss to select the best constant. We saw in <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> that absolute loss gives us the median wait time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(f&quot;median wait time: {np.median(sim_wait_times):.2f} minutes&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;median wait time: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">sim_wait_times</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1487,7 +1487,7 @@ fig.show()
 While our model captures the typical wait time, we also  want to provide an estimate of the variability in the process. This topic is covered in <a class="reference internal" href="../17/inf_pred_gen_intro.html#ch-inf-pred-theory"><span class="std std-numref">Chapter 17</span></a>.  We can compute the upper quartile of wait times to give us a sense of variability.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(f&quot;upper quartile wait time: {np.quantile(sim_wait_times, 0.75):.2f} minutes&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;upper quartile wait time: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">sim_wait_times</span><span class="p">,</span><span class="w"> </span><span class="mf">0.75</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> minutes&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

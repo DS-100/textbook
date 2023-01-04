@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1363,30 +1363,30 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
-# Ignore numpy dtype warnings. These warnings are caused by an interaction
-# between numpy and Cython and can be safely ignored.
-# Reference: https://stackoverflow.com/a/40846742
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-%matplotlib inline
-import ipywidgets as widgets
-from ipywidgets import interact, interactive, fixed, interact_manual
-import nbinteract as nbi
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-sns.set()
-sns.set_context(&#39;talk&#39;)
-np.set_printoptions(threshold=20, precision=2, suppress=True)
-pd.options.display.max_rows = 7
-pd.options.display.max_columns = 8
-pd.set_option(&#39;precision&#39;, 2)
-# This option stops scientific notation for pandas
-# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 </div>
 </div>
@@ -1439,23 +1439,23 @@ hypothesis were true.</p>
 <p>We begin with the student and gender data below. These data are a census of 47 students enrolled in an online course at a U.S. university.</p>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>student_eval = (
-    pd.read_csv(&#39;StudentRatingsData.csv&#39;)
-    .loc[:, [&quot;tagender&quot;, &quot;taidgender&quot;, &quot;prompt&quot;]]
-    .dropna()
-    .rename(columns={&#39;tagender&#39;: &#39;actual&#39;, &#39;taidgender&#39;: &#39;perceived&#39;})
-)
-student_eval[[&#39;actual&#39;, &#39;perceived&#39;]] = (
-    student_eval[[&#39;actual&#39;, &#39;perceived&#39;]]
-    .replace([0, 1], [&#39;female&#39;, &#39;male&#39;])
-)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">student_eval</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;StudentRatingsData.csv&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;tagender&quot;</span><span class="p">,</span> <span class="s2">&quot;taidgender&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">]]</span>
+    <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;tagender&#39;</span><span class="p">:</span> <span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;taidgender&#39;</span><span class="p">:</span> <span class="s1">&#39;perceived&#39;</span><span class="p">})</span>
+<span class="p">)</span>
+<span class="n">student_eval</span><span class="p">[[</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;perceived&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">student_eval</span><span class="p">[[</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;perceived&#39;</span><span class="p">]]</span>
+    <span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">])</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>student_eval
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">student_eval</span>
 </pre></div>
 </div>
 </div>
@@ -1538,13 +1538,13 @@ student_eval[[&#39;actual&#39;, &#39;perceived&#39;]] = (
 <p>After analyzing and plotting the ratings data from the experiment below,  there appears to be a difference between the groups of students, with perceived female ratings lower than male ratings; however, we need a more formal hypothesis test to see if this difference could simply be due to the random assignment of students.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>avg_ratings = (student_eval
- .loc[:, [&#39;actual&#39;, &#39;perceived&#39;, &#39;prompt&#39;]]
- .groupby([&#39;actual&#39;, &#39;perceived&#39;])
- .mean()
- .rename(columns={&#39;prompt&#39;: &#39;mean prompt&#39;})
-)
-avg_ratings
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">avg_ratings</span> <span class="o">=</span> <span class="p">(</span><span class="n">student_eval</span>
+ <span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;perceived&#39;</span><span class="p">,</span> <span class="s1">&#39;prompt&#39;</span><span class="p">]]</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="s1">&#39;perceived&#39;</span><span class="p">])</span>
+ <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;prompt&#39;</span><span class="p">:</span> <span class="s1">&#39;mean prompt&#39;</span><span class="p">})</span>
+<span class="p">)</span>
+<span class="n">avg_ratings</span>
 </pre></div>
 </div>
 </div>
@@ -1601,15 +1601,15 @@ avg_ratings
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig, ax = plt.subplots(figsize=(12, 7))
-ind = np.arange(4)
-plt.bar(ind, avg_ratings[&quot;mean prompt&quot;])
-ax.set_xticks(ind)
-ax.set_xticklabels([&#39;Female (Percieved Female)&#39;, &#39;Female (Percieved Male)&#39;, &#39;Male (Percieved Female)&#39;, &quot;Male (Percieved Male)&quot;])
-ax.set_ylabel(&#39;Average Promptness Rating&#39;)
-ax.set_xlabel(&#39;Actual/Percieved Gender&#39;)
-ax.set_title(&#39;Average Rating Per Actual/Percieved Gender&#39;)
-plt.show()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">avg_ratings</span><span class="p">[</span><span class="s2">&quot;mean prompt&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s1">&#39;Female (Percieved Female)&#39;</span><span class="p">,</span> <span class="s1">&#39;Female (Percieved Male)&#39;</span><span class="p">,</span> <span class="s1">&#39;Male (Percieved Female)&#39;</span><span class="p">,</span> <span class="s2">&quot;Male (Percieved Male)&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Average Promptness Rating&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Actual/Percieved Gender&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Average Rating Per Actual/Percieved Gender&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1623,18 +1623,18 @@ plt.show()
 <p>We will compute the observed difference between the average ratings of the identified male and identified female groups:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def stat(evals):
-    &#39;&#39;&#39;Computes the test statistic on the evals DataFrame&#39;&#39;&#39;
-    avgs = evals.groupby(&#39;perceived&#39;).mean()
-    return avgs.loc[&#39;female&#39;, &#39;prompt&#39;] - avgs.loc[&#39;male&#39;, &#39;prompt&#39;]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="n">evals</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Computes the test statistic on the evals DataFrame&#39;&#39;&#39;</span>
+    <span class="n">avgs</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;perceived&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">avgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;prompt&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">avgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;prompt&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>observed_difference = stat(student_eval)
-observed_difference
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">observed_difference</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">student_eval</span><span class="p">)</span>
+<span class="n">observed_difference</span>
 </pre></div>
 </div>
 </div>
@@ -1648,23 +1648,23 @@ observed_difference
 <p>Now, we can permute the perceived gender labels for each TA and calculate the test statistic 1,000 times:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def shuffle_column(df, col):
-    &#39;&#39;&#39;Returns a new copy of df with col shuffled&#39;&#39;&#39;
-    result = df.copy()
-    result[col] = np.random.choice(df[col], size=len(df[col]))
-    return result
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">shuffle_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns a new copy of df with col shuffled&#39;&#39;&#39;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">result</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repetitions = 1000
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">repetitions</span> <span class="o">=</span> <span class="mi">1000</span>
 
-gender_differences = np.array([
-    stat(shuffle_column(student_eval, &#39;perceived&#39;))
-    for _ in range(repetitions)
-])
+<span class="n">gender_differences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="n">stat</span><span class="p">(</span><span class="n">shuffle_column</span><span class="p">(</span><span class="n">student_eval</span><span class="p">,</span> <span class="s1">&#39;perceived&#39;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">)</span>
+<span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1672,13 +1672,13 @@ gender_differences = np.array([
 <p>We plot the approximate sampling distribution of the difference in scores using our permutations below, showing the observed value using a red dotted line.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>differences_df = pd.DataFrame()
-differences_df[&quot;gender_differences&quot;] = gender_differences
-gender_hist = differences_df.loc[:, &quot;gender_differences&quot;].hist(normed=True)
-gender_hist.set_xlabel(&quot;Average Gender Difference (Test Statistic)&quot;)
-gender_hist.set_ylabel(&quot;Percent per Unit&quot;)
-gender_hist.set_title(&quot;Distribution of Gender Differences&quot;)
-plt.axvline(observed_difference, c=&#39;r&#39;, linestyle=&#39;--&#39;);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">differences_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">differences_df</span><span class="p">[</span><span class="s2">&quot;gender_differences&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gender_differences</span>
+<span class="n">gender_hist</span> <span class="o">=</span> <span class="n">differences_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;gender_differences&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">gender_hist</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Average Gender Difference (Test Statistic)&quot;</span><span class="p">)</span>
+<span class="n">gender_hist</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Percent per Unit&quot;</span><span class="p">)</span>
+<span class="n">gender_hist</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Gender Differences&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">observed_difference</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1691,13 +1691,13 @@ plt.axvline(observed_difference, c=&#39;r&#39;, linestyle=&#39;--&#39;);
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>differences_df = pd.DataFrame()
-differences_df[&quot;gender_differences&quot;] = gender_differences
-gender_hist = differences_df.loc[:, &quot;gender_differences&quot;].hist(normed=True)
-gender_hist.set_xlabel(&quot;Average Gender Difference (Test Statistic)&quot;)
-gender_hist.set_ylabel(&quot;Percent per Unit&quot;)
-gender_hist.set_title(&quot;Distribution of Gender Differences&quot;)
-plt.axvline(observed_difference, c=&#39;r&#39;, linestyle=&#39;--&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">differences_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">differences_df</span><span class="p">[</span><span class="s2">&quot;gender_differences&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gender_differences</span>
+<span class="n">gender_hist</span> <span class="o">=</span> <span class="n">differences_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;gender_differences&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">gender_hist</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Average Gender Difference (Test Statistic)&quot;</span><span class="p">)</span>
+<span class="n">gender_hist</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Percent per Unit&quot;</span><span class="p">)</span>
+<span class="n">gender_hist</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of Gender Differences&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">observed_difference</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1711,17 +1711,17 @@ plt.axvline(observed_difference, c=&#39;r&#39;, linestyle=&#39;--&#39;)
 <p>From our calculation below, only 18 of the 1000 simulations had a difference at least as large as the one observed. Therefore, our p-value is less than the 0.05 threshold and we reject the null hypothesis in favor of the alternative.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>#Sample Distribution Parameters
-sample_sd = np.std(gender_differences)
-sample_mean = np.mean(gender_differences)
-#Computing right-hand extreme value
-num_sd_away = (sample_mean - observed_difference)/sample_sd
-right_extreme_val = sample_mean + (num_sd_away*sample_sd)
-#Calculate P-value
-num_extreme_left = np.count_nonzero(gender_differences &lt;= observed_difference)
-num_extreme_right = np.count_nonzero(gender_differences &gt;= right_extreme_val)
-empirical_P = (num_extreme_left + num_extreme_right) / repetitions
-empirical_P
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Sample Distribution Parameters</span>
+<span class="n">sample_sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">gender_differences</span><span class="p">)</span>
+<span class="n">sample_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">gender_differences</span><span class="p">)</span>
+<span class="c1">#Computing right-hand extreme value</span>
+<span class="n">num_sd_away</span> <span class="o">=</span> <span class="p">(</span><span class="n">sample_mean</span> <span class="o">-</span> <span class="n">observed_difference</span><span class="p">)</span><span class="o">/</span><span class="n">sample_sd</span>
+<span class="n">right_extreme_val</span> <span class="o">=</span> <span class="n">sample_mean</span> <span class="o">+</span> <span class="p">(</span><span class="n">num_sd_away</span><span class="o">*</span><span class="n">sample_sd</span><span class="p">)</span>
+<span class="c1">#Calculate P-value</span>
+<span class="n">num_extreme_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">gender_differences</span> <span class="o">&lt;=</span> <span class="n">observed_difference</span><span class="p">)</span>
+<span class="n">num_extreme_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">gender_differences</span> <span class="o">&gt;=</span> <span class="n">right_extreme_val</span><span class="p">)</span>
+<span class="n">empirical_P</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_extreme_left</span> <span class="o">+</span> <span class="n">num_extreme_right</span><span class="p">)</span> <span class="o">/</span> <span class="n">repetitions</span>
+<span class="n">empirical_P</span>
 </pre></div>
 </div>
 </div>

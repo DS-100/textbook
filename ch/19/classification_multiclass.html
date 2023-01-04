@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1363,64 +1363,64 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
-# Ignore numpy dtype warnings. These warnings are caused by an interaction
-# between numpy and Cython and can be safely ignored.
-# Reference: https://stackoverflow.com/a/40846742
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-%matplotlib inline
-import ipywidgets as widgets
-from ipywidgets import interact, interactive, fixed, interact_manual
-import nbinteract as nbi
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-sns.set()
-sns.set_context(&#39;talk&#39;)
-np.set_printoptions(threshold=20, precision=2, suppress=True)
-pd.options.display.max_rows = 7
-pd.options.display.max_columns = 8
-pd.set_option(&#39;precision&#39;, 2)
-# This option stops scientific notation for pandas
-# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>markers = {&#39;triangle&#39;:[&#39;^&#39;, sns.color_palette()[0]], 
-           &#39;square&#39;:[&#39;s&#39;, sns.color_palette()[1]],
-           &#39;circle&#39;:[&#39;o&#39;, sns.color_palette()[2]]}
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">markers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;triangle&#39;</span><span class="p">:[</span><span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">0</span><span class="p">]],</span> 
+           <span class="s1">&#39;square&#39;</span><span class="p">:[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">1</span><span class="p">]],</span>
+           <span class="s1">&#39;circle&#39;</span><span class="p">:[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">()[</span><span class="mi">2</span><span class="p">]]}</span>
 
-def plot_binary(data, label):
-    data_copy = data.copy()
-    data_copy[&#39;$y$ == &#39; + label] = (data_copy[&#39;$y$&#39;] == label).astype(&#39;category&#39;)
+<span class="k">def</span> <span class="nf">plot_binary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="n">data_copy</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data_copy</span><span class="p">[</span><span class="s1">&#39;$y$ == &#39;</span> <span class="o">+</span> <span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">data_copy</span><span class="p">[</span><span class="s1">&#39;$y$&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
     
-    sns.lmplot(&#39;$x_1$&#39;, &#39;$x_2$&#39;, data=data_copy, hue=&#39;$y$ == &#39; + label, hue_order=[True, False], 
-               markers=[markers[label][0], &#39;x&#39;], palette=[markers[label][1], &#39;gray&#39;],
-               fit_reg=False)
-    plt.xlim(1.0, 4.0)
-    plt.ylim(1.0, 4.0);
+    <span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">,</span> <span class="s1">&#39;$x_2$&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_copy</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;$y$ == &#39;</span> <span class="o">+</span> <span class="n">label</span><span class="p">,</span> <span class="n">hue_order</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> 
+               <span class="n">markers</span><span class="o">=</span><span class="p">[</span><span class="n">markers</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="n">markers</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;gray&#39;</span><span class="p">],</span>
+               <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def plot_confusion_matrix(y_test, y_pred):
-    sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, cbar=False, cmap=matplotlib.cm.get_cmap(&#39;gist_yarg&#39;))
-    plt.ylabel(&#39;Observed&#39;)
-    plt.xlabel(&#39;Predicted&#39;)
-    plt.xticks([0.5, 1.5, 2.5], [&#39;iris-setosa&#39;, &#39;iris-versicolor&#39;, &#39;iris-virginica&#39;])
-    plt.yticks([0.5, 1.5, 2.5], [&#39;iris-setosa&#39;, &#39;iris-versicolor&#39;, &#39;iris-virginica&#39;], rotation=&#39;horizontal&#39;)
-    ax = plt.gca()
-    ax.xaxis.set_ticks_position(&#39;top&#39;)
-    ax.xaxis.set_label_position(&#39;top&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;gist_yarg&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Observed&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;iris-setosa&#39;</span><span class="p">,</span> <span class="s1">&#39;iris-versicolor&#39;</span><span class="p">,</span> <span class="s1">&#39;iris-virginica&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;iris-setosa&#39;</span><span class="p">,</span> <span class="s1">&#39;iris-versicolor&#39;</span><span class="p">,</span> <span class="s1">&#39;iris-virginica&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_label_position</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1433,21 +1433,21 @@ def plot_binary(data, label):
 <p>In OvR classification (also known as one-vs-all, or OvA), we decompose a multiclass classification problem into several different binary classification problems. For example, we might observe training data as shown below:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>shapes = pd.DataFrame(
-    [[1.3, 3.6, &#39;triangle&#39;], [1.6, 3.2, &#39;triangle&#39;], [1.8, 3.8, &#39;triangle&#39;],
-     [2.0, 1.2, &#39;square&#39;], [2.2, 1.9, &#39;square&#39;], [2.6, 1.4, &#39;square&#39;],
-     [3.2, 2.9, &#39;circle&#39;], [3.5, 2.2, &#39;circle&#39;], [3.9, 2.5, &#39;circle&#39;]],
-    columns=[&#39;$x_1$&#39;, &#39;$x_2$&#39;, &#39;$y$&#39;]
-)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shapes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="s1">&#39;triangle&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="s1">&#39;triangle&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.8</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="s1">&#39;triangle&#39;</span><span class="p">],</span>
+     <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;square&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="s1">&#39;square&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">,</span> <span class="s1">&#39;square&#39;</span><span class="p">],</span>
+     <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.9</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">]],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">,</span> <span class="s1">&#39;$x_2$&#39;</span><span class="p">,</span> <span class="s1">&#39;$y$&#39;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sns.lmplot(&#39;$x_1$&#39;, &#39;$x_2$&#39;, data=shapes, hue=&#39;$y$&#39;, markers=[&#39;^&#39;, &#39;s&#39;, &#39;o&#39;], fit_reg=False)
-plt.xlim(1.0, 4.0)
-plt.ylim(1.0, 4.0);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">,</span> <span class="s1">&#39;$x_2$&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;$y$&#39;</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">],</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1458,7 +1458,7 @@ plt.ylim(1.0, 4.0);
 <p>Our goal is to build a multiclass classifier that labels observations as <code class="docutils literal notranslate"><span class="pre">triangle</span></code>, <code class="docutils literal notranslate"><span class="pre">square</span></code>, or <code class="docutils literal notranslate"><span class="pre">circle</span></code> given values for <span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span>. First, we want to build a binary classifier <code class="docutils literal notranslate"><span class="pre">lr_triangle</span></code> that predicts observations as <code class="docutils literal notranslate"><span class="pre">triangle</span></code> or not <code class="docutils literal notranslate"><span class="pre">triangle</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_binary(shapes, &#39;triangle&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_binary</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="s1">&#39;triangle&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1469,7 +1469,7 @@ plt.ylim(1.0, 4.0);
 <p>Similarly, we build binary classifiers <code class="docutils literal notranslate"><span class="pre">lr_square</span></code> and <code class="docutils literal notranslate"><span class="pre">lr_circle</span></code> for the remaining classes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_binary(shapes, &#39;square&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_binary</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="s1">&#39;square&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1479,7 +1479,7 @@ plt.ylim(1.0, 4.0);
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plot_binary(shapes, &#39;circle&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_binary</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1503,17 +1503,17 @@ plt.ylim(1.0, 4.0);
 <p>Then our multiclass classifier would input these values to each of <code class="docutils literal notranslate"><span class="pre">lr_triangle</span></code>, <code class="docutils literal notranslate"><span class="pre">lr_square</span></code>, and <code class="docutils literal notranslate"><span class="pre">lr_circle</span></code>. We extract the positive class probability of each of the three classifiers:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lr_triangle = LogisticRegression(random_state=42)
-lr_triangle.fit(shapes[[&#39;$x_1$&#39;, &#39;$x_2$&#39;]], shapes[&#39;$y$&#39;] == &#39;triangle&#39;)
-proba_triangle = lr_triangle.predict_proba([[3.2, 2.5]])[0][1]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_triangle</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">lr_triangle</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">shapes</span><span class="p">[[</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">,</span> <span class="s1">&#39;$x_2$&#39;</span><span class="p">]],</span> <span class="n">shapes</span><span class="p">[</span><span class="s1">&#39;$y$&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;triangle&#39;</span><span class="p">)</span>
+<span class="n">proba_triangle</span> <span class="o">=</span> <span class="n">lr_triangle</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">([[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-lr_square = LogisticRegression(random_state=42)
-lr_square.fit(shapes[[&#39;$x_1$&#39;, &#39;$x_2$&#39;]], shapes[&#39;$y$&#39;] == &#39;square&#39;)
-proba_square = lr_square.predict_proba([[3.2, 2.5]])[0][1]
+<span class="n">lr_square</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">lr_square</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">shapes</span><span class="p">[[</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">,</span> <span class="s1">&#39;$x_2$&#39;</span><span class="p">]],</span> <span class="n">shapes</span><span class="p">[</span><span class="s1">&#39;$y$&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;square&#39;</span><span class="p">)</span>
+<span class="n">proba_square</span> <span class="o">=</span> <span class="n">lr_square</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">([[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-lr_circle = LogisticRegression(random_state=42)
-lr_circle.fit(shapes[[&#39;$x_1$&#39;, &#39;$x_2$&#39;]], shapes[&#39;$y$&#39;] == &#39;circle&#39;)
-proba_circle = lr_circle.predict_proba([[3.2, 2.5]])[0][1]
+<span class="n">lr_circle</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">lr_circle</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">shapes</span><span class="p">[[</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">,</span> <span class="s1">&#39;$x_2$&#39;</span><span class="p">]],</span> <span class="n">shapes</span><span class="p">[</span><span class="s1">&#39;$y$&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;circle&#39;</span><span class="p">)</span>
+<span class="n">proba_circle</span> <span class="o">=</span> <span class="n">lr_circle</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">([[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">]])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1553,10 +1553,10 @@ proba_circle = lr_circle.predict_proba([[3.2, 2.5]])[0][1]
 <p>We will create a multiclass classifier that predicts the type of Iris plant based on the four features above. First, we read in the data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>iris = pd.read_csv(&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data&#39;,
-                  header=None, names=[&#39;sepal_length&#39;, &#39;sepal_width&#39;, &#39;petal_length&#39;, &#39;petal_width&#39;, &#39;species&#39;])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iris</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data&#39;</span><span class="p">,</span>
+                  <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sepal_length&#39;</span><span class="p">,</span> <span class="s1">&#39;sepal_width&#39;</span><span class="p">,</span> <span class="s1">&#39;petal_length&#39;</span><span class="p">,</span> <span class="s1">&#39;petal_width&#39;</span><span class="p">,</span> <span class="s1">&#39;species&#39;</span><span class="p">])</span>
 
-iris
+<span class="n">iris</span>
 </pre></div>
 </div>
 </div>
@@ -1650,8 +1650,8 @@ iris
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X, y = iris.drop(&#39;species&#39;, axis=1), iris[&#39;species&#39;]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=42)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">iris</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1659,8 +1659,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random
 <p>After dividing the dataset into train and test splits, we fit a multiclass classifier to our training data. By default, scikit-learn’s <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> sets <code class="docutils literal notranslate"><span class="pre">multi_class='ovr'</span></code>, which creates binary classifiers for each unique class:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lr = LogisticRegression(random_state=42)
-lr.fit(X_train, y_train)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1676,8 +1676,8 @@ lr.fit(X_train, y_train)
 <p>We predict on the test data, and use a confusion matrix to evaluate the results.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>y_pred = lr.predict(X_test)
-plot_confusion_matrix(y_test, y_pred)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1688,7 +1688,7 @@ plot_confusion_matrix(y_test, y_pred)
 <p>The confusion matrix shows that our classifier misclassified two <code class="docutils literal notranslate"><span class="pre">Iris-versicolor</span></code> observations as <code class="docutils literal notranslate"><span class="pre">Iris-virginica</span></code>. In observing the <code class="docutils literal notranslate"><span class="pre">sepal_length</span></code> and <code class="docutils literal notranslate"><span class="pre">sepal_width</span></code> features, we can hypothesize why this may have occurred:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sns.lmplot(x=&#39;sepal_length&#39;, y=&#39;sepal_width&#39;, data=iris, hue=&#39;species&#39;, fit_reg=False);
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;sepal_length&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;sepal_width&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">iris</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>

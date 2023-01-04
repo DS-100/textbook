@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1433,14 +1433,14 @@ $<span class="math notranslate nohighlight">\(
 The following functions set up this data generation process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def g(x): return np.sin(x) + 0.3 * x
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">x</span>
 
-def noise(n):
-    return np.random.normal(scale=0.2, size=n)
+<span class="k">def</span> <span class="nf">noise</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
 
-def draw(n):
-    points = np.random.choice(np.arange(0, 10, 0.05), size=n)
-    return points, g(points) + noise(n)
+<span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">g</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1448,9 +1448,9 @@ def draw(n):
 <p>We generate 50 <span class="math notranslate nohighlight">\( (x, y) \)</span> pairs from this model and plot them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(42)
-xs, ys = draw(50)
-error = ys-g(xs)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">draw</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">error</span> <span class="o">=</span> <span class="n">ys</span><span class="o">-</span><span class="n">g</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1463,11 +1463,11 @@ error = ys-g(xs)
 <p>Now let’s fit a second degree polynomial to these data. In other words, we take <span class="math notranslate nohighlight">\(\cal{F}\)</span> to be the collection of all functions that can be expressed as <span class="math notranslate nohighlight">\( \theta_0 + \theta_1 x + \theta_2 x^2\)</span>. Since <span class="math notranslate nohighlight">\( g(x) = \sin(x) + 0.3x \)</span>, it doesn’t belong to the collection of functions that we are optimizing over.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>poly = PolynomialFeatures(degree=2, include_bias=False)
-poly_features = poly.fit_transform(xs.reshape(-1,1))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">poly_features</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 
-model_deg2 = LinearRegression().fit(poly_features, ys)
-model_deg2.coef_
+<span class="n">model_deg2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">poly_features</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+<span class="n">model_deg2</span><span class="o">.</span><span class="n">coef_</span>
 </pre></div>
 </div>
 </div>
@@ -1486,19 +1486,19 @@ model_deg2.coef_
 <p>If we repeat this process, and generate another 50 points from the true  model and fit a second degree polynomial to these data, then the fitted coefficients of the quadratic will change because it depends on the new set of data. We can repeat this process many times, and average the fitted curves. This average curve will resemble the expected curve, <span class="math notranslate nohighlight">\( \mathbb{E}[ \hat{f} ] \)</span>. To demonstrate this, let’s generate 25 sets of data and fit a quadratic to each set of points.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def fit(n):
-    xs_new = np.random.choice(np.arange(0, 10, 0.05), size=n)
-    ys_new = g(xs_new) + noise(n)
-    X_new = xs_new.reshape(-1,1)
-    mod_new = LinearRegression().fit(poly.fit_transform(X_new), ys_new)
-    return mod_new.predict(poly_features_x_full).flatten()   
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">xs_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">ys_new</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="n">xs_new</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">X_new</span> <span class="o">=</span> <span class="n">xs_new</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">mod_new</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_new</span><span class="p">),</span> <span class="n">ys_new</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mod_new</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">poly_features_x_full</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>   
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fits = [fit(50) for j in range(25)]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fits</span> <span class="o">=</span> <span class="p">[</span><span class="n">fit</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">)]</span>
 </pre></div>
 </div>
 </div>

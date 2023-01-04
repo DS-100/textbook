@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1363,78 +1363,78 @@
                 
   <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
-# Ignore numpy dtype warnings. These warnings are caused by an interaction
-# between numpy and Cython and can be safely ignored.
-# Reference: https://stackoverflow.com/a/40846742
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.dtype size changed&quot;)
-warnings.filterwarnings(&quot;ignore&quot;, message=&quot;numpy.ufunc size changed&quot;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
+<span class="c1"># between numpy and Cython and can be safely ignored.</span>
+<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-%matplotlib inline
-import ipywidgets as widgets
-from ipywidgets import interact, interactive, fixed, interact_manual
-import nbinteract as nbi
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-sns.set()
-sns.set_context(&#39;talk&#39;)
-np.set_printoptions(threshold=20, precision=2, suppress=True)
-pd.options.display.max_rows = 7
-pd.options.display.max_columns = 8
-pd.set_option(&#39;precision&#39;, 2)
-# This option stops scientific notation for pandas
-# pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># This option stops scientific notation for pandas</span>
+<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def df_interact(df, nrows=7, ncols=7):
-    &#39;&#39;&#39;
-    Outputs sliders that show rows and columns of df
-    &#39;&#39;&#39;
-    def peek(row=0, col=0):
-        return df.iloc[row:row + nrows, col:col + ncols]
-    if len(df.columns) &lt;= ncols:
-        interact(peek, row=(0, len(df) - nrows, nrows), col=fixed(0))
-    else:
-        interact(peek,
-                 row=(0, len(df) - nrows, nrows),
-                 col=(0, len(df.columns) - ncols))
-    print(&#39;({} rows, {} columns) total&#39;.format(df.shape[0], df.shape[1]))
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Outputs sliders that show rows and columns of df</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
+                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
+                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.optimize import minimize as sci_min
-def minimize(cost_fn, grad_cost_fn, X, y, progress=True):
-    &#39;&#39;&#39;
-    Uses scipy.minimize to minimize cost_fn using a form of gradient descent.
-    &#39;&#39;&#39;
-    theta = np.zeros(X.shape[1])
-    iters = 0
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span> <span class="k">as</span> <span class="n">sci_min</span>
+<span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">cost_fn</span><span class="p">,</span> <span class="n">grad_cost_fn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Uses scipy.minimize to minimize cost_fn using a form of gradient descent.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="mi">0</span>
     
-    def objective(theta):
-        return cost_fn(theta, X, y)
-    def gradient(theta):
-        return grad_cost_fn(theta, X, y)
-    def print_theta(theta):
-        nonlocal iters
-        if progress and iters % progress == 0:
-            print(f&#39;theta: {theta} | cost: {cost_fn(theta, X, y):.2f}&#39;)
-        iters += 1
+    <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">grad_cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">print_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">iters</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="n">iters</span> <span class="o">%</span> <span class="n">progress</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;theta: </span><span class="si">{</span><span class="n">theta</span><span class="si">}</span><span class="s1"> | cost: </span><span class="si">{</span><span class="n">cost_fn</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span><span class="w"> </span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
         
-    print_theta(theta)
-    return sci_min(
-        objective, theta, method=&#39;BFGS&#39;, jac=gradient, callback=print_theta,
-        tol=1e-7
-    ).x
+    <span class="n">print_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sci_min</span><span class="p">(</span>
+        <span class="n">objective</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">print_theta</span><span class="p">,</span>
+        <span class="n">tol</span><span class="o">=</span><span class="mf">1e-7</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">x</span>
 </pre></div>
 </div>
 </div>
@@ -1471,8 +1471,8 @@ L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = &amp;= \frac{1}{n} \sum_i \left
 <p>Let us now return to the problem we faced at the start of this chapter: predicting which shots LeBron James will make. We start by loading the dataset of shots taken by LeBron in the 2017 NBA Playoffs.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>lebron = pd.read_csv(&#39;lebron.csv&#39;)
-lebron
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lebron</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;lebron.csv&#39;</span><span class="p">)</span>
+<span class="n">lebron</span>
 </pre></div>
 </div>
 </div>
@@ -1583,7 +1583,7 @@ lebron
 <p>We’ve included a widget below to allow you to pan through the entire DataFrame.</p>
 <div class="cell tag_interactive docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>df_interact(lebron)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_interact</span><span class="p">(</span><span class="n">lebron</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1598,13 +1598,13 @@ lebron
 <p>We start by using only the shot distance to predict whether or not the shot is made. <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> conveniently provides a logistic regression classifier as the <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html"><code class="docutils literal notranslate"><span class="pre">sklearn.linear_model.LogisticRegression</span></code></a> class. To use the class, we first create our data matrix <code class="docutils literal notranslate"><span class="pre">X</span></code> and vector of observed outcomes <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X = lebron[[&#39;shot_distance&#39;]].as_matrix()
-y = lebron[&#39;shot_made&#39;].as_matrix()
-print(&#39;X:&#39;)
-print(X)
-print()
-print(&#39;y:&#39;)
-print(y)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">lebron</span><span class="p">[[</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">lebron</span><span class="p">[</span><span class="s1">&#39;shot_made&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;X:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;y:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1627,13 +1627,13 @@ y:
 <p>As is customary, we split our data into a training set and a test set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.model_selection import train_test_split
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=40, random_state=42
-)
-print(f&#39;Training set size: {len(y_train)}&#39;)
-print(f&#39;Test set size: {len(y_test)}&#39;)
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1647,9 +1647,9 @@ Test set size: 40
 <p><code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> makes it simple to initialize the classifier and fit it on <code class="docutils literal notranslate"><span class="pre">X_train</span></code> and <code class="docutils literal notranslate"><span class="pre">y_train</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.linear_model import LogisticRegression
-simple_clf = LogisticRegression()
-simple_clf.fit(X_train, y_train)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="n">simple_clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">simple_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1665,20 +1665,20 @@ simple_clf.fit(X_train, y_train)
 <p>To visualize the classifier’s performance, we plot the original points and the classifier’s predicted probabilities.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.random.seed(42)
-sns.lmplot(x=&#39;shot_distance&#39;, y=&#39;shot_made&#39;,
-           data=lebron,
-           fit_reg=False, ci=False,
-           y_jitter=0.1,
-           scatter_kws={&#39;alpha&#39;: 0.3})
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
+           <span class="n">data</span><span class="o">=</span><span class="n">lebron</span><span class="p">,</span>
+           <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+           <span class="n">y_jitter</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
 
-xs = np.linspace(-2, 32, 100)
-ys = simple_clf.predict_proba(xs.reshape(-1, 1))[:, 1]
-plt.plot(xs, ys)
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">simple_clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
 
-plt.title(&#39;LeBron Training Data and Predictions&#39;)
-plt.xlabel(&#39;Distance from Basket (ft)&#39;)
-plt.ylabel(&#39;Shot Made&#39;);
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;LeBron Training Data and Predictions&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Distance from Basket (ft)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Shot Made&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1692,7 +1692,7 @@ plt.ylabel(&#39;Shot Made&#39;);
 <p>One method to evaluate the effectiveness of our classifier is to check its prediction accuracy: what proportion of points does it predict correctly?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>simple_clf.score(X_test, y_test)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1705,8 +1705,8 @@ plt.ylabel(&#39;Shot Made&#39;);
 <p>Our classifier achieves a rather low accuracy of 0.60 on the test set. If our classifier simply guessed each point at random, we would expect an accuracy of 0.50. In fact, if our classifier simply predicted that every shot LeBron takes will go in, we would also get an accuracy of 0.60:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># Calculates the accuracy if we always predict 1
-np.count_nonzero(y_test == 1) / len(y_test)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculates the accuracy if we always predict 1</span>
+<span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">y_test</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1723,16 +1723,16 @@ np.count_nonzero(y_test == 1) / len(y_test)
 <p>Incorporating more numerical features in our classifier is as simple as extracting additional columns from the <code class="docutils literal notranslate"><span class="pre">lebron</span></code> DataFrame into the <code class="docutils literal notranslate"><span class="pre">X</span></code> matrix. Incorporating categorical features, on the other hand, requires us to apply a one-hot encoding. In the code below, we augment our classifier with the <code class="docutils literal notranslate"><span class="pre">minute</span></code>, <code class="docutils literal notranslate"><span class="pre">opponent</span></code>, <code class="docutils literal notranslate"><span class="pre">action_type</span></code>, and <code class="docutils literal notranslate"><span class="pre">shot_type</span></code> features, using the <code class="docutils literal notranslate"><span class="pre">DictVectorizer</span></code> class from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to apply a one-hot encoding to the categorical variables.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.feature_extraction import DictVectorizer
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="kn">import</span> <span class="n">DictVectorizer</span>
 
-columns = [&#39;shot_distance&#39;, &#39;minute&#39;, &#39;action_type&#39;, &#39;shot_type&#39;, &#39;opponent&#39;]
-rows = lebron[columns].to_dict(orient=&#39;row&#39;)
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;minute&#39;</span><span class="p">,</span> <span class="s1">&#39;action_type&#39;</span><span class="p">,</span> <span class="s1">&#39;shot_type&#39;</span><span class="p">,</span> <span class="s1">&#39;opponent&#39;</span><span class="p">]</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">lebron</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span>
 
-onehot = DictVectorizer(sparse=False).fit(rows)
-X = onehot.transform(rows)
-y = lebron[&#39;shot_made&#39;].as_matrix()
+<span class="n">onehot</span> <span class="o">=</span> <span class="n">DictVectorizer</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">onehot</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">lebron</span><span class="p">[</span><span class="s1">&#39;shot_made&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
 
-X.shape
+<span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
@@ -1745,11 +1745,11 @@ X.shape
 <p>We will again split the data into a training set and test set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=40, random_state=42
-)
-print(f&#39;Training set size: {len(y_train)}&#39;)
-print(f&#39;Test set size: {len(y_test)}&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1763,9 +1763,9 @@ Test set size: 40
 <p>Finally, we fit our model once more and check its accuracy:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>clf = LogisticRegression()
-clf.fit(X_train, y_train)
-print(f&#39;Test set accuracy: {clf.score(X_test, y_test)}&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Test set accuracy: </span><span class="si">{</span><span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span><span class="w"> </span><span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

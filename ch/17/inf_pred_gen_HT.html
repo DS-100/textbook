@@ -249,7 +249,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../04/modeling_loss_functions.html">
-     4.2. Loss Functions
+     4.2. Minimizing Loss
     </a>
    </li>
    <li class="toctree-l2">
@@ -1358,8 +1358,8 @@
 <p>First, we read the data into a data frame.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>wiki = pd.read_csv(&quot;data/Wikipedia.csv&quot;)
-wiki.shape
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wiki</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/Wikipedia.csv&quot;</span><span class="p">)</span>
+<span class="n">wiki</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
@@ -1371,7 +1371,7 @@ wiki.shape
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>wiki.describe()[3:]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wiki</span><span class="o">.</span><span class="n">describe</span><span class="p">()[</span><span class="mi">3</span><span class="p">:]</span>
 </pre></div>
 </div>
 </div>
@@ -1440,8 +1440,8 @@ wiki.shape
 <p>We use the <code class="docutils literal notranslate"><span class="pre">rankdata</span></code> method in <code class="docutils literal notranslate"><span class="pre">scipy.stats</span></code> to rank the 200 values and compute the sum of ranks in the treatment group.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import rankdata
-ranks = rankdata(wiki[&#39;postproductivity&#39;], &#39;average&#39;)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">rankdata</span>
+<span class="n">ranks</span> <span class="o">=</span> <span class="n">rankdata</span><span class="p">(</span><span class="n">wiki</span><span class="p">[</span><span class="s1">&#39;postproductivity&#39;</span><span class="p">],</span> <span class="s1">&#39;average&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1449,7 +1449,7 @@ ranks = rankdata(wiki[&#39;postproductivity&#39;], &#39;average&#39;)
 <p>Let’s confirm that the average rank of the 200 values is 100.5.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.average(ranks)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1462,7 +1462,7 @@ ranks = rankdata(wiki[&#39;postproductivity&#39;], &#39;average&#39;)
 <p>And, find the average rank of the 100 productivity scores in the treatment group:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.average(ranks[100:])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">ranks</span><span class="p">[</span><span class="mi">100</span><span class="p">:])</span>
 </pre></div>
 </div>
 </div>
@@ -1476,9 +1476,9 @@ ranks = rankdata(wiki[&#39;postproductivity&#39;], &#39;average&#39;)
 <p>To carry out this simulation, we set up the urn as the <code class="docutils literal notranslate"><span class="pre">ranks</span></code> array from the data. Shuffling the 200 values in the array and taking the first 100 represents a randomly sampled treatment group. We write a function to shuffle the array of ranks and find the average of the first 100.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def rank_avg(ranks, n):
-    rng.shuffle(ranks)
-    return np.average(ranks[n:])      
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rank_avg</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">ranks</span><span class="p">[</span><span class="n">n</span><span class="p">:])</span>      
 </pre></div>
 </div>
 </div>
@@ -1486,8 +1486,8 @@ ranks = rankdata(wiki[&#39;postproductivity&#39;], &#39;average&#39;)
 <p>Our simulation  “mixes the marbles in the urn and draws 100 times”, computes the average rank for the 100 draws, and repeats this 100,000 times.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>rng = np.random.default_rng(42)
-rank_avg_simulation = [rank_avg(ranks, 100) for _ in range(100000)] 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">rank_avg_simulation</span> <span class="o">=</span> <span class="p">[</span><span class="n">rank_avg</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
 </pre></div>
 </div>
 </div>
@@ -1502,7 +1502,7 @@ rank_avg_simulation = [rank_avg(ranks, 100) for _ in range(100000)]
 <p>As we expected, the sampling distribution of the average rank is centered on 100 (100.5 actually) and is bell-shaped. The center of this distribution reflects the assumptions of the treatment having no effect. Our observed statistic looks well outside the typical range of simulated average ranks, and we use this simulated sampling distribution to find the approximate <span class="math notranslate nohighlight">\(p\)</span>-value for observing a statistic at least as big as ours.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>len([elem for elem in rank_avg_simulation if elem &gt;= 113.68]) / 100000
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rank_avg_simulation</span> <span class="k">if</span> <span class="n">elem</span> <span class="o">&gt;=</span> <span class="mf">113.68</span><span class="p">])</span> <span class="o">/</span> <span class="mi">100000</span>
 </pre></div>
 </div>
 </div>
@@ -1517,9 +1517,9 @@ rank_avg_simulation = [rank_avg(ranks, 100) for _ in range(100000)]
 <p>Although, we carried out a simulation to find the <span class="math notranslate nohighlight">\(p\)</span>-value for our observed statistic, rank tests are commonly used and made available in most statistical software.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from scipy.stats import ranksums
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ranksums</span>
 
-ranksums(x=treatment[&#39;postproductivity&#39;], y=control[&#39;postproductivity&#39;])
+<span class="n">ranksums</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">treatment</span><span class="p">[</span><span class="s1">&#39;postproductivity&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">control</span><span class="p">[</span><span class="s1">&#39;postproductivity&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1576,17 +1576,17 @@ ranksums(x=treatment[&#39;postproductivity&#39;], y=control[&#39;postproductivit
 We set this urn and sampling process up here.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>N = 43738
-n_samp = 21869
-N_groups = np.array([293, 293, (N-586)])
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">43738</span>
+<span class="n">n_samp</span> <span class="o">=</span> <span class="mi">21869</span>
+<span class="n">N_groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">293</span><span class="p">,</span> <span class="mi">293</span><span class="p">,</span> <span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">586</span><span class="p">)])</span>
 
-from scipy.stats import multivariate_hypergeom
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_hypergeom</span>
 
-def vacc_eff(N_groups, n_samp):
-    treat = multivariate_hypergeom.rvs(N_groups, n_samp)
-    ill_t = treat[1]
-    ill_c = N_groups[0] - treat[0] + N_groups[1] - treat[1]
-    return (ill_c - ill_t) / ill_c
+<span class="k">def</span> <span class="nf">vacc_eff</span><span class="p">(</span><span class="n">N_groups</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">):</span>
+    <span class="n">treat</span> <span class="o">=</span> <span class="n">multivariate_hypergeom</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">N_groups</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">)</span>
+    <span class="n">ill_t</span> <span class="o">=</span> <span class="n">treat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ill_c</span> <span class="o">=</span> <span class="n">N_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">treat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">N_groups</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">treat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">ill_c</span> <span class="o">-</span> <span class="n">ill_t</span><span class="p">)</span> <span class="o">/</span> <span class="n">ill_c</span>
 </pre></div>
 </div>
 </div>
@@ -1594,7 +1594,7 @@ def vacc_eff(N_groups, n_samp):
 <p>Now, we can simulate the clinical trial 100,000 times and calculate the vaccine efficacy for each trial.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sim_vacc_eff = [vacc_eff(N_groups, n_samp) for _ in range(100000)] 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sim_vacc_eff</span> <span class="o">=</span> <span class="p">[</span><span class="n">vacc_eff</span><span class="p">(</span><span class="n">N_groups</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
 </pre></div>
 </div>
 </div>
@@ -1609,7 +1609,7 @@ def vacc_eff(N_groups, n_samp):
 <p>The sampling distribution is centered at 0.5, which agrees with our model assumptions. We see that 0.667 is far out in the tail of this distribution.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>len([elem for elem in sim_vacc_eff if elem &gt;= 0.667]) 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">sim_vacc_eff</span> <span class="k">if</span> <span class="n">elem</span> <span class="o">&gt;=</span> <span class="mf">0.667</span><span class="p">])</span> 
 </pre></div>
 </div>
 </div>
