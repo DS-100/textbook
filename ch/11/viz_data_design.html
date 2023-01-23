@@ -1365,28 +1365,23 @@
   <div class="section" id="incorporating-the-data-design">
 <span id="sec-viz-data-design"></span><h1><span class="section-number">11.4. </span>Incorporating the Data Design<a class="headerlink" href="#incorporating-the-data-design" title="Permalink to this headline">¶</a></h1>
 <p>When you create a visualization, it’s important to consider the data scope, especially the data design
-(see {numref}‘Chapter %s <a class="reference external" href="ch:data_scope">ch:data_scope</a>’).
-Answering the question, How were the data collected?, can impact the plot that we make.
-These include considerations for the time and place that the data were collected and design used in selecting a
-sample.
-In this section, we look at a few examples of how the data scope can inform the kinds of visualizations we make.</p>
+(see <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a>).
+Considering the question of how the data were collected can impact our plot choice and the comparisons we portray.
+These considerations include the time and place that the data were collected and the design used to select a sample.
+We look at a few examples of how the data scope can inform the visualizations we make.</p>
 <div class="section" id="data-collected-over-time">
 <h2><span class="section-number">11.4.1. </span>Data Collected over Time<a class="headerlink" href="#data-collected-over-time" title="Permalink to this headline">¶</a></h2>
-<p>When data are collected over time, we typically make a line plot of points that puts timestamps on the x-axis and feature of interest on the y-axis.
+<p>When data are collected over time, we typically make a line plot of points that puts timestamps on the x-axis and a feature of interest on the y-axis.
 As an example, let’s revisit the data on San Francisco housing prices.
-These data were collected from 2003 to 2009 and include the date of the sale.
-House prices in the US fluctuated tremendously between 2005 and 2012 as
-the US Housing Bubble caused the market to crash in 2008/2009.
-So, let’s visualize the sale prices as a time series.
-To do this, we plot the median house price over time (this is a form of smoothing, see {numref}‘Section %s <a class="reference external" href="sec:viz_smoothing">sec:viz_smoothing</a>’).
-Why use the median? Home prices tend to be highly skewed because of a few  outliers.
-We saw this phenomenon when viewing the distribution of sale price.</p>
-<div class="cell tag_hide-input docutils container">
+These data were collected from 2003 to 2009 and show the crash in 2008/2009 of the US housing bubble<a class="footnote-reference brackets" href="#ushb" id="id1">1</a>.
+Since time is a key aspect of the scope of these data, let’s visualize sale price as a time series. Our earlier explorations showed that sale price
+is highly skewed so let’s work with percentiles, rather than averages. We plot the median price. (This is a form of smoothing as we saw earlier in this chapter.)</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">medians</span> <span class="o">=</span> <span class="n">rel_percentiles</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;percentile == 50&#39;</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">medians</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span>
-              <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Median House Sale Price&#39;</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+              <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Median Sale Price&#39;</span><span class="p">,</span>
+              <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 <span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1395,15 +1390,21 @@ We saw this phenomenon when viewing the distribution of sale price.</p>
 <img alt="../../_images/viz_data_design_7_0.svg" src="../../_images/viz_data_design_7_0.svg" /></div>
 </div>
 <p>This plot shows the rise in prices from 2003 to 2007 and the fall in 2008.
-But we can show more information by plotting a few other percentiles instead of
-just the median. In the plot below, we draw separate lines for the 10th, 30th, 50th (median),
-70th, and 90th percentile sale prices.</p>
-<div class="cell tag_hide-input docutils container">
+But we can show more information by plotting a few additional percentiles instead of just the median. Let’s draw separate lines for the 10th, 30th, 50th (median), 70th, and 90th percentile sale prices. When we examine prices over time, we typically need to adjust for inflation so that the comparisons are on the same footing. In addition to adjusting for inflation, let’s plot the prices
+relative to the starting price in 2003 for each of the percentiles.
+This means that all the lines will start at y=1 in 2003.
+(A value of 1.5 for the 90th percentile in 2006 indicates a sale price that is 1.5 times the 90th percentile in 2003.)
+This normalization lets us see how the housing crash affected homes in the different parts of the market.</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">rel_percentiles</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;percentile&#39;</span><span class="p">,</span>
-              <span class="n">color_discrete_sequence</span><span class="o">=</span><span class="n">plotly</span><span class="o">.</span><span class="n">express</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">sequential</span><span class="o">.</span><span class="n">Inferno</span><span class="p">,</span>
-              <span class="n">title</span><span class="o">=</span><span class="s1">&#39;House Sale Prices, Split By Percentile&#39;</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">infl_2003</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.66</span><span class="p">,</span> <span class="mf">6.14</span><span class="p">,</span> <span class="mf">9.57</span><span class="p">,</span> <span class="mf">12.69</span><span class="p">,</span><span class="mf">17.01</span><span class="p">,</span> <span class="mf">16.60</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">rel_percentiles</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;rel_price&#39;</span><span class="p">,</span> 
+              <span class="n">line_dash</span><span class="o">=</span><span class="s1">&#39;percentile&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;percentile&#39;</span><span class="p">,</span>
+              <span class="n">color_discrete_sequence</span><span class="o">=</span><span class="n">plotly</span><span class="o">.</span><span class="n">express</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">sequential</span><span class="o">.</span><span class="n">Magma</span><span class="p">,</span>
+              <span class="n">title</span><span class="o">=</span><span class="s1">&#39;SF House Sale Prices, Inflation Adjusted&#39;</span><span class="p">,</span>
+              <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">rel_price</span><span class="o">=</span><span class="s1">&#39;sale price relatve to 2003&#39;</span><span class="p">),</span>
+              <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
 <span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1411,74 +1412,35 @@ just the median. In the plot below, we draw separate lines for the 10th, 30th, 5
 <div class="cell_output docutils container">
 <img alt="../../_images/viz_data_design_9_0.svg" src="../../_images/viz_data_design_9_0.svg" /></div>
 </div>
-<p>When we examine prices over time, we typically need to adjust for inflation so that the comparisons are on the same footing.
-In addition to adjusting for inflation, let’s plot the prices
-relative to the starting price in 2003 for each of the percentiles.
-This means that all the lines will start at y=1 in 2003.
-This normalization lets us see
-how the housing crash affected homes in the different parts of the market.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Adjust for inflation 2003 = 1 to 2009-16.60</span>
-<span class="n">infl_2003</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.66</span><span class="p">,</span> <span class="mf">6.14</span><span class="p">,</span> <span class="mf">9.57</span><span class="p">,</span> <span class="mf">12.69</span><span class="p">,</span><span class="mf">17.01</span><span class="p">,</span> <span class="mf">16.60</span><span class="p">]</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">rel_percentiles</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;rel_price&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;percentile&#39;</span><span class="p">,</span>
-              <span class="n">color_discrete_sequence</span><span class="o">=</span><span class="n">plotly</span><span class="o">.</span><span class="n">express</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">sequential</span><span class="o">.</span><span class="n">Inferno</span><span class="p">,</span>
-              <span class="n">title</span><span class="o">=</span><span class="s1">&#39;House Sale Prices, Relative to April 2003&#39;</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/viz_data_design_11_0.svg" src="../../_images/viz_data_design_11_0.svg" /></div>
-</div>
-<p>The plot above shows that higher-end homes weren’t as affected by the crash.
-At the end of 2008, the 90th percentile home prices were nearly the same
-as the 2003 prices.
-But the 10th percentile home prices dropped by nearly a third.
-Applying this bit of domain knowledge helps reveal trends in the data that we might otherwise miss, and
-shows how we can use the data design to improve a visualization.</p>
+<p>When we follow the 10th percentile line plot over time, we see that it
+increases quickly in 2005, stays high relative to its 2003 value for a few
+years, and then drops earlier and faster than the other line plots. This tells us that the less expensive houses, such as starter homes, suffered greater volatility and lost much more value in the housing market crash.
+In contrast, higher-end homes were affected less by the crash; at the end of 2008, the 90th percentile home prices were nearly the same as the 2003 prices.
+Applying this bit of domain knowledge helps reveal trends in the data that we might otherwise miss, and shows how we can use the data design to improve a visualization.</p>
+<p>The housing data are an example of observational data that form a complete census in a geographic region over a specific period of time. Next we consider another observational study where self-selection and the time period impact the visualization.</p>
 </div>
 <div class="section" id="observational-studies">
 <h2><span class="section-number">11.4.2. </span>Observational Studies<a class="headerlink" href="#observational-studies" title="Permalink to this headline">¶</a></h2>
 <p>We need to be particularly cautious with data that do not form a census or scientific sample.
 We should also take care with cross-sectional studies, whether from a census or scientific sample,
-as we’ll show by revisisting the Cherry Blossom Ten-Mile Run example.
+as we show by revisiting the Cherry Blossom Ten-Mile Run example.
 Earlier in this chapter, we made a smoothed curve to examine the relationship between race time and age.
 We reproduce this plot below.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">runnersOver17</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">age5</span><span class="o">=</span><span class="n">runnersOver17</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;age5&#39;</span><span class="p">)</span>
-    <span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
-    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="p">)</span>
-
-<span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age5&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/viz_data_design_14_0.svg" src="../../_images/viz_data_design_14_0.svg" /></div>
-</div>
-<p>It’s tempting to look at this plot and say something like: a runner at age 20
-can expect to have similar race times at age 40.
+<p>It’s tempting to look at this plot and conclude something like: a runner at age 60 can expect to typically take an additional 600 seconds than when they were 40.
 However, this is a cross-sectional study, not a longitudinal study.
-For instance, the 25-year-old runners in a race are different people than the 40-year-old runners.
+The 60-year-old runners represented in the plot are different people than the 40-year-old runners.
 These two groups could be different in ways that would affect the relationship between race time and age.
-As a group, the 40-year-olds in the race are likely to be more fit for their age than the 25-year-olds.
+As a group, the 60-year-olds in the race are likely to be more fit for their age than the 40-year-olds.
 In other words, the data design doesn’t let us make conclusions about individual runners.
-The visualization isn’t wrong, but we should be careful about the conclusions we draw from it.</p>
+The visualization isn’t wrong, but we need to be careful about the conclusions we draw from it.</p>
 <p>The design is even more complex because we have race results from many years.
 Each year forms a cohort, a group of racers, and from one year to the next, the cohort changes.
-We can make a useful plot by conditioning on year, as shown in the plot below.
-Here, we’ve only plotted the data for the years 1999, 2005, and 2010.</p>
+We make a plot that brings this message home by conditioning on year.
+Below, we’ve separately plotted lines for the racers in 1999, 2005, and 2010.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">few</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;age5&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
+              <span class="n">line_dash</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Median Race Times vs. Age&#39;</span><span class="p">,</span>
               <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
              <span class="p">)</span>
@@ -1489,85 +1451,79 @@ Here, we’ve only plotted the data for the years 1999, 2005, and 2010.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/viz_data_design_18_0.svg" src="../../_images/viz_data_design_18_0.svg" /></div>
+<img alt="../../_images/viz_data_design_16_0.svg" src="../../_images/viz_data_design_16_0.svg" /></div>
 </div>
 <p>We see that the median race times in 2010 were higher at every age group than the times for
-the runners in 2005, and in turn, the 2005 runners times were higher that for the runners in 1999.
+the runners in 2005, and in turn, the 2005 runners times were higher than for the runners in 1999.
 It’s interesting that race times have slowed over the years.
-This is quite likely due to the increased popularity of the race and so higher participation
-from novice runners in the more recent years. This example showed how we need to be aware of the data scope when interpreting patterns. We also need to keep data scope in mind with scientific studies. This is the topic of the next section.</p>
+This is quite likely due to the increased popularity of the race where there is higher participation from novice runners in more recent years. This example has shown how we need to be aware of the data scope when interpreting patterns. We also need to keep data scope in mind with scientific studies. This is the topic of the next section.</p>
 </div>
 <div class="section" id="unequal-sampling">
 <h2><span class="section-number">11.4.3. </span>Unequal Sampling<a class="headerlink" href="#unequal-sampling" title="Permalink to this headline">¶</a></h2>
-<p>In a scientific study, we should consider the sample design because it can affect our plots.
-Some samples draw individuals at unequal rates.
-That is, if men have been sampled at twice the rate of women,
-we should avoid making even a simple plot like a histogram until we adjust for the uneven gender ratio.</p>
-<p>We have seen an example of a scientific study in {numref}‘Chapter %s <a class="reference external" href="ch:files">ch:files</a>’ and {numref}‘Chapter %s <a class="reference external" href="ch:wrangling">ch:wrangling</a>’, the Drug Abuse Warning Network (DAWN) survey.  These data are from a complex randomized study of drug-related emergency room visits, and each record comes with its weight that we must use in order to accurately represent the emergency room visit in the population. The two bar plots below show the distribution of the type of ER visit. The one on the left doesn’t use the weights and the one on the right does.</p>
-<div class="cell docutils container">
+<p>In a scientific study, we must consider the sample design because it can impact our plots. Some samples draw individuals at unequal rates and this needs to be accounted for in our visualizations.
+For example, if men have been sampled at twice the rate of women in a study, then we should avoid making a simple plot like a histogram until we adjust for the uneven gender ratio.</p>
+<p>We have seen an example of a scientific study in <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapters 8</span></a> and <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref"> 9</span></a>: the Drug Abuse Warning Network (DAWN) survey.  These data are from a complex randomized study of drug-related emergency room visits, and each record comes with its weight that we must use in order to accurately represent the emergency room visits in the population. The two bar plots below show the distribution of the type of ER visit. The one on the left doesn’t use the survey weights and the one on the right does.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dawn_type</span> <span class="o">=</span> <span class="n">dawn</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)[</span><span class="s1">&#39;wt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">dawn_wt_norm</span> <span class="o">=</span> <span class="n">dawn_type</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">dawn_type</span><span class="p">)</span>
+<span class="n">dawn_wts</span> <span class="o">=</span> <span class="n">dawn_wt_norm</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-
+<span class="n">dawn_cts</span> <span class="o">=</span> <span class="n">dawn</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;suicide attempt&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="s1">&#39;detox&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="s1">&#39;alcohol&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="s1">&#39;adverse reaction&#39;</span><span class="p">,</span>
-        <span class="mi">5</span><span class="p">:</span><span class="s1">&#39;overmedication&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="s1">&#39;malicious poisoning&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="s1">&#39;accidental ingestion&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span><span class="s1">&#39;other&#39;</span><span class="p">}</span>
+        <span class="mi">5</span><span class="p">:</span><span class="s1">&#39;overmedication&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="s1">&#39;malicious poisoning&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="s1">&#39;accidental ingestion&#39;</span><span class="p">,</span> 
+         <span class="mi">8</span><span class="p">:</span><span class="s1">&#39;other&#39;</span><span class="p">}</span>
 
-<span class="c1">#need to convert to plotly; add labels; order and normalize bars; put the two plots side-by-side</span>
-
-<span class="n">dawn_type</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<span class="n">types_ct</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">types</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dawn_cts</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>
+<span class="n">types_wt</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">types</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dawn_wts</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:xlabel=&#39;type&#39;&gt;
-</pre></div>
-</div>
-<img alt="../../_images/viz_data_design_22_1.svg" src="../../_images/viz_data_design_22_1.svg" /></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dawn_cts</span> <span class="o">=</span> <span class="n">dawn</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">dawn_cts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig1</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">types_ct</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">dawn_cts</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">types_wt</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">dawn_wt_sort</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">left_right</span><span class="p">(</span><span class="n">fig1</span><span class="p">,</span> <span class="n">fig2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
-</pre></div>
+<img alt="../../_images/viz_data_design_21_0.svg" src="../../_images/viz_data_design_21_0.svg" /></div>
 </div>
-<img alt="../../_images/viz_data_design_23_1.svg" src="../../_images/viz_data_design_23_1.svg" /></div>
-</div>
-<p>In the unweighted bar plot, it appears that the “Other” category is as frequent as the “Adverse Reaction” category. However, when weighted, Other drops to about 60% of Adverse Reaction. And, we see other changes in the order and size of the types of admission to the ER. Ignoring sampling weights can give a misleading presentation of a distribution. Whether for a histogram, bar plot, boxplot, two-dimensional contour, or smooth curve we need to use the weights to get a representative plot. Another aspect of the data scope that can impact our choice of plots is where the data are collected. This is the topic of the next section.</p>
+<p>In the unweighted bar plot, the “Other” category is as frequent as the “Adverse Reaction” category. However, when weighted, “Other” drops to about 2/3 of “Adverse Reaction”. Ignoring sampling weights can give a misleading presentation of a distribution. Whether for a histogram, bar plot, box plot, two-dimensional contour, or smooth curve we need to use the weights to get a representative plot. Another aspect of the data scope that can impact our choice of plots is where the data are collected. This is the topic of the next section.</p>
 </div>
 <div class="section" id="geographic-data">
 <h2><span class="section-number">11.4.4. </span>Geographic Data<a class="headerlink" href="#geographic-data" title="Permalink to this headline">¶</a></h2>
-<p>When our dataset contains geographic information like latitudes and longitudes, we should consider making a map in addition to the typical plots for numeric data like histograms and scatter plots.
+<p>When our data contains geographic information like latitude and longitude, we should consider making a map, in addition to the typical plots for numeric data.
 For example, the plot below shows the locations for US Air Quality sensors,
 which are the focus of the case study in <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>.</p>
-<div class="cell tag_hide-input docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_geo</span><span class="p">(</span><span class="n">aqs_sites</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span>
-                     <span class="n">locationmode</span><span class="o">=</span><span class="s1">&#39;USA-states&#39;</span><span class="p">,</span> 
-                     <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;usa&#39;</span><span class="p">,</span>
-                     <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="n">fig</span>
+               <span class="n">locationmode</span><span class="o">=</span><span class="s1">&#39;USA-states&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;usa&#39;</span><span class="p">,</span>
+               <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">geo</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">landcolor</span> <span class="o">=</span> <span class="s1">&#39;rgb(217, 217, 217)&#39;</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/viz_data_design_27_0.svg" src="../../_images/viz_data_design_27_0.svg" /></div>
+<img alt="../../_images/viz_data_design_25_0.svg" src="../../_images/viz_data_design_25_0.svg" /></div>
 </div>
 <p>Notice that there are many more points in California and the Eastern Seaboard.
-A simple histogram of XXX, would be difficult to interpret because the distribution doesn’t reflect the abundance of measurmeents on the east and west coasts.  To help remedy this problem, we can add XXX to the map.</p>
-<p>ADD Additional Variable in the Map</p>
-<p>In this section, we explored ways to incorporate the data scope into a plot.
-We considered where and when the data were collected and the sampling design.
-Maps are useful representations of geographic data, and
-time-series plots are useful when data have a time component.
-We also saw how the sample desgin affects the kinds of plots we make
-and their interpretations.
-In the next section, we’ll discuss principles for adding useful context to plots.</p>
+A simple histogram of air quality with data from all of these sensors would misrepresent the distribution of air quality in the US. To incorporate the spatial aspect into the distribution, we can add aqi to the map through different color markers, and we can facet the aqi distribution by geographic region.</p>
+<p>In addition to plotting features like bars, color, and line styles, we also have the option to add text with contextual information to make our plot more informative. This is the topic of the next section.</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="ushb"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/2000s_United_States_housing_bubble">https://en.wikipedia.org/wiki/2000s_United_States_housing_bubble</a></p>
+</dd>
+</dl>
 </div>
 </div>
 
