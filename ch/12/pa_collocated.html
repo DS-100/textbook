@@ -1366,27 +1366,26 @@
                 
   <div class="section" id="finding-collocated-sensors">
 <span id="ch-pa-collocated"></span><h1><span class="section-number">12.2. </span>Finding Collocated Sensors<a class="headerlink" href="#finding-collocated-sensors" title="Permalink to this headline">¶</a></h1>
-<p>Our analysis begins by finding collocated pairs of AQS and PurpleAir sensors—sensors that are placed immediately next to each other.
-This step is important because it lets us reduce the effects of other variables that might caused differences in sensor readings.
+<p>Our analysis begins by finding collocated pairs of AQS and PurpleAir sensors—sensors that are placed essentially next to each other.
+This step is important because it lets us reduce the effects of other variables that might cause differences in sensor readings.
 Consider what would happen if we compared an AQS sensor placed inside a building with a PurpleAir sensor placed outside the building.
-The two sensors would have different readings, but some of these differences
-would happen because the sensors are exposed to different environments.
+The two sensors would have different readings, in part because the sensors are exposed to different environments.
 Ensuring that sensors are truly collocated lets us say that the differences in sensor
-readings is caused the different ways the sensors are built, rather than
+readings is due to the different ways the sensors are built, rather than
 other potential confounding variables.</p>
 <p>Barkjohn et al.’s analysis found pairs of AQS and PurpleAir sensors that
 are installed within 50 meters of each other.
 Then, they contacted each AQS site to see whether the people maintaining the site
-also maintained a PurpleAir sensor.
+also maintained the PurpleAir sensor.
 This extra effort gave them confidence that their sensor pairs were truly collocated.</p>
-<p>In this section, we’ll explore and clean data from the AQS and PurpleAir.
-Then, we’ll perform a similar join to construct a list of potentially collocated sensors.
+<p>In this section, we explore and clean data from AQS and PurpleAir.
+Then, we perform a join of sorts to construct a list of potentially collocated sensors.
 We won’t contact AQS sites ourselves;
-instead, we’ll proceed with the analysis by reusing Barkjohn et al.’s list of truly
+instead, we proceed with the analysis by reusing Barkjohn et al.’s list of confirmed
 collocated sensors.</p>
 <p>We’ve downloaded a list of AQS and PurpleAir sensors in <code class="docutils literal notranslate"><span class="pre">data/list_of_aqs_sites.csv</span></code>
 and <code class="docutils literal notranslate"><span class="pre">data/list_of_purpleair_sensors.json</span></code>.
-Let’s begin by reading these files into <code class="docutils literal notranslate"><span class="pre">pandas</span></code>.
+Let’s begin by reading these files into <code class="docutils literal notranslate"><span class="pre">pandas</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>s.
 First, we check file sizes to see whether they are reasonable to load into memory.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1401,12 +1400,10 @@ First, we check file sizes to see whether they are reasonable to load into memor
 </div>
 </div>
 </div>
-<p>Both files are relatively small. We’ll start with the list of AQS sites.</p>
+<p>Both files are relatively small. Let’s start with the list of AQS sites.</p>
 <div class="section" id="wrangling-the-list-of-aqs-sites">
 <h2><span class="section-number">12.2.1. </span>Wrangling the List of AQS Sites<a class="headerlink" href="#wrangling-the-list-of-aqs-sites" title="Permalink to this headline">¶</a></h2>
-<p>We can pull data comes from the AQS map of sites<a class="footnote-reference brackets" href="#aqs-map" id="id1">1</a>.
-To do this, we filter the map to show only the AQS sites that measure PM2.5, then download
-the list as a CSV file using the map’s web app and load it into a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
+<p>We have filtered the AQS map of sites<a class="footnote-reference brackets" href="#aqs-map" id="id1">1</a> to show only the AQS sites that measure PM2.5, and then downloaded the list of sites as a CSV file using the map’s web app. Now we can load it into a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs_sites_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/list_of_aqs_sites.csv&#39;</span><span class="p">)</span>
@@ -1421,8 +1418,7 @@ the list as a CSV file using the map’s web app and load it into a <code class=
 </div>
 </div>
 </div>
-<p>There are 28 columns in the table.
-We want to find out which columns are most useful for us.</p>
+<p>There are 28 columns in the table.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs_sites_full</span><span class="o">.</span><span class="n">columns</span>
@@ -1443,10 +1439,10 @@ We want to find out which columns are most useful for us.</p>
 </div>
 </div>
 </div>
-<p>For a description of the columns, we can reference the data dictionary
+<p>To find out which columns are most useful for us, we reference the data dictionary
 that the AQS provides on their website<a class="footnote-reference brackets" href="#aqs-dict" id="id2">2</a>.
 There we confirm that the data table contains information about the AQS sites.
-So, we might expect the granularity corresponds to AQS sites; meaning each row represents a single site
+So, we might expect the granularity corresponds to an AQS site; meaning each row represents a single site
 and the column labeled <code class="docutils literal notranslate"><span class="pre">AQS_Site_ID</span></code> is the primary key. We can check this by counting the number of
 occurrences of each ID.</p>
 <div class="cell docutils container">
@@ -1470,7 +1466,7 @@ Name: AQS_Site_ID, Length: 921, dtype: int64
 </div>
 <p>It looks like some sites appear multiple times in this data frame.
 Unfortunately, this means that the granularity is finer than the individual site level.
-To figure out Why sites are duplicated,let’s take a closer look at the rows in the table for a duplicated site.</p>
+To figure out why sites are duplicated, let’s take a closer look at the rows in the table for one duplicated site.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dup_site</span> <span class="o">=</span> <span class="n">aqs_sites_full</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;AQS_Site_ID == &#39;19-163-0015&#39;&quot;</span><span class="p">)</span>
@@ -1549,8 +1545,8 @@ To figure out Why sites are duplicated,let’s take a closer look at the rows in
 <blockquote>
 <div><p>This is the “Parameter Occurrence Code” used to distinguish different instruments that measure the same parameter at the same site.</p>
 </div></blockquote>
-<p>In this case, there are four instruments at this site that all
-measure PM2.5. So, it appears that the granularity of the <code class="docutils literal notranslate"><span class="pre">aqs_sites</span></code> data frame
+<p>So, the site ‘19-163-0015’ has four instruments that all
+measure PM2.5. It appears that the granularity of the data frame
 is that each row represents a single instrument at an AQS site.</p>
 <p>Since we’re using this data to match AQS sites with PurpleAir sensors,
 we can adjust the granularity by grouping according to site ID, then taking
@@ -1684,7 +1680,7 @@ So, we keep only those columns of interest.</p>
 <div class="section" id="wrangling-the-list-of-purpleair-sites">
 <h2><span class="section-number">12.2.2. </span>Wrangling the List of PurpleAir Sites<a class="headerlink" href="#wrangling-the-list-of-purpleair-sites" title="Permalink to this headline">¶</a></h2>
 <p>Unlike the AQS sites, the file containing PurpleAir sensor data comes in a
-JSON format. This file is provided by the PurpleAir website. We address this format in more detail in <a class="reference internal" href="../14/web_intro.html#ch-web"><span class="std std-numref">Chapter 14</span></a>. We use shell tools (see <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapter 8</span></a>) to peak at the contents of the file.</p>
+JSON format. This file is provided by the PurpleAir website. We address this format in more detail in <a class="reference internal" href="../14/web_intro.html#ch-web"><span class="std std-numref">Chapter 14</span></a>. For now, we use shell tools (see <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapter 8</span></a>) to peak at the contents of the file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head<span class="w"> </span>data/list_of_purpleair_sensors.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-c<span class="w"> </span><span class="m">1</span>-60
@@ -1726,7 +1722,7 @@ We can use Python’s <code class="docutils literal notranslate"><span class="pr
 </div>
 </div>
 </div>
-<p>We create a data frame from the values in <code class="docutils literal notranslate"><span class="pre">data</span></code> and label the columns with the content of <code class="docutils literal notranslate"><span class="pre">fields</span></code>.</p>
+<p>We can create a data frame from the values in <code class="docutils literal notranslate"><span class="pre">data</span></code> and label the columns with the content of <code class="docutils literal notranslate"><span class="pre">fields</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa_sites_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pa_json</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">pa_json</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">])</span>
@@ -1875,7 +1871,7 @@ the column labels.</p>
 </div>
 <p>In this case, we can guess that the columns we’re most interested in are the
 sensor IDs (<code class="docutils literal notranslate"><span class="pre">ID</span></code>), sensor labels (<code class="docutils literal notranslate"><span class="pre">Label</span></code>), latitude (<code class="docutils literal notranslate"><span class="pre">Lat</span></code>), and longitude (<code class="docutils literal notranslate"><span class="pre">Lon</span></code>).
-Again, we consulted the data dictionary on the PurpleAir website to double check
+But, we consulted the data dictionary on the PurpleAir website to double check
 what the columns represent.</p>
 <p>Let’s check the <code class="docutils literal notranslate"><span class="pre">ID</span></code> column for duplicates, as we did for the AQS data.</p>
 <div class="cell docutils container">
@@ -2027,8 +2023,6 @@ the tables back into a data frame.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlalchemy</span>
 
-<span class="c1"># An empty database name uses an in-memory sqlite database that doesn&#39;t save</span>
-<span class="c1"># any files to disk</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite://&#39;</span><span class="p">)</span>
 
 <span class="n">aqs_sites</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;aqs&#39;</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -2169,7 +2163,7 @@ We ran this analysis using 2021 data and got 149 candidate matches.
 Perhaps in the years between 2018 and 2021 many more PurpleAir (or AQS)
 sensors were installed.
 In any case, our wrangling of the locations is complete, and we can turn to the task of
-wrangling and cleaning the sensor measurement. We start with the measurements taken from an AQS site.</p>
+wrangling and cleaning the sensor measurements. We start with the measurements taken from an AQS site.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="aqs-map"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
