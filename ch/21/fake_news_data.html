@@ -1319,9 +1319,9 @@
   <div class="section" id="obtaining-and-wrangling-the-data">
 <span id="sec-fake-news-data"></span><h1><span class="section-number">21.2. </span>Obtaining and Wrangling the Data<a class="headerlink" href="#obtaining-and-wrangling-the-data" title="Permalink to this headline">¶</a></h1>
 <p>Let’s get the data into Python.
-The dataset has <a class="reference external" href="https://github.com/KaiDMML/FakeNewsNet/tree/654361e1c8d5baa751baf1dac5032df621652280">a GitHub page</a> with the code needed to download the data.
+The dataset has <a class="reference external" href="https://github.com/KaiDMML/FakeNewsNet/tree/654361e1c8d5baa751baf1dac5032df621652280">a GitHub page</a> with the code that downloads the data.
 Running the script to download the Politifact data takes about an hour.
-After running the script, we’ve placed the data files into the <code class="docutils literal notranslate"><span class="pre">data/politifact</span></code> folder.
+After running the script, we placed the data files into the <code class="docutils literal notranslate"><span class="pre">data/politifact</span></code> folder.
 The articles that Politifact labeled as fake and real
 are in <code class="docutils literal notranslate"><span class="pre">data/politifact/fake</span></code> and <code class="docutils literal notranslate"><span class="pre">data/politifact/real</span></code>.
 Let’s take a look at one of the articles labeled real.</p>
@@ -1459,6 +1459,263 @@ Let’s load the JSON for one article into a Python dictionary.</p>
 </table>
 </div></div></div>
 </div>
+<p>There are many fields in the JSON file, but this analysis will only look at a
+few: the article’s <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">text</span></code>, <code class="docutils literal notranslate"><span class="pre">url</span></code>, and <code class="docutils literal notranslate"><span class="pre">publish_date</span></code>.
+We’ll create a dataframe where each row represents one article.
+To so this, we will load in each available JSON file as a Python dictionary.
+Then, we’ll extract the fields of interest and store the results as a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> dataframe named <code class="docutils literal notranslate"><span class="pre">df_raw</span></code>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="k">def</span> <span class="nf">df_row</span><span class="p">(</span><span class="n">content_json</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">content_json</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">content_json</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">content_json</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;publish_date&#39;</span><span class="p">:</span> <span class="n">content_json</span><span class="p">[</span><span class="s1">&#39;publish_date&#39;</span><span class="p">],</span>
+    <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">/</span> <span class="n">filename</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">df_row</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">filepath</span><span class="o">.</span><span class="n">read_text</span><span class="p">()))</span> <span class="k">if</span> <span class="n">filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">data</span><span class="p">,</span>
+        <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="n">df_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">load_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;fake&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">fakes</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span> <span class="o">+</span>
+                      <span class="p">[</span><span class="n">load_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;real&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">reals</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Raw data from JSON, without any processing</span>
+<span class="n">df_raw</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>url</th>
+      <th>text</th>
+      <th>title</th>
+      <th>publish_date</th>
+      <th>label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>dailybuzzlive.com/cannibals-arrested-florida/</td>
+      <td>Police in Vernal Heights, Florida, arrested 3-...</td>
+      <td>Cannibals Arrested in Florida Claim Eating Hum...</td>
+      <td>1.62e+09</td>
+      <td>fake</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>https://web.archive.org/web/20171228192703/htt...</td>
+      <td>WASHINGTON — Rod Jay Rosenstein, Deputy Attorn...</td>
+      <td>BREAKING: Trump fires Deputy Attorney General ...</td>
+      <td>1.45e+09</td>
+      <td>fake</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>https://web.archive.org/web/20160924061356/htt...</td>
+      <td>Keanu Reeves has long been known to be a stell...</td>
+      <td>Keanu Reeves Shook The World With Another POWE...</td>
+      <td>1.46e+09</td>
+      <td>fake</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1053</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>real</td>
+    </tr>
+    <tr>
+      <th>1054</th>
+      <td>https://web.archive.org/web/20090701202353/htt...</td>
+      <td>This is a rush transcript from "On the Record,...</td>
+      <td>An Open Letter to 'All Barack Channel' - Greta...</td>
+      <td>NaN</td>
+      <td>real</td>
+    </tr>
+    <tr>
+      <th>1055</th>
+      <td>https://web.archive.org/web/20130209000637/htt...</td>
+      <td>The State of the Union 2012\n\n“We can either ...</td>
+      <td>State of the Union 2013</td>
+      <td>NaN</td>
+      <td>real</td>
+    </tr>
+  </tbody>
+</table>
+<p>1056 rows × 5 columns</p>
+</div></div></div>
+</div>
+<p>Exploring this dataframe reveals some issues we’d like to address before we
+keep going with the analysis. For example:</p>
+<ol class="simple">
+<li><p>Some articles couldn’t be downloaded. When this happened, the <code class="docutils literal notranslate"><span class="pre">url</span></code> column contains <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p></li>
+<li><p>Some articles don’t have text (e.g. a webpage with only video content). We’ll drop these articles from our analysis.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">publish_date</span></code> column stores timestamps in Unix format (seconds since the Unix epoch), not as  <code class="docutils literal notranslate"><span class="pre">pandas.Timestamp</span></code> objects.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">url</span></code> column has the full URL (e.g. <code class="docutils literal notranslate"><span class="pre">dailybuzzlive.com/cannibals-arrested-florida/</span></code>), but we’re interested in the base URL (e.g. <code class="docutils literal notranslate"><span class="pre">dailybuzzlive.com</span></code>).</p></li>
+<li><p>Some articles were downloaded from an archival website (<code class="docutils literal notranslate"><span class="pre">web.archive.org</span></code>). When this happens, we want to extract the actual base URL from the original by removing the <code class="docutils literal notranslate"><span class="pre">web.archive.org</span></code> prefix.</p></li>
+<li><p>For our classifier, we want to concatenate the <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">text</span></code> columns into a single <code class="docutils literal notranslate"><span class="pre">content</span></code> column.</p></li>
+</ol>
+<p>We can tackle these data issues using a combination of <code class="docutils literal notranslate"><span class="pre">pandas</span></code> functions and
+regular expressions. After data wrangling, we end up with the following dataframe named <code class="docutils literal notranslate"><span class="pre">df</span></code>:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">combine_content</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">drop_nans</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">|</span>
+                <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">|</span> 
+                <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">))]</span>
+
+<span class="k">def</span> <span class="nf">url_basename</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">archive_prefix_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">archive_prefix_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">site_prefix_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">port_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">site</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">subset_df</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;baseurl&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">]]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_raw</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_nans</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">baseurl</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">url_basename</span><span class="p">))</span>
+      <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;publish_date&#39;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">))</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_content</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_df</span><span class="p">)</span>
+     <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>timestamp</th>
+      <th>baseurl</th>
+      <th>content</th>
+      <th>label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2021-04-05 16:39:51</td>
+      <td>dailybuzzlive.com</td>
+      <td>Cannibals Arrested in Florida Claim Eating Hum...</td>
+      <td>fake</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2016-01-01 23:17:43</td>
+      <td>houstonchronicle-tv.com</td>
+      <td>BREAKING: Trump fires Deputy Attorney General ...</td>
+      <td>fake</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2016-03-06 15:50:39</td>
+      <td>higherperspectives.com</td>
+      <td>Keanu Reeves Shook The World With Another POWE...</td>
+      <td>fake</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>776</th>
+      <td>NaT</td>
+      <td>msnbc.msn.com</td>
+      <td>Oct. 11: Levin, Graham, McCaffrey, Myers, roun...</td>
+      <td>real</td>
+    </tr>
+    <tr>
+      <th>777</th>
+      <td>NaT</td>
+      <td>foxnews.com</td>
+      <td>An Open Letter to 'All Barack Channel' - Greta...</td>
+      <td>real</td>
+    </tr>
+    <tr>
+      <th>778</th>
+      <td>NaT</td>
+      <td>whitehouse.gov</td>
+      <td>State of the Union 2013 The State of the Union...</td>
+      <td>real</td>
+    </tr>
+  </tbody>
+</table>
+<p>779 rows × 4 columns</p>
+</div></div></div>
+</div>
+<p>Now that we’ve loaded and cleaned the data, we can proceed to exploratory
+data analysis.</p>
 </div>
 
     <script type="text/x-thebe-config">
