@@ -1353,9 +1353,9 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>One technicality: the design matrix is defined as a mathematical matrix,
-not a dataframe, and a matrix doesn’t include the column or row labels that the dataframe has.
-But, we usually don’t have to worry about converting <code class="docutils literal notranslate"><span class="pre">X</span></code> into a matrix
-since most Python libraries for modeling treat dataframes as if they were matrices.</p>
+not a dataframe, so you might notice that a matrix doesn’t include the column or row labels that the dataframe has.</p>
+<p>That said, we usually don’t have to worry about converting dataframes into matrices
+since most Python libraries for modeling treat dataframes of numbers as if they were matrices.</p>
 </div>
 <p>For a given observation, say, the second row in <span class="math notranslate nohighlight">\(\textbf{X}\)</span>, we represent the outcome <span class="math notranslate nohighlight">\(y_2\)</span> by the linear approximation:</p>
 <div class="math notranslate nohighlight">
@@ -1421,60 +1421,43 @@ However, this approach gets cumbersome, and instead we use a geometric argument 
 <p>Again, our goal is the find the <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> that minimizes our loss
 function—we want to make <span class="math notranslate nohighlight">\(L({\boldsymbol{\theta}}, \textbf{X}, \mathbf{y})\)</span> as small as possible for a given <span class="math notranslate nohighlight">\(\textbf{X}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>.
 The key insight is that we can restate this goal in a geometric way.
-Since the model predictions <span class="math notranslate nohighlight">\(\mathbf{\hat{y}}\)</span> and the true outcomes
-<span class="math notranslate nohighlight">\(\mathbf{y}\)</span> are both vectors, we can think of them as points in <em>variable space</em>.</p>
-<p><a class="reference internal" href="#fig-geom-2d"><span class="std std-numref">Figure 15.5</span></a> gives and example of this, where we have just one
-<span class="math notranslate nohighlight">\(\mathbf{x}\)</span> (and no intercept term). In the figure, <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{\hat{y}}\)</span> are displayed as <span class="math notranslate nohighlight">\(n\)</span>-dimensional vectors. And minimizing squared loss, is finding <span class="math notranslate nohighlight">\(\theta\)</span> that minimizes:</p>
-<div class="math notranslate nohighlight">
-\[
-\frac{1}{n} \sum_i [y_i - \theta x_{i}]^2 
- = \frac{1}{n}  \lVert {\mathbf{y}} - {{\theta}{\mathbf{x}}} \rVert^2
-\]</div>
-<p>Since squared loss minimizes the distance between <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> and <span class="math notranslate nohighlight">\(\theta \mathbf{x}\)</span>,
-the picture shows us that the projection <span class="math notranslate nohighlight">\(\mathbf{\hat{y}} = \hat{\theta} \mathbf{x}\)</span> is the closest point of the form  <span class="math notranslate nohighlight">\(\theta \mathbf{x}\)</span> to <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>.
-We call <span class="math notranslate nohighlight">\(\mathbf{\hat{y}}\)</span> the <em>projection</em> of <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> onto <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>.</p>
-<div class="figure align-default" id="fig-geom-2d">
-<a class="reference internal image-reference" href="../../_images/geom-2d.svg"><img alt="../../_images/geom-2d.svg" src="../../_images/geom-2d.svg" width="250px" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.5 </span><span class="caption-text">A plot showing Y, y_hat, and one x …</span><a class="headerlink" href="#fig-geom-2d" title="Permalink to this image">¶</a></p>
+Since the model predictions <span class="math notranslate nohighlight">\( f_{\theta}(\mathbf{X}) \)</span> and the true outcomes
+<span class="math notranslate nohighlight">\(\mathbf{y}\)</span> are both vectors, we can think of them as points in <em>variable space</em>.
+When we change our model parameters <span class="math notranslate nohighlight">\( {\boldsymbol{\theta}} \)</span>, the model makes
+different predictions <span class="math notranslate nohighlight">\( f_{\theta}(\mathbf{X}) \)</span>, and the space of all possible model predictions is <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span>, as illustrated in
+<a class="reference internal" href="#fig-spanx"><span class="std std-numref">Figure 15.5</span></a>.</p>
+<div class="figure align-default" id="fig-spanx">
+<a class="reference internal image-reference" href="../../_images/spanX.svg"><img alt="../../_images/spanX.svg" src="../../_images/spanX.svg" width="80%" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.5 </span><span class="caption-text">In this simplified diagram, the space of all possible model prediction vectors <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span> is illustrated as a gray plane in 3-dimensional space, and the observed <span class="math notranslate nohighlight">\( \mathbf{y} \)</span> as a point.</span><a class="headerlink" href="#fig-spanx" title="Permalink to this image">¶</a></p>
 </div>
-<p>Now, let’s look at the case where we have two variables, <span class="math notranslate nohighlight">\(\mathbf{x}_1\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x}_2\)</span>.
-We have to draw the picture slightly differently now, to reflect we have three vectors.
-<a class="reference internal" href="#fig-geom-span"><span class="std std-numref">Figure 15.6</span></a> gives a diagram of this setting.
-We are faced with the same problem–we need to find a vector of the form
-<span class="math notranslate nohighlight">\({{\theta_1}{\mathbf{x}}_1} + {{\theta_2}{\mathbf{x}}_2}\)</span> that minimizes the least squares loss,</p>
-<div class="math notranslate nohighlight">
-\[
-\frac{1}{n} \sum_i [y_i - (\theta_1 {x}_{1,i} + \theta_2{x}_{2,i})]^2 
- = \frac{1}{n}  \lVert {\mathbf{y}} - {\textbf{X}}{\boldsymbol{\theta}} \rVert^2
-\]</div>
-<p>The <span class="math notranslate nohighlight">\(\theta_1{\mathbf{x}}_1 + \theta_2{\mathbf{x}}_2\)</span> (or <span class="math notranslate nohighlight">\({\textbf{X}}{\boldsymbol{\theta}}\)</span>) is a linear combination of the vectors <span class="math notranslate nohighlight">\(\mathbf{x}_1\)</span>
-and <span class="math notranslate nohighlight">\(\mathbf{x}_2\)</span>, and the shaded region in the figure shows all of the possible
-combinations.
-Hopefully, the diagram convinces you that the particular combination that minimizes the
-distance between <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> and vectors that lay in the shaded area is again the projection
-of <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> onto this gray area. The shaded area is called the <em>span of</em> <span class="math notranslate nohighlight">\(textbf{X}\)</span>
-and written as <span class="math notranslate nohighlight">\(\text{span}(\textbf{X})\)</span>.
-If you would like a more formal approach, rather than this proof-by-picture, we walk
-through the steps of deriving <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> using vector spaces in the Exercises.</p>
-<div class="figure align-default" id="fig-geom-span">
-<a class="reference internal image-reference" href="../../_images/geom-span.svg"><img alt="../../_images/geom-span.svg" src="../../_images/geom-span.svg" width="250px" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.6 </span><span class="caption-text">A plot showing all possible values of .</span><a class="headerlink" href="#fig-geom-span" title="Permalink to this image">¶</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As <a class="reference internal" href="#fig-spanx"><span class="std std-numref">Figure 15.5</span></a> shows, the true outcome vector <span class="math notranslate nohighlight">\( y \)</span> doesn’t usually lie in <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span>. This means that the model can’t get perfect accuracy on the training set. Although our loss can’t be exactly zero, we can instead find the point in <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span> that lies as close to <span class="math notranslate nohighlight">\( y \)</span> as possible.</p>
 </div>
-<p>We can derive the representation of <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> in terms of <span class="math notranslate nohighlight">\({\textbf{X}}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>. To do this, we use the earlier definition: <span class="math notranslate nohighlight">\(\mathbf{e} = \mathbf{y} - {\mathbf{\hat{y}}}\)</span> and the observation from picture that shows <span class="math notranslate nohighlight">\(\mathbf{e}\)</span> is perpendicular to <span class="math notranslate nohighlight">\(\text{span}(\textbf{X})\)</span>.
-We can now solve for <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span>
-(we have placed the complete proof in the Exercises):</p>
+<p>The error vector <span class="math notranslate nohighlight">\( \mathbf{e} = \mathbf{y} - f_{\theta}(\mathbf{X}) \)</span> represents the distance between the true outcomes and our model’s predictions.
+Visually, <span class="math notranslate nohighlight">\( \mathbf{e} \)</span> has the smallest magnitude when it is <em>perpendicular</em> to the subspace <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span>, as shown in
+<a class="reference internal" href="#fig-error-vector-optimal"><span class="std std-numref">Figure 15.6</span></a>.
+The proof of this fact is omitted for brevity.</p>
+<div class="figure align-default" id="fig-error-vector-optimal">
+<a class="reference internal image-reference" href="../../_images/error-vector-optimal.svg"><img alt="../../_images/error-vector-optimal.svg" src="../../_images/error-vector-optimal.svg" width="80%" /></a>
+<p class="caption"><span class="caption-number">Fig. 15.6 </span><span class="caption-text">The error is minimized when it lies perpendicular to <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span>.</span><a class="headerlink" href="#fig-error-vector-optimal" title="Permalink to this image">¶</a></p>
+</div>
+<p>In other words, there are many possible model parameters <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>, but only one <span class="math notranslate nohighlight">\( \hat{\boldsymbol{\theta}} \)</span> minimizes the loss by making the error vector perpendicular to <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span>.</p>
+<p>This fact lets us derive a formula for <span class="math notranslate nohighlight">\( \hat{\boldsymbol{\theta}} \)</span> as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 \textbf{X} \boldsymbol{\hat{\theta}} + \mathbf{e} &amp;= \mathbf{y} \\
-{\textbf{X}}^\top \textbf{X} \hat{\theta} + {\textbf{X}}^\top \mathbf{e} &amp;= {\textbf{X}}^\top \mathbf{y}
+{\textbf{X}}^\top \textbf{X} \hat{\boldsymbol{\theta}} + {\textbf{X}}^\top \mathbf{e} &amp;= {\textbf{X}}^\top \mathbf{y}
     &amp; (\text{left-multiply by } {\textbf{X}}^\top) \\
-{\textbf{X}}^\top \textbf{X} \hat{\theta} &amp;= {\textbf{X}}^\top \mathbf{y}
+{\textbf{X}}^\top \textbf{X} \hat{\boldsymbol{\theta}} &amp;= {\textbf{X}}^\top \mathbf{y}
     &amp; (\mathbf{e} \perp \text{span}(\textbf{X})) \\
 \boldsymbol{\hat{\theta}} &amp;= ({\textbf{X}}^\top \textbf{X})^{-1} {\textbf{X}}^\top \mathbf{y}
  &amp; (\text{left-multiply by } ({\textbf{X}}^\top \textbf{X})^{-1})
 \end{aligned}
 \end{split}\]</div>
+<p>In this derivation, we used the fact that <span class="math notranslate nohighlight">\( {\textbf{X}}^\top \mathbf{e} = 0 \)</span>
+when <span class="math notranslate nohighlight">\( \mathbf{e} \)</span> is perpendicular to <span class="math notranslate nohighlight">\( \text{span}(\mathbf{X}) \)</span>.</p>
 <p>This general approach to derive <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> for the multiple linear model also gives
 us <span class="math notranslate nohighlight">\(\hat{\theta}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\theta}_1\)</span> for the simple linear model. If we set
 <span class="math notranslate nohighlight">\({\textbf{X}}\)</span> to contain the intercept column and one column of features, using this
@@ -1486,9 +1469,9 @@ formula for <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta
 \[
 \boldsymbol{\hat{\theta}} = ({\textbf{X}}^\top \textbf{X})^{-1} {\textbf{X}}^\top \mathbf{y},
 \]</div>
-<p>we recommend leaving the calculation of <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> to the optimally tuned methods provided in the ‘sci-kit learn’ or ‘statsmodels’ libraries. They handle cases where the design matrix is sparse, highly co-linear, and not invertible.</p>
+<p>we recommend leaving the calculation of <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> to the optimally tuned methods provided in the <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> or <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> libraries. They handle cases where the design matrix is sparse, highly co-linear, and not invertible.</p>
 </div>
-<p>This solution for <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> (along with the pictures) reveal some useful properties of the fitted coefficients and the predictions. We present them here, and walk through the details of the derivations in the Exercises.</p>
+<p>This solution for <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta}}\)</span> (along with the pictures) reveal some useful properties of the fitted coefficients and the predictions:</p>
 <ul class="simple">
 <li><p>The residuals are orthogonal to the predicted values.</p></li>
 <li><p>The average of the residuals is <span class="math notranslate nohighlight">\(0\)</span>, if the model has an intercept term.</p></li>
@@ -1501,7 +1484,7 @@ formula for <span class="math notranslate nohighlight">\(\boldsymbol{\hat{\theta
 R^2 =  1 - \frac {\lVert \mathbf{y} - {\textbf{X}}{\boldsymbol{\hat{\theta}}} \rVert^2}
   {\lVert {\mathbf{y}} - \bar{y} \rVert^2}.
 \]</div>
-<p>As the model fits the data closer and closer, the multiple <span class="math notranslate nohighlight">\(R^2\)</span> gets nearer to <span class="math notranslate nohighlight">\(1\)</span>. That might seem like a good thing, but there are problems with this approach because <span class="math notranslate nohighlight">\(R^2\)</span> continues to grow even as we add meaningless features to our model, as long as the features fill out the <span class="math notranslate nohighlight">\(\text{span}(\textbf{X})\)</span>. To account for the size of a model, we often adjust the numerator and denominator by the number of fitted coefficients in the models. That is, we would normalize the numerator by <span class="math notranslate nohighlight">\(1/[n-(p+1)]\)</span> and the denominator by <span class="math notranslate nohighlight">\(1/(n-1)\)</span>. Better approaches to selecting a models are covered in <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a>.</p>
+<p>As the model fits the data closer and closer, the multiple <span class="math notranslate nohighlight">\(R^2\)</span> gets nearer to <span class="math notranslate nohighlight">\(1\)</span>. That might seem like a good thing, but there are problems with this approach because <span class="math notranslate nohighlight">\(R^2\)</span> continues to grow even as we add meaningless features to our model, as long as the features fill out the <span class="math notranslate nohighlight">\(\text{span}(\textbf{X})\)</span>. To account for the size of a model, we often adjust the numerator and denominator by the number of fitted coefficients in the models. That is, we would normalize the numerator by <span class="math notranslate nohighlight">\(1/[n-(p+1)]\)</span> and the denominator by <span class="math notranslate nohighlight">\(1/(n-1)\)</span>. Better approaches to selecting a model are covered in <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a>.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="ell2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
