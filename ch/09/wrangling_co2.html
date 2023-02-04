@@ -1366,9 +1366,9 @@
                 
   <div class="section" id="example-wrangling-co2-measurements-from-mauna-loa-observatory">
 <span id="ch-wrangling-co2"></span><h1><span class="section-number">9.1. </span>Example: Wrangling CO2 Measurements from Mauna Loa Observatory<a class="headerlink" href="#example-wrangling-co2-measurements-from-mauna-loa-observatory" title="Permalink to this headline">¶</a></h1>
-<p>We saw in <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a> that the National Oceanic and Atmospheric Administration (NOAA) monitors CO2 concentrations in the air at the Mauna Loa Observatory [^NOAA1]. We continue with this example and use it to introduce how to make data-quality checks, handle missing values, transform features, and reshape tables.
+<p>We saw in <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a> that the National Oceanic and Atmospheric Administration (NOAA) monitors CO2 concentrations in the air at the <a class="reference external" href="https://gml.noaa.gov/obop/mlo/">Mauna Loa Observatory</a>. We continue with this example and use it to introduce how to make data-quality checks, handle missing values, transform features, and reshape tables.
 These data are in the file <code class="docutils literal notranslate"><span class="pre">data/co2_mm_mlo.txt</span></code>. Let’s begin by checking the
-formatting, encoding, and size of the source before we load it into a data frame (see <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapter 8</span></a>.</p>
+formatting, encoding, and size of the source before we load it into a data frame (see <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapter 8</span></a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -1377,24 +1377,21 @@ formatting, encoding, and size of the source before we load it into a data frame
 
 <span class="n">co2_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;co2_mm_mlo.txt&#39;</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File size: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">co2_file_path</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s1">0.2f</span><span class="si">}</span><span class="s1"> KiB&#39;</span><span class="p">)</span>
-
-<span class="n">encoding</span> <span class="o">=</span> <span class="n">chardet</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">co2_file_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())[</span><span class="s1">&#39;encoding&#39;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File encoding: </span><span class="si">{</span><span class="n">encoding</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">co2_file_path</span><span class="p">),</span> 
+ <span class="n">chardet</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">co2_file_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())[</span><span class="s1">&#39;encoding&#39;</span><span class="p">]]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>File size: 49.93 KiB
-File encoding: ascii
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[51131, &#39;ascii&#39;]
 </pre></div>
 </div>
 </div>
 </div>
-<p>Our investigation has found that the file is plain text with ASCII encoding and about 50 KiB.
-Since the file is not particularly large, we shouldn’t have any difficulty
-loading it into a data frame, but we first need to determine the file’s format.
-To do this, let’s look at the first few lines in the file.</p>
+<p>Our investigation has found that the file is plain text with ASCII encoding and about 50 KiB in size.
+Since the file is not particularly large, we should have no trouble
+loading it into a data frame, but first we need to determine the file’s format.
+Let’s look at the first few lines in the file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lines</span> <span class="o">=</span> <span class="n">co2_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1425,7 +1422,7 @@ To do this, let’s look at the first few lines in the file.</p>
 </div>
 </div>
 </div>
-<p>We can see that the file begins with information about the data source. We should
+<p>We see that the file begins with information about the data source. We should
 read this documentation before starting our analysis, but some times the urge
 to plunge into the analysis wins over and we just start mucking about and
 discover properties of the data as we go. So let’s quickly find where the
@@ -1451,143 +1448,19 @@ actual data values are located.</p>
 </div>
 </div>
 </div>
-<p>We found the data begins on the 73rd line of the file. We also spot some relevant characteristics:</p>
+<p>We find the data begins on the 73rd line of the file. We also spot some relevant characteristics:</p>
 <ul class="simple">
 <li><p>The values are separated by white space, possibly tabs.</p></li>
 <li><p>The data line up down the rows. For example, the month appears in 7th to 8th position of each line.</p></li>
-<li><p>The 71st and 72nd lines in the file contain column headings split over two lines.</p></li>
+<li><p>The column headings split over two lines.</p></li>
 </ul>
-<p>We can use <code class="docutils literal notranslate"><span class="pre">read_csv</span></code> to read the data into a Pandas DataFrame and provide arguments to specify that the separators are white space, there is no header (we will set our own column names), and to skip the first 72 rows of the file.</p>
+<p>We can use <code class="docutils literal notranslate"><span class="pre">read_csv</span></code> to read the data into a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and provide arguments to specify that the separators are white space, there is no header (we will set our own column names), and to skip the first 72 rows of the file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">co2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/co2_mm_mlo.txt&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> 
-                  <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">co2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/co2_mm_mlo.txt&#39;</span><span class="p">,</span> 
+                  <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span>
                   <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Yr&#39;</span><span class="p">,</span> <span class="s1">&#39;Mo&#39;</span><span class="p">,</span> <span class="s1">&#39;DecDate&#39;</span><span class="p">,</span> <span class="s1">&#39;Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;Int&#39;</span><span class="p">,</span> <span class="s1">&#39;Trend&#39;</span><span class="p">,</span> <span class="s1">&#39;days&#39;</span><span class="p">])</span>
-<span class="n">co2</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Yr</th>
-      <th>Mo</th>
-      <th>DecDate</th>
-      <th>Avg</th>
-      <th>Int</th>
-      <th>Trend</th>
-      <th>days</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1958</td>
-      <td>3</td>
-      <td>1958.21</td>
-      <td>315.71</td>
-      <td>315.71</td>
-      <td>314.62</td>
-      <td>-1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1958</td>
-      <td>4</td>
-      <td>1958.29</td>
-      <td>317.45</td>
-      <td>317.45</td>
-      <td>315.29</td>
-      <td>-1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1958</td>
-      <td>5</td>
-      <td>1958.38</td>
-      <td>317.50</td>
-      <td>317.50</td>
-      <td>314.71</td>
-      <td>-1</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>735</th>
-      <td>2019</td>
-      <td>6</td>
-      <td>2019.46</td>
-      <td>413.92</td>
-      <td>413.92</td>
-      <td>411.58</td>
-      <td>27</td>
-    </tr>
-    <tr>
-      <th>736</th>
-      <td>2019</td>
-      <td>7</td>
-      <td>2019.54</td>
-      <td>411.77</td>
-      <td>411.77</td>
-      <td>411.43</td>
-      <td>23</td>
-    </tr>
-    <tr>
-      <th>737</th>
-      <td>2019</td>
-      <td>8</td>
-      <td>2019.62</td>
-      <td>409.95</td>
-      <td>409.95</td>
-      <td>411.84</td>
-      <td>29</td>
-    </tr>
-  </tbody>
-</table>
-<p>738 rows × 7 columns</p>
-</div></div></div>
-</div>
-<p>We have successfully loaded the file contents into a data frame, and we can see that the granularity of the data is a monthly average CO2, beginning in 1958 through 2019. Also, the table shape is <span class="math notranslate nohighlight">\( 738 \)</span> byy <span class="math notranslate nohighlight">\( 7 \)</span>. Now we can begin to check data quality.</p>
-<div class="section" id="quality-checks">
-<h2><span class="section-number">9.1.1. </span>Quality Checks<a class="headerlink" href="#quality-checks" title="Permalink to this headline">¶</a></h2>
-<p>Since scientific studies tend to have very clean data, it’s tempting to jump right in and make a plot to see how CO2 monthly averages have changed. The field <code class="docutils literal notranslate"><span class="pre">DecDate</span></code> conveniently represents the month and year as a numeric feature so we can easily make a time series plot.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;DecDate&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Avg&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/wrangling_co2_13_0.svg" src="../../_images/wrangling_co2_13_0.svg" /></div>
-</div>
-<p>Yikes! Plotting the data has uncovered a problem. What happened here? We can check a few rows of the dataframe to see if we can spot issues in the data.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">co2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">co2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1674,10 +1547,24 @@ actual data values are located.</p>
 </table>
 </div></div></div>
 </div>
+<p>We have successfully loaded the file contents into a data frame, and we can see that the granularity of the data is a monthly average CO2, beginning in 1958 through 2019. Also, the table shape is 738 by 7. Now we’re ready to check data quality.</p>
+<div class="section" id="quality-checks">
+<h2><span class="section-number">9.1.1. </span>Quality Checks<a class="headerlink" href="#quality-checks" title="Permalink to this headline">¶</a></h2>
+<p>Since scientific studies tend to have very clean data, it’s tempting to jump right in and make a plot to see how CO2 monthly averages have changed. The field <code class="docutils literal notranslate"><span class="pre">DecDate</span></code> conveniently represents the month and year as a numeric feature so we can easily make a line plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;DecDate&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Avg&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/wrangling_co2_13_0.svg" src="../../_images/wrangling_co2_13_0.svg" /></div>
+</div>
+<p>Yikes! Plotting the data has uncovered a problem. What happened here? We can check a few rows of the data frame to see if we can spot the problem.</p>
 <p>Looking a bit more closely this time, we see that some data have unusual values like -1 and -99.99. If we read the information at the top of the file more carefully, we find that -99.99 denotes a missing monthly average and -1 signifies a missing value for the number of days the equipment was in operation that month.</p>
-<p>Let’s step back and perform some quality checks.  First, we consider the shape of the data. How many rows should we have? From looking at the head and tail of the data frame, the data appear to be in chronological order, beginning with March 1958 and ending with August 2019.
-This means we should have <span class="math notranslate nohighlight">\( 12 \times (2019-1957) - 2 - 4 = 738 \)</span> records.</p>
-<p>Our calculations match the number of rows in the data table.</p>
+<p>Let’s step back for a moment and perform some quality checks.  First, we consider the shape of the data. How many rows should we have? From looking at the head and tail of the data frame, the data appear to be in chronological order, beginning with March 1958 and ending with August 2019.
+This means we should have <span class="math notranslate nohighlight">\( 12 \times (2019-1957) - 2 - 4 = 738 \)</span> records.
+Our calculations match the number of rows in the data table.</p>
 <p>Next, let’s check the quality of the features, starting with <code class="docutils literal notranslate"><span class="pre">Mo</span></code>. We expect the values to range from 1 to 12, and each month should have 2019-1957 = 62  or 61 instances (since the recordings begin in March of the first year and end in August of the most recent year).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1692,36 +1579,36 @@ This means we should have <span class="math notranslate nohighlight">\( 12 \time
 </div>
 </div>
 <p>As expected Jan, Feb, Sep, Oct, Nov, and Dec have 61 occurrences and the rest 62.</p>
-<p>Let’s turn to examine the column called <code class="docutils literal notranslate"><span class="pre">days</span></code>.</p>
+<p>Let’s turn to examine the column called <code class="docutils literal notranslate"><span class="pre">days</span></code> with a histogram.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;days&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;days&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_co2_20_0.svg" src="../../_images/wrangling_co2_20_0.svg" /></div>
+<img alt="../../_images/wrangling_co2_19_0.svg" src="../../_images/wrangling_co2_19_0.svg" /></div>
 </div>
-<p>In terms of data quality, a handful of months have averages based on measurements taken on fewer than half the days. In addition, there are nearly 200 missing values. With a scatter plot, we can check to see if there is any connection between missingness and the year of the recording.</p>
+<p>In terms of data quality, a handful of months have averages based on measurements taken on fewer than half the days. In addition, there are nearly 200 missing values. A scatter plot can help us check if there is any connection between missingness and the year of the recording.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Yr&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;days&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Yr&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;days&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_co2_22_0.svg" src="../../_images/wrangling_co2_22_0.svg" /></div>
+<img alt="../../_images/wrangling_co2_21_0.svg" src="../../_images/wrangling_co2_21_0.svg" /></div>
 </div>
 <p>All of the missing data are in the early years of operation. The number of days of operation of the equipment may not have been collected in the early days of operation. It also appears that there might have been problems with the equipment in the mid to late 80s. What do we do with these conjectures? We can try to confirm them by looking through documentation about the historical readings. If we are concerned about the impact on the CO2 averages for records with missing values for the feature <code class="docutils literal notranslate"><span class="pre">days</span></code>, then a simple solution would be to drop the earliest recordings. However, we would want to delay such action until after we have examined the time trends and assess whether there are any potential problems.</p>
 <p>Next, let’s return to the -99.99 values for the average CO2 measurement and begin our checks with a histogram.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Avg&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Avg&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_co2_24_0.svg" src="../../_images/wrangling_co2_24_0.svg" /></div>
+<img alt="../../_images/wrangling_co2_23_0.svg" src="../../_images/wrangling_co2_23_0.svg" /></div>
 </div>
 <p>The non-missing values are in the 300-400 range, which is what we expect based on our research into CO2 levels. We also see that there are only a few missing values. Since there aren’t many missing values, we can examine all
 of them:</p>
@@ -1834,52 +1721,43 @@ of them:</p>
 </table>
 </div></div></div>
 </div>
-<p>We are faced with the question of what to do with the <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> values. We have seen already the problems of leaving these values as is in a time series plot. There are several options, and we describe them next.</p>
+<p>We are faced with the question of what to do with the <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> values. We have seen already the problems of leaving these values as is in a line plot. There are several options, and we describe them next.</p>
 </div>
 <div class="section" id="addressing-missing-data">
 <h2><span class="section-number">9.1.2. </span>Addressing Missing Data<a class="headerlink" href="#addressing-missing-data" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>s for average CO2 levels indicate missing recordings. These interfere with our statistical summaries and plots. It’s good to know which values are missing, but we need to do something about them. We might drop those records, replace <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> with <code class="docutils literal notranslate"><span class="pre">NaN</span></code>, or substitute <code class="docutils literal notranslate"><span class="pre">99.99</span></code> with a likely value for the average CO2. Let’s examine each of these three options.  To do this, we create two versions of the data table, one that drops records and the other that replaces <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> with <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">co2_drop</span> <span class="o">=</span> <span class="n">co2</span><span class="p">[</span><span class="n">co2</span><span class="p">[</span><span class="s1">&#39;Avg&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-
-<span class="n">co2_NA</span> <span class="o">=</span> <span class="n">co2</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="o">-</span><span class="mf">99.99</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>And, for a third version of the data, we note that the table already comes with a substitute value for the <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>.  The column labeled, <code class="docutils literal notranslate"><span class="pre">Int</span></code>, has values that exactly match those in <code class="docutils literal notranslate"><span class="pre">Avg</span></code>, except when <code class="docutils literal notranslate"><span class="pre">Avg</span></code> is <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>, and then a “reasonable” estimate is used instead.
-So, the third version of our data will use the <code class="docutils literal notranslate"><span class="pre">Int</span></code> feature instead of <code class="docutils literal notranslate"><span class="pre">Avg</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>s for average CO2 levels indicate missing recordings. These interfere with our statistical summaries and plots. It’s good to know which values are missing, but we need to do something about them. We might drop those records, replace <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> with <code class="docutils literal notranslate"><span class="pre">NaN</span></code>, or substitute <code class="docutils literal notranslate"><span class="pre">99.99</span></code> with a likely value for the average CO2. Let’s examine each of these three options.</p>
+<p>Note that the table already comes with a substitute value for the <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>.  The column labeled, <code class="docutils literal notranslate"><span class="pre">Int</span></code>, has values that exactly match those in <code class="docutils literal notranslate"><span class="pre">Avg</span></code>, except when <code class="docutils literal notranslate"><span class="pre">Avg</span></code> is <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>, and then a “reasonable” estimate is used instead.</p>
 <p>To see the effect of each option, let’s zoom in on a short time period, say the measurements in 1958, where we know we have two missing values. We can create a time series plot for the three cases: drop the records with <code class="docutils literal notranslate"><span class="pre">-99.99</span></code>s (left plot); use <code class="docutils literal notranslate"><span class="pre">NaN</span></code> for missing values (middle plot); substitute an estimate for <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> (right plot).</p>
-<div class="cell tag_remove-input docutils container">
+<div class="cell tag_remove-input tag_hide-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_co2_32_0.svg" src="../../_images/wrangling_co2_32_0.svg" /></div>
+<img alt="../../_images/wrangling_co2_30_0.svg" src="../../_images/wrangling_co2_30_0.svg" /></div>
 </div>
 <p>When we look closely, we can see the difference between each of these plots. The leftmost plot
-connects dots over a two month time period, rather than one month.  In the
+connects dots across a two month time period, rather than one month.  In the
 middle, the line breaks where the data are missing, and on the right, we can
-see months <span class="math notranslate nohighlight">\( 6 \)</span> and <span class="math notranslate nohighlight">\( 10 \)</span> now have values. In the big picture since there are
+see months 6 and 10 now have values. In the big picture since there are
 only seven values missing from the 738 months, any of these options works.
 However, there is some appeal to the right plot since the seasonal trends are
 more cleanly discernible.</p>
-<p>The method used to interpolate the CO2 measurements for the missing values uses an averaging process that takes into consideration the month and year. The idea is to reflect both seasonal changes and the long term trend. This technique is described in greater detail in the documentation at the top of the data file. We go for this option and use the interpolated values provided by NOAA.</p>
+<p>The method used to interpolate the CO2 measurements for the missing values is an averaging process that takes into consideration the month and year. The idea is to reflect both seasonal changes and the long term trend. This technique is described in greater detail in the documentation at the top of the data file.</p>
 <p>These plots have shown the granularity of the data to be monthly measurements, but other granularity options are available to us. We discuss this next.</p>
 </div>
 <div class="section" id="reshaping-the-data-table">
 <h2><span class="section-number">9.1.3. </span>Reshaping the Data Table<a class="headerlink" href="#reshaping-the-data-table" title="Permalink to this headline">¶</a></h2>
-<p>The CO2 measurements taken at the Mauna Loa research station are available both daily and hourly. You might see some asymmetry in the granularity. We say the hourly data has a <em>finer granularity</em> than the daily data; and reciprocally, the daily data has a <em>coarser granularity</em> than the hourly data.</p>
-<p>Why not always just use the data with the finest granularity available? On a computational level, fine-grained data can become quite large. The Mauna Loa Observatory started recording CO2 levels in 1958. Imagine how many rows the data table would contain if they provided measurements every single second! But more importantly, we want the granularity of the data to match our research question. Suppose we want to see whether CO2 levels have risen over the past 50+ years, consistent with global warming predictions. We don’t need a CO2 measurement every second. In fact, we might well be content with yearly averages where the seasonal patterns are smoothed away. We can aggregate the data, changing its granularity to annual average measurements, and make a plot to display the trend.
-We use <strong>aggregation</strong> to go to a coarser granularity — in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we can use <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code> and <code class="docutils literal notranslate"><span class="pre">.agg()</span></code>.</p>
-<div class="cell docutils container">
+<p>The CO2 measurements taken at the Mauna Loa research station are also available both daily and hourly. The hourly data has a <em>finer granularity</em> than the daily data; and reciprocally, the daily data is <em>coarser</em> than the hourly data.</p>
+<p>Why not always just use the data with the finest granularity available? On a computational level, fine-grained data can become quite large. The Mauna Loa Observatory started recording CO2 levels in 1958. Imagine how many rows the data table would contain if they provided measurements every single second! But more importantly, we want the granularity of the data to match our research question. Suppose we want to see whether CO2 levels have risen over the past 50+ years, consistent with global warming predictions. We don’t need a CO2 measurement every second. In fact, we might well be content with yearly averages where the seasonal patterns are smoothed away. We can aggregate the monthly measurements, changing its granularity to annual averages, and make a plot to display the general trend.
+We can use <em>aggregation</em> to go to a coarser granularity — in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we use <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code> and <code class="docutils literal notranslate"><span class="pre">.agg()</span></code>.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">co2_NA</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Yr&#39;</span><span class="p">)[</span><span class="s1">&#39;Int&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">co2</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Yr&#39;</span><span class="p">)[</span><span class="s1">&#39;Int&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+             <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_co2_35_0.svg" src="../../_images/wrangling_co2_35_0.svg" /></div>
+<img alt="../../_images/wrangling_co2_33_0.svg" src="../../_images/wrangling_co2_33_0.svg" /></div>
 </div>
 <p>Indeed, we see a rise by nearly 100 ppm of CO2 since Mauna Loa began recording in 1958.</p>
 <p>To recap, after reading the whitespace-separated, plain-text file into a data frame, we began to check its quality.  We used the scope and context of the data to affirm that its shape matched the range of dates of collection. We confirmed the values and counts for the month were as expected. We ascertained the extent of missing values in the features, and looked for connections between missing values and other features. We considered three approaches to handling the missing data: drop records, work with <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values, and impute values to have a full table. And, finally, we changed the granularity of the data frame by rolling it up from a monthly to an annual average. This change in granularity removed seasonal fluctuations and focused on the long term trend in the level of CO2 in the atmosphere. The next four sections of this chapter expand on these actions to wrangle data into a form suitable for analysis: quality checks, missing value treatments, transformations, and shape adjustments. We begin with quality checks.</p>

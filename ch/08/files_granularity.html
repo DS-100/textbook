@@ -1456,8 +1456,8 @@ Number of unique business ids: 6406
 </div>
 </div>
 </div>
-<p>The number of unique <code class="docutils literal notranslate"><span class="pre">business_id</span></code>s matches the number of rows in the table, so it seems safe to assume the granularity is the restaurant. Since <code class="docutils literal notranslate"><span class="pre">business_id</span></code> uniquely identifies each record in the data frame, we treat <code class="docutils literal notranslate"><span class="pre">business_id</span></code> as the <em>primary key</em> for the table, which uniquely identifies each row in a table. We can use primary keys to join tables like we did in
-<a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-numref">Chapter 6</span></a>. Sometimes a primary key consists of two (or more) features.
+<p>The number of unique <code class="docutils literal notranslate"><span class="pre">business_id</span></code>s matches the number of rows in the table, so it seems safe to assume the granularity is the restaurant. Since <code class="docutils literal notranslate"><span class="pre">business_id</span></code> uniquely identifies each record in the data frame, we treat <code class="docutils literal notranslate"><span class="pre">business_id</span></code> as the <em>primary key</em> for the table. We can use primary keys to join tables (see <a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-numref">Chapter 6</span></a>).
+Sometimes a primary key consists of two (or more) features.
 This is the case for the other two restaurant files.
 Let’s continue the examination of the inspections and violations data frames
 and find their granularity.</p>
@@ -1548,7 +1548,7 @@ dtype: int64
 </div>
 </div>
 </div>
-<p>The combination of restaurant ID and inspection date, uniquely identifies each record in the this table, with the exception of three restaurants that have two records for their ID-date combination. Restaurant <code class="docutils literal notranslate"><span class="pre">64859</span></code> has two records with an inspection date of <code class="docutils literal notranslate"><span class="pre">20150924</span></code>. Let’s examine these rows.</p>
+<p>The combination of restaurant ID and inspection date, uniquely identifies each record in the this table, with the exception of three restaurants that have two records for their ID-date combination. Let’s examine the rows for restaurant <code class="docutils literal notranslate"><span class="pre">64859</span></code> .</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">insp</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;business_id == 64859 and date == 20150924&#39;</span><span class="p">)</span>
@@ -1599,11 +1599,11 @@ dtype: int64
 </table>
 </div></div></div>
 </div>
-<p>Restaurant <code class="docutils literal notranslate"><span class="pre">64859</span></code> got two different inspection scores on <code class="docutils literal notranslate"><span class="pre">20150924</span></code> (Sept. 24, 2015). How could this happen? It may be that the restaurant had two inspections in one day, or it might be an error.
+<p>Thie restaurant got two different inspection scores on the same day! How could this happen? It may be that the restaurant had two inspections in one day, or it might be an error.
 We address these sorts of questions when we consider the data quality in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a>.
 Since there are only three of these double-inspection days, we can ignore the issue, until we clean the data. So, the primary key is the combination of restaurant ID and inspection date.</p>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">business_id</span></code> field in the inspections table acts as a reference to the primary key in the business table.
-So we call <code class="docutils literal notranslate"><span class="pre">business_id</span></code> in <code class="docutils literal notranslate"><span class="pre">insp</span></code> a <em>foreign key</em> because it
+So <code class="docutils literal notranslate"><span class="pre">business_id</span></code> in <code class="docutils literal notranslate"><span class="pre">insp</span></code> is a <em>foreign key</em> because it
 links each record in the inspections table to a record in the business table.
 This means that we can readily join these two tables together.</p>
 <p>Next, we examine the granularity of the third table, the one that contains the violations.</p>
@@ -1714,7 +1714,7 @@ and older. Also, -8 represents a missing value.</p>
 </div>
 <p>Earlier, we determined the file contains 200 thousand lines and over 280 million
 characters so, on average, there are about 1200 characters per line.
-This might be why they used a fixed-width file rather than a CSV file.
+This might be why they used a fixed-width rather than a CSV format.
 Think how much larger the file would be if there was a comma between every field!</p>
 <p>Given the tremendous amount of information on each line, we read just a few
 features into a data frame. We can use the <code class="docutils literal notranslate"><span class="pre">pandas.read_fwf</span></code> method to do this. We specify the exact positions of the fields to extract, provide names for these fields, and other information about the header and index.</p>
@@ -1822,7 +1822,7 @@ features into a data frame. We can use the <code class="docutils literal notrans
 </div>
 </div>
 <p>The number of rows in the data frame matches the number of lines in the file. That’s good.
-The granularity of the data frame is a bit complicated due to the survey design.  Recall that these data are part of a large scientific study, with a complex sampling scheme. A row represents an emergency room visit, so the granularity is at the emergency room visit level. However, in order to reflect the sampling scheme and be representative of the population, weights are provided. We must apply a weight to each record when we compute summary statistics, build histograms, and fit models.</p>
+The granularity of the data frame is a bit complicated due to the survey design.  Recall that these data are part of a large scientific study, with a complex sampling scheme. A row represents an emergency room visit, so the granularity is at the emergency room visit level. However, in order to reflect the sampling scheme and be representative of the population of all drug-related ER visits in a year, weights are provided. We must apply a weight to each record when we compute summary statistics, build histograms, and fit models.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">wt</span></code> field contains a value that takes into account the probability of an ER visit like this one appearing in the sample. By “like this one” we mean a visit with similar features, like the visitor age, race, visit location, and time of day. We examine the different values in <code class="docutils literal notranslate"><span class="pre">wt</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1858,27 +1858,22 @@ much more finely.</p>
 <p>It is critical to include the survey weights in your analysis to get data that represents the population at large. For example, we can compare the calculation of the proportion of females among the ER visits both with and without the weights.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unweighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">])</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unweighted % female: </span><span class="si">{</span><span class="n">unweighted</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Weighted % female: </span><span class="si">{</span><span class="n">weighted</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unweighted percent female: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  Weighted percent female: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;sex&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">weights</span><span class="o">=</span><span class="n">dawn</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">])</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Unweighted % female: 48.0%
-  Weighted % female: 52.3%
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Unweighted percent female: 48.0%
+  Weighted percent female: 52.3%
 </pre></div>
 </div>
 </div>
 </div>
 <p>These figures differ by more than 4 percentage points. The weighted version is a more accurate estimate of the proportion of females among the entire population of drug-related ER visits.</p>
-<p>In this section, we discovered the granularity for
-the restaurant dataset tables and the DAWN data.
-Sometimes the granularity can be tricky to figure out, like we saw with the
+<p>Sometimes the granularity can be tricky to figure out, like we saw with the
 inspections data.
-And, we needed to take the sampling weights into account when looking at the granularity for the DAWN data.
+And at other times, we need to take sampling weights into account like for the DAWN data.
 These examples show it’s important to take your time and review the data
 descriptions before proceeding with analysis.</p>
 </div>
