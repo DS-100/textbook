@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>12.4. Wrangling and Cleaning PurpleAir Sensor Data &#8212; Learning Data Science</title>
+    <title>12.4. Wrangling PurpleAir Sensor Data &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -617,7 +617,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     12.4. Wrangling and Cleaning PurpleAir Sensor Data
+     12.4. Wrangling PurpleAir Sensor Data
     </a>
    </li>
    <li class="toctree-l2">
@@ -1335,7 +1335,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Wrangling and Cleaning PurpleAir Sensor Data</h1>
+                <h1>Wrangling PurpleAir Sensor Data</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -1376,8 +1376,8 @@
             
               <div>
                 
-  <div class="section" id="wrangling-and-cleaning-purpleair-sensor-data">
-<span id="ch-pa-cleaning-pa"></span><h1><span class="section-number">12.4. </span>Wrangling and Cleaning PurpleAir Sensor Data<a class="headerlink" href="#wrangling-and-cleaning-purpleair-sensor-data" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="wrangling-purpleair-sensor-data">
+<span id="ch-pa-cleaning-pa"></span><h1><span class="section-number">12.4. </span>Wrangling PurpleAir Sensor Data<a class="headerlink" href="#wrangling-purpleair-sensor-data" title="Permalink to this headline">¶</a></h1>
 <p>In the previous section, we analyzed data from the AQS site <code class="docutils literal notranslate"><span class="pre">06-067-0010</span></code>.
 The matching PurpleAir sensor is named <code class="docutils literal notranslate"><span class="pre">AMTS_TESTINGA</span></code>, and we’ve used
 the PurpleAir website to download the data for this sensor into the <code class="docutils literal notranslate"><span class="pre">data/purpleair_AMTS</span></code> folder.</p>
@@ -1416,15 +1416,14 @@ TESTING B (undefined) (38.568404 -121.493163) Secondary Real Time 05
 </div>
 </div>
 <p>We can see that the first two CSV files correspond to the instrument A,
-and then last two CSV files correspond to B.
+and the last two CSV files correspond to B.
 Having two instruments is useful for data cleaning; if A and B disagree about
 a measurement, we might question the integrity of the measurement and decide to
 remove it.</p>
-<p>The data dictionary also mentions that each instrument records Primary data and
+<p>The data dictionary also mentions that each instrument records Primary and
 Secondary data. The Primary data contains the fields we’re interested in: PM2.5,
 temperature, and humidity. The Secondary data contains data for other particle
-sizes, like PM1.0 and PM10. Since we’re interested in PM2.5, we’ll work
-only with the Primary data for instruments A and B.</p>
+sizes, like PM1.0 and PM10. So we work only with the Primary files.</p>
 <p>Our tasks are similar to those of the previous section, with the addition of addressing readings from two instruments.</p>
 <p>We begin by loading in the data.
 When CSV files have long names, we can assign the file names into a Python variable
@@ -1559,18 +1558,18 @@ along with the date, temperature and relative humidity.</p>
 </table>
 </div></div></div>
 </div>
+<p>Next we check granularity.</p>
 <div class="section" id="checking-the-granularity">
 <h2><span class="section-number">12.4.1. </span>Checking the Granularity<a class="headerlink" href="#checking-the-granularity" title="Permalink to this headline">¶</a></h2>
 <p>In order for the granularity of these measurements to match the AQS data,
 we want one average PM2.5 for each date (a 24-hour period).
 PurpleAir states that sensors take measurements every 2 minutes.
 Let’s double check the granularity of the raw measurements, before we aggregate
-measurements to 24-hour periods.</p>
+them to 24-hour periods.</p>
 <p>To do this we convert the column containing the date information from strings
 to <code class="docutils literal notranslate"><span class="pre">pd.TimeStamp</span></code> objects. The format of the date is different than the AQS format,
 which we describe as ‘%Y-%m-%d %X %Z’.
-As we’ll soon see, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> has special support for data frames with an index
-of timestamps, so we also set the data frame index to the timestamps.</p>
+As we soon see, <code class="docutils literal notranslate"><span class="pre">pandas</span></code> has special support for data frames with an index of timestamps.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_timestamps</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1638,8 +1637,7 @@ timezone. However, the AQS data were averaged according to the <em>local time in
 California</em>, which is either 7 or 8 hours behind UTC time, depending on whether
 daylight saving time is in effect.
 This means we need to change the timezone of the PurpleAir timestamps to match
-the local timezone using the <code class="docutils literal notranslate"><span class="pre">df.tz_convert()</span></code> method.
-This method only operates on the index of the dataframe, which is one reason
+the local timezone. The <code class="docutils literal notranslate"><span class="pre">df.tz_convert()</span></code> method operates on the index of the dataframe, which is one reason
 why we set the index of <code class="docutils literal notranslate"><span class="pre">pa</span></code> to the timestamps.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1714,47 +1712,72 @@ timestamps to be grouped—we can group into dates, weeks, months, and many
 more options. (The <code class="docutils literal notranslate"><span class="pre">D</span></code> argument tells resample to aggregate timestamps into individual dates.)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">per_day</span> <span class="o">=</span> <span class="p">(</span><span class="n">pa</span>
+ <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;records_per_day&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">per_day</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>timestamp
-2018-05-19 00:00:00-07:00     315
-2018-05-20 00:00:00-07:00    1079
-2018-05-21 00:00:00-07:00    1074
-                             ... 
-2019-12-27 00:00:00-08:00    1440
-2019-12-28 00:00:00-08:00    1200
-2019-12-29 00:00:00-08:00     480
-Freq: D, Length: 590, dtype: int64
-</pre></div>
-</div>
-</div>
-</div>
-<p>We see that the number of measurements in a day varies widely. We can make a line plot of these counts to get a better sense of these variations. And since we will reuse the plotting code later, we put it in a function.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_measurements_per_day</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">extra_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sensor&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;# measurements / day&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">extra_lines</span><span class="p">:</span> <span class="k">return</span>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="s1">&#39;2019-05-30&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;May 30, 2019&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mf">0.63</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1080 points / day&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mf">0.64</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="s1">&#39;720 points / day&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">);</span>
-</pre></div>
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>records_per_day</th>
+    </tr>
+    <tr>
+      <th>timestamp</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2018-05-19 00:00:00-07:00</th>
+      <td>315</td>
+    </tr>
+    <tr>
+      <th>2018-05-20 00:00:00-07:00</th>
+      <td>1079</td>
+    </tr>
+    <tr>
+      <th>2018-05-21 00:00:00-07:00</th>
+      <td>1074</td>
+    </tr>
+    <tr>
+      <th>2018-05-22 00:00:00-07:00</th>
+      <td>1079</td>
+    </tr>
+    <tr>
+      <th>2018-05-23 00:00:00-07:00</th>
+      <td>999</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
-</div>
-</div>
+<p>We see that the number of measurements in a day varies widely. A line plot of these counts gives us a better sense of these variations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_measurements_per_day</span><span class="p">(</span><span class="n">pa</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">per_day</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">per_day</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;records_per_day&#39;</span><span class="p">,</span>
+       <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1816,8 +1839,7 @@ Name: timestamp, Length: 1077, dtype: int64
 </div>
 </div>
 </div>
-<p>We see that each timestamp appears exactly twice, and
-we can verify that all duplicated dates contain the same PM2.5 reading.
+<p>Each timestamp appears exactly twice, and we can verify that all duplicated dates contain the same PM2.5 reading.
 Since this is also
 true for both temperature and humidity, we drop the duplicate rows from the data frame.</p>
 <div class="cell docutils container">
@@ -1840,18 +1862,44 @@ true for both temperature and humidity, we drop the duplicate rows from the data
 </div>
 </div>
 </div>
+<p>To check, we remake the line plot of the number of records for a day, and this time shade in the regions where the counts are supposed to be contained.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_measurements_per_day</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="n">extra_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">per_day</span> <span class="o">=</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;records_per_day&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">per_day</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">per_day</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;records_per_day&#39;</span><span class="p">,</span>
+       <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_shape</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">,</span>
+    <span class="n">x0</span><span class="o">=</span><span class="s2">&quot;2019-05-30&quot;</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="s2">&quot;2019-12-27&quot;</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">720</span><span class="p">,</span>
+    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_shape</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">,</span>
+    <span class="n">x0</span><span class="o">=</span><span class="s2">&quot;2018-05-22&quot;</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="s2">&quot;2019-05-30&quot;</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">1080</span><span class="p">,</span>
+    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_cleaning_purpleair_36_0.svg" src="../../_images/pa_cleaning_purpleair_36_0.svg" /></div>
+<img alt="../../_images/pa_cleaning_purpleair_38_0.svg" src="../../_images/pa_cleaning_purpleair_38_0.svg" /></div>
 </div>
-<p>We see that after dropping duplicate dates, the plot of measurements per day
-looks much more consistent with the the counts we expect <a class="footnote-reference brackets" href="#dst" id="id2">2</a>.
-There’s still missing measurements, and we need to decide what to do about them.</p>
+<p>After dropping duplicate dates, the plot of measurements per day
+looks much more consistent with the the counts we expect.
+Careful readers will see two spikes above the maximum measurements around
+November of each year when Daylight Saving Time is no longer in effect.
+When clocks are rolled back one hour, that day has 25 hours instead of the usual
+24 hours. Timestamps are tricky!</p>
+<p>But, there’s still missing measurements, and we need to decide what to do about them.</p>
 </div>
 </div>
 <div class="section" id="handling-missing-values">
@@ -1868,71 +1916,7 @@ We calculate the minimum number of measurements needed to keep a day.</p>
 </div>
 </div>
 </div>
-<p>Next, we find the number of measurements taken each day.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">per_day</span> <span class="o">=</span> <span class="p">(</span><span class="n">pa</span>
- <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
- <span class="o">.</span><span class="n">size</span><span class="p">()</span>
- <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;per_day&#39;</span><span class="p">)</span>
- <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
-<span class="p">)</span>
-<span class="n">per_day</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>per_day</th>
-    </tr>
-    <tr>
-      <th>timestamp</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2018-05-19 00:00:00-07:00</th>
-      <td>315</td>
-    </tr>
-    <tr>
-      <th>2018-05-20 00:00:00-07:00</th>
-      <td>1079</td>
-    </tr>
-    <tr>
-      <th>2018-05-21 00:00:00-07:00</th>
-      <td>1074</td>
-    </tr>
-    <tr>
-      <th>2018-05-22 00:00:00-07:00</th>
-      <td>1079</td>
-    </tr>
-    <tr>
-      <th>2018-05-23 00:00:00-07:00</th>
-      <td>999</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Finally, we determine which of the days have enough measurements to keep.</p>
+<p>Now, we can determine which of the days have enough measurements to keep.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cutoff_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2019-05-30&#39;</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="s1">&#39;US/Pacific&#39;</span><span class="p">)</span>
@@ -1966,8 +1950,7 @@ Freq: D, dtype: bool
 </div>
 </div>
 </div>
-<p>Now, we can prepare the data; we average together the readings for each day and then remove the days
-without enough readings.</p>
+<p>We’re ready to average together the readings for each day and then remove the days without enough readings.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_daily_avgs</span><span class="p">(</span><span class="n">pa</span><span class="p">):</span>
@@ -2049,21 +2032,14 @@ two separate instruments that generated consistent and complete readings.</p>
 <p>To fully replicate Barkjohn’s analysis, we would need to repeat this process over all the PurpleAir sensors.
 Then, we would repeat the AQS cleaning procedure on all the AQS sensors.
 Finally, we would merge the PurpleAir and AQS data together.
-This procedure produces daily average readings for each co-located sensor pair.
-For brevity, we omit the code to repeat the data processing for the rest of the raw sensor data.
-Instead, we reuse Barkjohn’s cleaned and merged final dataset, and proceed with the final steps of the analysis to
-explore the dataset with an eye toward modeling and build a correction for the PurpleAir sensors.</p>
+This procedure produces daily average readings for each collocated sensor pair.
+For brevity, we omit this code.
+Instead, we proceed with the final steps of the analysis using Berkjohn’s dataset.
+We begin with an EDA with an eye toward modeling.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="pa-dict"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a href="/purpleair_study/pa_data_dict.pdf" target="_blank">pa_data_dict.pdf</a>,
-downloaded from <a class="reference external" href="https://www.purpleair.com/sensorlist">https://www.purpleair.com/sensorlist</a> in November 2021.</p>
-</dd>
-<dt class="label" id="dst"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>Careful readers will see two spikes above the maximum measurements around
-November of each year when Daylight Saving Time is no longer in effect.
-When clocks are rolled back one hour, that day has 25 hours instead of the usual
-24 hours. Timestamps are tricky!</p>
+<dd><p>The <a class="reference external" href="https://www.purpleair.com/sensorlist">site</a> used to collect these data (with accompanying data dictionary) has been downgraded. The data are now available through a REST API. This site also contains <a class="reference external" href="https://api.purpleair.com/#api-sensors-get-sensor-data">information about the fields</a>. The topic of REST is covered in <a class="reference internal" href="../14/web_intro.html#ch-web"><span class="std std-numref">Chapter 14</span></a>.</p>
 </dd>
 </dl>
 </div>

@@ -619,7 +619,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="pa_cleaning_purpleair.html">
-     12.4. Wrangling and Cleaning PurpleAir Sensor Data
+     12.4. Wrangling PurpleAir Sensor Data
     </a>
    </li>
    <li class="toctree-l2">
@@ -1323,10 +1323,10 @@
 <p>Now that we’ve explored the relationship between PM2.5 readings from AQS and PurpleAir sensors,
 we’re ready for the final step of the analysis: creating a model that corrects PurpleAir measurements.
 Barkjohn’s original analysis fits many models to the data in order to find the most appropriate one.
-In this section, we fit the simple linear using the techniques from <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>.
+In this section, we fit a simple linear model using the techniques from <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>.
 We also briefly describe the final model Barkjohn chose for real-world use.
 Since these models use methods that we introduce later in the book,
-we won’t explain the technical details very deeply here—we
+we won’t explain the technical details very deeply here. Instead, we
 instead encourage you to revisit this section after reading <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>.</p>
 <p>First, let’s go over our modeling goals.
 We want to create a model that predicts PM2.5 as accurately as possible.
@@ -1335,22 +1335,21 @@ We treat the AQS measurements as the true PM2.5 values because
 they are taken from carefully calibrated instruments and are
 actively used by the US government for decision-making. So, we have reason to
 trust the AQS PM2.5 values as precise and close to the truth.</p>
-<p>After we build the model that adjusts the PurpleAir measurements using AQS, we then flip the model around to use it to predict the true air quality in the future from PurpleAir measurements.
+<p>After we build the model that adjusts the PurpleAir measurements using AQS, we then flip the model around and use it to predict the true air quality in the future from PurpleAir measurements when wec don’t have a nearby AQS instrument.
 This is a <em>calibration</em> scenario.
 Since the AQS measurements are close to the truth, we fit the more variable PurpleAir measurements to them;
 this is the calibration procedure.
 Then, we use the calibration curve to correct future PurpleAir measurements.
 This two-step process is encapsulated in the simple linear model and its flipped form below.</p>
+<p>First, we fit a line to predict a PA measurement from the ground truth, as recorded by an AQS instrument:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\text{PA} &amp;\approx b + m\text{AQS}  &amp;~~~~~~\text{Fit a line to calibrate PA from AQS.}\\
-\text{True Air Quality} &amp;\approx -b/m + 1/m \text{PA} &amp;~~~~~~\text{Flip the line around to use PA to predict true values.}
-\end{aligned}
-\end{split}\]</div>
+\[ \text{PA} \approx b + m\text{AQS} \]</div>
+<p>Next, we flip the line around to use a PA measurement to predict the air quality,</p>
+<div class="math notranslate nohighlight">
+\[ \text{True Air Quality} \approx -b/m + 1/m \text{PA} \]</div>
 <p>The scatter plot and histograms that we made during our exploratory data analysis suggests that
 the PurpleAir measurements are more variable, which supports the calibration approach.
-And we saw that the PurpleAir measurements are about twice as high as the AQS measurements,
+And, we saw that the PurpleAir measurements are about twice as high as the AQS measurements,
 which suggests that <span class="math notranslate nohighlight">\( m \)</span> may be close to 2 and <span class="math notranslate nohighlight">\(1/m\)</span> close to <span class="math notranslate nohighlight">\( 1/2 \)</span>.</p>
 <div class="admonition-why-two-steps admonition">
 <p class="admonition-title">Why Two Steps?</p>
@@ -1360,35 +1359,36 @@ That seems a lot easier, and we wouldn’t need to invert anything.</p>
 <p>Since AQS measurements are “true” (or close to it), they have no error.
 Intuitively, a linear model works conditionally on the value of the variable on the <span class="math notranslate nohighlight">\( x \)</span>-axis,
 and minimizes the error in the <span class="math notranslate nohighlight">\( y \)</span> direction: <span class="math notranslate nohighlight">\( y-(b + mx) \)</span>.<br />
-So, to calibrate an instrument, we place the accurate measurements on the x-axis
-and to fit the line, called the <em>calibration curve</em>. Then, in the future, we invert the line to
-predict the truth from our instrument’s measurement. That’s why this process is also called <em>inverse regression</em>. It’s a reasonable thing to do when the pairs of measurements are highly correlated.</p>
-<p>As a simpler example, let’s say we’re calibrating a weight scale.
+So, we place the accurate measurements on the x-axis to fit the line, called the <em>calibration curve</em>.
+Then, in the future, we invert the line to
+predict the truth from our instrument’s measurement. That’s why this process is also called <em>inverse regression</em>.
+Calibration is only a reasonable thing to do when the pairs of measurements are highly correlated.</p>
+<p>As a simpler example, let’s say we want to calibrate a scale.
 We could do this by placing known weights—say 1 kg, 5 kg,
 and 10 kg—onto the scale, and seeing what the scale reports.
 We typically repeat this a few times, each time getting slightly different measurements from the scale.
-Analogously, the AQS measurements are the known quantities, and we check
-what the PurpleAir sensors report.</p>
-<p>For a more rigorous treatment of statistical calibration,
-see <span id="id1">[<a class="reference internal" href="../../references.html#id28">Osborne, 1991</a>]</span>.</p>
+If we discover that our scale is often 10% too high (<span class="math notranslate nohighlight">\(y=1.1x\)</span>), then when we go to weigh something in the future,
+we would adjust the scale’s reading downward by 90% (<span class="math notranslate nohighlight">\(1/1.1 = 0.9\)</span>).<br />
+Analogously, the AQS measurements are the known quantities, and our model checks
+what the PurpleAir sensor reports.</p>
 </div>
-<p>Now, let’s fit the model. We follow the notion from <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> and choose a loss function and minimize the average error. Recall that a <em>loss function</em> measures how far away our model is from the actual data. We use squared loss: <span class="math notranslate nohighlight">\( [y - (b+mx)]^2 \)</span>. And, to fit the model to our data, we minimize the average squared loss over our data,</p>
+<p>Now, let’s fit the model. We follow the notion from <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> and choose a loss function and minimize the average error. Recall that a <em>loss function</em> measures how far away our model is from the actual data. We use squared loss: which in this case is <span class="math notranslate nohighlight">\( [PA - (b+mAQS)]^2 \)</span>. And, to fit the model to our data, we minimize the average squared loss over our data,</p>
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
-\frac{1}{n} \sum_{i = 1}^{n} [y_i - (b + mx_i]^2
+\frac{1}{n} \sum_{i = 1}^{n} [PA_i - (b + mAQS_i]^2
 \end{aligned}
 \]</div>
-<p>We use the linear modeling functionality provided by <code class="docutils literal notranslate"><span class="pre">scikit</span> <span class="pre">learn</span></code> to do this.</p>
+<p>We use the linear modeling functionality provided by <code class="docutils literal notranslate"><span class="pre">scikit</span> <span class="pre">learn</span></code> to do this. (Again, don’t worry about these details for now.)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
 
 
 <span class="c1"># Fit calibration model using sklearn</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">full_df</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]],</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+<span class="n">AQS</span><span class="p">,</span> <span class="n">PA</span> <span class="o">=</span> <span class="n">full_df</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]],</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
     
-<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">AQS</span><span class="p">,</span> <span class="n">PA</span><span class="p">)</span>
 <span class="n">m</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">intercept_</span>
     
 <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="n">m</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">m</span><span class="p">]</span> 
@@ -1420,10 +1420,10 @@ more than one variable to make predictions. We can fit it by minimizing the aver
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
-\frac{1}{n} \sum_{i = 1}^{n} [y_i - (b + m_1x_i + m_2 h_i]^2
+\frac{1}{n} \sum_{i = 1}^{n} [PA_i - (b + m_1AQS_i + m_2 RH_i]^2
 \end{aligned}
 \]</div>
-<p>Here, <span class="math notranslate nohighlight">\(y_i\)</span> is the PurpleAir measurement, <span class="math notranslate nohighlight">\(x_i\)</span> the AQS measurement, and <span class="math notranslate nohighlight">\(h_i\)</span> the relative humidity for the <span class="math notranslate nohighlight">\(i\)</span>th row in the data frame. Then, we invert the calibration to find the prediction model using the equation:</p>
+<p>Then, we invert the calibration to find the prediction model using the equation:</p>
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
@@ -1434,8 +1434,8 @@ more than one variable to make predictions. We can fit it by minimizing the aver
 <p>We fit this model and check the coefficients:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">full_df</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]],</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
-<span class="n">model_h</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AQS_RH</span><span class="p">,</span> <span class="n">PA</span> <span class="o">=</span> <span class="n">full_df</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]],</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+<span class="n">model_h</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">AQS_RH</span><span class="p">,</span> <span class="n">PA</span><span class="p">)</span>
 <span class="p">[</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">],</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model_h</span><span class="o">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">model_h</span><span class="o">.</span><span class="n">intercept_</span>
     
 <span class="p">[</span><span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">m1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">m1</span><span class="p">,</span> <span class="o">-</span> <span class="n">m2</span> <span class="o">/</span> <span class="n">m1</span><span class="p">]</span>
@@ -1452,10 +1452,10 @@ more than one variable to make predictions. We can fit it by minimizing the aver
 <div class="math notranslate nohighlight">
 \[
 \begin{aligned}
-\text{True Air Quality} \approx 5.74 + 0.53 \cdot \text{PA} - 0.09 \cdot \text{RH}
+\text{True Air Quality} \approx 5.74 + 0.53 \text{PA} - 0.09 \text{RH}
 \end{aligned}
 \]</div>
-<p>Later in <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapters 15</span></a> and <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">16</span></a> we learn how to compare these two models by examining things like the size of and patterns in prediction error. For now, we note that the model that incorporates relative humidity performs the best.</p>
+<p>Later in <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapters 15</span></a> and <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">16</span></a>, we learn how to compare these two models by examining things like the size of and patterns in prediction error. For now, we note that the model that incorporates relative humidity performs the best.</p>
 </div>
 
     <script type="text/x-thebe-config">

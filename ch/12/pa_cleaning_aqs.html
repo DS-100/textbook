@@ -53,7 +53,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="12.4. Wrangling and Cleaning PurpleAir Sensor Data" href="pa_cleaning_purpleair.html" />
+    <link rel="next" title="12.4. Wrangling PurpleAir Sensor Data" href="pa_cleaning_purpleair.html" />
     <link rel="prev" title="12.2. Finding Collocated Sensors" href="pa_collocated.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -617,7 +617,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="pa_cleaning_purpleair.html">
-     12.4. Wrangling and Cleaning PurpleAir Sensor Data
+     12.4. Wrangling PurpleAir Sensor Data
     </a>
    </li>
    <li class="toctree-l2">
@@ -1374,11 +1374,11 @@
                 
   <div class="section" id="wrangling-and-cleaning-aqs-sensor-data">
 <span id="ch-pa-cleaning-aqs"></span><h1><span class="section-number">12.3. </span>Wrangling and Cleaning AQS Sensor Data<a class="headerlink" href="#wrangling-and-cleaning-aqs-sensor-data" title="Permalink to this headline">¶</a></h1>
-<p>Now that we have located sensors that are near each other, we are ready to wrangle and clean the files that contain the measurement data for the sites. We demonstrate the tasks involved for one sensor from the AQS and its matching sensor from PurpleAir. We picked a pair located in Sacramento, California. The AQS sensor ID is
+<p>Now that we have located sensors that are near each other, we are ready to wrangle and clean the files that contain the measurement data for these sites. We demonstrate the tasks involved with one AQS instrument and its matching PurpleAir sensor. We picked a pair located in Sacramento, California. The AQS sensor ID is
 <code class="docutils literal notranslate"><span class="pre">06-067-0010</span></code>, and the PurpleAir sensor name is <code class="docutils literal notranslate"><span class="pre">AMTS_TESTINGA</span></code>.</p>
-<p>The AQS provides a website and API to download sensor data<a class="footnote-reference brackets" href="#aqs-api" id="id1">1</a>.
-To match Barkjohn’s analysis, we downloaded the daily measurements from May 20, 2018 to Dec 29, 2019 into the
-<code class="docutils literal notranslate"><span class="pre">data/aqs_06-067-0010.csv</span></code> file. Let’s begin by loading this file into a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
+<p>The AQS provides a website and <a class="reference external" href="https://aqs.epa.gov/aqsweb/documents/data_api.html">API</a> to download sensor data.
+We downloaded the daily measurements from May 20, 2018 to Dec 29, 2019 into the
+<code class="docutils literal notranslate"><span class="pre">data/aqs_06-067-0010.csv</span></code> file. Let’s begin by loading this file into a data frame.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/aqs_06-067-0010.csv&#39;</span><span class="p">)</span>
@@ -1392,33 +1392,12 @@ To match Barkjohn’s analysis, we downloaded the daily measurements from May 20
 </div>
 </div>
 </div>
-<p>As before, this data frame has too many columns to display in the notebook so
-we display columns names.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs_full</span><span class="o">.</span><span class="n">columns</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;state_code&#39;, &#39;county_code&#39;, &#39;site_number&#39;, &#39;parameter_code&#39;, &#39;poc&#39;,
-       &#39;latitude&#39;, &#39;longitude&#39;, &#39;datum&#39;, &#39;parameter&#39;, &#39;sample_duration&#39;,
-       &#39;pollutant_standard&#39;, &#39;date_local&#39;, &#39;units_of_measure&#39;, &#39;event_type&#39;,
-       &#39;observation_count&#39;, &#39;observation_percent&#39;, &#39;validity_indicator&#39;,
-       &#39;arithmetic_mean&#39;, &#39;first_max_value&#39;, &#39;first_max_hour&#39;, &#39;aqi&#39;,
-       &#39;method_code&#39;, &#39;method&#39;, &#39;local_site_name&#39;, &#39;site_address&#39;, &#39;state&#39;,
-       &#39;county&#39;, &#39;city&#39;, &#39;cbsa_code&#39;, &#39;cbsa&#39;, &#39;date_of_last_change&#39;],
-      dtype=&#39;object&#39;)
-</pre></div>
-</div>
-</div>
-</div>
-<p>From the data dictionary for this data<a class="footnote-reference brackets" href="#aqs-dict" id="id2">2</a>, we find out that the
-<code class="docutils literal notranslate"><span class="pre">arithmetic_mean</span></code> column corresponds to the actual PM2.5 measurements. Some AQS
+<p>From the <a class="reference external" href="https://aqs.epa.gov/aqsweb/airdata/FileFormats.html#_hourly_data_files">data dictionary</a>, we find out that the
+column called, <code class="docutils literal notranslate"><span class="pre">arithmetic_mean</span></code>, corresponds to the actual PM2.5 measurements. Some AQS
 sensors take a measurement every hour.
 For our analysis, we downloaded the 24-hour averages (the arithmetic mean) of the
 hourly sensor measurements.</p>
-<p>Let’s begin with some quality checks, and clean the data where necessary.
+<p>Let’s carry out some quality checks, and clean the data where necessary.
 We focus on checks related to scope and quality of values:</p>
 <ol class="simple">
 <li><p>Check and correct the granularity of the data.</p></li>
@@ -1451,99 +1430,13 @@ Name: date_local, Length: 189, dtype: int64
 </div>
 </div>
 </div>
-<p>Indeed, there are 12 rows for each date so the granularity is <em>not</em>
-at the individual date level. To figure out why this happens, we can filter the
-table to a single date, then look for columns that have different values within
-that date.
-If we do this, we find that the <code class="docutils literal notranslate"><span class="pre">pollutant_standard</span></code> and <code class="docutils literal notranslate"><span class="pre">event_type</span></code> columns
-differ within a date.
-Here, we display these columns for the date
-<code class="docutils literal notranslate"><span class="pre">2018-12-31</span></code>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_date</span> <span class="o">=</span> <span class="p">(</span><span class="n">aqs_full</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;date_local == &quot;2018-12-31&quot;&#39;</span><span class="p">)</span>
- <span class="p">[[</span><span class="s1">&#39;date_local&#39;</span><span class="p">,</span> <span class="s1">&#39;pollutant_standard&#39;</span><span class="p">,</span> <span class="s1">&#39;event_type&#39;</span><span class="p">,</span> <span class="s1">&#39;arithmetic_mean&#39;</span><span class="p">]]</span>
-<span class="p">)</span>
-<span class="n">display_df</span><span class="p">(</span><span class="n">one_date</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>date_local</th>
-      <th>pollutant_standard</th>
-      <th>event_type</th>
-      <th>arithmetic_mean</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>2018-12-31</td>
-      <td>PM25 24-hour 2006</td>
-      <td>None</td>
-      <td>3.1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2018-12-31</td>
-      <td>PM25 24-hour 2006</td>
-      <td>Included</td>
-      <td>3.1</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>700</th>
-      <td>2018-12-31</td>
-      <td>PM25 Annual 1997</td>
-      <td>None</td>
-      <td>3.1</td>
-    </tr>
-    <tr>
-      <th>701</th>
-      <td>2018-12-31</td>
-      <td>PM25 Annual 1997</td>
-      <td>Included</td>
-      <td>3.1</td>
-    </tr>
-  </tbody>
-</table>
-<p>12 rows × 4 columns</p>
-</div></div></div>
-</div>
+<p>Indeed, there are 12 rows for each date so the granularity is <em>not</em> at the individual date level.</p>
 <p>From the data dictionary, we learn that there are multiple standards for
 computing the final measurements from the raw sensor data.
 The <code class="docutils literal notranslate"><span class="pre">pollutant_standard</span></code> column contains the name of each standard.
 The <code class="docutils literal notranslate"><span class="pre">event_type</span></code> column marks whether data measured during “exceptional events”
-are included in the measurement.</p>
-<p>However, for our data these columns seem to have no effect on the PM2.5
-measurements.
-In the <code class="docutils literal notranslate"><span class="pre">2018-12-31</span></code> data above the PM2.5 measurements are all identical.
-We can verify this for the rest of the data by checking that the
-maximum PM2.5 minus the minimum PM2.5 for each date is equal to zero.</p>
+are included in the measurement.
+Let’s check how different these average values are by calculating the range of 12 measurements.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">aqs_full</span>
@@ -1552,7 +1445,6 @@ maximum PM2.5 minus the minimum PM2.5 for each date is equal to zero.</p>
  <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">)</span> <span class="c1"># np.ptp computes max() - min()</span>
  <span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 <span class="p">)</span>
-<span class="c1"># For all 189 dates, the max PM2.5 - min PM2.5 is 0</span>
 </pre></div>
 </div>
 </div>
@@ -1563,7 +1455,7 @@ Name: arithmetic_mean, dtype: int64
 </div>
 </div>
 </div>
-<p>This means that we can simply take the first PM2.5 measurement for each date.</p>
+<p>For all 189 dates, the max PM2.5 - min PM2.5 is 0. This means that we can simply take the first PM2.5 measurement for each date.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rollup_dates</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1591,15 +1483,15 @@ Name: arithmetic_mean, dtype: int64
 </div>
 </div>
 <p>This data cleaning step gives us the desired granularity:
-every row in <code class="docutils literal notranslate"><span class="pre">aqs</span></code> represents a single date, with an average PM2.5 measurement for that date.
+each row represents a single date, with an average PM2.5 measurement for that date.
 Next, we further modify the structure of the data frame and drop unneeded columns.</p>
 </div>
 <div class="section" id="removing-unneeded-columns">
 <h2><span class="section-number">12.3.2. </span>Removing Unneeded Columns<a class="headerlink" href="#removing-unneeded-columns" title="Permalink to this headline">¶</a></h2>
-<p>We plan to match the PM2.5 measurements in the <code class="docutils literal notranslate"><span class="pre">aqs</span></code> dataframe with
+<p>We plan to match the PM2.5 measurements in the AQS data frame with
 the PurpleAir PM2.5 measurements for each date.
-To simplify the structure, we can drop all but the date and PM2.5 columns and rename the
-PM2.5 column so that it’s easier to understand.</p>
+To simplify the structure, we can drop all but the date and PM2.5 columns.
+We also rename the PM2.5 column so that it’s easier to understand.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">drop_cols</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1675,49 +1567,27 @@ PM2.5 column so that it’s easier to understand.</p>
 </div>
 <div class="section" id="checking-the-validity-of-dates">
 <h2><span class="section-number">12.3.3. </span>Checking the Validity of Dates<a class="headerlink" href="#checking-the-validity-of-dates" title="Permalink to this headline">¶</a></h2>
-<p>Let’s take a closer look at the column that contains the dates.
-We have already seen that there are gaps in dates where there are no
-PM2.5 readings so we expect there are missing dates.</p>
-<p>We first check that the <code class="docutils literal notranslate"><span class="pre">date_local</span></code> column contains strings.
-(Remember Python strings are recorded as the <code class="docutils literal notranslate"><span class="pre">object</span></code> type.)</p>
+<p>Let’s take a closer look at the the dates.
+We have already seen that there are gaps when there are no PM2.5 readings so we expect there are missing dates.
+Let’s parse the dates as timestamp objects to make it easier to figure out which dates are missing.
+As in <a class="reference internal" href="../09/wrangling_intro.html#ch-wrangling"><span class="std std-numref">Chapter 9</span></a> we check the format.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs</span><span class="o">.</span><span class="n">dtypes</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs</span><span class="p">[</span><span class="s1">&#39;date_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>date_local     object
-pm25          float64
-dtype: object
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0    2018-05-20
+1    2018-05-23
+2    2018-05-29
+Name: date_local, dtype: object
 </pre></div>
 </div>
 </div>
 </div>
-<p>Next, we check the format of the strings.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aqs</span><span class="p">[</span><span class="s1">&#39;date_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;2018-05-20&#39;
-</pre></div>
-</div>
-</div>
-</div>
-<p>Let’s parse the dates as <code class="docutils literal notranslate"><span class="pre">pd.Timestamp</span></code> objects, which make it easier to compute
-the dates that are missing. To parse the dates, we use the <code class="docutils literal notranslate"><span class="pre">pd.to_datetime()</span></code> function.
-First, since the dates are represented as YYYY-MM-DD, we describe the format in the Python representation.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">date_format</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Then, we reassign the <code class="docutils literal notranslate"><span class="pre">date_local</span></code> column as <code class="docutils literal notranslate"><span class="pre">pd.TimeStamp</span></code>s.</p>
+<p>The dates are represented as YYYY-MM-DD, we describe the format in the Python representation, ‘%Y-%m-%d’.
+To parse the dates, we use the <code class="docutils literal notranslate"><span class="pre">pd.to_datetime()</span></code> function, and we reassign the <code class="docutils literal notranslate"><span class="pre">date_local</span></code> column as <code class="docutils literal notranslate"><span class="pre">pd.TimeStamp</span></code>s.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_dates</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1734,22 +1604,11 @@ First, since the dates are represented as YYYY-MM-DD, we describe the format in 
        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">rollup_dates</span><span class="p">)</span>
        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_cols</span><span class="p">)</span>
        <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_dates</span><span class="p">))</span>
-<span class="n">aqs</span><span class="o">.</span><span class="n">dtypes</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>date_local    datetime64[ns]
-pm25                 float64
-dtype: object
 </pre></div>
 </div>
 </div>
 </div>
-<p>We see that the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of this series is <code class="docutils literal notranslate"><span class="pre">datetime64[ns]</span></code> rather than
-<code class="docutils literal notranslate"><span class="pre">object</span></code>, which means that the values are <code class="docutils literal notranslate"><span class="pre">pd.TimeStamp</span></code> objects rather than strings.
-Also, the method runs without erroring, indicating that all the
-strings matched the format.</p>
+<p>The method runs without erroring, indicating that all the strings matched the format.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Just because the dates can be parsed doesn’t mean that the dates are immediately
@@ -1763,20 +1622,7 @@ have recorded.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">date_range</span> <span class="o">=</span> <span class="n">aqs</span><span class="p">[</span><span class="s1">&#39;date_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">aqs</span><span class="p">[</span><span class="s1">&#39;date_local&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-<span class="n">date_range</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Timedelta(&#39;588 days 00:00:00&#39;)
-</pre></div>
-</div>
-</div>
-</div>
-<p>Subtracting timestamps give <code class="docutils literal notranslate"><span class="pre">Timedelta</span></code> objects, which have a few useful properties like:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">date_range</span><span class="o">.</span><span class="n">days</span>
+<span class="n">date_range</span><span class="o">.</span><span class="n">days</span>
 </pre></div>
 </div>
 </div>
@@ -1786,7 +1632,8 @@ have recorded.</p>
 </div>
 </div>
 </div>
-<p>There are many dates missing from the data. However, when we combine these
+<p>Subtracting timestamps give <code class="docutils literal notranslate"><span class="pre">Timedelta</span></code> objects, which as we see has a few useful properties.
+There are many dates missing from the data. However, when we combine these
 data for this sensor with other sensors, we expect to have enough data to fit a model.</p>
 <p>Our final wrangling step is to check the quality of the PM2.5 measurements.</p>
 </div>
@@ -1805,24 +1652,14 @@ correspond to major events like a wildfire.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_cleaning_aqs_45_0.svg" src="../../_images/pa_cleaning_aqs_45_0.svg" /></div>
+<img alt="../../_images/pa_cleaning_aqs_36_0.svg" src="../../_images/pa_cleaning_aqs_36_0.svg" /></div>
 </div>
-<p>We can see that the PM2.5 measurements don’t go below 0. We also a large spike in PM2.5 around mid-November of 2018. This sensor is located in Sacramento, CA so we can check if there was a fire around that area?</p>
+<p>We see that the PM2.5 measurements don’t go below 0. We also found a large spike in PM2.5 around mid-November of 2018. This sensor is located in Sacramento, CA so we can check if there was a fire around that area.</p>
 <p>Indeed, November 8, 2018 marks the start of the Camp Fire, the “deadliest and
-most destructive wildfire in California history” <span id="id3">[<a class="reference internal" href="../../references.html#id26">Bureau, 2018</a>]</span>. The fire
-started just 80 miles north of Sacramento, so this AQS sensor captured the
-dramatic spike in PM2.5.</p>
+most destructive wildfire in California history” (see the <a class="reference external" href="https://www.census.gov/topics/preparedness/events/wildfires/camp.html">Camp Fire page</a> managed by the US Census). The fire
+started just 80 miles north of Sacramento, so this AQS sensor captured the dramatic spike in PM2.5.</p>
 <p>We’ve cleaned and explored the data for one AQS sensor.
-In the next section, we do the same for its co-located PurpleAir sensor.</p>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="aqs-api"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://aqs.epa.gov/aqsweb/documents/data_api.html">https://aqs.epa.gov/aqsweb/documents/data_api.html</a></p>
-</dd>
-<dt class="label" id="aqs-dict"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://aqs.epa.gov/aqsweb/airdata/FileFormats.html#_hourly_data_files">https://aqs.epa.gov/aqsweb/airdata/FileFormats.html#_hourly_data_files</a></p>
-</dd>
-</dl>
+In the next section, we do the same for its collocated PurpleAir sensor.</p>
 </div>
 </div>
 
@@ -1861,7 +1698,7 @@ In the next section, we do the same for its co-located PurpleAir sensor.</p>
     <a class='right-next' id="next-link" href="pa_cleaning_purpleair.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">12.4. </span>Wrangling and Cleaning PurpleAir Sensor Data</p>
+        <p class="prev-next-title"><span class="section-number">12.4. </span>Wrangling PurpleAir Sensor Data</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

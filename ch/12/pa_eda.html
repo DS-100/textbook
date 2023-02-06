@@ -54,7 +54,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="12.6. Creating a Model to Correct PurpleAir Measurements" href="pa_modeling.html" />
-    <link rel="prev" title="12.4. Wrangling and Cleaning PurpleAir Sensor Data" href="pa_cleaning_purpleair.html" />
+    <link rel="prev" title="12.4. Wrangling PurpleAir Sensor Data" href="pa_cleaning_purpleair.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -617,7 +617,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="pa_cleaning_purpleair.html">
-     12.4. Wrangling and Cleaning PurpleAir Sensor Data
+     12.4. Wrangling PurpleAir Sensor Data
     </a>
    </li>
    <li class="toctree-l2 current active">
@@ -1318,7 +1318,9 @@
                 
   <div class="section" id="exploring-purpleair-and-aqs-measurements">
 <span id="ch-pa-eda"></span><h1><span class="section-number">12.5. </span>Exploring PurpleAir and AQS Measurements<a class="headerlink" href="#exploring-purpleair-and-aqs-measurements" title="Permalink to this headline">¶</a></h1>
-<p>Before we begin to model, let’s explore the cleaned dataset of matched AQS and PurpleAir PM2.5 readings and look for insights that might help us in our modeling.</p>
+<p>Let’s explore the cleaned dataset of matched AQS and PurpleAir PM2.5 readings and look for insights that might help us in modeling.
+Our main interest is in the relationship between the two sources of air quality measurements. But, we want to keep in mind the scope of the data, like how these data are situated in time and place. We learned from our data cleaning that we are working with daily averages of PM 2.5 for a couple of years and that we have data from dozens of locations across the US.</p>
+<p>First we review the entire cleaned data frame.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">csv_file</span> <span class="o">=</span> <span class="s1">&#39;data/cleaned_purpleair_aqs/Full24hrdataset.csv&#39;</span>
@@ -1326,7 +1328,13 @@
 <span class="n">full_df</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
         <span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
 <span class="n">full_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">,</span> <span class="s1">&#39;dew&#39;</span><span class="p">]</span>
-<span class="n">full_df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_df</span>
 </pre></div>
 </div>
 </div>
@@ -1442,7 +1450,7 @@
 <p>12246 rows × 8 columns</p>
 </div></div></div>
 </div>
-<p>We’ve included an explanation for each of the columns in our data frame.</p>
+<p>We include an explanation for each of the columns in our data frame in the following table.</p>
 <table class="colwidths-auto table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Column</p></th>
@@ -1476,11 +1484,10 @@
 </tr>
 </tbody>
 </table>
-<p>Our main interest is in the relationship between the two sources of air quality measurements. But, we want to keep in mind the scope of the data, like how these data are situated in time and place. We learned from our data cleaning that we are working with daily averages of PM 2.5 for a couple of years and that we have data from dozens of locations across the US.</p>
-<p>Let’s start with making a few simple visualizations, that give us insights. Since the scope involves measurements over time at particular locations, we can choose one location with many measurements and make a line plot of the weekly average air quality.</p>
+<p>Let’s start with making a few simple visualizations to gain insight. Since the scope involves measurements over time at particular locations, we can choose one location with many measurements and make a line plot of the weekly average air quality. To choose, let’s find the sites with many records.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1488,16 +1495,12 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>IA3    830
 NC4    699
 CA2    659
-      ... 
-WI3     12
-MT1      8
-WI5      3
-Name: id, Length: 49, dtype: int64
+Name: id, dtype: int64
 </pre></div>
 </div>
 </div>
 </div>
-<p>The location labeled <code class="docutils literal notranslate"><span class="pre">NC4</span></code> has hundreds of observations. Let’s find the weekly average of AQS and separately, PurpleAir measurements and plot them.</p>
+<p>The location labeled <code class="docutils literal notranslate"><span class="pre">NC4</span></code> has nearly 700 hundred observations. To smooth the line plot a bit, Let’s plot weekly averages.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts_nc4</span> <span class="o">=</span> <span class="p">(</span><span class="n">full_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;NC4&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
@@ -1506,68 +1509,9 @@ Name: id, Length: 49, dtype: int64
  <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
  <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 <span class="p">)</span>
-<span class="n">ts_nc4</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>date</th>
-      <th>pm25aqs</th>
-      <th>pm25pa</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>2018-03-25</td>
-      <td>5.18</td>
-      <td>7.04</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2018-04-01</td>
-      <td>7.45</td>
-      <td>8.38</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>2018-04-08</td>
-      <td>7.31</td>
-      <td>9.51</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2018-04-15</td>
-      <td>10.56</td>
-      <td>15.53</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>2018-04-22</td>
-      <td>5.50</td>
-      <td>5.96</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1576,7 +1520,7 @@ Name: id, Length: 49, dtype: int64
 
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">ts_nc4</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">ts_nc4</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">],</span>
                          <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s1">&#39;dot&#39;</span><span class="p">)))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Date&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;PM 2.5 weekly avg&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">])</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -1584,12 +1528,12 @@ Name: id, Length: 49, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_eda_11_0.svg" src="../../_images/pa_eda_11_0.svg" /></div>
+<img alt="../../_images/pa_eda_12_0.svg" src="../../_images/pa_eda_12_0.svg" /></div>
 </div>
-<p>We see that most PM2.5 values for the AQS sensor (solif line) range between 5.0 and 15.0 µg m⁻³.
+<p>We see that most PM2.5 values for the AQS sensor (solid line) range between 5.0 and 15.0 µg m⁻³.
 The PurpleAir sensor follows the up and down pattern of the AQS, which is reassuring.
-but the measurements are consistently higher than AQS and in some cases quite a bit higher, which tells us that a correction might be helpful.</p>
-<p>Next, we consider the distribution of the AQS and PurpleAir PM2.5 readings. We make histograms for each.</p>
+But, the measurements are consistently higher than AQS and in some cases quite a bit higher, which tells us that a correction might be helpful.</p>
+<p>Next, let’s consider the distributions of the PM2.5 readings for the two sensors.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">left</span><span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">full_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;NC4&#39;</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">)</span>
@@ -1604,35 +1548,9 @@ but the measurements are consistently higher than AQS and in some cases quite a 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_eda_13_0.svg" src="../../_images/pa_eda_13_0.svg" /></div>
+<img alt="../../_images/pa_eda_14_0.svg" src="../../_images/pa_eda_14_0.svg" /></div>
 </div>
 <p>Both distributions are skewed right, which often happens when there’s a lower bound on values (in this case 0).
-We can also see the greater spread in the PurpleAir readings. What we can’t see here is how the two readings vary together. Let’s look at this next. First, we take a look at the distribution of difference between the two readings.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diffs</span> <span class="o">=</span> <span class="p">(</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;NC4&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">diffs</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span> 
-                   <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">30</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Difference: PA - AQS reading&quot;</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">xbins</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-        <span class="n">start</span><span class="o">=-</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-                 <span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/pa_eda_16_0.svg" src="../../_images/pa_eda_16_0.svg" /></div>
-</div>
-<p>We see that 90% of the time, the PurpleAir measurement is larger than the AQS 24-hour average, and about 25% of the time it is more than 10 µg m⁻³, which is a lot given the AQS averages tend to be between 5 and 10 µg m⁻³.
 A better way to compare these two distributions is with a quantile-quantile plot (see <a class="reference internal" href="../10/eda_intro.html#ch-eda"><span class="std std-numref">Chapter 10</span></a>).
 With a Q-Q plot it can be easier to compare means, spreads, and tails.</p>
 <div class="cell docutils container">
@@ -1658,10 +1576,36 @@ With a Q-Q plot it can be easier to compare means, spreads, and tails.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_eda_19_0.svg" src="../../_images/pa_eda_19_0.svg" /></div>
+<img alt="../../_images/pa_eda_17_0.svg" src="../../_images/pa_eda_17_0.svg" /></div>
 </div>
 <p>The quantile-quantile plot is roughly linear. The slope of the curve is roughly 2, which indicates the spread of the PurpleAir measurements is about twice that of AQS. Also, the slight curvature at the lower end of the quantile-quantile plot indicates that the PurpleAir measurements have a larger right skew in comparison to AQS.</p>
-<p>A scatter plot can give us even more insight into the relationship between the measurements from these two instruments. Since we are interested in finding a general relationship, regardless of time and location, we include all of our average readings in the plot.</p>
+<p>What we can’t see in the Q-Q plot or the side-by-side histograms is how the sensor readings vary together. Let’s look at this next. First, we take a look at the distribution of difference between the two readings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diffs</span> <span class="o">=</span> <span class="p">(</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;NC4&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">diffs</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span> 
+                   <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">30</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Difference: PA - AQS reading&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">xbins</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">start</span><span class="o">=-</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                 <span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/pa_eda_21_0.svg" src="../../_images/pa_eda_21_0.svg" /></div>
+</div>
+<p>If the instruments are in perfect agreement, we would see a spike at 0. If there is no bias, we expect to see a distribution centered at 0. Instead, we see that 90% of the time, the PurpleAir measurement is larger than the AQS 24-hour average, and about 25% of the time it is more than 10 µg m⁻³ higher, which is a lot given the AQS averages tend to be between 5 and 10 µg m⁻³.</p>
+<p>A scatter plot can give us additional insight into the relationship between the measurements from these two instruments. Since we are interested in finding a general relationship, regardless of time and location, we include all of our average readings in the plot.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">full_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
@@ -1669,10 +1613,10 @@ With a Q-Q plot it can be easier to compare means, spreads, and tails.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_eda_22_0.svg" src="../../_images/pa_eda_22_0.svg" /></div>
+<img alt="../../_images/pa_eda_24_0.svg" src="../../_images/pa_eda_24_0.svg" /></div>
 </div>
 <p>While the relationship looks linear, all but a handful of readings are in the bottom left corner of the plot.
-Let’s remake the scatter plot and drop these observations to get a better look at the relationship. We also add a smooth curve to the plot to help us see the relationship better.</p>
+Let’s remake the scatter plot and drop these observations to get a better look. We also add a smooth curve to the plot to help us see the relationship better.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_df</span> <span class="o">=</span> <span class="n">full_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">)]</span>
@@ -1689,10 +1633,10 @@ Let’s remake the scatter plot and drop these observations to get a better look
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pa_eda_25_0.svg" src="../../_images/pa_eda_25_0.svg" /></div>
+<img alt="../../_images/pa_eda_27_0.svg" src="../../_images/pa_eda_27_0.svg" /></div>
 </div>
-<p>The relationship looks roughly linear, but there is a slight bend in the curve for small values of AQS. When the air is very clean, the PurpleAir sensor doesn’t pick up as much particulate matter. Also, the curve should go through the point (0, 0).
-The correlation between these two measurements is high:</p>
+<p>The relationship looks roughly linear, but there is a slight bend in the curve for small values of AQS. When the air is very clean, the PurpleAir sensor doesn’t pick up as much particulate matter and so is more accurate. Also, we can see that the curve should go through the point (0, 0). Despite the slight bend in the relationship,
+the linear association (correlation) between these two measurements is high:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">],</span> <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
@@ -1708,7 +1652,7 @@ The correlation between these two measurements is high:</p>
 </div>
 <p>Before starting this analysis, we expected that PurpleAir measurements
 would generally overestimate the PM2.5.
-And indeed, this is reflected in the scatter plot, but we also see that there appears to be a linear relationship
+And indeed, this is reflected in the scatter plot, but we also see that there appears to be a strong linear relationship
 between the measurements from these two instruments that will be helpful in calibrating the PurpleAir sensor.</p>
 </div>
 
@@ -1741,7 +1685,7 @@ between the measurements from these two instruments that will be helpful in cali
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">12.4. </span>Wrangling and Cleaning PurpleAir Sensor Data</p>
+            <p class="prev-next-title"><span class="section-number">12.4. </span>Wrangling PurpleAir Sensor Data</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="pa_modeling.html" title="next page">

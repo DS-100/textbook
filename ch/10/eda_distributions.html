@@ -617,7 +617,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../12/pa_cleaning_purpleair.html">
-     12.4. Wrangling and Cleaning PurpleAir Sensor Data
+     12.4. Wrangling PurpleAir Sensor Data
     </a>
    </li>
    <li class="toctree-l2">
@@ -1318,27 +1318,53 @@
                 
   <div class="section" id="what-to-look-for-in-a-distribution">
 <span id="sec-eda-distributions"></span><h1><span class="section-number">10.2. </span>What to Look For in a Distribution<a class="headerlink" href="#what-to-look-for-in-a-distribution" title="Permalink to this headline">¶</a></h1>
-<p>Visual displays of a feature can help us see patterns in observations; they are often much better than direct examination of the numbers or strings in a feature themselves.
+<p>Visual displays of a feature can help us see patterns in observations; they are often much better than direct examination of the numbers or strings themselves.
 The simple rug plot locates each observation as a “yarn” in a
 “rug” along an axis. The rug plot can be useful when we have a handful of observations,
 but it soon gets difficult to distinguish high density (most populated) regions
-with, say, even 100 observations. The figure below shows a rug plot with about 150 longevity values for dog breeds along the top of a histogram.</p>
+with, say, even 100 records. The figure below shows a rug plot with about 150 longevity values for dog breeds along the top of a histogram.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longevity&quot;</span><span class="p">,</span> <span class="n">marginal</span><span class="o">=</span><span class="s2">&quot;rug&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+             <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_distributions_4_0.svg" src="../../_images/eda_distributions_4_0.svg" /></div>
+<img alt="../../_images/eda_distributions_5_0.svg" src="../../_images/eda_distributions_5_0.svg" /></div>
 </div>
 <p>Although we can see an unusually large value that’s greater than 16, it’s hard
 to compare the density of yarns in different regions. Instead, the histogram gives
 a much better sense of the density of observations for various longevity values.
 Similarly, the <em>density curve</em> shown below
 gives a picture of the regions of high and low density.</p>
-<div class="cell tag_remove-input docutils container">
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
+
+<span class="n">new_x</span> <span class="o">=</span> <span class="n">dogs</span><span class="p">[</span><span class="s1">&#39;longevity&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">bandwidth</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">new_x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_x</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">new_x</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)(</span><span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f2</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ys</span><span class="p">))</span>
+
+<span class="n">f2</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">18.5</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;longevity (years)&quot;</span><span class="p">)</span>
+<span class="n">f2</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">)</span>
+<span class="n">f2</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">f2</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_distributions_6_0.svg" src="../../_images/eda_distributions_6_0.svg" /></div>
+<img alt="../../_images/eda_distributions_8_0.svg" src="../../_images/eda_distributions_8_0.svg" /></div>
 </div>
 <p>In both the histogram and density curve, we can see that the distribution of longevity is asymmetric. There is one main mode around 12 years and a shoulder in the 9-11 year range, meaning
-that while 12 is the most “popular” longevity, many breeds have a longevity one to three
-years below 12.  We also see a small secondary mode around 7, and a few
+that while 12 is the most common longevity, many breeds have a longevity one to three
+years shorter than 12.  We also see a small secondary mode around 7, and a few
 breeds with longevity as long as 14-16 years.</p>
 <p>When interpreting a histogram or density curve, we examine: the symmetry and
 skewness of the distribution; the number, location, and size of high-frequency
@@ -1348,7 +1374,7 @@ gaps where no values are observed; and unusually large or anomalous values.
 features. When we read a distribution, we connect the features that we see in
 the plot to the quantity measured.</p>
 <div class="figure align-default" id="example-density-plot">
-<img alt="../../_images/example-density-plot.png" src="../../_images/example-density-plot.png" />
+<a class="reference internal image-reference" href="../../_images/example-density-plot.png"><img alt="../../_images/example-density-plot.png" src="../../_images/example-density-plot.png" style="width: 350px;" /></a>
 <p class="caption"><span class="caption-number">Fig. 10.1 </span><span class="caption-text">Example density plot that connects qualities of a distribution to the shape of the density curve.</span><a class="headerlink" href="#example-density-plot" title="Permalink to this image">¶</a></p>
 </div>
 <p>As another example, the distribution of the number of ailments in dog breed, appears in the following histogram.
@@ -1366,20 +1392,28 @@ nine ailments. When bin counts are small, we use wider bins to further smooth
 the distribution because we do not want to read too much into the fluctuations
 of small numbers. In this case, none of the breeds have six or seven ailments,
 but some had four, five, eight and nine.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<img alt="../../_images/eda_distributions_11_0.svg" src="../../_images/eda_distributions_11_0.svg" /></div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">9.5</span><span class="p">]</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">dogs</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;ailments&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">);</span>
+</pre></div>
 </div>
-<p><strong>Density in the y-axis.</strong> Notice that the y-axis in the histogram of longevity and this histogram of ailments are both labeled “Density”.
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/eda_distributions_13_0.svg" src="../../_images/eda_distributions_13_0.svg" /></div>
+</div>
+<dl class="simple myst">
+<dt>Density in the y-axis</dt><dd><p>Notice that the y-axis in the histogram of longevity and the histogram of ailments are both labeled “Density”.
 The term “density” implies that the total area of the bars in the
 histogram is 1. We can think of the histogram as a skyline with tall buildings
 having denser populations. To find the fraction of observations in any bin, we
-compute the area of the rectangle. For example, for the rectangle that runs
-from 3.5 to 9.5, we take the product: 6 (width) × 0.017 (height),
-which is about 0.10 or 10%. If all of the bins are the same width, then the
+compute the area of the rectangle. For example, the rectangle that runs
+from 3.5 to 9.5 in the ailments histogram contains about 10% of the breeds: 6 (width) × 0.017 (height) is roughly 0.10. If all of the bins are the same width, then the
 “skyline” will look the same whether the y-axis represents counts or density.
 Changing the y-axis to counts in this histogram
 would give a misleading picture of a very large rectangle in the right tail.</p>
+</dd>
+</dl>
 <p>With a histogram we hide the details of individual yarns in a rug plot in order
 to view the general features of the distribution. Smoothing refers to this
 process of replacing sets of points with rectangles; we choose not to show
@@ -1391,65 +1425,53 @@ can’t tell where the points are in a bin.</p>
 <p>Smooth density curves, like the one we showed earlier for longevity, also have the property that the total area under the
 curve sums to 1. The density curve uses a smooth <em>kernel</em> function to spread out the
 individual yarns and is some times referred to as a <em>kernel density estimate</em> or kde for short.</p>
-<p><strong>Bar Plot ≠ Histogram.</strong> With qualitative data, the bar plot serves a similar
+<dl class="simple myst">
+<dt>Bar Plot ≠ Histogram</dt><dd><p>With qualitative data, the bar plot serves a similar
 role to the histogram. The bar plot gives a visual presentation of the
 “popularity” or frequency of different groups. However, we cannot interpret the
 shape of the bar plot in the same way as a histogram. Tails and symmetry do not
 make sense in this setting. Also, the frequency of a category is represented by
-the height of the bar, and the width carries no information about the
-distribution. The two bar charts below display identical information, the
-only difference is in the width of the bars.  In the extreme, the
+the height of the bar, and the width carries no information.
+The two bar charts below display identical information about the
+the number of breeds in a category; the only difference is in the width of the bars.
+In the extreme, the
 line plot on the right eliminates the bars entirely and represents
 each count by a single dot. (Without the connecting lines, the right most
 figure is called a dot chart.) Reading this line plot, we see there are few breeds
 that are not suitable for children.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>children</th>
-      <th>breed</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1.0</td>
-      <td>67</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2.0</td>
-      <td>35</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3.0</td>
-      <td>10</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
+</dd>
+</dl>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kid_counts</span> <span class="o">=</span> <span class="n">dogs</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;kids&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">kid_counts</span> <span class="o">=</span> <span class="n">kid_counts</span><span class="o">.</span><span class="n">reindex</span><span class="p">([</span><span class="s2">&quot;High&quot;</span><span class="p">,</span> <span class="s2">&quot;Medium&quot;</span><span class="p">,</span> <span class="s2">&quot;Low&quot;</span><span class="p">])</span>
+</pre></div>
 </div>
-<div class="cell tag_remove-input docutils container">
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">kid_counts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">kid_counts</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">]),</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">kid_counts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">kid_counts</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">]),</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">kid_counts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">kid_counts</span><span class="p">[</span><span class="s1">&#39;breed&#39;</span><span class="p">],</span>
+                        <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers+lines&#39;</span><span class="p">),</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Breed Suitable for Kids&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">70</span><span class="p">])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>              
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_distributions_17_0.svg" src="../../_images/eda_distributions_17_0.svg" /></div>
+<img alt="../../_images/eda_distributions_19_0.svg" src="../../_images/eda_distributions_19_0.svg" /></div>
 </div>
 <p>Now that we have covered how to examine distributions of single features, we
 turn to the situation when we want to look at two features and how they relate.</p>
