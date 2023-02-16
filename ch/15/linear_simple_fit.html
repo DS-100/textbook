@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>15.2. Fitting the Simple Linear Model &#8212; Learning Data Science</title>
+    <title>15.3. Fitting the Simple Linear Model &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -55,8 +55,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="15.3. Multiple Linear Model" href="linear_multi.html" />
-    <link rel="prev" title="15.1. Simple Linear Model" href="linear_simple.html" />
+    <link rel="next" title="15.4. Multiple Linear Model" href="linear_multi.html" />
+    <link rel="prev" title="15.2. Example: A Simple Linear Model for Air Quality" href="linear_pa.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -732,39 +732,44 @@
      15.1. Simple Linear Model
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="linear_pa.html">
+     15.2. Example: A Simple Linear Model for Air Quality
+    </a>
+   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     15.2. Fitting the Simple Linear Model
+     15.3. Fitting the Simple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_multi.html">
-     15.3. Multiple Linear Model
+     15.4. Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_multi_fit.html">
-     15.4. Fitting the Multiple Linear Model
+     15.5. Fitting the Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_case.html">
-     15.5. Example: Where is the Land of Opportunity?
+     15.6. Example: Where is the Land of Opportunity?
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_feature_eng.html">
-     15.6. Feature Engineering for Numeric Measurements
+     15.7. Feature Engineering for Numeric Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_categorical.html">
-     15.7. Feature Engineering for Categorical Measurements
+     15.8. Feature Engineering for Categorical Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_summary.html">
-     15.8. Summary
+     15.9. Summary
     </a>
    </li>
   </ul>
@@ -801,7 +806,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../16/ms_risk.html">
-     16.5. Risk and Loss Minimization
+     16.5. Model Bias and Variance
     </a>
    </li>
    <li class="toctree-l2">
@@ -1300,19 +1305,6 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
-            <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
-            </div>
-            <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#minimizing-the-loss">
-   15.2.1. Minimizing the Loss
-  </a>
- </li>
-</ul>
-
-            </nav>
         </div>
     </div>
 </div>
@@ -1325,19 +1317,6 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#minimizing-the-loss">
-   15.2.1. Minimizing the Loss
-  </a>
- </li>
-</ul>
-
-                        </nav>
                     </div>
                 </div>
             </div>
@@ -1345,49 +1324,42 @@
               <div>
                 
   <div class="section" id="fitting-the-simple-linear-model">
-<span id="sec-linear-simple-fit"></span><h1><span class="section-number">15.2. </span>Fitting the Simple Linear Model<a class="headerlink" href="#fitting-the-simple-linear-model" title="Permalink to this headline">¶</a></h1>
-<p>To fit a model, we use the notion of loss minimization that was first introduced in
-<a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>).
-The first step is to choose the loss function. Then, we find which values of
-<span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span> give the smallest loss for our data.
-We call <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span> <em>model parameters</em>, and we often represent them as the vector <span class="math notranslate nohighlight">\({\boldsymbol{\theta}} = [\theta_0, \theta_1]\)</span>.</p>
-<p>To fit a linear model with a numeric outcome variable, we typically choose squared loss, where for a given data point <span class="math notranslate nohighlight">\((x,y)\)</span> and model parameters <span class="math notranslate nohighlight">\({\boldsymbol{\theta}}\)</span>, the squared loss is:</p>
+<span id="sec-linear-simple-fit"></span><h1><span class="section-number">15.3. </span>Fitting the Simple Linear Model<a class="headerlink" href="#fitting-the-simple-linear-model" title="Permalink to this headline">¶</a></h1>
+<p>We stated earlier in this chapter that when we minimize the average loss over the data:</p>
 <div class="math notranslate nohighlight">
 \[
-{\cal l}({\boldsymbol{\theta}}, x, y) = [y - (\theta_0 + \theta_1 x)]^2
+\frac{1}{n} \sum_{i}[y_i - (\theta_0 + \theta_1 x_i)]^2,
 \]</div>
-<p>Notice that this loss function squares the error between the outcome <span class="math notranslate nohighlight">\(y\)</span> and the prediction, <span class="math notranslate nohighlight">\(\theta_0 + \theta_1 x\)</span>, given <span class="math notranslate nohighlight">\(x\)</span>. That’s why squared loss is also called <em>squared error</em>. We saw in the previous section that these errors are in the vertical direction on the scatter plot, meaning for a specific <span class="math notranslate nohighlight">\(x\)</span>, the error is the vertical difference between the points <span class="math notranslate nohighlight">\((x, y)\)</span> and <span class="math notranslate nohighlight">\((x, \theta_0 + \theta_1 x)\)</span>.  (See <a class="reference internal" href="linear_simple.html#fig-slr"><span class="std std-numref">Figure 15.1</span></a> for a diagram that includes two sample errors).</p>
-<p>For a data set with <span class="math notranslate nohighlight">\(n\)</span> points: <span class="math notranslate nohighlight">\((x_1, y_1), \ldots, (x_n, y_n) \)</span>, the average squared loss (ASE) is:</p>
+<p>the best fitting line has intercept and slope:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-L({\boldsymbol{\theta}}, {\mathbf{x}}, {\mathbf{y}})
- &amp;= \frac{1}{n} \sum_{i} {\cal l}({\boldsymbol{\theta}}, x_i, y_i) \\
- &amp;= \frac{1}{n} \sum_{i}[y_i - (\theta_0 + \theta_1 x_i)]^2.
+\hat{\theta}_0 &amp;= \bar{y} - \hat{\theta}_1 \bar{x} \\
+\hat{\theta}_1 &amp;= r({\mathbf{x}},{\mathbf{y}}) \frac{SD({\mathbf{y}})}{SD({\mathbf{x}})}
 \end{aligned}
 \end{split}\]</div>
-<p>Again, <span class="math notranslate nohighlight">\({\mathbf{x}}\)</span> is the vector <span class="math notranslate nohighlight">\([x_1, \ldots, x_n]\)</span> and <span class="math notranslate nohighlight">\({\mathbf{y}}\)</span> is similarly defined.</p>
-<p>Now that we have chosen the loss function, we want to find <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\theta}}\)</span> that minimizes the loss. We use calculus to do this.</p>
-<div class="section" id="minimizing-the-loss">
-<h2><span class="section-number">15.2.1. </span>Minimizing the Loss<a class="headerlink" href="#minimizing-the-loss" title="Permalink to this headline">¶</a></h2>
-<p>With the simple linear model, the average squared error is a function of two model parameters. This means that if we use calculus to find the minimizing parameter values, we need to find the partial derivatives of the ASE with respect to <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>. We can also find these minimizing values by other techniques:</p>
-<ul class="simple">
-<li><p><em>Gradient descent</em>. We can use numerical optimization techniques, such as gradient descent, when the loss function is more complex and calculus is not an option (see <a class="reference internal" href="../20/gd_intro.html#ch-optimization"><span class="std std-numref">Chapter 20</span></a>.</p></li>
-<li><p><em>Quadratic formula</em>. Since <span class="math notranslate nohighlight">\(L({\boldsymbol{\theta}},{\mathbf{x}},{\mathbf{y})}\)</span> is a quadratic function of <span class="math notranslate nohighlight">\({\boldsymbol{\theta}}\)</span> we can use the quadratic formula (along with a lot of algebra) to solve for the minimizing model parameter values. We guide you through the quadratic approach in the Exercises.</p></li>
-<li><p><em>Geometric argument</em>. Later in this chapter, we use a geometric interpretation of least squares to fit multiple linear models. This approach relates to the Pythagorean theorem and has several intuitive benefits.</p></li>
-</ul>
-<p>We choose calculus to optimize the simple linear model since it is quick and straightforward. To begin, we take the partial derivatives of the average squared error with respect to each parameter:</p>
+<p>In this section, we use calculus to derive these results.</p>
+<p>With the simple linear model, the mean squared error is a function of two model parameters, the intercept and slope. This means that if we use calculus to find the minimizing parameter values, we need to find the partial derivatives of the MSE with respect to <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>. We can also find these minimizing values by other techniques.</p>
+<dl class="simple myst">
+<dt><em>Gradient descent</em></dt><dd><p>We can use numerical optimization techniques, such as gradient descent, when the loss function is more complex and it’s faster to find pretty accurate approximate solutions (see <a class="reference internal" href="../20/gd_intro.html#ch-optimization"><span class="std std-numref">Chapter 20</span></a>).</p>
+</dd>
+<dt><em>Quadratic formula</em></dt><dd><p>Since the average loss is a quadratic function of <span class="math notranslate nohighlight">\( \theta_0\)</span> and <span class="math notranslate nohighlight">\( \theta_1 \)</span>, we can use the quadratic formula (along with a lot of algebra) to solve for the minimizing parameter values.</p>
+</dd>
+<dt><em>Geometric argument</em></dt><dd><p>Later in this chapter, we use a geometric interpretation of least squares to fit multiple linear models. This approach relates to the Pythagorean theorem and has several intuitive benefits.</p>
+</dd>
+</dl>
+<p>We choose calculus to optimize the simple linear model since it is quick and straightforward. To begin, we take the partial derivatives of the sum of squared errors with respect to each parameter. (We can ignore the e<span class="math notranslate nohighlight">\(1/n\)</span> in the MSE because it doesn’t affect the location of the minimum.)</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\frac{\partial}{\partial \theta_0} L({\boldsymbol{\theta}}, {\mathbf{x}}, {\mathbf{y}})
-  &amp;= \frac{1}{n} \sum_{i} 2 (y_i - \theta_0 - \theta_1 x_i ) (-1)\\
+\frac{\partial}{\partial \theta_0} \sum_{i}[y_i - (\theta_0 + \theta_1 x_i)]^2
+  &amp;=  \sum_{i} 2 (y_i - \theta_0 - \theta_1 x_i ) (-1)\\
  &amp; \\ 
-\frac{\partial}{\partial \theta_1} L({\boldsymbol{\theta}}, {\mathbf{x}}, {\mathbf{y}})
-  &amp;= \frac{1}{n} \sum_{i} 2 (y_i - \theta_0 - \theta_1 x_i) (-x_i)  
+\frac{\partial}{\partial \theta_1} \sum_{i}[y_i - (\theta_0 + \theta_1 x_i)]^2,
+  &amp;= \sum_{i} 2 (y_i - \theta_0 - \theta_1 x_i) (-x_i)  
 \end{aligned}
 \end{split}\]</div>
-<p>Then, we set the partial derivatives equal to 0, and simplify a bit by multiplying both sides of the equations by <span class="math notranslate nohighlight">\(-n/2\)</span> to get:</p>
+<p>Then, we set the partial derivatives equal to 0, and simplify a bit by multiplying both sides of the equations by <span class="math notranslate nohighlight">\(-1/2\)</span> to get:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -1399,7 +1371,7 @@ L({\boldsymbol{\theta}}, {\mathbf{x}}, {\mathbf{y}})
 In the first equation, we see that <span class="math notranslate nohighlight">\(\hat{\theta}_0\)</span> can be represented as a function of <span class="math notranslate nohighlight">\(\hat{\theta}_1\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[
-\hat{\theta}_0 = \bar{y} - \hat{\theta}_1 \bar{x}
+\hat{\theta}_0 = \bar{y} - \hat{\theta}_1 \bar{x}.
 \]</div>
 <p>Plugging this value into the second equation, gives us:</p>
 <div class="math notranslate nohighlight">
@@ -1415,79 +1387,42 @@ In the first equation, we see that <span class="math notranslate nohighlight">\(
 \[
 \hat{\theta}_1 = r({\mathbf{x}},{\mathbf{y}}) \frac{SD({\mathbf{y}})}{SD({\mathbf{x}})}
 \]</div>
-<p>This representation says that, a point on the fitted line at <span class="math notranslate nohighlight">\(x\)</span> can be written as</p>
+<p>As shown earlier in this chapter, this representation says that a point on the fitted line at <span class="math notranslate nohighlight">\(x\)</span> can be written as</p>
 <div class="math notranslate nohighlight">
-\[\begin{split} 
-\begin{aligned}
-\hat{y} &amp;= \hat{\theta}_0 + \hat{\theta}_1 x \\
-&amp;= \bar{y} - \hat{\theta}_1 \bar{x} + \hat{\theta}_1 x \\
-&amp;= \bar{y} + r({\mathbf{x}},{\mathbf{y}}) SD({\mathbf{y}}) \frac{(x - \bar{x})}{SD({\mathbf{x}})}\\ 
-\end{aligned}
-\end{split}\]</div>
-<p>This equation for the line has a nice interpretation: for a given <span class="math notranslate nohighlight">\(x\)</span> value, we find how many standard deviations above (or below) average it is, and then predict <span class="math notranslate nohighlight">\(y\)</span> to be <span class="math notranslate nohighlight">\(r\)</span> times as many standard deviations above (or below) its average.</p>
-<p>Since <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> objects have built-in methods to compute
+\[ 
+\hat{\theta}_0 + \hat{\theta}_1 x 
+= \bar{y} + r({\mathbf{x}},{\mathbf{y}}) SD({\mathbf{y}}) \frac{(x - \bar{x})}{SD({\mathbf{x}})} 
+\]</div>
+<p>We have derived the equation  for the least squares line that we used in the previous section. There, we used the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> built-in methods to compute
 <span class="math notranslate nohighlight">\(SD(\mathbf{x})\)</span>, <span class="math notranslate nohighlight">\(SD(\mathbf{y})\)</span>, and <span class="math notranslate nohighlight">\(r(\mathbf{x}, \mathbf{y})\)</span>,
-we can quickly define functions that fit the simple linear model to our data:</p>
+to easily calculate the equation for this line.
+However, in practice we recommend using the functionality provided in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to do the model fitting.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">theta_1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span> <span class="o">*</span> <span class="n">y</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span> 
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]]</span>
+
+<span class="n">reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">theta_0</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">theta_1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Now, we can fit the model by computing
-<span class="math notranslate nohighlight">\(\hat{\theta}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\theta}_1\)</span> on the data set.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <span class="n">theta_1</span><span class="p">(</span><span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">],</span> <span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
-<span class="n">t0</span> <span class="o">=</span> <span class="n">theta_0</span><span class="p">(</span><span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">],</span> <span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Model: f(x) = </span><span class="si">{</span><span class="n">t0</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">t1</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">x&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model: PA = </span><span class="si">{</span><span class="n">reg</span><span class="o">.</span><span class="n">intercept_</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="n">reg</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">AQS&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Model: f(x) = -3.36 + 2.10x
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Model: PA = -3.36 + 2.10AQS
 </pre></div>
 </div>
 </div>
 </div>
-<p>The model we fitted matches the line that we used in the previous section. This is not by accident. We purposely chose the least squares line as our fitted model. Of course, can use the functionality provided in scikit learn for finding the model parameters.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-
-<span class="n">y</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">]]</span>
-
-<span class="n">reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intercept: </span><span class="si">{</span><span class="n">reg</span><span class="o">.</span><span class="n">intercept_</span><span class="si">}</span><span class="s2">  Slope: </span><span class="si">{</span><span class="n">reg</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: [-3.36]  Slope: [2.1]
-</pre></div>
-</div>
-</div>
-</div>
-<p>Rather than computing the model parameters with summary statistics, we will want to use the <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> method in scikit learn because it offers numerically stable algorithms. This is especially important when fitting multiple variables.  We introduce the multiple linear model in the next section.</p>
-</div>
+<p>Notice that we provided <code class="docutils literal notranslate"><span class="pre">y</span></code> as an array and <code class="docutils literal notranslate"><span class="pre">x</span></code> as a data frame to <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code>. We will soon see why when we fit multiple explanatory features in a model.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> method offers numerically stable algorithms to fit linear models by least squares. This is especially important when fitting multiple variables, which we introduce next.</p>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1515,17 +1450,17 @@ we can quickly define functions that fit the simple linear model to our data:</p
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="linear_simple.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="linear_pa.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">15.1. </span>Simple Linear Model</p>
+            <p class="prev-next-title"><span class="section-number">15.2. </span>Example: A Simple Linear Model for Air Quality</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="linear_multi.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">15.3. </span>Multiple Linear Model</p>
+        <p class="prev-next-title"><span class="section-number">15.4. </span>Multiple Linear Model</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

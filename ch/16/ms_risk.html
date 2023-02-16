@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>16.5. Risk and Loss Minimization &#8212; Learning Data Science</title>
+    <title>16.5. Model Bias and Variance &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -733,38 +733,43 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_pa.html">
+     15.2. Example: A Simple Linear Model for Air Quality
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_simple_fit.html">
-     15.2. Fitting the Simple Linear Model
+     15.3. Fitting the Simple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_multi.html">
-     15.3. Multiple Linear Model
+     15.4. Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_multi_fit.html">
-     15.4. Fitting the Multiple Linear Model
+     15.5. Fitting the Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_case.html">
-     15.5. Example: Where is the Land of Opportunity?
+     15.6. Example: Where is the Land of Opportunity?
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_feature_eng.html">
-     15.6. Feature Engineering for Numeric Measurements
+     15.7. Feature Engineering for Numeric Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_categorical.html">
-     15.7. Feature Engineering for Categorical Measurements
+     15.8. Feature Engineering for Categorical Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_summary.html">
-     15.8. Summary
+     15.9. Summary
     </a>
    </li>
   </ul>
@@ -801,7 +806,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     16.5. Risk and Loss Minimization
+     16.5. Model Bias and Variance
     </a>
    </li>
    <li class="toctree-l2">
@@ -1300,24 +1305,6 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
-            <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
-            </div>
-            <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loss-for-a-new-observation">
-   16.5.1. Loss for a New Observation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#model-bias-and-variance">
-   16.5.2. Model Bias and Variance
-  </a>
- </li>
-</ul>
-
-            </nav>
         </div>
     </div>
 </div>
@@ -1325,125 +1312,26 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Risk and Loss Minimization</h1>
+                <h1>Model Bias and Variance</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loss-for-a-new-observation">
-   16.5.1. Loss for a New Observation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#model-bias-and-variance">
-   16.5.2. Model Bias and Variance
-  </a>
- </li>
-</ul>
-
-                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="section" id="risk-and-loss-minimization">
-<h1><span class="section-number">16.5. </span>Risk and Loss Minimization<a class="headerlink" href="#risk-and-loss-minimization" title="Permalink to this headline">¶</a></h1>
-<p>Regularization, train-test split, and cross-validation all have the goal to reduce over-fitting. The problem with over-fitting comes from using data to both fit a model and estimate the model’s error in predicting new observations. In this section, we formalize this idea.</p>
-<p>Throughout this book, our approach to fitting and evaluating models has taken the perspective of minimizing loss.
-We first introduced the notion of a loss function in <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> where we used absolute loss to fit a constant to data.  There, the loss function was simply <span class="math notranslate nohighlight">\( {\cal l}(\theta, y) = | y - \theta | \)</span>. Then, in <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a> we introduced the multiple linear model and used squared loss to fit them, with the loss function  <span class="math notranslate nohighlight">\( {\cal l}(\theta, \mathbf{x}, y) = (y - \mathbf{x}\boldsymbol{\theta})^2\)</span>. Here <span class="math notranslate nohighlight">\( \mathbf{x} \)</span> consists of <span class="math notranslate nohighlight">\( p \)</span> features and  <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span> contains <span class="math notranslate nohighlight">\( p \)</span> coefficients (aka parameters), one for each feature. In <a class="reference internal" href="../19/classification_intro.html#ch-logistic"><span class="std std-numref">Chapter 19</span></a>, we use cross-entropy loss  for the situation when <span class="math notranslate nohighlight">\(y\)</span> represents a categorical feature and takes on values of 0 and 1, only. Our focus is on squared loss in this chapter.</p>
-<p>Generally speaking, a loss function <span class="math notranslate nohighlight">\({\cal l}(f, \mathbf{x}, y)\)</span> gives the model’s loss for a single data point where we use <span class="math notranslate nohighlight">\( f(\mathbf{x}) \)</span> to predict <span class="math notranslate nohighlight">\( y \)</span>. So for squared loss, we have</p>
-<div class="math notranslate nohighlight">
-\[ {\cal l}(f, \mathbf{x}, y) = (y - f(\mathbf{x}))^2 \]</div>
-<p>In model fitting, we have minimized average loss, <span class="math notranslate nohighlight">\( L(f, \textbf{X}, \mathbf{y}) \)</span>,</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-L(f, \textbf{X}, \mathbf{y}) &amp; = \frac{1}{n} \sum_{i = 1}^{n}{\cal l}(f, \mathbf{x}_i, {y_i}) 
-\end{aligned}
-\]</div>
-<p>Here <span class="math notranslate nohighlight">\( \textbf{X} \)</span> is an <span class="math notranslate nohighlight">\( n \times p \)</span> design matrix, and <span class="math notranslate nohighlight">\( \mathbf{x}_i \)</span> is the <span class="math notranslate nohighlight">\(i\)</span>th row of the design matrix, which corresponds to the <span class="math notranslate nohighlight">\( i \)</span>th observation in the data set. For multiple linear models and squared error, we have an average loss:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-L(\boldsymbol{\theta}, \textbf{X},  \mathbf{y})
-&amp; =  \frac{1}{n} \sum_{i = 1}^{n} (y_i - \mathbf{x}_i\boldsymbol{\theta})^2 \\
-\end{aligned}
-\end{split}\]</div>
-<p>The average loss is an approximation for the expected loss for a new observation. We describe expected loss next.</p>
-<div class="section" id="loss-for-a-new-observation">
-<h2><span class="section-number">16.5.1. </span>Loss for a New Observation<a class="headerlink" href="#loss-for-a-new-observation" title="Permalink to this headline">¶</a></h2>
-<p>The train-test split and cross-validation are techniques to estimate the loss for a new observation, an observation that we have not come across as we fit our model. In essence these techniques aim to mimic the expected loss for a new observation. We call this expected loss the  <strong>risk</strong> for a model <span class="math notranslate nohighlight">\( f \)</span>. That is if we have a new observation <span class="math notranslate nohighlight">\( (\mathbf{x}_0 , y_0) \)</span>, the risk is expressed as</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-R(f) &amp; = \mathbb{E}[ {\cal l}(f, \mathbf{x}_0, {y_0}) ] 
-\end{aligned}
-\]</div>
-<p>Since we don’t know the underlying distribution of <span class="math notranslate nohighlight">\( (\mathbf{x}_0 , y_0) \)</span>, we can’t calculate the risk, but we can approximate it by the average loss over the data we have collected:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-R(f) &amp; = \mathbb{E}[ {\cal l}(f, \mathbf{x}_0, {y_0}) ] \\
- &amp; \approx 
- \frac{1}{n} \sum_{i = 1}^{n} (y_i - f(\mathbf{x}_i))^2 \\
-\end{aligned}
-\end{split}\]</div>
-<p>This approximation goes by the name of <em>empirical risk</em>. But, hopefully you recognize it as mean square error (MSE).</p>
-<p>When model fitting we find the model, <span class="math notranslate nohighlight">\( \hat{f} \)</span> that minimizes the risk over all possible models, <span class="math notranslate nohighlight">\( \cal{F} = \{ f \} \)</span>,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned} 
- \min_{f \in \cal{F}} R(f) = 
- \min_{f \in \cal{F}} \frac{1}{n} \sum_{i = 1}^{n}  (y_i - f(\mathbf{x}_i))^2 \\
-\end{aligned}
-\end{split}\]</div>
-<p>This technique is aptly called <em>empirical risk minimization</em>. The collection of models could be linear models,
-<span class="math notranslate nohighlight">\( f( \mathbf{x}) = \mathbf{x} \boldsymbol{{\theta}} \)</span>, or degree 2 polynomial models,
-<span class="math notranslate nohighlight">\( f({x}) = \theta_0 + \theta_1x + \theta_2 x^2 \)</span>, or other types of models.</p>
-<p>In this chapter, we have seen problems arise when we use the empirical risk to both fit a model and evaluate it. When we estimate the risk of a new observation empirically, we have</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned} 
-  \frac{1}{n} \sum_{i = 1}^{n} (y_i - \hat{f}(\mathbf{x}_i))^2, ~\textrm{where}
-\end{aligned}
-\]</div>
-<p>the data have been used to find <span class="math notranslate nohighlight">\( \hat{f} \)</span> and to estimate the risk. The train-test split helps us get around this problem,
-$<span class="math notranslate nohighlight">\(
-\begin{aligned} 
-  \frac{1}{n_S} \sum_{j = 1}^{n_S} (y_j - \hat{f}_T (\mathbf{x}_j))^2, ~\textrm{where}
-\end{aligned}
-\)</span>$</p>
-<p>we the notation, <span class="math notranslate nohighlight">\( \hat{f}_T \)</span> means that we have used the train set to fit the model. The risk for a new observation is approximated by <span class="math notranslate nohighlight">\( y_j \)</span> and <span class="math notranslate nohighlight">\( \mathbf{x}_j \)</span> from the test set. Regularization takes a different approach and penalizes the empirical risk minimization to keep the model from fitting the data too closely.  Ideally, we want to estimate the risk</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-\mathbb{E}[R({\hat{f}})]  = \mathbb{E}[ (y_0 - \hat{f}(\mathbf{x}_0))^2 ],
-\end{aligned}
-\]</div>
-<p>where the expected value is over both the new observation <span class="math notranslate nohighlight">\( (\mathbf{x}_0, y_0) \)</span> and over <span class="math notranslate nohighlight">\( {\hat{f}} \)</span> (which involves the original data <span class="math notranslate nohighlight">\( \textbf{x}_i\)</span> and <span class="math notranslate nohighlight">\( {y}_i \)</span>, <span class="math notranslate nohighlight">\( i = 1, \ldots, n \)</span>.</p>
-<p>Before we examine this expectation in greater detail, we provide an example that shows how this risk can be broken down into three pieces: model bias, model variance, and irreducible error.</p>
-</div>
-<div class="section" id="model-bias-and-variance">
-<h2><span class="section-number">16.5.2. </span>Model Bias and Variance<a class="headerlink" href="#model-bias-and-variance" title="Permalink to this headline">¶</a></h2>
-<p>A general model of data might be expressed as follows:</p>
+  <div class="section" id="model-bias-and-variance">
+<h1><span class="section-number">16.5. </span>Model Bias and Variance<a class="headerlink" href="#model-bias-and-variance" title="Permalink to this headline">¶</a></h1>
+<p>In this section, we provide a different way to think about the problem of over- and under-fitting. We carry out a simulation study where we generate synthetic data from a model of our design. This way, we know the true model, and we can see how close we get to the truth when we fit models to the data.</p>
+<p>We concoct a general model of data as follows:</p>
 <div class="math notranslate nohighlight">
 \[ y = g(\mathbf{x}) + {\epsilon}.\]</div>
-<p>The errors are assumed to have no trends or patterns, constant variance, and independent of one another. The <em>signal</em> in the model is the function, <span class="math notranslate nohighlight">\(g()\)</span>. The data are the <span class="math notranslate nohighlight">\( (\mathbf{x}_i, y_i) \)</span> pairs, and we fit models by minimizing the empirical risk,</p>
-<div class="math notranslate nohighlight">
-\[
-\min_{f \in \cal{F}} \frac{1}{n} \sum_{i = 1}^{n} (y_i - f(\mathbf{x}_i)^2 
-\]</div>
-<p>Note that <span class="math notranslate nohighlight">\(g\)</span> might not be in the collection of functions that we are using to fit a model.</p>
-<p>As an example, let’s take <span class="math notranslate nohighlight">\( g(x) = \sin(x) + 0.3x \)</span> and add errors are from a normal curve to get <span class="math notranslate nohighlight">\( y \)</span>.
-The following functions set up this data generation process.</p>
+<p>This expression makes it easy to see the two components of the model, the signal, <span class="math notranslate nohighlight">\(g(x)\)</span> and the noise <span class="math notranslate nohighlight">\( \epsilon \)</span>. In our model, we assume that the errors (the noise) have no trends or patterns, constant variance, and are independent of one another.</p>
+<p>As an example, let’s take <span class="math notranslate nohighlight">\( g(x) = \sin(x) + 0.3x \)</span> and the errors from a normal curve with center 0 and SD = 0.2.  We can generate data from this model with the
+following functions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">x</span>
@@ -1458,34 +1346,50 @@ The following functions set up this data generation process.</p>
 </div>
 </div>
 </div>
-<p>We generate 50 <span class="math notranslate nohighlight">\( (x, y) \)</span> pairs from this model and plot them.</p>
+<p>Let’s generate 50 data points <span class="math notranslate nohighlight">\( (x_i, y_i)\)</span>, <span class="math notranslate nohighlight">\(i=1, \ldots, 50 \)</span>, from this model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
 <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">draw</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">error</span> <span class="o">=</span> <span class="n">ys</span><span class="o">-</span><span class="n">g</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>We can plot our data, and since we know the true signal, we can find the errors and plot them too.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/ms_risk_10_0.svg" src="../../_images/ms_risk_10_0.svg" /></div>
+<img alt="../../_images/ms_risk_6_0.svg" src="../../_images/ms_risk_6_0.svg" /></div>
 </div>
 <p>The plot on the left shows <span class="math notranslate nohighlight">\(g\)</span> as a dashed curve. We can also see the <span class="math notranslate nohighlight">\( (x, y) \)</span> pairs form a scatter of dots about this curve. The right hand plot shows the errors, <span class="math notranslate nohighlight">\( y - g(x) \)</span>, for the 50 points. Notice that they do not form a pattern.</p>
-<p>Now let’s fit a second degree polynomial to these data. In other words, we take <span class="math notranslate nohighlight">\(\cal{F}\)</span> to be the collection of all functions that can be expressed as <span class="math notranslate nohighlight">\( \theta_0 + \theta_1 x + \theta_2 x^2\)</span>. Since <span class="math notranslate nohighlight">\( g(x) = \sin(x) + 0.3x \)</span>, it doesn’t belong to the collection of functions that we are optimizing over.</p>
+<p>When we fit a model to the data, we minimize the mean square error. Let’s write this minimization in  generality,</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{f \in \cal{F}} \frac{1}{n} \sum_{i = 1}^{n} [y_i - f(\mathbf{x}_i)]^2 
+\]</div>
+<p>The minimization is over the collection of functions <span class="math notranslate nohighlight">\( \cal{F} \)</span>. We have seen in this chapter that this collection of functions might be polynomials of 12 degrees, or simply bent lines. An important point is that the true model, <span class="math notranslate nohighlight">\(g\)</span>, doesn’t have to be one of the functions in the collection.</p>
+<p>Let’s take <span class="math notranslate nohighlight">\( \cal{F} \)</span> to be the collection of second degree polynomials; in other words, functions that can be expressed as <span class="math notranslate nohighlight">\( \theta_0 + \theta_1 x + \theta_2 x^2\)</span>. Since <span class="math notranslate nohighlight">\( g(x) = \sin(x) + 0.3x \)</span>, it doesn’t belong to the collection of functions that we are optimizing over.</p>
+<p>Let’s fit a polynomial to our 50 data points,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">include_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">poly_features</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 
 <span class="n">model_deg2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">poly_features</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
-<span class="n">model_deg2</span><span class="o">.</span><span class="n">coef_</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fitted Model: </span><span class="si">{</span><span class="n">model_deg2</span><span class="o">.</span><span class="n">intercept_</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;+ </span><span class="si">{</span><span class="n">model_deg2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x + </span><span class="si">{</span><span class="n">model_deg2</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x^2&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-0.19,  0.05])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fitted Model: 0.98 + -0.19x + 0.05x^2
 </pre></div>
 </div>
 </div>
@@ -1493,10 +1397,10 @@ The following functions set up this data generation process.</p>
 <p>Again, we know the true model is not quadratic (because we built it). Let’s plot the data and the fitted curve.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/ms_risk_14_0.svg" src="../../_images/ms_risk_14_0.svg" /></div>
+<img alt="../../_images/ms_risk_13_0.svg" src="../../_images/ms_risk_13_0.svg" /></div>
 </div>
-<p>The quadratic doesn’t fit the data well, and it doesn’t represent the underlying curve well either.  There is <em>model bias</em> present in this fitting procedure because the set of models that we are fitting to the data (second order polynomials) does not include the truth, <span class="math notranslate nohighlight">\( g \)</span>.</p>
-<p>If we repeat this process, and generate another 50 points from the true  model and fit a second degree polynomial to these data, then the fitted coefficients of the quadratic will change because it depends on the new set of data. We can repeat this process many times, and average the fitted curves. This average curve will resemble the expected curve, <span class="math notranslate nohighlight">\( \mathbb{E}[ \hat{f} ] \)</span>. To demonstrate this, let’s generate 25 sets of data and fit a quadratic to each set of points.</p>
+<p>The quadratic doesn’t fit the data well, and it doesn’t represent the underlying curve well either because the set of models that we are choosing from (second order polynomials) can’t capture the curvature in <span class="math notranslate nohighlight">\( g \)</span>.</p>
+<p>If we repeat this process, and generate another 50 points from the true  model and fit a second degree polynomial to these data, then the fitted coefficients of the quadratic will change because it depends on the new set of data. We can repeat this process many times, and average the fitted curves. This average curve will resemble the typical best fit of a second degree polynomial to 50 points from our true model. To demonstrate this notion, let’s generate 25 sets of 50 data points and fit a quadratic to each dataset.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
@@ -1519,24 +1423,10 @@ The following functions set up this data generation process.</p>
 <p>The plot below shows all 25 fitted models along with the true function, <span class="math notranslate nohighlight">\(g\)</span>, and the average of the fitted curves <span class="math notranslate nohighlight">\( \bar{f} \)</span>.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/ms_risk_19_0.svg" src="../../_images/ms_risk_19_0.svg" /></div>
+<img alt="../../_images/ms_risk_18_0.svg" src="../../_images/ms_risk_18_0.svg" /></div>
 </div>
 <p>We can see the 25 fitted quadratics vary with the data. This concept is called <em>model variation</em>. The average of the 25 quadratics is represented by the solid black line. The difference between the average quadratic and the true curve is called the <em>model bias</em>.</p>
-<p>Now, let’s return to the general problem. We can decompose the risk for square loss into parts representing the model bias, model variance, and the <em>irreducible error</em> from <span class="math notranslate nohighlight">\( \epsilon \)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-R &amp; = \mathbb{E} [ y_0 -  \hat{f}(x_0)]^2   &amp; \textrm{definition}~\textrm{of} ~R\\
- &amp;  = \mathbb{E} [ g(x_0) + \epsilon -  \hat{f}(x_0)]^2  &amp; \textrm{definition}~\textrm{of} ~y\\
-  &amp;  = \mathbb{E} [ g(x_0) + \epsilon - \mathbb{E}[\hat{f}(x_0)] + \mathbb{E}[\hat{f}(x_0)] -  \hat{f}(x_0)]^2 &amp; \textrm{adding}~ \pm \mathbb{E}[\hat{f}(x_0)] \\
- &amp;  = \mathbb{E} [ g(x_0) - \mathbb{E}[\hat{f}(x_0)] -  (\hat{f}(x_0) - \mathbb{E}[\hat{f}(x_0)]) + \epsilon]^2  &amp; \textrm{rearranging}~\textrm{terms}\\
- &amp;  = [ g(x_0) - \mathbb{E}[\hat{f}(x_0)]]^2 + \mathbb{E}[\hat{f}(x_0) - \mathbb{E}[\hat{f}(x_0)]]^2 + \sigma^2 \\
-% &amp; =  ~~~\textrm{model bias}^2 ~~~~~~~+~~~~ \textrm{model variance}^2 ~+~ \textrm{error}
-\end{aligned}
-\end{split}\]</div>
-<p>(To derive the last equality from the previous line, we need to formally prove that the cross product terms in the expansion of the quadratic are all 0. This takes quite a bit of algebra and we don’t present it here.) The first of the three terms in the final equation is model bias (squared). When, the signal, <span class="math notranslate nohighlight">\( g \)</span>,  does not belong to the model space, we have model bias. If the model space can approximate <span class="math notranslate nohighlight">\(g\)</span> well, then the bias is small. For instance, a 10-degree polynomial can get pretty close to the <span class="math notranslate nohighlight">\(g\)</span> used in our example.  The second term represents the variability in the fitted model that comes from the data. We have seen earlier in this chapter that higher degree polynomials over fit the data, so they vary a lot from one set of data to the next. The more complex the model space, the greater the variability in the fitted model. Finally, the last term is the variability in the errors, the “irreducible error”.  This error sticks around whether we have under fit with a simple model (high bias) or over fit with a complex model (high variance).</p>
-<p>This representation of the expected loss is called the <em>bias-variance decomposition</em> of the model. Model selection aims to balance these competing sources of error. This balancing problem is called the <em>bias-variance trade off</em>.</p>
-</div>
+<p>When the signal, <span class="math notranslate nohighlight">\( g \)</span>,  does not belong to the model space, <span class="math notranslate nohighlight">\( \cal{F} \)</span>, we have model bias. If the model space can approximate <span class="math notranslate nohighlight">\(g\)</span> well, then the bias is small. For instance, a 10-degree polynomial can get pretty close to the <span class="math notranslate nohighlight">\(g\)</span> used in our example.  On the other hand, we have seen earlier in this chapter that higher degree polynomials can over-fit the data and vary a lot trying to get close to the data. The more complex the model space, the greater the variability in the fitted model.  Under-fitting with too simple of a model can lead to high model bias (the difference between <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(\bar{f}\)</span>), and over-fitting with too complex of a model can result in high model variance (the fluctuations of <span class="math notranslate nohighlight">\(\hat{f}\)</span> around <span class="math notranslate nohighlight">\(\bar{f}\)</span>). This notion is called the <em>bias-variance trade off</em>. Model selection aims to balance these competing sources of a lack of fit.</p>
 </div>
 
     <script type="text/x-thebe-config">

@@ -733,38 +733,43 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_pa.html">
+     15.2. Example: A Simple Linear Model for Air Quality
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_simple_fit.html">
-     15.2. Fitting the Simple Linear Model
+     15.3. Fitting the Simple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_multi.html">
-     15.3. Multiple Linear Model
+     15.4. Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_multi_fit.html">
-     15.4. Fitting the Multiple Linear Model
+     15.5. Fitting the Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_case.html">
-     15.5. Example: Where is the Land of Opportunity?
+     15.6. Example: Where is the Land of Opportunity?
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_feature_eng.html">
-     15.6. Feature Engineering for Numeric Measurements
+     15.7. Feature Engineering for Numeric Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_categorical.html">
-     15.7. Feature Engineering for Categorical Measurements
+     15.8. Feature Engineering for Categorical Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_summary.html">
-     15.8. Summary
+     15.9. Summary
     </a>
    </li>
   </ul>
@@ -801,7 +806,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="ms_risk.html">
-     16.5. Risk and Loss Minimization
+     16.5. Model Bias and Variance
     </a>
    </li>
    <li class="toctree-l2">
@@ -1346,14 +1351,85 @@
                 
   <div class="section" id="overfitting">
 <h1><span class="section-number">16.1. </span>Overfitting<a class="headerlink" href="#overfitting" title="Permalink to this headline">¶</a></h1>
-<p>When we have many features available, choosing which ones to include or exclude in a model rapidly gets complicated. Even with a two variable model and eight features, there are 28 pairs of features that we could fit and check.
-And all together, there are over 250 models to choose from, if we consider all one-, two-, …, eight-variable models.
-It can be hard to tell where to stop, to decide how simple is simple, and to examine hundreds of residual plots.
-Unfortunately, the notion of loss and minimizing MSE isn’t entirely helpful either. With each variable that we add to the model, the MSE typically gets smaller. Recall from the geometric perspective of model fitting (<a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>) that adding a feature to a model adds an <span class="math notranslate nohighlight">\(n\)</span>-dimensional vector to the feature space, and the error between the outcome vector and its projection into the space spanned by the explanatory variables gets smaller. We might view this as a good thing because our model fits the data more closely, but there is a danger in overfitting.</p>
-<p>Overfitting happens when the model follows the data too closely and picks up the variability in the random noise in the outcomes. When this happens, new observations are not well predicted. An example, helps clarify this idea.</p>
+<p>When we have many features available to include in a model, choosing which ones to include or exclude rapidly gets complicated. In the upward mobility from <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a> we chose two of the seven variables to fit the model, but there are 21 pairs of features that we could have examined and fitted for a two-variable model.
+And, there are over 100 models to choose from, if we consider all one-, two-, …, seven-variable models.
+It can be hard to to examine hundreds of residual plots, to decide how simple is simple, and settle on a model.
+Unfortunately, the notion of minimizing MSE isn’t entirely helpful either. With each variable that we add to a model, the MSE typically gets smaller. Recall from the geometric perspective of model fitting (<a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>) that adding a feature to a model adds an <span class="math notranslate nohighlight">\(n\)</span>-dimensional vector to the feature space, and the error between the outcome vector and its projection into the space spanned by the explanatory variables shrinks. We might view this as a good thing because our model fits the data more closely, but there is a danger in overfitting.</p>
+<p>Overfitting happens when the model follows the data too closely and picks up the variability in the random noise in the outcome. When this happens, new observations are not well predicted. An example, helps clarify this idea.</p>
 <div class="section" id="example-energy-consumption">
 <h2><span class="section-number">16.1.1. </span>Example: Energy Consumption<a class="headerlink" href="#example-energy-consumption" title="Permalink to this headline">¶</a></h2>
-<p>The following dataset contains the utility bills from a private residence in Minnesota. We have records of the monthly gas usage in a home (cubic feet) and the average daily temperature (degrees Farenheit)<a class="footnote-reference brackets" href="#kaplan" id="id1">1</a>.</p>
+<p>The following dataset contains the utility bills from a private residence in Minnesota. We have records of the monthly gas usage in a home (cubic feet) and the average temperature that month (degrees Farenheit)<a class="footnote-reference brackets" href="#kaplan" id="id1">1</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heat_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/utilities.csv&#39;</span><span class="p">,</span> <span class="n">usecols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span><span class="s1">&#39;ccf&#39;</span><span class="p">])</span>
+<span class="n">heat_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>temp</th>
+      <th>ccf</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>29</td>
+      <td>166</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>31</td>
+      <td>179</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>15</td>
+      <td>224</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>76</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>55</td>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td>39</td>
+      <td>91</td>
+    </tr>
+  </tbody>
+</table>
+<p>99 rows × 2 columns</p>
+</div></div></div>
+</div>
 <p>Let’s begin by looking at a scatter plot of gas consumption as a function of temperature.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1380,16 +1456,16 @@ Unfortunately, the notion of loss and minimizing MSE isn’t entirely helpful ei
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_6_0.svg" src="../../_images/ms_overfitting_6_0.svg" /></div>
 </div>
-<p>The relationship shows curvature, but when we tried to straighten it with a log transformation a different curvature arises. Additionally, there are two unusual points. If we refer back to the documentation, we find that these points represent recording errors, so we remove them.</p>
+<p>The relationship shows curvature, but when we tried to straighten it with a log transformation a different curvature arises. Additionally, there are two unusual points. When we refer back to the documentation, we find that these points represent recording errors, so we remove them.</p>
 <div class="cell tag_remove-input docutils container">
 </div>
 <p>Let’s see if a quadratic curve can capture the relationship between gas usage and temperature.
 Polynomials are still considered linear models. They are linear in their polynomial features. For example, we can express a quadratic model as,</p>
 <div class="math notranslate nohighlight">
 \[
-y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
+\theta_0 + \theta_1 x + \theta_2 x^2
 \]</div>
-<p>This model is linear in the features <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(x^2\)</span>, and in matrix notation we can write this model as <span class="math notranslate nohighlight">\({\mathbf{y}} = {\textbf{X}} {\boldsymbol{\theta}} + {error}\)</span>, where
+<p>This model is linear in the features <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(x^2\)</span>, and in matrix notation we can write this model as <span class="math notranslate nohighlight">\({\textbf{X}} {\boldsymbol{\theta}}\)</span>, where
 <span class="math notranslate nohighlight">\( \textbf{X} \)</span> is the design matrix,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -1405,7 +1481,7 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 <p>We can create the polynomial features of the design matrix with the <code class="docutils literal notranslate"><span class="pre">PolynomialFeatures</span></code> tool in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[[</span><span class="s1">&#39;temp&#39;</span><span class="p">]]</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PolynomialFeatures</span>
@@ -1447,7 +1523,7 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_17_0.svg" src="../../_images/ms_overfitting_17_0.svg" /></div>
 </div>
-<p>The quadratic captures the curve in the data quite well, but the residuals show a slight upward trend in the 70-80 degree range of temperature, which indicates some lack of fit.</p>
+<p>The quadratic captures the curve in the data quite well, but the residuals show a slight upward trend in the 70-80 degree range of temperature, which indicates some lack of fit. There is also some funneling in the residuals, where the variability in gas consumption is greater in the colder months. We might expect this behavior since we have only the monthly average temperature.</p>
 <p>For comparison, we fit a few more models with higher degree polynomials and collectively examine the fitted curves.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1469,7 +1545,7 @@ y = \theta_0 + \theta_1 x + \theta_2 x^2 + error
 Also, when the <span class="math notranslate nohighlight">\(x\)</span> values are large, then the normal equations are poorly conditioned and the coefficients can be difficult to interpret and compare.</p>
 <p>A better practice is to use polynomials that have been constructed to be orthogonal to one another. These polynomials fill the same space as the original polynomials, but they are uncorrelated with one another and give a more stable fit.</p>
 </div>
-<p>The plot below places all of the fits on the same graph so that we can see how the higher degree polynomials tend to bend more and more strangely.</p>
+<p>The plot below places all of the fits on the same graph so that we can see how the higher degree polynomials bend more and more strangely.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_23_0.svg" src="../../_images/ms_overfitting_23_0.svg" /></div>
@@ -1479,7 +1555,7 @@ Also, when the <span class="math notranslate nohighlight">\(x\)</span> values ar
 <div class="cell_output docutils container">
 <img alt="../../_images/ms_overfitting_25_0.svg" src="../../_images/ms_overfitting_25_0.svg" /></div>
 </div>
-<p>The degree 1 curve (the straight line) in the top left facet misses the curved pattern in the data. The degree 2, begins to capture it, and the degree 3 looks like an improvement but notice the upward bend at the right side of the plot. The polynomials of degree 6, 8, and 12 follow the data more and more closely, as they get more and more curvy. These polynomials seem to fit spurious bumps in the data. All together, these six curves illustrate under- and over- fitting. The fitted line in the top left under-fits and misses the curvature entirely. And, the degree 12 polynomial in the bottom right definitely over-fits with a wiggly pattern that we don’t think makes sense for this context.</p>
+<p>The degree 1 curve (the straight line) in the top left facet misses the curved pattern in the data. The degree 2, begins to capture it, and the degree 3 looks like an improvement but notice the upward bend at the right side of the plot. The polynomials of degree 6, 8, and 12 follow the data more and more closely, as they get more and more curvy. These polynomials seem to fit spurious bumps in the data. All together, these six curves illustrate under- and over- fitting. The fitted line in the top left under-fits and misses the curvature entirely. And, the degree 12 polynomial in the bottom right definitely over-fits with a wiggly pattern that we don’t think makes sense in this context.</p>
 <p>In general, as we add more features, models get more complex and the MSE drops, but at the same time,
 the fitted model grows increasingly erratic and sensitive to the data.
 When we over-fit, the model follows the data too closely, and predictions are poor for new observations. One simple technique to assess a fitted model is it compute the MSE on new data, data that were not used in building the model. Since we don’t typically have the capacity to acquire more data, we set aside some of the original data to evaluate the fitted model. This technique is the topic of the next section.</p>

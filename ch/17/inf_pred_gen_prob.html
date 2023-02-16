@@ -733,38 +733,43 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../15/linear_pa.html">
+     15.2. Example: A Simple Linear Model for Air Quality
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_simple_fit.html">
-     15.2. Fitting the Simple Linear Model
+     15.3. Fitting the Simple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_multi.html">
-     15.3. Multiple Linear Model
+     15.4. Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_multi_fit.html">
-     15.4. Fitting the Multiple Linear Model
+     15.5. Fitting the Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_case.html">
-     15.5. Example: Where is the Land of Opportunity?
+     15.6. Example: Where is the Land of Opportunity?
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_feature_eng.html">
-     15.6. Feature Engineering for Numeric Measurements
+     15.7. Feature Engineering for Numeric Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_categorical.html">
-     15.7. Feature Engineering for Categorical Measurements
+     15.8. Feature Engineering for Categorical Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../15/linear_summary.html">
-     15.8. Summary
+     15.9. Summary
     </a>
    </li>
   </ul>
@@ -801,7 +806,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../16/ms_risk.html">
-     16.5. Risk and Loss Minimization
+     16.5. Model Bias and Variance
     </a>
    </li>
    <li class="toctree-l2">
@@ -1320,6 +1325,11 @@
    17.6.3. Probability behind testing and intervals
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#probability-behind-model-selection">
+   17.6.4. Probability Behind Model Selection
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -1355,6 +1365,11 @@
    17.6.3. Probability behind testing and intervals
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#probability-behind-model-selection">
+   17.6.4. Probability Behind Model Selection
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -1367,33 +1382,43 @@
   <div class="section" id="probability-for-inference-and-prediction">
 <span id="sec-theory-probintro"></span><h1><span class="section-number">17.6. </span>Probability for Inference and Prediction<a class="headerlink" href="#probability-for-inference-and-prediction" title="Permalink to this headline">¶</a></h1>
 <p>Hypothesis testing, confidence intervals, and prediction intervals rely on probability calculations computed from the sampling distribution and the data generation process. These probability frameworks also enable us to run simulation and bootstrap studies for a hypothetical survey, an experiment, or some other chance process in order to study its random behavior. For example, we found the sampling distribution for an average of ranks under the assumption that the treatment in a Wikipedia experiment was not effective. Using simulation, we quantified the typical deviations from the expected outcome and the distribution of the possible values for the summary statistic. The triptych in <a class="reference internal" href="inf_pred_gen_dist.html#triptych"><span class="std std-numref">Figure 1 17.1</span></a> provided a diagram to guide us in the process; it helped keep straight the differences between the population, probability, and sample and also showed their connections. In this section, we bring more mathematical rigor to these concepts.</p>
-<p>We formally introduce the notions of expected value, standard deviation, and random variable, and we connect them to the concepts we have been using in this chapter for testing hypotheses and making confidence and prediction intervals. We begin with the specific example from the Wikipedia experiment, before we generalize them. Along the way, we connect this formalism to the triptych that we have used as our guide throughout the chapter.</p>
+<p>We formally introduce the notions of expected value, standard deviation, and random variable, and we connect them to the concepts we have been using in this chapter for testing hypotheses and making confidence and prediction intervals. We begin with the specific example from the Wikipedia experiment, and then generalize. Along the way, we connect this formalism to the triptych that we have used as our guide throughout the chapter.</p>
 <div class="figure align-default" id="triptychrank">
 <img alt="../../_images/TriptychRank.png" src="../../_images/TriptychRank.png" />
 <p class="caption"><span class="caption-number">Fig. 17.3 </span><span class="caption-text">This diagram shows the population, sampling, and sample distributions and their summaries from the Wikipedia example. In this example, the population is known to consist of the integers from 1 to 200, and the sample are the ranks of the observed post-productivity measurements for the treatment group. In the middle, the sampling distribution of the average rank is created from a simulation study. Notice it is normal in shape with a center that matches the population average.</span><a class="headerlink" href="#triptychrank" title="Permalink to this image">¶</a></p>
 </div>
 <div class="section" id="formalizing-the-theory-for-average-rank-statistics">
 <h2><span class="section-number">17.6.1. </span>Formalizing the theory for average rank statistics<a class="headerlink" href="#formalizing-the-theory-for-average-rank-statistics" title="Permalink to this headline">¶</a></h2>
-<p>Recall in the Wikipedia experiment, we pooled the post-award productivity values from the treatment and control groups and converted them into ranks, <span class="math notranslate nohighlight">\(1, 2, 3, \ldots, 200\)</span> so the population is simply made up of the integers from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(200\)</span>. <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a> is a diagram that represents this specific situation. Notice that the population distribution is flat and ranges from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(200\)</span> (see leftside of <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a>). Also, the population summary (called <em>population parameter</em>) we have used is the average rank:</p>
+<p>Recall in the Wikipedia experiment, we pooled the post-award productivity values from the treatment and control groups and converted them into ranks, <span class="math notranslate nohighlight">\(1, 2, 3, \ldots, 200\)</span> so the population is simply made up of the integers from 1 to 200. <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a> is a diagram that represents this specific situation. Notice that the population distribution is flat and ranges from 1 to 200 (leftside of <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a>). Also, the population summary (called <em>population parameter</em>) we use is the average rank:</p>
 <div class="math notranslate nohighlight">
-\[\theta^* ~=~ Avg(pop) ~=~  \frac{1}{200} \Sigma_{k=1}^{200} k ~=~ 100.5. \]</div>
+\[
+\theta^* ~=~ Avg(pop) ~=~  \frac{1}{200} \Sigma_{k=1}^{200} k ~=~ 100.5.
+\]</div>
 <p>Another relevant summary is the spread about <span class="math notranslate nohighlight">\(\theta^*\)</span>, defined as the population standard deviation:</p>
 <div class="math notranslate nohighlight">
-\[ SD(pop) ~=~ \sqrt{\frac {1}{200} \Sigma_{k=1}^{200} (k - \theta^*)^2} ~=~  
+\[ 
+SD(pop) ~=~ \sqrt{\frac {1}{200} \Sigma_{k=1}^{200} (k - \theta^*)^2} ~=~  
 \sqrt{\frac {1}{200} \Sigma_{k=1}^{200} (k - 100.5)^2}
-~\approx~ 57.7 \]</div>
-<p>The SD(pop) represents the typical deviation of a rank from the population average.   To calculate SD(pop) for this example takes some mathematical handiwork. If you want to learn more see Pitman.</p>
+~\approx~ 57.7 
+\]</div>
+<p>The SD(pop) represents the typical deviation of a rank from the population average.   To calculate SD(pop) for this example takes some mathematical handiwork.</p>
 <p>The observed sample consists of the integer ranks of the treatment group; we refer to these values as <span class="math notranslate nohighlight">\(k_1, k_2, \ldots, k_{100}.\)</span> The sample distribution appears on the right in <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a> (each of the 100 integers appears once).</p>
-<p>A parallel to the population average is the sample average, which is our statistic of interest:</p>
+<p>The parallel to the population average is the sample average, which is our statistic of interest:</p>
 <div class="math notranslate nohighlight">
-\[ Avg(sample) ~=~  \frac{1}{100} \Sigma_{i=1}^{100} k_i ~=~ \bar{k} ~=~113.7. \]</div>
+\[
+Avg(sample) ~=~  \frac{1}{100} \Sigma_{i=1}^{100} k_i ~=~ \bar{k} ~=~113.7.
+\]</div>
 <p>The <span class="math notranslate nohighlight">\(Avg(sample)\)</span> is the observed value for <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>. Similarly, the spread about <span class="math notranslate nohighlight">\(Avg(sample)\)</span>, called the standard deviation of the sample, represents the typical deviation of a rank in the sample from the sample average:</p>
 <div class="math notranslate nohighlight">
-\[ SD(sample) ~=~ \sqrt{\frac {1}{100} \Sigma_{i=1}^{100} (k_i - \bar{k})^2} ~=~ 55.3.\]</div>
+\[ 
+SD(sample) ~=~ \sqrt{\frac {1}{100} \Sigma_{i=1}^{100} (k_i - \bar{k})^2} ~=~ 55.3.
+\]</div>
 <p>Notice the parallel between the definitions of the sample statistic and the population parameter, in the case where they are averages. The parallel between the two SDs is also note worthy.</p>
 <p>Next we turn to the data generation process: draw 100 marbles from the urn (with values <span class="math notranslate nohighlight">\(1, 2,\ldots,200\)</span>), without replacement, to create the treatment ranks.  We represent the action of drawing the first marble from the urn and the integer that we get, by the capital letter <span class="math notranslate nohighlight">\(Z_1\)</span>. This <span class="math notranslate nohighlight">\(Z_1\)</span> is called a <em>random variable</em>. It has a probability distribution determined by the urn model. That is, we can list all of the values that <span class="math notranslate nohighlight">\(Z_1\)</span> might take and the probability associated with each:</p>
 <div class="math notranslate nohighlight">
-\[{\mathbb{P}}(Z_1 = k) ~=~ \frac{1}{200} ~~~~\textrm{ for } k=1, \ldots, 200.\]</div>
+\[
+{\mathbb{P}}(Z_1 = k) ~=~ \frac{1}{200} ~~~~\text{ for } k=1, \ldots, 200.
+\]</div>
 <p>In this example, the probability distribution of <span class="math notranslate nohighlight">\(Z_1\)</span> is determined by a simple formula because all of the integers are equally likely to be drawn from the urn. (<a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a> first introduces the notion of a probability distribution).</p>
 <p>We often summarize the distribution of a random variable by its <em>expected value</em> and <em>standard deviation</em>. Like with the population and sample, these two quantities give us a sense of what to expect as an outcome and how far the actual value might be from what is expected.</p>
 <p>For our example, the expected value of <span class="math notranslate nohighlight">\(Z_1\)</span> is simply,</p>
@@ -1411,12 +1436,12 @@
 <p class="admonition-title">Note</p>
 <p>The term <em>expected value</em> can be a bit confusing because it need not be a possible value of the random variable. For example, <span class="math notranslate nohighlight">\(\mathbb{E}[Z_1] = 100.5\)</span>, but only integers are possible values for <span class="math notranslate nohighlight">\(Z_1\)</span>.</p>
 </div>
-<p>Next, the variance of <span class="math notranslate nohighlight">\(Z_1\)</span> is</p>
+<p>Next, the variance of <span class="math notranslate nohighlight">\(Z_1\)</span> is defined as</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\mathbb{V}(Z_1)
-&amp;= (1 - \mathbb{E}[Z_1)]^2 \mathbb{P}(Z_1 = 1) + \cdots + [200 - \mathbb{E}(Z_1)]^2  \mathbb{P}(Z_1 = 200) \\
+\mathbb{V}(Z_1) &amp;= \mathbb{E}[Z_1 - \mathbb{E}(Z_1)]^2 \\
+&amp;= [1 - \mathbb{E}(Z_1)]^2 \mathbb{P}(Z_1 = 1) + \cdots + [200 - \mathbb{E}(Z_1)]^2  \mathbb{P}(Z_1 = 200) \\
 &amp;= (1 - 100.5)^2 \times \frac{1}{200} + \cdots + (200 - 100.5)^2  \times \frac{1}{200} \\
 &amp;= 3333.25
 \end{aligned}
@@ -1429,32 +1454,36 @@ SD(Z_1) = \sqrt{\mathbb{V}(Z_1)} = 57.7
 <p>We again point out that the standard deviation of <span class="math notranslate nohighlight">\(Z_1 \)</span> matches the <span class="math notranslate nohighlight">\(SD(pop)\)</span>.</p>
 <p>To describe the entire data generation process in <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a>, we also define, <span class="math notranslate nohighlight">\(Z_2 , Z_3, \ldots, Z_{100}\)</span> as the result of the remaining 99 draws from the urn. By symmetry these random variables should all have the same probability distribution. That is, for any <span class="math notranslate nohighlight">\(k = 1, \ldots, 200\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[\mathbb{P}(Z_1 = k) ~=~ \mathbb{P}(Z_2 = k) ~=~ \cdots ~=~ \mathbb{P}(Z_{100} = k) ~=~ \frac{1}{200}.\]</div>
+\[
+\mathbb{P}(Z_1 = k) ~=~ \mathbb{P}(Z_2 = k) ~=~ \cdots ~=~ \mathbb{P}(Z_{100} = k) ~=~ \frac{1}{200}.
+\]</div>
 <p>This implies that each <span class="math notranslate nohighlight">\(Z_i\)</span> has the same expected value, 100.5, and standard deviation, 57.7.  However, these random variables are not independent. For example, if you know that <span class="math notranslate nohighlight">\(Z_1 = 17\)</span>, then it is not possible for <span class="math notranslate nohighlight">\(Z_2 = 17\)</span>.</p>
 <p>To complete the middle portion of <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a>, which involves the sampling distribution of <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>, we express the average rank statistic as follows:</p>
 <div class="math notranslate nohighlight">
-\[\hat{\theta} = \frac{1}{100} \Sigma_{i=1}^{100} Z_i\]</div>
+\[
+\hat{\theta} = \frac{1}{100} \Sigma_{i=1}^{100} Z_i
+\]</div>
 <p>We can use the expected value and SD of <span class="math notranslate nohighlight">\(Z_1\)</span> and our knowledge of the data generation process to find the expected value and SD of <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>. However, we need some more information about how combinations of random variables behave so we first present the results and then circle back to explain why. We first find the expected value of <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{align}
+\begin{aligned}
 \mathbb{E}(\hat{\theta}) ~&amp;=~ \mathbb{E}[\frac{1}{100} \Sigma_{i=1}^{100} Z_i]\\
 ~&amp;=~ \frac{1}{100} \Sigma_{i=1}^{100} \mathbb{E}[Z_i] \\
 ~&amp;=~  100.5 \\
 ~&amp;=~ \theta^*
-\end{align}
+\end{aligned}
 \end{split}\]</div>
 <p>In other words, the expected value of the average of random draws from the population equals the population average. Below we provide formulas for the variance of the average in terms of the population variance, as well as the SD.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{align}
+\begin{aligned}
 \mathbb{V}(\hat{\theta}) ~&amp;=~ \mathbb{V}[\frac{1}{100} \Sigma_{i=1}^{100} Z_i]\\
  ~&amp;=~ \frac{200-100}{100-1} \times \frac{\mathbb{V}(Z_i)}{100} \\
  ~&amp;=~ 16.75 \\
  ~&amp;~\\
  SD(\hat{\theta}) ~&amp;=~ \sqrt{\frac{100}{199}} \frac{SD(Z_1)}{10} \\
  ~&amp;=~ 4.1 
-\end{align}
+\end{aligned}
 \end{split}\]</div>
 <p>These computations relied on several properties of expected value and variance of a random variable and sums of random variables. Next we describe several useful properties of sums and averages of random variables. These can be used to derive the formulas we just presented for the expected value and SD of the average from a population.</p>
 </div>
@@ -1467,10 +1496,10 @@ SD(Z_1) = \sqrt{\mathbb{V}(Z_1)} = 57.7
 <p>the variance <span class="math notranslate nohighlight">\(X\)</span> is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{align}
+\begin{aligned}
 \mathbb{V}(X) ~&amp;=~ \mathbb{E}[(X - \mathbb{E}[X])^2] \\
  ~&amp;=~ \sum_{x} [x - \mathbb{E}(X)]^2  p_x,
-\end{align}
+\end{aligned}
 \end{split}\]</div>
 <p>and, the <span class="math notranslate nohighlight">\(SD(X)\)</span> is the square-root of <span class="math notranslate nohighlight">\(\mathbb{V}(X)\)</span>.</p>
 <div class="admonition note">
@@ -1486,7 +1515,7 @@ SD(Z_1) = \sqrt{\mathbb{V}(Z_1)} = 57.7
 SD(a + bX) ~&amp;=~ |b|SD(X) \\
 \end{aligned}
 \end{split}\]</div>
-<p>To convince yourself that these formulas make sense, think about how a distribution changes if you added a constant <span class="math notranslate nohighlight">\(a\)</span> to each value: it would simply shift the distribution, which in turn would shift the expected value but not change the size of the deviations about the expected value. On the other hand, scaling the values by, say, 2 would spread the distribution out and essentially double the deviations from the expected value.</p>
+<p>To convince yourself that these formulas make sense, think about how a distribution changes if you added a constant <span class="math notranslate nohighlight">\(a\)</span> to each value or scaled each value by <span class="math notranslate nohighlight">\(b\)</span>. Adding <span class="math notranslate nohighlight">\(a\)</span> to each value would simply shift the distribution, which in turn would shift the expected value but not change the size of the deviations about the expected value. On the other hand, scaling the values by, say, 2, would spread the distribution out and essentially double both the expected value and the deviations from the expected value.</p>
 <p>We are also interested in the properties of the sum of two or more random variables. Let’s consider two random variables, say <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>. Then,</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1500,11 +1529,11 @@ SD(a + bX) ~&amp;=~ |b|SD(X) \\
 <p>A summary of how <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> vary together, called the covariance, is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{align}
+\begin{aligned}
 Cov(X, Y) ~&amp;=~ \mathbb{E}[(X - \mathbb{E}[X])(Y - \mathbb{E}[Y])] \\
  ~&amp;=~ \mathbb{E}[(XY) - \mathbb{E}(X)\mathbb{E}(Y)] \\
  ~&amp;=~ \Sigma{x,y}[(xy) - \mathbb{E}(X)\mathbb{E}(Y)]p_{x,y} 
- \end{align}
+ \end{aligned}
 \end{split}\]</div>
 <p>The covariance enters into the calculation of <span class="math notranslate nohighlight">\(\mathbf(a + bX + cY)\)</span>, as shown below:</p>
 <div class="math notranslate nohighlight">
@@ -1526,30 +1555,30 @@ SD(\bar{X}) ~&amp;=~ \sigma/\sqrt{n}
 \end{align}
 \end{split}\]</div>
 <p>This situation arises with the urn model where <span class="math notranslate nohighlight">\(X_1, \ldots,X_n\)</span> are the result of random draws with replacement. In this case, <span class="math notranslate nohighlight">\(\mu\)</span> represents the average of the urn and <span class="math notranslate nohighlight">\(\sigma\)</span> the standard deviation.</p>
-<p>However, when we made random draws from the urn, they were made without replacement. In this situation, <span class="math notranslate nohighlight">\(\bar{X}\)</span> has the following expected value and variance:</p>
+<p>However, when we make random draws from the urn without replacement, the <span class="math notranslate nohighlight">\(X_i\)</span> are not independent. In this situation, <span class="math notranslate nohighlight">\(\bar{X}\)</span> has the following expected value and variance:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{align}
+\begin{aligned}
 \mathbb{E}(\bar{X}) ~&amp;=~ \mu\\
 \mathbb{V}(\bar{X}) ~&amp;=~ \frac{N-n}{N-1} \times \frac{\sigma^2}{n}\\
-\end{align}
+\end{aligned}
 \end{split}\]</div>
 <p>Notice that while the expected value is the same as when the draws are without replacement, the variance and SD are smaller. These quantities are adjusted by <span class="math notranslate nohighlight">\((N-n/(N-1)\)</span>, which is called the <em>finite population correction factor</em>.  We used this formula earlier to compute the <span class="math notranslate nohighlight">\(SD(\hat{\theta})\)</span> in our Wikipedia example.</p>
-<p>Returning to <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a>, we see that the sampling distribution for <span class="math notranslate nohighlight">\(\bar{X}\)</span> in the center of the diagram has an expectation that matches the population average; the SD decreases like <span class="math notranslate nohighlight">\(1/\sqrt{n}\)</span> but even faster because we are drawing without replacement; and the distribution is shaped like a normal curve.  We saw these properties earlier in our simulation study, any you can read more about the probability theory behind these observations in XX.</p>
+<p>Returning to <a class="reference internal" href="#triptychrank"><span class="std std-numref">Figure 17.3</span></a>, we see that the sampling distribution for <span class="math notranslate nohighlight">\(\bar{X}\)</span> in the center of the diagram has an expectation that matches the population average; the SD decreases like <span class="math notranslate nohighlight">\(1/\sqrt{n}\)</span> but even faster because we are drawing without replacement; and the distribution is shaped like a normal curve.  We saw these properties earlier in our simulation study.</p>
 <p>Now that we have outlined the general properties of random variables and their sums, we connect these ideas to testing, confidence, and prediction intervals.</p>
 </div>
 <div class="section" id="probability-behind-testing-and-intervals">
 <h2><span class="section-number">17.6.3. </span>Probability behind testing and intervals<a class="headerlink" href="#probability-behind-testing-and-intervals" title="Permalink to this headline">¶</a></h2>
-<p>As mentioned at the beginning of this chapter, probability is the underpinning behind conducting a hyptohesis test, providing a confidence interval for an estimator and a prediction interval for a future observation.</p>
+<p>As mentioned at the beginning of this chapter, probability is the underpinning behind conducting a hypothesis test, providing a confidence interval for an estimator and a prediction interval for a future observation.</p>
 <p>We now have the technical machinery to explain these concepts, which we have carefully defined in this chapter without the use of formal technicalities. This time we present the results in terms of random variables and their distributions.</p>
 <p>Recall that a hypothesis test relies on a null model which provides the probability distribution for the statistic, <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>. The tests we carried out were essentially computing (sometimes approximately) the following probability: given the assumptions of the null distribution,</p>
 <div class="math notranslate nohighlight">
-\[ \mathbb{P}(\hat{\theta} \geq \textrm{observed statistic}) \]</div>
+\[ \mathbb{P}(\hat{\theta} \geq \text{observed statistic}) \]</div>
 <p>Often times, the random variable is normalized to make these computations easier and standard:</p>
 <div class="math notranslate nohighlight">
 \[ 
-\mathbb{P}\left( \frac{\hat{\theta} - {\theta}^*}{SD(\hat{\theta})} \geq \frac{\textrm{observed stat}- \theta^*}{SD(\hat{\theta})}\right)\]</div>
-<p>When, <span class="math notranslate nohighlight">\(SD(\hat{\theta})\)</span> is not known, we have approximated it via simulation or, when we have a formula for <span class="math notranslate nohighlight">\(SD(\hat{\theta})\)</span> in terms of <span class="math notranslate nohighlight">\(SD(pop)\)</span>, we substitute <span class="math notranslate nohighlight">\(SD(samp)\)</span> in for <span class="math notranslate nohighlight">\(SD(pop)\)</span>. This normalization is popular because it simplifies the null distribution. For example, if <span class="math notranslate nohighlight">\(\hat{\theta}\)</span> has an approximate normal distribution than the normalized version will have a standard normal distribution with center 0 and SD of 1. These approximations are useful if a lot of hypothesis tests are being carried out, such as with A/B testing, for there is no need to simulate every for every statistic because we can just use the normal curve probabilities.</p>
+\mathbb{P}\left( \frac{\hat{\theta} - {\theta}^*}{SD(\hat{\theta})} \geq \frac{\text{observed stat}- \theta^*}{SD(\hat{\theta})}\right)\]</div>
+<p>When, <span class="math notranslate nohighlight">\(SD(\hat{\theta})\)</span> is not known, we have approximated it via simulation or, when we have a formula for <span class="math notranslate nohighlight">\(SD(\hat{\theta})\)</span> in terms of <span class="math notranslate nohighlight">\(SD(pop)\)</span>, we substitute <span class="math notranslate nohighlight">\(SD(samp)\)</span> in for <span class="math notranslate nohighlight">\(SD(pop)\)</span>. This normalization is popular because it simplifies the null distribution. For example, if <span class="math notranslate nohighlight">\(\hat{\theta}\)</span> has an approximate normal distribution than the normalized version will have a standard normal distribution with center 0 and SD of 1. These approximations are useful if a lot of hypothesis tests are being carried out, such as with A/B testing, for there is no need to simulate for every statistic because we can just use the normal curve probabilities.</p>
 <p>The probability statement behind a confidence interval is quite similar to the probability calculations used in testing. In particular, to create a 95% confidence interval where the sampling distribution of the estimator is roughly normal, we standardize and use the probability,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -1561,10 +1590,10 @@ SD(\bar{X}) ~&amp;=~ \sigma/\sqrt{n}
 <p>Note that <span class="math notranslate nohighlight">\(\hat{\theta}\)</span> is a random variable in the above probability statement and <span class="math notranslate nohighlight">\(\theta^*\)</span> is considered a fixed unknown parameter value. The confidence interval is created by substituting the observed statistic in for <span class="math notranslate nohighlight">\(\hat\theta\)</span> and calling it a 95% confidence interval:</p>
 <div class="math notranslate nohighlight">
 \[
-\left[\textrm{observed stat} - 1.96SD(\hat{\theta}),~ \textrm{observed stat} + 1.96SD(\hat{\theta}) \right]
+\left[\text{observed stat} - 1.96SD(\hat{\theta}),~ \text{observed stat} + 1.96SD(\hat{\theta}) \right]
 \]</div>
-<p>Once the observed statistic is substituted in for the random variable, then we say that we are 95% confident that the interval we have created contains the true value <span class="math notranslate nohighlight">\(\theta^*\)</span>. In other words, in 100 cases where we compute an interval in this way, we expect 95 of them to cover the population parameter that we are estimating. We show how to simulate this scenario in the Exercises.</p>
-<p>Lastly, we consider prediction intervals. The basic notion is to provide an interval that denotes the expected variation of a future observation about the estimator. In the simple case, where the statistic is <span class="math notranslate nohighlight">\(\bar{X}\)</span> and we have a hypothetical new observation <span class="math notranslate nohighlight">\(X_0\)</span> that has the same expected value, say <span class="math notranslate nohighlight">\(\mu\)</span>, and standard deviation, say <span class="math notranslate nohighlight">\(\sigma\)</span>, of each <span class="math notranslate nohighlight">\(X_i\)</span>, then we find the expected variation of the squared loss:</p>
+<p>Once the observed statistic is substituted in for the random variable, then we say that we are 95% confident that the interval we have created contains the true value <span class="math notranslate nohighlight">\(\theta^*\)</span>. In other words, in 100 cases where we compute an interval in this way, we expect 95 of them to cover the population parameter that we are estimating.</p>
+<p>Next, we consider prediction intervals. The basic notion is to provide an interval that denotes the expected variation of a future observation about the estimator. In the simple case, where the statistic is <span class="math notranslate nohighlight">\(\bar{X}\)</span> and we have a hypothetical new observation <span class="math notranslate nohighlight">\(X_0\)</span> that has the same expected value, say <span class="math notranslate nohighlight">\(\mu\)</span>, and standard deviation, say <span class="math notranslate nohighlight">\(\sigma\)</span>, of the <span class="math notranslate nohighlight">\(X_i\)</span>, then we find the expected variation of the squared loss:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -1596,7 +1625,66 @@ vector of random variables, where the expected value of each variable is determi
 \end{split}\]</div>
 <p>We approximate the variance of <span class="math notranslate nohighlight">\(\epsilon\)</span> with the variance of the residuals from the least squares fit.</p>
 <p>The prediction intervals we create using the normal curve rely on the additional assumption that the distribution of the errors is approximately normal. This is a stronger assumption than we  make for the confidence intervals. With confidence intervals, the probability distribution of <span class="math notranslate nohighlight">\(X_i\)</span> need not look normal for <span class="math notranslate nohighlight">\(\bar{X}\)</span> to have an approximate normal distribution. Similarly, the probability distribution of <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}\)</span> in the linear model need not look normal for the estimator <span class="math notranslate nohighlight">\(\hat{\theta}\)</span> to have an approximate normal distribution.</p>
-<p>We also assume that the linear model is approximately correct when making these prediction intervals. In <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a> we consider the case where the fitted model doesn’t match the model that has produced the data.</p>
+<p>We also assume that the linear model is approximately correct when making these prediction intervals. In <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a> we consider the case where the fitted model doesn’t match the model that has produced the data. We now have the technical machinery to derive the model bias-variance tradeoff introduced in that chapter. It’s very similar to the prediction interval derivation with a couple of small twists.</p>
+</div>
+<div class="section" id="probability-behind-model-selection">
+<h2><span class="section-number">17.6.4. </span>Probability Behind Model Selection<a class="headerlink" href="#probability-behind-model-selection" title="Permalink to this headline">¶</a></h2>
+<p>In <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a> we introduced model under- and over-fitting with mean square error.
+We described a general set up where the data might be expressed as follows:</p>
+<div class="math notranslate nohighlight">
+\[ y = g(\mathbf{x}) + {\epsilon}.\]</div>
+<p>The <span class="math notranslate nohighlight">\(\epsilon\)</span>) are assumed to behave like random errors that have no trends or patterns, constant variance, and are independent of one another. The <em>signal</em> in the model is the function, <span class="math notranslate nohighlight">\(g()\)</span>. The data are the <span class="math notranslate nohighlight">\( (\mathbf{x}_i, y_i) \)</span> pairs, and we fit models by minimizing the MSE,</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{f \in \cal{F}} \frac{1}{n} \sum_{i = 1}^{n} (y_i - f(\mathbf{x}_i)^2,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\cal{F}\)</span> is the collection of models over which we are minimizing. This collection might be all polynomials of degree <span class="math notranslate nohighlight">\(m\)</span> or less, bent lines with a bend at point <span class="math notranslate nohighlight">\(k\)</span>, etc. Note that <span class="math notranslate nohighlight">\(g\)</span> doesn’t have to be in the collection of functions that we are using to fit a model.</p>
+<p>Our goal in model selection is to land on a model that predicts a new observation well. For a new observation, we would like the expected loss to be small:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}[ y_0 - f(\mathbf{x}_0)]^2 
+\]</div>
+<p>This expectation is with respect to the distribution of possible <span class="math notranslate nohighlight">\((\mathbf{x}_0, y_0)\)</span>, and is called <em>risk</em>. Since we don’t know the population distribution of <span class="math notranslate nohighlight">\( (\mathbf{x}_0 , y_0) \)</span>, we can’t calculate the risk, but we can approximate it by the average loss over the data we have collected:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E}[ y_0 - f(\mathbf{x}_0)]^2 &amp; \approx 
+ \frac{1}{n} \sum_{i = 1}^{n} (y_i - f(\mathbf{x}_i))^2 \\
+\end{aligned}
+\end{split}\]</div>
+<p>This approximation goes by the name of <em>empirical risk</em>. But, hopefully you recognize it as mean square error (MSE).</p>
+<p>We fit models by minimizing the empirical risk (or MSE) over all possible models, <span class="math notranslate nohighlight">\( \cal{F} = \{ f \} \)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{f \in \cal{F}} \frac{1}{n} \sum_{i = 1}^{n}  (y_i - f(\mathbf{x}_i))^2 
+\]</div>
+<p>The fitted model is called <span class="math notranslate nohighlight">\( \hat{f} \)</span>, a slightly more general representation of the linear model <span class="math notranslate nohighlight">\( \textbf{X}\hat{\boldsymbol{\theta}}\)</span>. This technique is aptly called <em>empirical risk minimization</em>.</p>
+<p>In <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a>, we saw problems arise when we used the empirical risk to both fit a model and evaluate the risk for a new observation. Ideally, we want to estimate the risk (expected loss),</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+\mathbb{E}[ (y_0 - \hat{f}(\mathbf{x}_0))^2 ],
+\end{aligned}
+\]</div>
+<p>where the expected value is over both the new observation <span class="math notranslate nohighlight">\( (\mathbf{x}_0, y_0) \)</span> and over <span class="math notranslate nohighlight">\( {\hat{f}} \)</span> (which involves the original data <span class="math notranslate nohighlight">\( \textbf{x}_i\)</span> and <span class="math notranslate nohighlight">\( {y}_i \)</span>, <span class="math notranslate nohighlight">\( i = 1, \ldots, n \)</span>).</p>
+<p>To understand the problem, we decompose the risk for a new observation that is estimated by the least squares fit, <span class="math notranslate nohighlight">\(\hat{f}\)</span>, into three parts representing the model bias, model variance, and the <em>irreducible error</em> from <span class="math notranslate nohighlight">\( \epsilon \)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{E} [ y_0 -  \hat{f}(x_0)]^2  &amp;  = \mathbb{E} [ g(x_0) + \epsilon_0 -  \hat{f}(x_0)]^2  &amp; \textrm{definition}~\textrm{of} ~y_0\\
+  &amp;  = \mathbb{E} [ g(x_0) + \epsilon_0 - \mathbb{E}[\hat{f}(x_0)] + \mathbb{E}[\hat{f}(x_0)] -  \hat{f}(x_0)]^2 &amp; \textrm{adding}~ \pm \mathbb{E}[\hat{f}(x_0)] \\
+ &amp;  = \mathbb{E} [ g(x_0) - \mathbb{E}[\hat{f}(x_0)] -  (\hat{f}(x_0) - \mathbb{E}[\hat{f}(x_0)]) + \epsilon_0]^2  &amp; \textrm{rearranging}~\textrm{terms}\\
+ &amp;  = [ g(x_0) - \mathbb{E}[\hat{f}(x_0)]]^2 + \mathbb{E}[\hat{f}(x_0) - \mathbb{E}[\hat{f}(x_0)]]^2 + \sigma^2 \\
+% &amp; =  ~~~\textrm{model bias}^2 ~~~~~~~+~~~~ \textrm{model variance}^2 ~+~ \textrm{error}
+\end{aligned}
+\end{split}\]</div>
+<p>To derive the last equality from the previous line, we need to formally prove that the cross product terms in the expansion of the quadratic are all 0. This takes a bit of algebra and we don’t present it here. But the main idea is that the terms <span class="math notranslate nohighlight">\(\epsilon_0\)</span> and <span class="math notranslate nohighlight">\((\hat{f}(x_0) - \mathbb{E}[\hat{f}(x_0])\)</span> are independent and have expected value 0.</p>
+<ul class="simple">
+<li><p>The first of the three terms in the final equation is model bias (squared). When, the signal, <span class="math notranslate nohighlight">\( g \)</span>, does not belong to the model space, we have model bias. If the model space can approximate <span class="math notranslate nohighlight">\(g\)</span> well, then the bias is small. Note that this term is not present in our prediction intervals because we assumed that there is no (or minimal) model bias.</p></li>
+<li><p>The second term represents the variability in the fitted model that comes from the data. We have seen in earlier examples that high degree polynomials can over fit, and so vary a lot from one set of data to the next. The more complex the model space, the greater the variability in the fitted model.</p></li>
+<li><p>Finally, the last term is the variability in the error, the <span class="math notranslate nohighlight">\(\epsilon_0\)</span>, which is dubbed the “irreducible error”. This error sticks around whether we have under fit with a simple model (high bias) or over fit with a complex model (high variance).</p></li>
+</ul>
+<p>This representation of the expected loss shows the bias-variance decomposition of a fitted model. Model selection aims to balance these two competing sources of error. The train-test split, cross-validation, and regularization introduced in <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a> are techniques to either mimic the expected loss for a new observation or penalize a model from over fitting.</p>
 <p>While we have covered a lot of theory in this chapter, we have attempted to tie it to the basics of the urn model and the three distributions: population, sample, and sampling. We wrap up the chapter with a few cautions to keep in mind when performing hypothesis tests and when making confidence or prediction intervals.</p>
 </div>
 </div>

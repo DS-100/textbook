@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>15.7. Feature Engineering for Categorical Measurements &#8212; Learning Data Science</title>
+    <title>15.8. Feature Engineering for Categorical Measurements &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -55,8 +55,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="15.8. Summary" href="linear_summary.html" />
-    <link rel="prev" title="15.6. Feature Engineering for Numeric Measurements" href="linear_feature_eng.html" />
+    <link rel="next" title="15.9. Summary" href="linear_summary.html" />
+    <link rel="prev" title="15.7. Feature Engineering for Numeric Measurements" href="linear_feature_eng.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -733,38 +733,43 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="linear_pa.html">
+     15.2. Example: A Simple Linear Model for Air Quality
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="linear_simple_fit.html">
-     15.2. Fitting the Simple Linear Model
+     15.3. Fitting the Simple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_multi.html">
-     15.3. Multiple Linear Model
+     15.4. Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_multi_fit.html">
-     15.4. Fitting the Multiple Linear Model
+     15.5. Fitting the Multiple Linear Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_case.html">
-     15.5. Example: Where is the Land of Opportunity?
+     15.6. Example: Where is the Land of Opportunity?
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_feature_eng.html">
-     15.6. Feature Engineering for Numeric Measurements
+     15.7. Feature Engineering for Numeric Measurements
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     15.7. Feature Engineering for Categorical Measurements
+     15.8. Feature Engineering for Categorical Measurements
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="linear_summary.html">
-     15.8. Summary
+     15.9. Summary
     </a>
    </li>
   </ul>
@@ -801,7 +806,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../16/ms_risk.html">
-     16.5. Risk and Loss Minimization
+     16.5. Model Bias and Variance
     </a>
    </li>
    <li class="toctree-l2">
@@ -1319,13 +1324,13 @@
               <div>
                 
   <div class="section" id="feature-engineering-for-categorical-measurements">
-<h1><span class="section-number">15.7. </span>Feature Engineering for Categorical Measurements<a class="headerlink" href="#feature-engineering-for-categorical-measurements" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">15.8. </span>Feature Engineering for Categorical Measurements<a class="headerlink" href="#feature-engineering-for-categorical-measurements" title="Permalink to this headline">¶</a></h1>
 <p>The first model we ever fit was the constant model in <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>. There, we minimized squared loss to find the best fitting constant:</p>
 <div class="math notranslate nohighlight">
 \[
 \min_c \sum_i (y_i - c)^2
 \]</div>
-<p>We can think of including a nominal feature in a model in a similar fashion. That is, we find the best fitting constant to each subgroup of the data. In other words,</p>
+<p>We can think of including a nominal feature in a model in a similar fashion. That is, we find the best fitting constant to each subgroup of the data corresponding to a category:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -1335,29 +1340,28 @@
 ~~~&amp;~~~ \min_{c_R} \sum_{i \in \textrm{Richmond}} (y_i - c_R)^2. 
 \end{aligned}
 \end{split}\]</div>
-<p>A much simpler way to describe this model is with <em>one hot encoding</em>.</p>
+<p>Another way to describe this model is with <em>one-hot encoding</em>.</p>
 <p>One-hot encoding takes a categorical feature and creates multiple numeric
-features that have only <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> values.
+features that have only the values 0 or 1.
 To one-hot encode a feature, we create new features, one for each unique category.
 In this case, since we have four cities:
 Berkeley, Lamorinda, Piedmont, and Richmond,
-we create four new features in a design matrix, called <span class="math notranslate nohighlight">\(X_city\)</span>.
-Each row in <span class="math notranslate nohighlight">\(X_city\)</span> contains one value of <span class="math notranslate nohighlight">\(1\)</span> that appears  in the column that matches the city. and all other columns contain 0 in that row.
-We illustrated this process in <a class="reference internal" href="#fig-one-hot2"><span class="std std-numref">Figure 15.7</span></a>.</p>
+we create four new features in a design matrix, called <span class="math notranslate nohighlight">\(X_{city}\)</span>.
+Each row in <span class="math notranslate nohighlight">\(X_{city}\)</span> contains one value of 1 and it appears  in the column that corresponds to the city. All other columns contain 0 for that row.
+<a class="reference internal" href="#fig-one-hot2"><span class="std std-numref">Figure 15.6</span></a> illustrates this notion.</p>
 <div class="figure align-default" id="fig-one-hot2">
 <a class="reference internal image-reference" href="../../_images/one-hot.svg"><img alt="../../_images/one-hot.svg" src="../../_images/one-hot.svg" width="100%" /></a>
-<p class="caption"><span class="caption-number">Fig. 15.7 </span><span class="caption-text">One-hot encoding for a small example dataset (left) and its resulting design matrix (right).</span><a class="headerlink" href="#fig-one-hot2" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 15.6 </span><span class="caption-text">One-hot encoding for a categorical feature with 6 rows (left) and its resulting design matrix (right).</span><a class="headerlink" href="#fig-one-hot2" title="Permalink to this image">¶</a></p>
 </div>
 <p>Now we can concisely represent the model as follows:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-y_i ~\approx~ \theta_B x_{i,B} ~+~ \theta_L x_{i,L} \\
-~~~~~~~~~~ ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
-\end{split}\]</div>
-<p>(Again we have ignored the errors in this equation). Here, we have indexed the columns of the design matrix by <span class="math notranslate nohighlight">\(B\)</span>, <span class="math notranslate nohighlight">\(L\)</span>, <span class="math notranslate nohighlight">\(P\)</span>, and <span class="math notranslate nohighlight">\(R\)</span>, rather than <span class="math notranslate nohighlight">\(j\)</span>, to make it clear that each column represents a column of 0s and 1s where, say, a 1 appears for <span class="math notranslate nohighlight">\(x_{i,P}\)</span> if the <span class="math notranslate nohighlight">\(i\)</span>th house is located in Piedmont.</p>
+\[
+\theta_B x_{i,B} ~+~ \theta_L x_{i,L} ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
+\]</div>
+<p>Here, we have indexed the columns of the design matrix by <span class="math notranslate nohighlight">\(B\)</span>, <span class="math notranslate nohighlight">\(L\)</span>, <span class="math notranslate nohighlight">\(P\)</span>, and <span class="math notranslate nohighlight">\(R\)</span>, rather than <span class="math notranslate nohighlight">\(j\)</span>, to make it clear that each column represents a column of 0s and 1s where, say, a 1 appears for <span class="math notranslate nohighlight">\(x_{i,P}\)</span> if the <span class="math notranslate nohighlight">\(i\)</span>th house is located in Piedmont.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>One-hot encoding creates features that have only 0-1 values. These features are known as <em>dummy variables</em> or <em>indicator variables</em>.
+<p>One-hot encoding creates features that have only 0-1 values. These features are also known as <em>dummy variables</em> or <em>indicator variables</em>.
 The term “dummy variable” is more common in econometrics, and the usage of “indicator variable” is more common in statistics.</p>
 </div>
 <p>Our goal is to minimize least square loss over <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>,</p>
@@ -1367,10 +1371,10 @@ The term “dummy variable” is more common in econometrics, and the usage of �
 \| \mathbf{y} - \textbf{X}\boldsymbol{\theta} \|^2 &amp;=
 \sum_i (y_i - \theta_B x_{i,B} ~+~ \theta_L x_{i,L}  ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R})^2 \\
 &amp; = \sum_{i \in Berkeley} (y_i - \theta_B x_{i,B})^2 ~+~ \sum_{i \in Lamorinda} (y_i -\theta_L x_{i,L})^2 \\
-~~~~~~~~&amp; ~+~ \sum_{i \in Piedmont} (y_i -\theta_P x_{i,P})^2 ~+~ \sum_{i \in Richmond} (y_i -\theta_R x_{i,R})^2 
+~~~~~~~~&amp; ~+~ \sum_{i \in Piedmont} (y_i -\theta_P x_{i,P})^2 ~+~ \sum_{i \in Richmond} (y_i -\theta_R x_{i,R})^2,
 \end{aligned}
 \end{split}\]</div>
-<p>Here <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> is the column vector <span class="math notranslate nohighlight">\([\theta_B, \theta_L, \theta_P, \theta_R]\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> is the column vector <span class="math notranslate nohighlight">\([\theta_B, \theta_L, \theta_P, \theta_R]\)</span>. Notice that this minimization reduces to 4 minimizations, one for each city. That’s the idea that we started with at the beginning of this section.</p>
 <p>We can use <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> to create this design matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1474,7 +1478,7 @@ The term “dummy variable” is more common in econometrics, and the usage of �
 <p>We fit a model using these one-hot encoded features.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_log</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_log</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]</span>
 
 <span class="n">model_city</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_city_df</span><span class="p">,</span> <span class="n">y_log</span><span class="p">)</span>
 </pre></div>
@@ -1482,7 +1486,7 @@ The term “dummy variable” is more common in econometrics, and the usage of �
 </div>
 </div>
 <p>And, examine the multiple <span class="math notranslate nohighlight">\(R^2\)</span>.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for city model: </span><span class="si">{</span><span class="n">model_city</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_city_df</span><span class="p">,</span><span class="w"> </span><span class="n">y_log</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1494,7 +1498,7 @@ The term “dummy variable” is more common in econometrics, and the usage of �
 </div>
 </div>
 </div>
-<p>With knowing only the city where the house is located, the model does a reasonably good job of estimating sale price. Below are the coefficients of the fit.</p>
+<p>With knowing only the city where a house is located, the model does a reasonably good job of estimating its sale price. Below are the coefficients from the fit.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_city</span><span class="o">.</span><span class="n">coef_</span>
@@ -1502,7 +1506,7 @@ The term “dummy variable” is more common in econometrics, and the usage of �
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[5.87, 6.03, 6.1 , 5.67]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([5.87, 6.03, 6.1 , 5.67])
 </pre></div>
 </div>
 </div>
@@ -1510,29 +1514,29 @@ The term “dummy variable” is more common in econometrics, and the usage of �
 <p>As expected from the box plots, the estimated sale price (in log $) depends on the city. But, if we know the size of the house as well as the city, we should have an even better model. We saw earlier that the simple log-log model that explains sale price by house size fits reasonably well so we expect that the city feature (as one-hot encoded variables) should further improve the model.</p>
 <p>Such a model looks like:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-y_i ~\approx~ \theta_1x_i +  \theta_B x_{i,B} ~+~ \theta_L x_{i,L} \\
-~~~~~~~~~~ ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
-\end{split}\]</div>
+\[
+y_i ~\approx~ \theta_1x_i +  \theta_B x_{i,B} ~+~ \theta_L x_{i,L} 
+~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
+\]</div>
 <p>Notice that this model describes the relationship between log(price), which is represented as <span class="math notranslate nohighlight">\(y\)</span> and log(size), which is represented as <span class="math notranslate nohighlight">\(x\)</span>, as linear with the same coefficient for log(size) for each city.
 But, the intercept term depends on the city.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-y_i ~&amp;\approx~ \theta_1x_i +  \theta_B  ~~&amp;\textrm{for houses in Berkeley} \\
-y_i ~&amp;\approx~ \theta_1x_i + \theta_L  ~~&amp;\textrm{for houses in Lamorinda}\\
-y_i ~&amp;\approx~ \theta_1x_i + \theta_P  ~~&amp;\textrm{for houses in Piedmont}\\
-y_i ~&amp;\approx~ \theta_1x_i + \theta_R  ~~&amp;\textrm{for houses in Richmond}
+y_i ~&amp;\approx~ \theta_1x_i +  \theta_B  ~~&amp;\text{for houses in Berkeley} \\
+y_i ~&amp;\approx~ \theta_1x_i + \theta_L  ~~&amp;\text{for houses in Lamorinda}\\
+y_i ~&amp;\approx~ \theta_1x_i + \theta_P  ~~&amp;\text{for houses in Piedmont}\\
+y_i ~&amp;\approx~ \theta_1x_i + \theta_R  ~~&amp;\text{for houses in Richmond}
 \end{aligned}
 \end{split}\]</div>
 <p>We make a facet of scatter plots, one for each city, to see if this relationship roughly holds.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">],</span> 
-                 <span class="n">facet_col</span><span class="o">=</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;city&#39;</span><span class="p">],</span> <span class="n">facet_col_wrap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
-                     <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;price (log $)&quot;</span><span class="p">,</span>
-                     <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;building size (sq ft)&quot;</span><span class="p">},)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+                 <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="n">facet_col_wrap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
 <span class="n">fig</span>
 </pre></div>
 </div>
@@ -1540,10 +1544,10 @@ y_i ~&amp;\approx~ \theta_1x_i + \theta_R  ~~&amp;\textrm{for houses in Richmond
 <div class="cell_output docutils container">
 <img alt="../../_images/linear_categorical_18_0.svg" src="../../_images/linear_categorical_18_0.svg" /></div>
 </div>
-<p>The shift is evident in the scatter plot, but it may be the case that the slopes also differ by city. We concatenate our two design matrices together to fit the model that includes size and city.</p>
+<p>The shift is evident in the scatter plot. We concatenate our two design matrices together to fit the model that includes size and city.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_size</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[[</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">]]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_size</span> <span class="o">=</span> <span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">]</span> 
 
 <span class="n">X_city_size</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X_size</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">X_city_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">X_city_size</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1653,46 +1657,47 @@ y_i ~&amp;\approx~ \theta_1x_i + \theta_R  ~~&amp;\textrm{for houses in Richmond
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.62, 3.89, 3.98, 4.03, 3.75]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.62, 3.89, 3.98, 4.03, 3.75])
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for city and log(size): </span><span class="si">{</span><span class="n">model_city_size</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_city_size</span><span class="p">,</span><span class="w"> </span><span class="n">y_log</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R-square for city and log(size):&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">model_city_size</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_city_size</span><span class="p">,</span><span class="w"> </span><span class="n">y_log</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for city and log(size): 0.79
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>R-square for city and log(size):  0.79
 </pre></div>
 </div>
 </div>
 </div>
 <p>This fit, which includes the nominal variable <code class="docutils literal notranslate"><span class="pre">city</span></code> and the log-transformed house size, is better than both the simple log-log model with house size and the model that fits constants for each city.</p>
-<p>Notice that we dropped the intercept from the model so that each subgroup has their own intercept. However, we usually remove one of the feature columns from the design matrix and keep the intercept. For example, if we drop the feature for Berkeley houses and add the intercept, then the model is:</p>
+<p>Notice that we dropped the intercept from the model so that each subgroup has their own intercept.
+However, common practice is to remove one of the one-hot encoded features from the design matrix and keep the intercept. For example, if we drop the feature for Berkeley houses and add the intercept, then the model is:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-y_i ~\approx~ \theta_0 ~+~ \theta_1x_i ~+~ \theta_L x_{i,L} \\
-~~~~~~~~~~ ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
-\end{split}\]</div>
+\[
+\theta_0 ~+~ \theta_1x_i ~+~ \theta_L x_{i,L} ~+~ \theta_P x_{i,P} ~+~ \theta_R x_{i,R}
+\]</div>
 <p>The meaning of the coefficients for the dummy variables has changed in this representation.
 For example, consider this equation for a house in Berkeley and a house in Piedmont:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-y_i ~&amp;\approx~ \theta_0 + \theta_1x_i ~~&amp;\textrm{for a house in Berkeley} \\
-y_i ~&amp;\approx~ \theta_0 ~+~ \theta_1x_i + \theta_P  ~~&amp;\textrm{for a house in Piedmont}
+\theta_0 &amp; ~+~ \theta_1x_i ~~&amp;\text{for a house in Berkeley} \\
+\theta_0 &amp; ~+~ \theta_1x_i + \theta_P  ~~&amp;\text{for a house in Piedmont}
 \end{aligned}
 \end{split}\]</div>
-<p>In this representation, the intercept is for Berkeley houses, and the coefficient <span class="math notranslate nohighlight">\(\theta_P\)</span> measures the typical difference between a Piedmont house and a Berkeley house. In this representation, we can more easily compare
-<span class="math notranslate nohighlight">\(\theta_P\)</span> to 0, to see if these two cities have essentially the same model.</p>
+<p>In this representation, the intercept, <span class="math notranslate nohighlight">\(\theta_0\)</span> is for Berkeley houses, and the coefficient <span class="math notranslate nohighlight">\(\theta_P\)</span> measures the typical difference between a Piedmont house and a Berkeley house. In this representation, we can more easily compare
+<span class="math notranslate nohighlight">\(\theta_P\)</span> to 0, to see if these two cities have essentially the same average price.</p>
 <p>If we had included the intercept and all of the city variables, then
-the columns of the design matrix will be linearly dependent, which means that we can’t solve for the coefficients. Our predictions will be the same in either case, but there will not be a unique solution to the minimization. We’ve left this proof as an exercise.</p>
-<p>We also prefer the representation of the model that drops one dummy variable and includes an intercept term for when we  include one-hot encodings of two categorical variables. This practice maintains consistency in the interpretation of the coefficients.</p>
-<p>The relationship does not appear linear: for each additional bedroom, the sale price does not increase by the same amount. Given that the number of bedrooms is discrete, we can treat this feature as categorical, which allows each bedroom encoding to contribute a different amount to the cost.</p>
-<p>We demonstrate how to build a model with two sets of dummy variables, using the <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> library and its formula language.</p>
+the columns of the design matrix are linearly dependent, which means that we can’t solve for the coefficients. Our predictions will be the same in either case, but there will not be a unique solution to the minimization.</p>
+<p>We also prefer the representation of the model that drops one dummy variable and includes an intercept term when we  include one-hot encodings of two categorical variables. This practice maintains consistency in the interpretation of the coefficients.</p>
+<p>For example, consider the number of bedrooms. The earlier box plots showed that the relationship with price does not appear linear: for each additional bedroom, the sale price does not increase by the same amount. Given that the number of bedrooms is discrete, we can treat it as categorical, and allow each bedroom encoding to contribute a different amount to the sale price.</p>
+<p>We demonstrate how to build a model with two sets of dummy variables, using the <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> library. This library uses a formula language to describe the model to fit so we don’t need to create the design matrix ourselves.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
@@ -1700,7 +1705,7 @@ the columns of the design matrix will be linearly dependent, which means that we
 </div>
 </div>
 </div>
-<p>We first fit the model with the nominal variable <code class="docutils literal notranslate"><span class="pre">city</span></code> and house size again to show how to use the formula.</p>
+<p>Let’s first repeat our fit of the model with the nominal variable <code class="docutils literal notranslate"><span class="pre">city</span></code> and house size to show how to use the formula language and compare the results.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city&#39;</span><span class="p">,</span>
@@ -1709,7 +1714,7 @@ the columns of the design matrix will be linearly dependent, which means that we
 </div>
 </div>
 </div>
-<p>The value for the formula parameter describes the model to fit. The model has <code class="docutils literal notranslate"><span class="pre">log_price</span></code> as the outcome and fits a linear combination of <code class="docutils literal notranslate"><span class="pre">log_bsqft</span></code> and <code class="docutils literal notranslate"><span class="pre">city</span></code> as explanatory variables. Notice that we do not need to create dummy variables to fit the model. The <code class="docutils literal notranslate"><span class="pre">smf</span></code> procedure takes care of one-hot encoding the city feature. The fitted coefficients of the model shown below, include an intercept term and drops the Berkeley indicator variable.</p>
+<p>The string provided for the <code class="docutils literal notranslate"><span class="pre">formula</span></code> parameter describes the model to fit. The model has <code class="docutils literal notranslate"><span class="pre">log_price</span></code> as the outcome and fits a linear combination of <code class="docutils literal notranslate"><span class="pre">log_bsqft</span></code> and <code class="docutils literal notranslate"><span class="pre">city</span></code> as explanatory variables. Notice that we do not need to create dummy variables to fit the model. Conveniently, <code class="docutils literal notranslate"><span class="pre">smf.ols</span></code> does the one-hot encoding of the city feature for us. The fitted coefficients of the model shown below, include an intercept term and drops the Berkeley indicator variable.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_size_city</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
@@ -1727,7 +1732,7 @@ dtype: float64
 </div>
 </div>
 </div>
-<p>If we want to drop the intercept, we add <code class="docutils literal notranslate"><span class="pre">-1</span></code> to the formula and a 0-1 variable is included for all four categories.</p>
+<p>If we want to drop the intercept, we can add <code class="docutils literal notranslate"><span class="pre">-1</span></code> to the formula and all of the one-hot encoded features are included.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city - 1&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span>
@@ -1745,67 +1750,29 @@ dtype: float64
 </div>
 </div>
 </div>
-<p>Additionally, we can add interaction terms between the city and size variables, which allows each city to have both a different intercept and a different coefficient for size. We can easily specify this in the formula by adding the term <code class="docutils literal notranslate"><span class="pre">log_bsqft:city</span></code>.</p>
+<p>Additionally, we can add interaction terms between the city and size variables to allow each city to have both a different intercept and a different coefficient for size.
+We can easily specify this in the formula by adding the term <code class="docutils literal notranslate"><span class="pre">log_bsqft:city</span></code>. We don’t go into further details here.</p>
+<p>Now, let’s fit a model with two categorical variables: the number of bedrooms and the city. Recall that we earlier reassigned the count of bedrooms that were above 6 to 6, which essentially collapses 6, 7, 8, … into the category, 6+. Below is a box plot of price (log $) by bedrooms.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city_interact</span> <span class="o">=</span> \
-   <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city + log_bsqft:city&#39;</span><span class="p">,</span>
-           <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_size_city_interact</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;br&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;log_price&quot;</span><span class="p">,</span>
+      <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>log_bsqft                      0.59
-log_bsqft:city[T.Lamorinda]    0.21
-log_bsqft:city[T.Piedmont]     0.21
-log_bsqft:city[T.Richmond]    -0.05
-dtype: float64
-</pre></div>
-</div>
-</div>
-</div>
-<p>We do see that the effect of size on price for Berkeley and Richmond are nearly the same, but they are larger for Lamorinda and Piedmont. However, when we examine the multiple <span class="math notranslate nohighlight">\(R^2\)</span> we find that the model is not much improved from the simpler one where all cities had the same size effect size.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city_interact</span><span class="o">.</span><span class="n">rsquared</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7931404456356028
-</pre></div>
-</div>
-</div>
-</div>
-<p>Since the multiple <span class="math notranslate nohighlight">\(R^2\)</span> is adjusted for the number of parameters in the model, any gain in adding 3 more terms to the model is offset by the adjustment.</p>
-<p>We demonstrate how to fit a model with two categorical variables: the number of bedrooms and the city. Recall that we earlier reassigned the count of bedrooms that were above 6 to 6, which essentially collapses 6, 7, 8, … into the category, 6+. Below is a box plot of price (log $) by bedrooms.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;br&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;log_price&quot;</span><span class="p">)</span>
-
-<span class="n">fig</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/linear_categorical_43_0.svg" src="../../_images/linear_categorical_43_0.svg" /></div>
+<img alt="../../_images/linear_categorical_38_0.svg" src="../../_images/linear_categorical_38_0.svg" /></div>
 </div>
 <p>The relationship does not appear linear: for each additional bedroom, the sale price does not increase by the same amount. Given that the number of bedrooms is discrete, we can treat this feature as categorical, which allows each bedroom encoding to contribute a different amount to the cost.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city_br</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city + C(br)&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city_br</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s1">&#39;log_price ~ log_bsqft + city + C(br)&#39;</span><span class="p">,</span>
+                             <span class="n">data</span><span class="o">=</span><span class="n">sfh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Since, the number of bedrooms is numeric data type, we have used the term <code class="docutils literal notranslate"><span class="pre">C(br)</span></code> in the formula to indicate that we want the number of bedrooms to be treated like a categorical variable.</p>
+<p>We have used the term <code class="docutils literal notranslate"><span class="pre">C(br)</span></code> in the formula to indicate that we want the number of bedrooms, which is numeric, to be treated like a categorical variable.</p>
 <p>Let’s examine the coefficients and the multiple <span class="math notranslate nohighlight">\(R2\)</span> from the fit.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1828,20 +1795,18 @@ Length: 10, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city_br</span><span class="o">.</span><span class="n">rsquared</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_size_city_br</span><span class="o">.</span><span class="n">rsquared</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7882112766574794
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.79
 </pre></div>
 </div>
 </div>
 </div>
-<p>Again, the multiple <span class="math notranslate nohighlight">\(R^2\)</span> has not increased because it is adjusted for the number of parameters in the model. This time, we added 5 more terms and do no better than the model based on size and city alone.</p>
-<p>In this section, we introduced feature engineering for qualitative features.
-We saw how the one-hot encoding technique lets us include categorical data in linear models.
-And, one-hot encoding gives a natural interpretation for model parameters.</p>
+<p>The multiple <span class="math notranslate nohighlight">\(R^2\)</span> has not increased even though we have added 5 more one-hot encoded features. The <span class="math notranslate nohighlight">\(R^2\)</span> is adjusted for the number of parameters in the model and by this measure
+is no better than the earlier one that included only city and size.</p>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1873,13 +1838,13 @@ And, one-hot encoding gives a natural interpretation for model parameters.</p>
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">15.6. </span>Feature Engineering for Numeric Measurements</p>
+            <p class="prev-next-title"><span class="section-number">15.7. </span>Feature Engineering for Numeric Measurements</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="linear_summary.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">15.8. </span>Summary</p>
+        <p class="prev-next-title"><span class="section-number">15.9. </span>Summary</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
