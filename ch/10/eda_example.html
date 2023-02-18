@@ -1405,11 +1405,10 @@ wrangling stage, for demonstration purposes the data we work with here
 have already been partially cleaned so that we can focus on exploring
 the features of interest. Note also that we do not discuss creating the
 visualizations in much detail; that topic is covered in <a class="reference internal" href="../11/viz_intro.html#ch-viz"><span class="std std-numref">Chapter 11</span></a>.</p>
-<p>First, we consider the scope and granularity of the data.</p>
-<p>These data were scraped from the San Francisco Chronicle (SFChron)
-Website<a class="footnote-reference brackets" href="#sfchron" id="id1">1</a>. They form a complete list of homes sold in the area from Apr 2003 to December 2008.
-Since we have no plans to generalize our findings beyond the time period and the location, we are working with a census so the population matches the access frame and the sample consists of the entire population.</p>
-<p>Each record represents a sale of a home in the SF Bay Area
+<p>Our data were scraped from the San Francisco Chronicle (SFChron) Website[^SFChron].
+They form a complete list of homes sold in the area from Apr 2003 to December 2008.
+Since we have no plans to generalize our findings beyond the time period and the location, we are working with a census so in terms of scope: the population matches the access frame and the sample consists of the entire population.</p>
+<p>As for granularity, each record represents a sale of a home in the SF Bay Area
 during the specified time period.  This means that if a home was sold
 twice during this time, then there are two records in the table. And, if a
 home in the Bay Area was not up for sale during this time, then it does not appear in
@@ -1569,6 +1568,14 @@ before you start reading the next section. Don’t worry about the range of pric
 <div class="section" id="understanding-price">
 <h2><span class="section-number">10.6.1. </span>Understanding Price<a class="headerlink" href="#understanding-price" title="Permalink to this headline">¶</a></h2>
 <p>It seems like a good guess is that the distribution of sale price is a highly skewed to the right with a few very expensive houses. The summary statistics shown below confirm this skewness.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This option stops scientific notation for pandas</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.float_format&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">percs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
@@ -1692,9 +1699,15 @@ the right tail of the distribution and compute a few high percentiles.</p>
 a rarity. Let’s examine the histogram of sale prices below $4M.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">under_4m</span> <span class="o">=</span> <span class="n">sfh_df</span><span class="p">[</span><span class="n">sfh_df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4_000_000</span><span class="p">]</span>
-<span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">under_4m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-            <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">under_4m</span> <span class="o">=</span> <span class="n">sfh_df</span><span class="p">[</span><span class="n">sfh_df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4_000_000</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">under_4m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1705,14 +1718,20 @@ a rarity. Let’s examine the histogram of sale prices below $4M.</p>
 Let’s plot the histogram of the log-transformed sale price. The logarithm transformation often does a good job at converting a right-skewed distribution into one that is more symmetric.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_prices</span> <span class="o">=</span> <span class="n">under_4m</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_price</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">under_4m</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]))</span>
-<span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">log_prices</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-             <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">under_4m</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">under_4m</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">under_4m</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_22_0.svg" src="../../_images/eda_example_22_0.svg" /></div>
+<img alt="../../_images/eda_example_23_0.svg" src="../../_images/eda_example_23_0.svg" /></div>
 </div>
 <p>We see that the distribution of log-transformed sale price is roughly symmetric.
 Now that we have an understanding of the distribution of sale price, let’s
@@ -1784,34 +1803,34 @@ further narrow our exploration to a few cities of interest.</p>
     <tr>
       <th>0</th>
       <td>Alameda</td>
-      <td>94501.00</td>
+      <td>94501.0</td>
       <td>1001 Post Street</td>
-      <td>689000.00</td>
-      <td>4.00</td>
-      <td>4484.00</td>
-      <td>1982.00</td>
+      <td>6.89e+05</td>
+      <td>4.0</td>
+      <td>4484.0</td>
+      <td>1982.0</td>
       <td>2004-08-29</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Alameda</td>
-      <td>94501.00</td>
+      <td>94501.0</td>
       <td>1001 Shoreline Drive \#108</td>
-      <td>485000.00</td>
-      <td>2.00</td>
-      <td>39353.00</td>
-      <td>1360.00</td>
+      <td>4.85e+05</td>
+      <td>2.0</td>
+      <td>39353.0</td>
+      <td>1360.0</td>
       <td>2004-09-05</td>
     </tr>
     <tr>
       <th>10</th>
       <td>Alameda</td>
-      <td>94501.00</td>
+      <td>94501.0</td>
       <td>1001 Shoreline Drive \#306</td>
-      <td>390000.00</td>
-      <td>2.00</td>
-      <td>39353.00</td>
-      <td>1360.00</td>
+      <td>3.90e+05</td>
+      <td>2.0</td>
+      <td>39353.0</td>
+      <td>1360.0</td>
       <td>2004-01-25</td>
     </tr>
     <tr>
@@ -1828,34 +1847,34 @@ further narrow our exploration to a few cities of interest.</p>
     <tr>
       <th>521469</th>
       <td>Windsor</td>
-      <td>95492.00</td>
+      <td>95492.0</td>
       <td>9960 Herb Road</td>
-      <td>439000.00</td>
-      <td>3.00</td>
-      <td>9583.00</td>
-      <td>1626.00</td>
+      <td>4.39e+05</td>
+      <td>3.0</td>
+      <td>9583.0</td>
+      <td>1626.0</td>
       <td>2004-04-04</td>
     </tr>
     <tr>
       <th>521473</th>
       <td>Windsor</td>
-      <td>95492.00</td>
+      <td>95492.0</td>
       <td>9964 Troon Court</td>
-      <td>1200000.00</td>
-      <td>3.00</td>
-      <td>20038.00</td>
-      <td>4281.00</td>
+      <td>1.20e+06</td>
+      <td>3.0</td>
+      <td>20038.0</td>
+      <td>4281.0</td>
       <td>2004-10-31</td>
     </tr>
     <tr>
       <th>521480</th>
       <td>Windsor</td>
-      <td>95492.00</td>
+      <td>95492.0</td>
       <td>9980 Brooks Road</td>
-      <td>650000.00</td>
-      <td>3.00</td>
-      <td>45738.00</td>
-      <td>1200.00</td>
+      <td>6.50e+05</td>
+      <td>3.0</td>
+      <td>45738.0</td>
+      <td>1200.0</td>
       <td>2004-10-24</td>
     </tr>
   </tbody>
@@ -1879,8 +1898,13 @@ below shows the distribution of building size on the left and the log-transforme
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_bsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">]))</span>
-
-<span class="n">left</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;bsqft&#39;</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">left</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;bsqft&#39;</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 <span class="n">right</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">sfh</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;log_bsqft&#39;</span><span class="p">,</span> <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;percent&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">left_right</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
 </pre></div>
@@ -1889,7 +1913,7 @@ below shows the distribution of building size on the left and the log-transforme
 </div>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_33_0.svg" src="../../_images/eda_example_33_0.svg" /></div>
+<img alt="../../_images/eda_example_35_0.svg" src="../../_images/eda_example_35_0.svg" /></div>
 </div>
 <p>The distribution is unimodal with a peak at about 1500 ft^2, and
 many houses are over 2,500 ft^2 in size.
@@ -1986,7 +2010,7 @@ few houses having 5 or 6 bedrooms.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_41_0.svg" src="../../_images/eda_example_41_0.svg" /></div>
+<img alt="../../_images/eda_example_43_0.svg" src="../../_images/eda_example_43_0.svg" /></div>
 </div>
 <p>The bar plot confirms that we generally had the right idea. However, we find that there are some houses with over 30 bedrooms! That’s a bit hard to believe and points to another possible data quality problem. Since the records include the addresses of the houses, we can double check theses values on a real estate app.</p>
 <p>In the meantime, let’s just transform the number of bedrooms into an ordinal feature by
@@ -2003,7 +2027,7 @@ transformed data.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_43_0.svg" src="../../_images/eda_example_43_0.svg" /></div>
+<img alt="../../_images/eda_example_45_0.svg" src="../../_images/eda_example_45_0.svg" /></div>
 </div>
 <p>We can see that even lumping all of the houses with 8+ bedrooms together, they do not amount to many. The distribution is nearly symmetric with a peak at 3, nearly the same proportion of houses have
 2 or 4 bedrooms, and nearly the same have 1 or 5. There is asymmetry present
@@ -2045,7 +2069,7 @@ different numbers of bedrooms. We can do this with box plots.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_49_0.svg" src="../../_images/eda_example_49_0.svg" /></div>
+<img alt="../../_images/eda_example_51_0.svg" src="../../_images/eda_example_51_0.svg" /></div>
 </div>
 <p>The median sale price increases with the number of bedrooms from 1
 to 5 bedrooms, but for the largest houses (those with 6, 7, and 8+ bedrooms),
@@ -2121,7 +2145,7 @@ and Orinda, three neighboring bedroom communities), and Piedmont.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_61_0.svg" src="../../_images/eda_example_61_0.svg" /></div>
+<img alt="../../_images/eda_example_63_0.svg" src="../../_images/eda_example_63_0.svg" /></div>
 </div>
 <p>The box plots show that Lamorinda and Piedmont tend to have more expensive homes and Richmond has the least
 expensive, but there is overlap in sale price for many cities.</p>
@@ -2140,7 +2164,7 @@ expensive, but there is overlap in sale price for many cities.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/eda_example_64_0.svg" src="../../_images/eda_example_64_0.svg" /></div>
+<img alt="../../_images/eda_example_66_0.svg" src="../../_images/eda_example_66_0.svg" /></div>
 </div>
 <p>The relationship between price per square foot and building size is roughly
 log-linear with a negative association for each of the four locations. While,
@@ -2172,13 +2196,6 @@ To examine price changes over time we often make line plots, and we adjust for i
 <p>Despite being brief, this section conveys the basic approach of
 EDA in action. For an extended case study on a different dataset, see
 <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>.</p>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="sfchron"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>The SFChron published weekly data on the sale of houses in the San
-Francisco Bay Area. This site is no longer available.</p>
-</dd>
-</dl>
 </div>
 </div>
 
