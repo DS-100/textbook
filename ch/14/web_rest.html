@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>14.4. [In Progress] REST &#8212; Learning Data Science</title>
+    <title>14.4. REST &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -708,7 +708,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     14.4. [In Progress] REST
+     14.4. REST
     </a>
    </li>
    <li class="toctree-l2">
@@ -1320,7 +1320,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>[In Progress] REST</h1>
+                <h1>REST</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -1331,8 +1331,322 @@
             
               <div>
                 
-  <div class="section" id="in-progress-rest">
-<h1><span class="section-number">14.4. </span>[In Progress] REST<a class="headerlink" href="#in-progress-rest" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="rest">
+<h1><span class="section-number">14.4. </span>REST<a class="headerlink" href="#rest" title="Permalink to this headline">¶</a></h1>
+<p>Web services are increasingly implementing the REST (REpresentational State Transfer) architecture for developers to access their data. These include social media platforms like Twitter and Instagram, music apps like Spotify, real estate apps like Zillow, scientific sources of data such as the Climate Data Store, government data at the World Bank, and many many more.  At its simplest, REST leverages URLs to identify resources (data).</p>
+<p>REST is considered stateless meaning that the server does not remember the client from one request to the next. This aspect of REST has a few advantages: the server and the client can understand any message received without seeing previous messages; code can be changed on either the client or server side without impacting the operation of the service; as well as being scalable, fast, modular, and independent.</p>
+<p>In this section, we work through an example to retrieve data from Spotify. We use both POST and GET methods in a series of requests to retrieve data on the songs by <a class="reference external" href="https://www.theclash.com/">The Clash</a>. Our example follows <a class="reference external" href="https://stmorse.github.io/journal/spotify-api.html">Steven Morse’s blog post</a>. While there is a library, <a class="reference external" href="https://spotipy.readthedocs.io/en/2.22.1/"><code class="docutils literal notranslate"><span class="pre">spotipy</span></code></a> with functionality to interact with the [Spotify Web API]((<a class="reference external" href="https://developer.spotify.com/">https://developer.spotify.com/</a>), data scientists not infrequently find themselves in the position of wanting to access data that is available via REST and there isn’t a library made yet. We use Spotify as an example of how we might go about retrieving data.</p>
+<p>Typically a REST application provides documentation with examples on how to request their data. Spotify has extensive documentation on how to access their data. It is geared to developers who want to build an app, but we can also access their service just to explore data. In order to do that, we need to register as a developer and get a client ID and secret. We then use these to identify us to Spotify in our HTTP requests.</p>
+<p>The screenshot in <a class="reference internal" href="#fig-spotify-dev"><span class="std std-numref">Figure 14.4</span></a> shows one of the <a class="reference external" href="https://developer.spotify.com/documentation/general/guides/authorization/app-settings/">developer pages</a> where we register our “app”.</p>
+<div class="figure align-default" id="fig-spotify-dev">
+<img alt="ch/14/figures/SpotifyDevSS.png" src="ch/14/figures/SpotifyDevSS.png" />
+<p class="caption"><span class="caption-number">Fig. 14.4 </span><span class="caption-text">Screenshot of the <a class="reference external" href="https://developer.spotify.com/documentation/general/guides/authorization/app-settings/">Spotify page</a> with instructions on how to get started as a developer.</span><a class="headerlink" href="#fig-spotify-dev" title="Permalink to this image">¶</a></p>
+</div>
+<p>After we register, we can begin to request data. There are basically two steps: authenticate and request resources.</p>
+<dl class="simple myst">
+<dt>Authenticate</dt><dd><p>We begin by authenticating ourselves. We issue a POST to provide the web service with our client ID and secrete. We provide these in the header. In return, we receive a token that authorizes us to make requests.
+Authorizations must be sent to particular URL.</p>
+</dd>
+</dl>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AUTH_URL</span> <span class="o">=</span> <span class="s1">&#39;https://accounts.spotify.com/api/token&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">AUTH_URL</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;client_credentials&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;client_id&#39;</span><span class="p">:</span> <span class="n">CLIENT_ID</span><span class="p">,</span>
+    <span class="s1">&#39;client_secret&#39;</span><span class="p">:</span> <span class="n">CLIENT_SECRET</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We provided our ID and secret in key:value pairs in the header of our POST request. Like with our GET in the previous section, we can check the status of our request:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response</span><span class="o">.</span><span class="n">status_code</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>200
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;application/json&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>The body of the response is JSON formatted content.  It contains the token that we need in the next step.  We convert it to a dictionary and save the access-token to use in the next step.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response_data</span> <span class="o">=</span> <span class="n">auth_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;access_token&#39;, &#39;token_type&#39;, &#39;expires_in&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">access_token</span> <span class="o">=</span> <span class="n">auth_response_data</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">]</span>
+<span class="n">token_type</span> <span class="o">=</span> <span class="n">auth_response_data</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that we did not share our ID and secret so others reading this book can’t imitate us. This request won’t be successful without a valid ID and secret. For example, below we make up an ID and secret and try to authenticate.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CLIENT_bad_ID</span> <span class="o">=</span> <span class="s1">&#39;0123456789&#39;</span>
+<span class="n">CLIENT_bad_SECRET</span> <span class="o">=</span> <span class="s1">&#39;a1b2c3d4e5&#39;</span>
+
+<span class="n">auth_bad</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">AUTH_URL</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;client_credentials&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;client_id&#39;</span><span class="p">:</span> <span class="n">CLIENT_bad_ID</span><span class="p">,</span>
+    <span class="s1">&#39;client_secret&#39;</span><span class="p">:</span> <span class="n">CLIENT_bad_SECRET</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can check the status of this request.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_bad</span><span class="o">.</span><span class="n">status_code</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>400
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the previous section, we learned that a 400 status means that we issued a bad request. As another example, the web service limits the amount of time that our token is live, and it shuts us down if we take too much time making requests. A couple of times we ran into this issue:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">res_clash</span><span class="o">.</span><span class="n">status_code</span>
+
+<span class="mi">401</span>
+</pre></div>
+</div>
+<p>Now for the second step, let’s get some data.</p>
+<dl class="simple myst">
+<dt>Resource Requests</dt><dd><p>Requests for resources can then be made via GET for this service. Other services may require additional POSTs.  These requests must include the token we received from the web service in the first step. We can use this token many times. We pass the access token in the header of our GET request. First we construct the name_value pairs as a dictionary.</p>
+</dd>
+</dl>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{type}</span><span class="s1"> </span><span class="si">{token}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">token_type</span><span class="p">,</span><span class="n">token</span><span class="o">=</span><span class="n">access_token</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The developer API tells us that an artist’s albums are available at URLs that look like:
+‘<a class="reference external" href="https://api.spotify.com/v1/artists/3RGLhK1IP9jnYFH4BRFJBS/albums">https://api.spotify.com/v1/artists/3RGLhK1IP9jnYFH4BRFJBS/albums</a>’  where the code between ‘artists/’ and /albums’ is the identifier for the artist. This particular code is for The Clash. And information about the tracks on an album is available at a URL like:  ‘<a class="reference external" href="https://api.spotify.com/v1/albums/49kzgMsxHU5CTeb2XmFHjo/tracks">https://api.spotify.com/v1/albums/49kzgMsxHU5CTeb2XmFHjo/tracks</a>’ where the identifier here is for the album.</p>
+<p>If we know the identifier for an artist, we can retrieve the IDs for their albums, and in turn we can get data about the tracks on the album. We’ll do this for The Clash. We can get the ID for this band from Spotify’s site.</p>
+<p>We first set the base URL that remains the same across all of our requests and the artist ID for The Claseh, which we found on the Spotify site.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BASE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.spotify.com/v1/&#39;</span>
+<span class="n">artist_id</span> <span class="o">=</span> <span class="s1">&#39;3RGLhK1IP9jnYFH4BRFJBS&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our request begins with getting the group’s albums. We construct the URL from the ‘BASE_URL’ and the ‘artist_id’ and pass the header with our access token.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res_clash</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE_URL</span> <span class="o">+</span> <span class="s1">&#39;artists/&#39;</span> <span class="o">+</span> <span class="n">artist_id</span> <span class="o">+</span> <span class="s1">&#39;/albums&#39;</span><span class="p">,</span>
+                        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                        <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;include_groups&#39;</span><span class="p">:</span> <span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="s1">&#39;limit&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res_clash</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Response [200]&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our request was successful. Now let’s check the content-type of the response body.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res_clash</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;application/json; charset=utf-8&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>The resource returned from our request is JSON so we can load it into a dictionary.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clash_albums</span> <span class="o">=</span> <span class="n">res_clash</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>After poking around a bit, we can find that the album information are in the ‘items’ elements.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">clash_albums</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>17
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are 17 albums. Let’s find the keys for one of the albums.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clash_albums</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;album_group&#39;, &#39;album_type&#39;, &#39;artists&#39;, &#39;available_markets&#39;, &#39;external_urls&#39;, &#39;href&#39;, &#39;id&#39;, &#39;images&#39;, &#39;name&#39;, &#39;release_date&#39;, &#39;release_date_precision&#39;, &#39;total_tracks&#39;, &#39;type&#39;, &#39;uri&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s print the album ids, names, and release dates for the albums.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">album</span> <span class="ow">in</span> <span class="n">clash_albums</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ID: &#39;</span><span class="p">,</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;----&#39;</span><span class="p">,</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;release_date&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ID:  7nL9UERtRQCB5eWEQCINsh   Combat Rock + The People&#39;s Hall ---- 2022-05-20
+ID:  3un5bLdxz0zKhiZXlmnxWE   Live At Shea Stadium ---- 2008-08-26
+ID:  4dMWTj1OkiCKFN5yBMP1vS   Live at Shea Stadium (Remastered) ---- 2008
+ID:  1Au9637RH9pXjBv5uS3JpQ   From Here To Eternity Live ---- 1999-10-04
+ID:  70NjH8NkxcbYNvWAHnyv1e   From Here to Eternity (Live) [Remastered] ---- 1999
+ID:  2gaW2Y3JhRCSNZC2FSibZk   Raw and Unfiltered ---- 1988-06-14
+ID:  5xZ2mBLIMlMyrTfUMkTByT   Raw and Unfiltered: The Interviews ---- 1988-06-14
+ID:  3E01XjnmC1HdxTE8dPuEkn   Cut The Crap ---- 1985-11-04
+ID:  1sUuxJFnDGaL8nj6n4sGj5   Combat Rock ---- 1982-03-15
+ID:  1ZH5g1RDq3GY1OvyD0w0s2   Combat Rock (Remastered) ---- 1982
+ID:  2UxN3UKyS3Z5r0Sra8A5RF   Sandinista! (Remastered) ---- 1980
+ID:  6FCzvataOZh68j8OKzOt9a   London Calling (Remastered) ---- 1979
+ID:  3TZuLZx0zB3Q45aQXDswb9   London Calling (Expanded Edition) ---- 1979
+ID:  4NEvCc6vHcsCPviWPCCrVg   Give &#39;Em Enough Rope (Remastered) ---- 1978
+ID:  7LRgVof5HTOq7o4wb3W52h   The Clash (UK Version) ---- 1977-12-31
+ID:  1184u2MotesLLCUTxyBIW8   The Clash ---- 1977-08-27
+ID:  49kzgMsxHU5CTeb2XmFHjo   The Clash (Remastered) ---- 1977
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that several of the albums are remastered and live versions of others. We ignore this “duplication”, and process them all. We cycle through the albums, pick up the ID, and for each album, request information about the tracks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tracks</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">album</span> <span class="ow">in</span> <span class="n">js_clash</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]:</span> 
+    
+    <span class="n">res_tracks</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE_URL</span> <span class="o">+</span> <span class="s1">&#39;albums/&#39;</span> <span class="o">+</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/tracks&#39;</span><span class="p">,</span>
+                             <span class="n">headers</span> <span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="n">tracks_js</span> <span class="o">=</span> <span class="n">res_tracks</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">tracks_js</span><span class="p">:</span>
+        <span class="n">res_feat</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE_URL</span> <span class="o">+</span> <span class="s1">&#39;audio-features/&#39;</span> <span class="o">+</span> <span class="n">track</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+                             <span class="n">headers</span> <span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="n">feat_js</span> <span class="o">=</span> <span class="n">res_feat</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        
+        <span class="n">feat_js</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;track_name&#39;</span><span class="p">:</span> <span class="n">track</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;album_name&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;release_date&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;release_date&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;album_id&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="p">})</span>
+        
+        <span class="n">tracks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feat_js</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>We put the track information into a data frame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clash_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tracks</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clash_df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;danceability&#39;, &#39;energy&#39;, &#39;key&#39;, &#39;loudness&#39;, &#39;mode&#39;, &#39;speechiness&#39;,
+       &#39;acousticness&#39;, &#39;instrumentalness&#39;, &#39;liveness&#39;, &#39;valence&#39;, &#39;tempo&#39;,
+       &#39;type&#39;, &#39;id&#39;, &#39;uri&#39;, &#39;track_href&#39;, &#39;analysis_url&#39;, &#39;duration_ms&#39;,
+       &#39;time_signature&#39;, &#39;track_name&#39;, &#39;album_name&#39;, &#39;release_date&#39;,
+       &#39;album_id&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, let’s examine the relationship between danceability and loudness of the tracks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">clash_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;danceability&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;loudness&#39;</span><span class="p">,</span> 
+           <span class="n">color</span><span class="o">=</span><span class="s1">&#39;album_name&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;duration_ms&#39;</span><span class="p">,</span>
+           <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/web_rest_45_0.svg" src="../../_images/web_rest_45_0.svg" /></div>
+</div>
+<p>When we get HTML pages, we often need to extract data from it to wrangle it into an analyzable form. At other times the data from a REST request may be in an XML format. We describe how to work with these formats next.</p>
 </div>
 
     <script type="text/x-thebe-config">
