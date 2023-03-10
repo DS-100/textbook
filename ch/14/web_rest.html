@@ -1338,9 +1338,13 @@
                 
   <div class="section" id="rest">
 <h1><span class="section-number">14.4. </span>REST<a class="headerlink" href="#rest" title="Permalink to this headline">¶</a></h1>
-<p>Web services are increasingly implementing the REST (REpresentational State Transfer) architecture for developers to access their data. These include social media platforms like Twitter and Instagram, music apps like Spotify, real estate apps like Zillow, scientific sources of data such as the Climate Data Store, government data at the World Bank, and many many more.  At its simplest, REST leverages URLs to identify resources (data).</p>
+<p>Web services are increasingly implementing the REST (REpresentational State Transfer) architecture for developers to access their data. These include social media platforms like Twitter and Instagram, music apps like Spotify, real estate apps like Zillow, scientific sources of data such as the Climate Data Store, government data at the World Bank, and many many more. The basic behind REST is that every URL identifies a resource (data).</p>
 <p>REST is considered stateless meaning that the server does not remember the client from one request to the next. This aspect of REST has a few advantages: the server and the client can understand any message received without seeing previous messages; code can be changed on either the client or server side without impacting the operation of the service; as well as being scalable, fast, modular, and independent.</p>
-<p>In this section, we work through an example to retrieve data from Spotify. We use both POST and GET methods in a series of requests to retrieve data on the songs by <a class="reference external" href="https://www.theclash.com/">The Clash</a>. Our example follows <a class="reference external" href="https://stmorse.github.io/journal/spotify-api.html">Steven Morse’s blog post</a>. While there is a library, <a class="reference external" href="https://spotipy.readthedocs.io/en/2.22.1/"><code class="docutils literal notranslate"><span class="pre">spotipy</span></code></a> with functionality to interact with the [Spotify Web API]((<a class="reference external" href="https://developer.spotify.com/">https://developer.spotify.com/</a>), data scientists not infrequently find themselves in the position of wanting to access data that is available via REST and there isn’t a library made yet. We use Spotify as an example of how we might go about retrieving data.</p>
+<p>In this section, we work through an example to retrieve data from Spotify. We use both POST and GET methods in a series of requests to retrieve data on the songs by <a class="reference external" href="https://www.theclash.com/">The Clash</a>. Our example follows <a class="reference external" href="https://stmorse.github.io/journal/spotify-api.html">Steven Morse’s blog post</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In practice, we wouldn’t write GET and POST requests ourselves for Spotify. Instead, we’d use the <a class="reference external" href="https://spotipy.readthedocs.io/en/2.22.1/"><code class="docutils literal notranslate"><span class="pre">spotipy</span></code></a> library, which has functions to interact with the [Spotify Web API]((<a class="reference external" href="https://developer.spotify.com/">https://developer.spotify.com/</a>). That said, data scientists can often find themselves in the position of wanting to access data available via REST that doesn’t have a Python library available. This section gives a peek behind the curtain and shows how libraries like <code class="docutils literal notranslate"><span class="pre">spotipy</span></code> work.</p>
+</div>
 <p>Typically a REST application provides documentation with examples on how to request their data. Spotify has extensive documentation on how to access their data. It is geared to developers who want to build an app, but we can also access their service just to explore data. In order to do that, we need to register as a developer and get a client ID and secret. We then use these to identify us to Spotify in our HTTP requests.</p>
 <p>After we register, we can begin to request data. There are basically two steps: authenticate and request resources.</p>
 <dl class="simple myst">
@@ -1357,7 +1361,10 @@ Authorizations must be sent to particular URL.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">AUTH_URL</span><span class="p">,</span> <span class="p">{</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The CLIENT_ID and CLIENT_SECRET variables can&#39;t be published, or else</span>
+<span class="c1"># someone can make requests pretending to be us! We&#39;ve hidden these secret</span>
+<span class="c1"># values in this code.</span>
+<span class="n">auth_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">AUTH_URL</span><span class="p">,</span> <span class="p">{</span>
     <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;client_credentials&#39;</span><span class="p">,</span>
     <span class="s1">&#39;client_id&#39;</span><span class="p">:</span> <span class="n">CLIENT_ID</span><span class="p">,</span>
     <span class="s1">&#39;client_secret&#39;</span><span class="p">:</span> <span class="n">CLIENT_SECRET</span><span class="p">,</span>
@@ -1419,7 +1426,7 @@ Authorizations must be sent to particular URL.</p>
 </div>
 </div>
 </div>
-<p>Notice that we did not share our ID and secret so others reading this book can’t imitate us. This request won’t be successful without a valid ID and secret. For example, below we make up an ID and secret and try to authenticate.</p>
+<p>Notice that we did hid our ID and secret so others reading this book can’t imitate us. This request won’t be successful without a valid ID and secret. For example, below we make up an ID and secret and try to authenticate.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CLIENT_bad_ID</span> <span class="o">=</span> <span class="s1">&#39;0123456789&#39;</span>
@@ -1584,14 +1591,13 @@ ID:  49kzgMsxHU5CTeb2XmFHjo   The Clash (Remastered) ---- 1977
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tracks</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">album</span> <span class="ow">in</span> <span class="n">js_clash</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]:</span> 
-    
-    <span class="n">res_tracks</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE_URL</span> <span class="o">+</span> <span class="s1">&#39;albums/&#39;</span> <span class="o">+</span> <span class="n">album</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/tracks&#39;</span><span class="p">,</span>
-                             <span class="n">headers</span> <span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="n">tracks_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s1">albums/</span><span class="si">{</span><span class="n">album</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s1">/tracks&#39;</span>
+    <span class="n">res_tracks</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tracks_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
     <span class="n">tracks_js</span> <span class="o">=</span> <span class="n">res_tracks</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
     
     <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">tracks_js</span><span class="p">:</span>
-        <span class="n">res_feat</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BASE_URL</span> <span class="o">+</span> <span class="s1">&#39;audio-features/&#39;</span> <span class="o">+</span> <span class="n">track</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-                             <span class="n">headers</span> <span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="n">features_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s1">audio-features/</span><span class="si">{</span><span class="n">track</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">res_feat</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">features_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
         <span class="n">feat_js</span> <span class="o">=</span> <span class="n">res_feat</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         
         <span class="n">feat_js</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
@@ -1644,9 +1650,12 @@ ID:  49kzgMsxHU5CTeb2XmFHjo   The Clash (Remastered) ---- 1977
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/web_rest_43_0.svg" src="../../_images/web_rest_43_0.svg" /></div>
+<img alt="../../_images/web_rest_46_0.svg" src="../../_images/web_rest_46_0.svg" /></div>
 </div>
-<p>When we get HTML pages, we often need to extract data from it to wrangle it into an analyzable form. At other times the data from a REST request may be in an XML format. We describe how to work with these formats next.</p>
+<p>This section talked about REST APIs, which often let programs download data as JSON.
+That said, sometimes a REST API isn’t available for the data we want.
+Instead, we can extract data from webpages themselves since webpages are stored in HTML, a format similar to XML.
+We describe how to work with these formats next.</p>
 </div>
 
     <script type="text/x-thebe-config">
