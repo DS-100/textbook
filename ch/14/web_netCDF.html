@@ -1369,22 +1369,22 @@
 <p>The <a class="reference external" href="https://www.unidata.ucar.edu/software/netcdf/">Network Common Data Form (NetCDF)</a> is a convenient and efficient format for storing array-oriented scientific data. A mental model for this format represents a variable by a multi-dimensional grid of values. <a class="reference internal" href="#netcdf-diagram"><span class="std std-numref">Figure 14.1</span></a> shows the concept with a diagram. A variable such as rainfall is recorded daily at places around the globe. We can imagine these rainfall values arranged in the cube with longitude running along one side of the cube, latitude along another, and date for the third dimension. Then each cell in the cube holds the rainfall recorded on the corresponding day at that particular latitude-longitude location. A NetCDF file also contains information, which we call metadata, about the dimensions of the the cube. This way, we don’t need to repeat the latitude and longitude values for each day, nor the dates for each location. The same information in a data frame would be organized quite differently. We would need three features for latitude, longitude, and date for each rainfall measurement, which would mean repeating lots of data.</p>
 <div class="figure align-default" id="netcdf-diagram">
 <img alt="../../_images/netCDF-diagram.png" src="../../_images/netCDF-diagram.png" />
-<p class="caption"><span class="caption-number">Fig. 14.1 </span><span class="caption-text">This diagram represents a model for NetCDF data. The data arre organized into a three-dimensional array that contains recordings of rainfall at locations in time (latitude, longitude, and time). The “X” marks one rainfall measurement for a specific location on a particular date.</span><a class="headerlink" href="#netcdf-diagram" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 14.1 </span><span class="caption-text">This diagram represents a model for NetCDF data. The data are organized into a three-dimensional array that contains recordings of rainfall at locations in time (latitude, longitude, and time). The “X” marks one rainfall measurement for a specific location on a particular date.</span><a class="headerlink" href="#netcdf-diagram" title="Permalink to this image">¶</a></p>
 </div>
 <p>NetCDF has several other advantages, in addition to being more compact:</p>
 <ul class="simple">
 <li><p>scalable - efficient access to subsets of the data</p></li>
-<li><p>appendable - easily add new data without redefining the structure or making copies</p></li>
-<li><p>sharable - common format that doesn’t depend on the the coding language or operating system</p></li>
-<li><p>self-describing - the source file contains both the description of the data organization and the data itself making it easy for tools to directly read and determine its structure</p></li>
-<li><p>community - general tools provided by a community of users are available for working with NetCDF data</p></li>
+<li><p>appendable - easily add new data without redefining the structure</p></li>
+<li><p>sharable - common format that’s independent of the coding language and operating system</p></li>
+<li><p>self-describing - the source file contains both a description of the data’s organization and the data itself</p></li>
+<li><p>community - general tools made available by a community of users</p></li>
 </ul>
-<p>NetCDF variables are not limited to three-dimensions. For example, elevation could be added to our earth science application so that we have recordings of, say, temperature,  in time, latitude, longitude, and elevation. And, dimensions need not correspond to physical dimensions. For example climate scientists often run several models and store the model number in a dimension along with the model output. While NetCDF was originally developed for atmospheric scientists at the University Corporation for Atmospheric Research (UCAR), the format has gained popularity and is now used at thousands of educational, research and government sites around the world. Also, the applications have expanded to areas, such as astronomy and physics with the <a class="reference external" href="https://science.nasa.gov/astrophysics/astrophysics-data-centers/smithsonian-nasa-astrophysics-data-system-ads">Smithsonian/NASA Astrophysics Data System (ADS)</a> and medical imaging with <a class="reference external" href="http://www.bic.mni.mcgill.ca/software/minc/minc.html">Medical Image NetCDF (MINC)</a>.</p>
-<p>NetCDF files have three basic components: dimensions, variables, and various sorts of metadata. The <em>variable</em> contains what we think of as the data, such as the rainfall recordings. Each variable has a name, storage type, and shape, meaning the number of dimensions. The <em>dimensions</em> component gives information about such as the name and how many points along the dimension that measurements are taken. Additional information is provided by the <em>coordinates</em>, in particular the points where the measurements were made. For example, the dimension that corresponds to longitude has 1440 points: <span class="math notranslate nohighlight">\(0.0, 0.25, 0.50, \ldots, 359.75\)</span>.  Other metadata, include <em>attributes</em>. Attributes for a variable can hold ancillary information about the variables, and other attributes contain global information about the file, such as who published the data, permissions for using the data, and contact information. This global information is critical to ensure reproducible results.</p>
-<p>The following example examines the components of a NetCDF file and demonstrates how to extract portions of data from variables.</p>
+<p>NetCDF variables are not limited to three-dimensions. For example, elevation could be added to our earth science application so that we have recordings of, say, temperature,  in time, latitude, longitude, and elevation. And, dimensions need not correspond to physical dimensions. Climate scientists often run several models and store the model number in a dimension along with the model output. While NetCDF was originally developed for atmospheric scientists at the University Corporation for Atmospheric Research (UCAR), the format has gained popularity and is now used at thousands of educational, research and government sites around the world. And, the applications have expanded to areas, such as astronomy and physics with the <a class="reference external" href="https://science.nasa.gov/astrophysics/astrophysics-data-centers/smithsonian-nasa-astrophysics-data-system-ads">Smithsonian/NASA Astrophysics Data System (ADS)</a> and medical imaging with <a class="reference external" href="http://www.bic.mni.mcgill.ca/software/minc/minc.html">Medical Image NetCDF (MINC)</a>.</p>
+<p>NetCDF files have three basic components: dimensions, variables, and various sorts of metadata. The <em>variable</em> contains what we think of as the data, such as the rainfall recordings. Each variable has a name, storage type, and shape, meaning the number of dimensions. The <em>dimensions</em> component gives each dimensions name and number of grid points. Additional information is provided by the <em>coordinates</em>. In particular the points where the measurements are made, such as for longitude, where these might be: <span class="math notranslate nohighlight">\(0.0, 0.25, 0.50, \ldots, 359.75\)</span>.  Other metadata, include <em>attributes</em>. Attributes for a variable can hold ancillary information about the variables, and other attributes contain global information about the file, such as who published the dataset, their contact information, and permissions for using the data. This global information is critical to ensure reproducible results.</p>
+<p>The following example examines the components of a particular NetCDF file and demonstrates how to extract portions of data from variables.</p>
 <div class="section" id="example-rainfall-around-the-world">
 <h2><span class="section-number">14.1.1. </span>Example: Rainfall Around the World<a class="headerlink" href="#example-rainfall-around-the-world" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference external" href="https://cds.climate.copernicus.eu/">Climate Data Store</a> provides a diverse collection of data sets from various climate sectors and services. We visited their site and requested measurements of temperature and total precipitation for a two-week period in Dec 2022. Let’s walk through a brief examination of these data to get a sense of the organization of the components in the file, how to extract subsets, and make visualizations.</p>
+<p>The <a class="reference external" href="https://cds.climate.copernicus.eu/">Climate Data Store</a> provides a collection of data sets from various climate sectors and services. We visited their site and requested measurements of temperature and total precipitation for a two-week period in Dec 2022. Let’s walk through a brief examination of these data to get a sense of the organization of the components in the file, how to extract subsets, and make visualizations.</p>
 <p>The data are in the NetCDF file <code class="docutils literal notranslate"><span class="pre">CDS_ERA5_22-12.nc</span></code>. Let’s first figure out how large the file is (<a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-numref">Chapter 8</span></a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1405,8 +1405,8 @@
 </div>
 </div>
 </div>
-<p>Despite having only three variables (total precipitation, rain rate, temperature at two meters) and  and two weeks of records, the file is two GiB in size! These climate sources often tend to be quite large, and we need to take care when working with them.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">xarray</span></code> package is useful for working with general array-like data and the NetCDF format in particular. We use its functionality to explore the components of our climate file.  First we open the file.</p>
+<p>Despite having only three variables (total precipitation, rain rate, temperature) for two weeks, the file is two GiB in size! These climate sources often tend to be quite large.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">xarray</span></code> package is useful for working with array-like data and, in particular, NetCDF. We use its functionality to explore the components of our climate file.  First we open the file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
@@ -1487,8 +1487,7 @@
 </div>
 </div>
 </div>
-<p>All of this information is provided when we print the dataset contents.</p>
-<p>By keeping all of these pieces of information about the data in the file itself, we don’t risk losing it or having it get out of sync.</p>
+<p>By keeping all of these pieces of information in the source file itself, we don’t risk losing it or having the description get out of sync with the data.</p>
 <p>Like with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">xarray</span></code> provides many different ways to select portions of the data to work with. We show two examples. First, we focus on one specific location and examine the total precipitation in time with a line plot.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1497,9 +1496,9 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/web_netCDF_23_0.svg" src="../../_images/web_netCDF_23_0.svg" /></div>
+<img alt="../../_images/web_netCDF_22_0.svg" src="../../_images/web_netCDF_22_0.svg" /></div>
 </div>
-<p>Next we choose one date, Dec 31, 2022 at 1 pm, and narrow down the latitude and longitude to the continental United States to make a map of temperature at 2 meters (<code class="docutils literal notranslate"><span class="pre">t2m</span></code>).</p>
+<p>Next we choose one date, Dec 31, 2022 at 1 pm, and narrow down the latitude and longitude to the continental United States to make a map of temperature.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
@@ -1510,39 +1509,18 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># US coordinate bounds</span>
-<span class="n">min_lon</span> <span class="o">=</span> <span class="mi">232</span> 
-<span class="n">min_lat</span> <span class="o">=</span> <span class="mi">21</span>
-<span class="n">max_lon</span> <span class="o">=</span> <span class="mi">300</span>
-<span class="n">max_lat</span> <span class="o">=</span> <span class="mi">50</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">min_lon</span><span class="p">,</span> <span class="n">min_lat</span><span class="p">,</span> <span class="n">max_lon</span><span class="p">,</span> <span class="n">max_lat</span> <span class="o">=</span> <span class="mi">232</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">50</span>
 
 <span class="n">mask_lon</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">longitude</span> <span class="o">&gt;</span> <span class="n">min_lon</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">longitude</span> <span class="o">&lt;</span> <span class="n">max_lon</span><span class="p">)</span>
 <span class="n">mask_lat</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&gt;</span> <span class="n">min_lat</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&lt;</span> <span class="n">max_lat</span><span class="p">)</span>
+
+<span class="n">ds_oneday_us</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">one_day</span><span class="p">)</span><span class="o">.</span><span class="n">t2m</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_lon</span> <span class="o">&amp;</span> <span class="n">mask_lat</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <p>Like <code class="docutils literal notranslate"><span class="pre">loc</span></code> for data frames, <code class="docutils literal notranslate"><span class="pre">sel</span></code> returns a new <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> whose data is determined by the index labels along the specified dimension, which for this example is the date. And, like <code class="docutils literal notranslate"><span class="pre">np.where</span></code>, <code class="docutils literal notranslate"><span class="pre">xr.where</span></code> returns elements depending on the logical condition provided. We use <code class="docutils literal notranslate"><span class="pre">drop=True</span></code> to reduce the size of the dataset.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_oneday_us</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">one_day</span><span class="p">)</span><span class="o">.</span><span class="n">t2m</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_lon</span> <span class="o">&amp;</span> <span class="n">mask_lat</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_oneday_us</span><span class="o">.</span><span class="n">dims</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&#39;latitude&#39;, &#39;longitude&#39;)
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can see that this new array has lost one dimension (time) and has fewer latitude and longitude values. Let’s make a chloropleth map of temperature, where color represents the temperature.</p>
+<p>Let’s make a chloropleth map of temperature, where color represents the temperature.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_oneday_us</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">));</span>
@@ -1550,7 +1528,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/web_netCDF_31_0.svg" src="../../_images/web_netCDF_31_0.svg" /></div>
+<img alt="../../_images/web_netCDF_29_0.svg" src="../../_images/web_netCDF_29_0.svg" /></div>
 </div>
 <p>We can make out the shape of the US, the warm Caribbean, and the colder mountain ranges from this map.</p>
 <p>We wrap up by closing the file.</p>
