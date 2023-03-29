@@ -55,8 +55,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="19.4. Using Logistic Regression" href="classification_log_reg.html" />
-    <link rel="prev" title="19.2. The Logistic Model" href="classification_log_model.html" />
+    <link rel="next" title="19.4. Interpreting the Probabilities for Classification" href="class_dr.html" />
+    <link rel="prev" title="19.2. Modeling Proportions (and Probabilities)" href="class_log_model.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -923,7 +923,7 @@
 </p>
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="classification_intro.html">
+  <a class="reference internal" href="class_intro.html">
    19. Classification
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
@@ -933,13 +933,13 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="classification_prob.html">
-     19.1. Regression on Probabilities
+    <a class="reference internal" href="class_pred.html">
+     19.1. Modeling and Classification
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="classification_log_model.html">
-     19.2. The Logistic Model
+    <a class="reference internal" href="class_log_model.html">
+     19.2. Modeling Proportions (and Probabilities)
     </a>
    </li>
    <li class="toctree-l2 current active">
@@ -948,28 +948,13 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="classification_log_reg.html">
-     19.4. Using Logistic Regression
+    <a class="reference internal" href="class_dr.html">
+     19.4. Interpreting the Probabilities for Classification
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="classification_cost_justification.html">
-     19.5. Approximating the Empirical Probability Distribution
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="classification_sgd.html">
-     19.6. Fitting a Logistic Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="classification_sensitivity_specificity.html">
-     19.7. Evaluating Logistic Models
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="classification_multiclass.html">
-     19.8. Multiclass Classification
+    <a class="reference internal" href="class_summary.html">
+     19.5. Summary
     </a>
    </li>
   </ul>
@@ -1278,7 +1263,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../../_sources/ch/19/classification_cost.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../../_sources/ch/19/class_loss.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -1304,7 +1289,7 @@
     <div class="dropdown-buttons">
         
         
-        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/19/classification_cost.ipynb&branch=master"><button type="button"
+        <a class="jupyterhub-button" href="https://datahub.berkeley.edu/hub/user-redirect/git-pull?repo=https://github.com/ds-100/textbook&urlpath=tree/textbook/content/ch/19/class_loss.ipynb&branch=master"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch JupyterHub" data-toggle="tooltip"
                 data-placement="left"><img class="jupyterhub-button-logo"
                     src="../../_static/images/logo_jupyterhub.svg"
@@ -1326,18 +1311,8 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#cross-entropy-loss">
-   19.3.1. Cross-Entropy Loss
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#gradient-of-the-cross-entropy-loss">
-   19.3.2. Gradient of the Cross-Entropy Loss
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#summary">
-   19.3.3. Summary
+  <a class="reference internal nav-link" href="#fitting-a-logistic-model">
+   19.3.1. Fitting a Logistic Model
   </a>
  </li>
 </ul>
@@ -1361,18 +1336,8 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#cross-entropy-loss">
-   19.3.1. Cross-Entropy Loss
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#gradient-of-the-cross-entropy-loss">
-   19.3.2. Gradient of the Cross-Entropy Loss
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#summary">
-   19.3.3. Summary
+  <a class="reference internal nav-link" href="#fitting-a-logistic-model">
+   19.3.1. Fitting a Logistic Model
   </a>
  </li>
 </ul>
@@ -1384,202 +1349,193 @@
             
               <div>
                 
-  <div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="c1"># Ignore numpy dtype warnings. These warnings are caused by an interaction</span>
-<span class="c1"># between numpy and Cython and can be safely ignored.</span>
-<span class="c1"># Reference: https://stackoverflow.com/a/40846742</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.dtype size changed&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;numpy.ufunc size changed&quot;</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
-
-<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="c1"># This option stops scientific notation for pandas</span>
-<span class="c1"># pd.set_option(&#39;display.float_format&#39;, &#39;{:.2f}&#39;.format)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">df_interact</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Outputs sliders that show rows and columns of df</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">:</span><span class="n">row</span> <span class="o">+</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span> <span class="o">+</span> <span class="n">ncols</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ncols</span><span class="p">:</span>
-        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span> <span class="n">col</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">interact</span><span class="p">(</span><span class="n">peek</span><span class="p">,</span>
-                 <span class="n">row</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">nrows</span><span class="p">),</span>
-                 <span class="n">col</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="n">ncols</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> rows, </span><span class="si">{}</span><span class="s1"> columns) total&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lebron</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;lebron.csv&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="a-loss-function-for-the-logistic-model">
+  <div class="section" id="a-loss-function-for-the-logistic-model">
 <h1><span class="section-number">19.3. </span>A Loss Function for the Logistic Model<a class="headerlink" href="#a-loss-function-for-the-logistic-model" title="Permalink to this headline">¶</a></h1>
-<p>We have defined a regression model for probabilities, the logistic model:</p>
+<p>The logistic model gives us probabilities (or empirical proportions) so we write our loss function as <span class="math notranslate nohighlight">\(\ell(p, y) \)</span>, where <span class="math notranslate nohighlight">\(p\)</span> is between 0 and 1. Since the response takes on one of two values (because the feature is a binary classification), any loss function reduces to:</p>
 <div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-f_\hat{\boldsymbol{\theta}} (\textbf{x}) = \sigma(\hat{\boldsymbol{\theta}} \cdot \textbf{x})
-\end{aligned}
+\[\begin{split}
+\begin{aligned} 
+{\ell}(p, y) = 
+ \begin{cases}
+    \ell(p, 0) &amp; \text{if $y$ is 0} \\    
+    \ell(p, 1) &amp; \text{if $y$ is 1}
+    \end{cases}
+\end{aligned} 
+\end{split}\]</div>
+<p>Once again, using 0 and 1 to represent the categories has an advantage because means we can be conveniently write the loss as:</p>
+<div class="math notranslate nohighlight">
+\[ 
+\ell(p, y) =  ~ y \ell(p, y) + (1-y) \ell(p, 1-y)             
 \]</div>
-<p>Like the model for linear regression, this model has parameters <span class="math notranslate nohighlight">\( \hat{\boldsymbol{\theta}} \)</span>, a vector that contains one parameter for each feature of <span class="math notranslate nohighlight">\( \textbf{x} \)</span>. We now address the problem of defining a loss function for this model that allows us to fit the model’s parameters to data.</p>
-<p>Intuitively, we want the model’s predictions to match the data as closely as possible. Below we recreate a plot of LeBron’s shot attempts in the 2017 NBA Playoffs using the distance of each shot from the basket. The points are jittered on the y-axis to mitigate overplotting.</p>
-<div class="cell tag_hide-input docutils container">
+<p>The logistic model pairs well with <em>logistic loss</em> loss:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned} 
+{\ell}(p, y) = &amp; 
+ \begin{cases}
+    -\log(p) &amp; \text{if $y$ is 1} \\    
+    -\log(1-p) &amp; \text{if $y$ is 0}
+    \end{cases}
+    \\
+    = &amp; -y \log(p) -(1-y) \log(1-p)   
+\end{aligned} 
+\end{split}\]</div>
+<p>Note that the log loss is not defined at 0 and 1 because <span class="math notranslate nohighlight">\(-\log (p)\)</span> tends to <span class="math notranslate nohighlight">\(\infty\)</span> as <span class="math notranslate nohighlight">\(p\)</span> approaches 0, and similarly for <span class="math notranslate nohighlight">\(-\log (1-p)\)</span> as <span class="math notranslate nohighlight">\( p \)</span> tends to 1. So we are careful to avoid the end points in our minimization. We can see this in the plot below:</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
-           <span class="n">data</span><span class="o">=</span><span class="n">lebron</span><span class="p">,</span>
-           <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-           <span class="n">y_jitter</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;LeBron Shot Attempts&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Distance from Basket (ft)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Shot Made&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span><span class="mf">0.999</span><span class="p">,</span><span class="mi">75</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span> <span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y = 1&quot;</span><span class="p">,</span>
+                        <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y = 0&quot;</span><span class="p">,</span>
+                        <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s1">&#39;dot&#39;</span><span class="p">)))</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">xaxis_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/classification_cost_4_0.png" src="../../_images/classification_cost_4_0.png" />
+<img alt="../../_images/class_loss_7_0.svg" src="../../_images/class_loss_7_0.svg" /></div>
 </div>
+<p>When <span class="math notranslate nohighlight">\(y \)</span> is 1 (solid line), the loss is small for <span class="math notranslate nohighlight">\(p\)</span> near 1,
+and when <span class="math notranslate nohighlight">\(y\)</span> is 0 (dotted line) the loss is small near 0.</p>
+<p>If our goal is to fit a constant to the data using logistic loss, then the average loss is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(p, \textbf{y}) = &amp;  \frac{1}{n} \sum_i  - y_i  \log(p)  - (1 - y_i) \log (1 -p)) \\
+ = &amp; -\frac{n_1}{n} \log(p)  - \frac{n_0}{n} \log (1 -p))
+\end{aligned}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(n_0\)</span> and <span class="math notranslate nohighlight">\(n_1\)</span> are the number of <span class="math notranslate nohighlight">\(y_i\)</span> that are 0 and 1, respectively.
+We can differentiate with respect to <span class="math notranslate nohighlight">\( p\)</span> to find the minimizer:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac {\partial L(p, \textbf{y})} {\partial p} =  -\frac{n_1}{np}  + \frac{n_0}{n(1-p)})
+\]</div>
+<p>Then, we set the derivative to 0 and solve for the minimizing value <span class="math notranslate nohighlight">\(\hat{p}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+0 &amp;= -\frac{n_1}{n{\hat{p}}}  + \frac{n_0}{n(1-{\hat{p}})} \\
+0 &amp;= - \hat{p}(1-\hat{p}) \frac{n_1}{\hat{p}}  + \hat{p}(1-\hat{p}) \frac{n_0}{(1-{\hat{p}})}\\ 
+{n_1} (1-\hat{p})  &amp; = {n_0} \hat{p}\\
+\hat{p}  &amp; = \frac{n_1}{n}
+\end{aligned}
+\end{split}\]</div>
+<p>(The final equation results from noting that <span class="math notranslate nohighlight">\(n_0 + n_1 = n\)</span>.)</p>
+<p>To fit a more complex model based on the logistic function, then we substitute <span class="math notranslate nohighlight">\( \sigma(\theta_0 + \theta_1x) \)</span> for <span class="math notranslate nohighlight">\( p \)</span>. And, we write logistic loss for the logistic model as follows,</p>
+<div class="math notranslate nohighlight">
+\[ 
+{\ell}(\sigma(\theta_0 + \theta_1x), y) =  ~ y \ell(\sigma(\theta_0 + \theta_1x), y) + 
+(1-y)\ell(\sigma(\theta_0 + \theta_1x), 1-y)             
+\]</div>
+<p>Averaging the loss over the data, we arrive at:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+L(\theta_0, \theta_1,\textbf{x}, \textbf{y}) =  \frac{1}{n} \sum_i  &amp; - y_i 
+ \log(\sigma(\theta_0 + \theta_1x_i)) \\
+ &amp; - (1 - y_i) \log (1 - \sigma(\theta_0 + \theta_1x_i))
+\end{aligned}
+\end{split}\]</div>
+<p>Unlike with squared loss, there is no closed form solution to this loss function so iterative methods like gradient descent (see <a class="reference internal" href="../20/gd_intro.html#ch-optimization"><span class="std std-numref">Chapter 20</span></a>) are typically used to minimize the average loss with respect to <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span> over the data. Also, we don’t use squared error loss for logistic models because the average squared error is non-convex which makes it hard to optimize.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Logistic loss is also called, <em>log loss</em> and <em>cross-entropy loss</em>.
+Another name for it is the <em>negative log-likelihood</em>. This name refers to the technique of fitting models using the likelihood that a model produced our data. We do not go into the connections between these alternative names here.</p>
 </div>
-<p>Noticing the large cluster of made shots close to the basket and the smaller cluster of missed shots further from the basket, we expect that a logistic model fitted on this data might look like:</p>
-<div class="cell tag_hide-input docutils container">
+<p>Fitting the logistic model (with the log-odds loss) is called <em>logistic regression</em>. Logisitc regression isn’t technically a linear model but instead a generalized linear model (a linear model with a non-linear transformation).</p>
+<div class="section" id="fitting-a-logistic-model">
+<h2><span class="section-number">19.3.1. </span>Fitting a Logistic Model<a class="headerlink" href="#fitting-a-logistic-model" title="Permalink to this headline">¶</a></h2>
+<p>We can fit logistic models with <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>. The API is the same as for fitting linear models by least squares, so we already know how to use it.  First, we import the logistic regression module, and then we set up the regression problem with outcome <code class="docutils literal notranslate"><span class="pre">y</span></code> and covariates <code class="docutils literal notranslate"><span class="pre">X</span></code> (notice that we import it from the linear models module):</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">expit</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
 
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;shot_distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;shot_made&#39;</span><span class="p">,</span>
-           <span class="n">data</span><span class="o">=</span><span class="n">lebron</span><span class="p">,</span>
-           <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-           <span class="n">y_jitter</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-           <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
+<span class="n">trees</span><span class="p">[</span><span class="s1">&#39;log_diam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">])</span> 
+<span class="n">X</span> <span class="o">=</span> <span class="n">trees</span><span class="p">[[</span><span class="s1">&#39;log_diam&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
-<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">ys</span> <span class="o">=</span> <span class="n">expit</span><span class="p">(</span><span class="o">-</span><span class="mf">0.15</span> <span class="o">*</span> <span class="p">(</span><span class="n">xs</span> <span class="o">-</span> <span class="mi">15</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Logistic model&#39;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Possible logistic model fit&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Distance from Basket (ft)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Shot Made&#39;</span><span class="p">);</span>
+<span class="n">lr_model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lbfgs&quot;</span><span class="p">)</span>
+<span class="n">lr_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/classification_cost_6_0.png" src="../../_images/classification_cost_6_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LogisticRegression()
+</pre></div>
 </div>
 </div>
-<p>Although we can use the mean squared error loss function as we have for linear regression, it is non-convex for a logistic model and thus difficult to optimize.</p>
-<div class="section" id="cross-entropy-loss">
-<h2><span class="section-number">19.3.1. </span>Cross-Entropy Loss<a class="headerlink" href="#cross-entropy-loss" title="Permalink to this headline">¶</a></h2>
-<p>Instead of the mean squared error, we use the <strong>cross-entropy loss</strong>. Let <span class="math notranslate nohighlight">\( \textbf{X} \)</span> represent the <span class="math notranslate nohighlight">\( n \times p \)</span> input data matrix, <span class="math notranslate nohighlight">\( \textbf{y} \)</span> the vector of observed data values, and <span class="math notranslate nohighlight">\( f_\boldsymbol{\theta}(\textbf{x}) \)</span> the logistic model. <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> contains the current parameter values. Using this notation, the average cross-entropy loss is defined as:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-L(\boldsymbol{\theta}, \textbf{X}, \textbf{y}) = \frac{1}{n} \sum_i \left(- y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) \right)
-\end{aligned}
-\]</div>
-<p>You may observe that as usual we take the mean loss over each point in our dataset. The inner expression in the above summation represents the loss at one data point <span class="math notranslate nohighlight">\((\textbf{X}_i, y_i)\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-\begin{aligned}
-\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i) = - y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) )
-\end{aligned}
-\]</div>
-<p>Recall that each <span class="math notranslate nohighlight">\( y_i \)</span> is either 0 or 1 in our dataset. If <span class="math notranslate nohighlight">\( y_i = 0 \)</span>, the first term in the loss is zero. If <span class="math notranslate nohighlight">\( y_i = 1 \)</span>, the second term in the loss is zero. Thus, for each point in our dataset, only one term of the cross-entropy loss contributes to the overall loss.</p>
-<p>Suppose <span class="math notranslate nohighlight">\( y_i = 0 \)</span> and our predicted probability <span class="math notranslate nohighlight">\( f_\boldsymbol{\theta}(\textbf{X}_i) = 0 \)</span>—our model is completely correct. The loss for this point will be:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\ell(\boldsymbol{\theta}, \textbf{X}_i, y_i)
-&amp;= - y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) ) \\
-&amp;= - 0 - (1 - 0) \ln (1 - 0 ) \\
-&amp;= - \ln (1) \\
-&amp;= 0
-\end{aligned}
-\end{split}\]</div>
-<p>As expected, the loss for a correct prediction is <span class="math notranslate nohighlight">\( 0 \)</span>. You may verify that the further the predicted probability is from the true value, the greater the loss.</p>
-<p>Minimizing the overall cross-entropy loss requires the model <span class="math notranslate nohighlight">\( f_\boldsymbol{\theta}(\textbf{x}) \)</span> to make the most accurate predictions it can. Conveniently, this loss function is convex, making gradient descent a useful choice for optimization.</p>
 </div>
-<div class="section" id="gradient-of-the-cross-entropy-loss">
-<h2><span class="section-number">19.3.2. </span>Gradient of the Cross-Entropy Loss<a class="headerlink" href="#gradient-of-the-cross-entropy-loss" title="Permalink to this headline">¶</a></h2>
-<p>In order to run gradient descent on a model’s cross-entropy loss we must calculate the gradient of the loss function. First, we compute the derivative of the sigmoid function since we’ll use it in our gradient calculation.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\sigma(t) &amp;= \frac{1}{1 + e^{-t}} \\
-\sigma'(t) &amp;= \frac{e^{-t}}{(1 + e^{-t})^2} \\
-\sigma'(t) &amp;= \frac{1}{1 + e^{-t}} \cdot \left(1 - \frac{1}{1 + e^{-t}} \right) \\
-\sigma'(t) &amp;= \sigma(t) (1 - \sigma(t))
-\end{aligned}
-\end{split}\]</div>
-<p>The derivative of the sigmoid function can be conveniently expressed in terms of the sigmoid function itself.</p>
-<p>As a shorthand, we define <span class="math notranslate nohighlight">\( \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \)</span>. We will soon need the gradient of <span class="math notranslate nohighlight">\( \sigma_i \)</span> with respect to the vector <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span> so we will derive it now using a straightforward application of the chain rule.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\nabla_{\boldsymbol{\theta}} \sigma_i
-&amp;= \nabla_{\boldsymbol{\theta}} \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \\
-&amp;= \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) (1 - \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}))  \nabla_{\boldsymbol{\theta}} (\textbf{X}_i \cdot \boldsymbol{\theta}) \\
-&amp;= \sigma_i (1 - \sigma_i) \textbf{X}_i 
-\end{aligned}
-\end{split}\]</div>
-<p>Now, we derive the gradient of the cross-entropy loss with respect to the model parameters <span class="math notranslate nohighlight">\( \boldsymbol{\theta} \)</span>. In the derivation below, we let <span class="math notranslate nohighlight">\( \sigma_i = f_\boldsymbol{\theta}(\textbf{X}_i) = \sigma(\textbf{X}_i \cdot \boldsymbol{\theta}) \)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
-&amp;= \frac{1}{n} \sum_i \left(- y_i \ln (f_\boldsymbol{\theta}(\textbf{X}_i)) - (1 - y_i) \ln (1 - f_\boldsymbol{\theta}(\textbf{X}_i) \right) \\
-&amp;= \frac{1}{n} \sum_i \left(- y_i \ln \sigma_i - (1 - y_i) \ln (1 - \sigma_i) \right) \\
-\nabla_{\boldsymbol{\theta}} L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
-&amp;= \frac{1}{n} \sum_i \left(
-    - \frac{y_i}{\sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i
-    + \frac{1 - y_i}{1 - \sigma_i} \nabla_{\boldsymbol{\theta}} \sigma_i \right) \\
-&amp;= - \frac{1}{n} \sum_i \left(
-    \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-\right) \nabla_{\boldsymbol{\theta}} \sigma_i \\
-&amp;= - \frac{1}{n} \sum_i \left(
-    \frac{y_i}{\sigma_i} - \frac{1 - y_i}{1 - \sigma_i}
-\right) \sigma_i (1 - \sigma_i) \textbf{X}_i \\
-&amp;= - \frac{1}{n} \sum_i \left(
-    y_i - \sigma_i
-\right) \textbf{X}_i \\
-\end{aligned}
-\end{split}\]</div>
-<p>The surprisingly simple gradient expression allows us to fit a logistic model to the cross-entropy loss using gradient descent:</p>
-<div class="math notranslate nohighlight">
-\[ \hat{\boldsymbol{\theta}} = \displaystyle\arg \min_{\substack{\boldsymbol{\theta}}}  L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})\]</div>
-<p>Section 17.6 delves into deriving update formulas for batch, stochastic, and mini-batch gradient descent.</p>
+<p>We can examine the intercept and coefficient for diameter:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_model</span><span class="o">.</span><span class="n">coef_</span>
+</pre></div>
 </div>
-<div class="section" id="summary">
-<h2><span class="section-number">19.3.3. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Since the cross-entropy loss function is convex, we minimize it using gradient descent to fit logistic models to data. We now have the necessary components of logistic regression: the model, loss function, and minimization procedure. In Section 17.5, we take a closer look at why we use average cross-entropy loss for logistic regression.</p>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[3.04]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_model</span><span class="o">.</span><span class="n">intercept_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-7.39])
+</pre></div>
+</div>
+</div>
+</div>
+<p>When making a prediction the <code class="docutils literal notranslate"><span class="pre">predict</span></code> function returns the predicted (most likely class), and  the <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code> returns the predicted probability. For a tree with diameter 6, we expect the prediction to be 0 (meaning standing) with a high probability. Let’s check:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">6</span><span class="p">)]]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">6</span><span class="p">)]]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.87, 0.13]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">7.39</span> <span class="o">-</span> <span class="p">(</span><span class="mf">3.04</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">6</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.12531303145932227
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is the fitted logistic regression curve that we added to the earlier plot of probabilities. We might want to see if including the strength of the storm improves the model. To do this, we follow the same fitting procedure to fit a multiple logistic regression.</p>
+<p>When we fit a logistic regression, we are fitting a model to observed proportions, but we want to make classifications based on the predicted probabilities/proportions. Remember, this was our original classification problem. We address it next.</p>
 </div>
 </div>
 
@@ -1608,17 +1564,17 @@ L(\boldsymbol{\theta}, \textbf{X}, \textbf{y})
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="classification_log_model.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="class_log_model.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">19.2. </span>The Logistic Model</p>
+            <p class="prev-next-title"><span class="section-number">19.2. </span>Modeling Proportions (and Probabilities)</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="classification_log_reg.html" title="next page">
+    <a class='right-next' id="next-link" href="class_dr.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">19.4. </span>Using Logistic Regression</p>
+        <p class="prev-next-title"><span class="section-number">19.4. </span>Interpreting the Probabilities for Classification</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
