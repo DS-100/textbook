@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>19.1. Modeling and Classification &#8212; Learning Data Science</title>
+    <title>19.2. Modeling and Classification &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -55,8 +55,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="19.2. Modeling Proportions (and Probabilities)" href="class_log_model.html" />
-    <link rel="prev" title="19. Classification" href="class_intro.html" />
+    <link rel="next" title="19.3. Modeling Proportions (and Probabilities)" href="class_log_model.html" />
+    <link rel="prev" title="19.1. Example: Wind Damaged Trees" href="class_example.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -932,29 +932,34 @@
    </i>
   </label>
   <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="class_example.html">
+     19.1. Example: Wind Damaged Trees
+    </a>
+   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     19.1. Modeling and Classification
+     19.2. Modeling and Classification
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="class_log_model.html">
-     19.2. Modeling Proportions (and Probabilities)
+     19.3. Modeling Proportions (and Probabilities)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="class_loss.html">
-     19.3. A Loss Function for the Logistic Model
+     19.4. A Loss Function for the Logistic Model
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="class_dr.html">
-     19.4. Interpreting the Probabilities for Classification
+     19.5. From Probabilities to Classification
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="class_summary.html">
-     19.5. Summary
+     19.6. Summary
     </a>
    </li>
   </ul>
@@ -1324,10 +1329,10 @@
               <div>
                 
   <div class="section" id="modeling-and-classification">
-<h1><span class="section-number">19.1. </span>Modeling and Classification<a class="headerlink" href="#modeling-and-classification" title="Permalink to this headline">¶</a></h1>
-<p>The modeling task we face is to explain the susceptibility of trees to windthrow (windthrow happens when a tree is uprooted by wind).
-Another way of putting it is that we need to build a model for a two-level nominal feature, fallen or standing. When the response variable is nominal, this modeling task is called <em>classification</em>, and in the case when there are only two levels, it is called <em>binary classification</em>.</p>
-<p>In binary classification, we want to track how often we predict the correct category.  A count of how many correct predictions we make is sometimes called the <em>zero-one error</em>. Here, the loss function takes on one of two possible values: one when an incorrect prediction is made and zero for a correct prediction. If <span class="math notranslate nohighlight">\( y \)</span> is the observed value and <span class="math notranslate nohighlight">\( \theta \)</span> is the prediction, then we can express this loss function as follows:</p>
+<h1><span class="section-number">19.2. </span>Modeling and Classification<a class="headerlink" href="#modeling-and-classification" title="Permalink to this headline">¶</a></h1>
+<p>The modeling task we face is to explain the susceptibility of trees to windthrow.
+Another way of putting it is that we need to build a model for a two-level nominal feature, fallen or standing. When the response variable is nominal, this modeling task is called <em>classification</em>, and in the case when there are only two levels, we call it <em>binary classification</em>.</p>
+<p>In classification, we want to track how often we predict the correct category.  A count of the correct predictions is sometimes called the <em>zero-one error</em> because the loss function takes on one of two possible values: one when an incorrect prediction is made and zero for a correct prediction. If <span class="math notranslate nohighlight">\( y \)</span> is the observed value and <span class="math notranslate nohighlight">\( \theta \)</span> is the prediction, then we can express this loss function as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned} 
@@ -1342,11 +1347,11 @@ Another way of putting it is that we need to build a model for a two-level nomin
 \[\begin{split}
 \begin{aligned}
 L(\theta, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^n {\ell}(\theta, y) \\
-  &amp;= \frac{\# \text{ incorrect predictions}}{n} 
+  &amp;= \frac{\# \text{ mismatches}}{n} 
 \end{aligned}
 \end{split}\]</div>
-<p>In the case of a constant model (see <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>), the minimizing value for <span class="math notranslate nohighlight">\(\theta\)</span> must be one of the two possible categories. If it’s not, then all of our predictions are incorrect and the average loss is 1. Of the two possibilities, the most prevalent gives the smallest average loss, which is the proportion of the less common category.</p>
-<p>In the case of the black spruce, we have the following proportions of standing and fallen:</p>
+<p>In the case of a constant model (see <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>), the minimizing value for <span class="math notranslate nohighlight">\(\theta\)</span> must be one of the two possible categories. For any other value, all of our predictions are incorrect and the average loss is 1. Of the two possibilities, the most prevalent gives the smallest average loss.</p>
+<p>In the case of the black spruce, we have the following proportions of standing and fallen trees:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
@@ -1385,7 +1390,7 @@ Name: status, dtype: float64
 </div>
 </div>
 </div>
-<p>Typically when we want to model a relationship, we begin by making a scatter plot of the outcome variable against explanatory variable(s) (see <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>). But, now our outcome variable is a nominal feature. Again, the 0-1 representation of this feature is convenient for plotting. Below we plot the tree status against diameter, but we add a small amount of random noise to the status to help us see the density of 0 and 1 values at each diameter. As before, we jitter the diameter values and adjust the opacity of the markers to reduce over-plotting. We also add a horizontal line at the proportion of fallen trees:</p>
+<p>Typically when we want to model a relationship, we begin by making a scatter plot of the outcome variable against explanatory variable(s) (see <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>). But, now our outcome variable is a nominal feature. Again, the 0-1 representation of this feature is convenient for plotting. Below we plot the tree status against diameter, but we add a small amount of random noise to the status to help us see the density of 0 and 1 values at each diameter. As before, we jitter the diameter values too and adjust the opacity of the markers to reduce over-plotting. We also add a horizontal line at the proportion of fallen trees:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">jitter</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">],</span> <span class="n">amt</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> 
@@ -1404,8 +1409,8 @@ Name: status, dtype: float64
 <div class="cell_output docutils container">
 <img alt="../../_images/class_pred_16_0.svg" src="../../_images/class_pred_16_0.svg" /></div>
 </div>
-<p>This scatter plot also shows that the smaller trees are more likely to remain standing than the larger trees. Notice that the average status for trees (0.35) essentially fits a constant model to the response variable. If we consider tree diameter as an explanatory feature, we should be able to improve the model.</p>
-<p>A starting place might be to compute a constant (the proportion of fallen trees) for different diameters. The following block of code divides the tree diameter into intervals and computes the proportion of fallen trees in each bin.</p>
+<p>This scatter plot shows that the smaller trees are more likely to be standing than the larger trees. Notice that the average status for trees (0.35) essentially fits a constant model to the response variable. If we consider tree diameter as an explanatory feature, we should be able to improve the model.</p>
+<p>A starting place might be to compute a constant (the proportion of fallen trees) for different diameters. The following block of code divides tree diameter into intervals and computes the proportion of fallen trees in each bin.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">splits</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
@@ -1424,7 +1429,7 @@ Name: status, dtype: float64
 </div>
 </div>
 </div>
-<p>Next, we plot these proportions against tree diameter, and reflect the number of trees in each bin by the size of the marker.</p>
+<p>We can plot these proportions against tree diameter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tree_bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
@@ -1439,7 +1444,7 @@ Name: status, dtype: float64
 <div class="cell_output docutils container">
 <img alt="../../_images/class_pred_21_0.svg" src="../../_images/class_pred_21_0.svg" /></div>
 </div>
-<p>We might use these proportions in our model. For example, if we a tree is 6 cm in diameter, we would classify it as standing, whereas for a 20 cm tree, our classification would be fallen. A natural starting place for binary classification is to model the observed proportions and then use these proportions to classify. We do this next.</p>
+<p>The size of the markers reflects the number of trees in the diameter bin. We can use these proportions to improve our model. For example, for a tree is 6 cm in diameter, we would classify it as standing, whereas for a 20 cm tree, our classification would be fallen. A natural starting place for binary classification is to model the observed proportions and then use these proportions to classify. We develop a model for the proportions next.</p>
 </div>
 
     <script type="text/x-thebe-config">
@@ -1467,17 +1472,17 @@ Name: status, dtype: float64
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="class_intro.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="class_example.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">19. </span>Classification</p>
+            <p class="prev-next-title"><span class="section-number">19.1. </span>Example: Wind Damaged Trees</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="class_log_model.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">19.2. </span>Modeling Proportions (and Probabilities)</p>
+        <p class="prev-next-title"><span class="section-number">19.3. </span>Modeling Proportions (and Probabilities)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
