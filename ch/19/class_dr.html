@@ -1234,27 +1234,54 @@
             
               <div>
                 
-  <div class="section" id="from-probabilities-to-classification">
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">splits</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
+<span class="n">tree_bins</span> <span class="o">=</span> <span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">],</span> <span class="n">splits</span><span class="p">))</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="s1">&#39;proportion&#39;</span><span class="p">})</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">right</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="from-probabilities-to-classification">
 <h1><span class="section-number">19.5. </span>From Probabilities to Classification<a class="headerlink" href="#from-probabilities-to-classification" title="Permalink to this headline">¶</a></h1>
 <p>We started this chapter by presenting a binary classification problem where we want to model a nominal response variable. At this point, we have used logistic regression to model proportions or probabilities, and we’re now ready to return to the original problem.
 We use the predicted probabilities to classify records. For our example, this means that for a tree of a particular diameter, we use the fitted coefficients from the logistic regression to estimate the chance it is fallen. If the chance is high, we classify a tree as fallen and otherwise we classify it as standing. But, we need to choose a threshold for making this <em>decision rule</em>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> logistic regression model’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> function implements the basic decision rule: predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 + \hat{\theta}_1 x)&gt; 0.5\)</span> otherwise predict 0. We confirm this with:</p>
-<div class="cell docutils container">
+<p>The <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> logistic regression model’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> function implements the basic decision rule: predict <code class="docutils literal notranslate"><span class="pre">1</span></code> if the predicted probability <span class="math notranslate nohighlight">\( p &gt; 0.5 \)</span>. Otherwise, predict 0. We’ve overlain this decision rule on top of the model predictions below as a dotted line:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">==</span> 
-       <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_plt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">50</span><span class="p">)</span> <span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p_hats</span> <span class="o">=</span> <span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_plt</span><span class="p">)</span>
+<span class="n">X_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">X_plt</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tree_bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span>
+                 <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;diameter&#39;</span><span class="p">:</span><span class="s2">&quot;Tree Diameter (cm)&quot;</span><span class="p">,</span>
+                         <span class="s1">&#39;proportion&#39;</span><span class="p">:</span><span class="s2">&quot;Proportion Down&quot;</span><span class="p">},</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_orig</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">p_hats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+                         <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+                         <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Model Predictions&#39;</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_orig</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_orig</span><span class="p">)),</span>
+                         <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dash</span><span class="o">=</span><span class="s1">&#39;dashdot&#39;</span><span class="p">),</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Decision rule&#39;</span><span class="p">))</span>
+
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
-</pre></div>
+<img alt="../../_images/class_dr_7_0.svg" src="../../_images/class_dr_7_0.svg" /></div>
 </div>
-</div>
-</div>
-<p>In this section, we consider a more general decision rule. For some choice of <span class="math notranslate nohighlight">\(\tau\)</span>,
-predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 + \hat{\theta}_1 x)&gt; \tau\)</span> otherwise predict 0.</p>
-<p>Choosing an appropriate value for <span class="math notranslate nohighlight">\(\tau\)</span> depends on our goals. Suppose we want to maximize accuracy.  The <em>accuracy</em> of a classifier is the fraction of correct predictions.  We can compute the accuracy for different thresholds:</p>
+<p>In this section, we consider a more general decision rule. For some choice of <span class="math notranslate nohighlight">\(\tau\)</span>, predict 1 if the model’s predicted probability <span class="math notranslate nohighlight">\( p &gt; \tau \)</span>, otherwise predict 0. By default, <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> sets <span class="math notranslate nohighlight">\( \tau = 0.5 \)</span>. Now, we’ll explore what happens when <span class="math notranslate nohighlight">\( \tau \)</span> is set to other values.</p>
+<p>Choosing an appropriate value for <span class="math notranslate nohighlight">\(\tau\)</span> depends on our goals. Suppose we want to maximize accuracy. The <em>accuracy</em> of a classifier is the fraction of correct predictions. We can compute the accuracy for different thresholds, or different <span class="math notranslate nohighlight">\( \tau \)</span> values:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">threshold_predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span> 
@@ -1269,20 +1296,22 @@ predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 
 </div>
 </div>
 </div>
-<p>Rather than just maximizing accuracy with respect to <span class="math notranslate nohighlight">\(\tau\)</span>, we plot the accuracy to get a sense of how it changes with <span class="math notranslate nohighlight">\(\tau\)</span>:</p>
+<p>To understand how accuracy changes with respect to <span class="math notranslate nohighlight">\(\tau\)</span>, we’ll make a plot:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">accs</span><span class="p">,</span> 
-              <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">accs</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;x = 0.5&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">))</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Threshold&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Accuracy&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_dr_10_0.svg" src="../../_images/class_dr_10_0.svg" /></div>
+<img alt="../../_images/class_dr_11_0.svg" src="../../_images/class_dr_11_0.svg" /></div>
 </div>
-<p>Notice that the threshold with the highest accuracy is not necessarily at 0.5. (In practice we should use cross validation to select the threshold like in <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a>). The “best” threshold be a value other than 0.5 for many reasons, but a common one is <em>class imbalance</em>, where one category is more frequent than another. When this happens, then we do better to classify a record as belonging to the more frequently observed category. We have seen this phenomenon when fitting the constant model. This explains why accuracy alone is often not how we want to judge a model. Instead, we want to differentiate between the types of correct and incorrect classifications.</p>
+<p>Notice that the threshold with the highest accuracy isn’t exactly at 0.5. In practice we should use cross validation to select the threshold like in <a class="reference internal" href="../16/ms_intro.html#ch-risk"><span class="std std-numref">Chapter 16</span></a>.
+The threshold that maximizes accuracy could be a value other than 0.5 for many reasons, but a common one is <em>class imbalance</em>, where one category is more frequent than another. Under class imbalance, a fitted model more often classifies a record as belonging to the more frequently observed category. We have seen this phenomenon when fitting the constant model. This explains why accuracy alone is often not how we want to judge a model. Instead, we want to differentiate between the types of correct and incorrect classifications.</p>
 <div class="section" id="the-confusion-matrix">
 <h2><span class="section-number">19.5.1. </span>The Confusion Matrix<a class="headerlink" href="#the-confusion-matrix" title="Permalink to this headline">¶</a></h2>
 <p>A convenient way to visualize errors in a binary classification is to look at the confusion matrix.  The confusion matrix compares what the model predicts with the actual outcomes. There are two types of error in this situation:</p>
@@ -1291,7 +1320,7 @@ predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 
 <li><p><em>False-Negatives</em>: When the actual class is 1 (true) but the model predicts 0 (false).</p></li>
 </ol>
 <p>Ideally, we would like to minimize both kinds of errors, but we often need to manage the balance between these two sources.</p>
-<p>Scikit-learn has a function to compute the confusion matrix:</p>
+<p>Scikit-learn has a function to compute and plot the confusion matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
@@ -1330,13 +1359,14 @@ predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_dr_15_0.svg" src="../../_images/class_dr_15_0.svg" /></div>
+<img alt="../../_images/class_dr_16_0.svg" src="../../_images/class_dr_16_0.svg" /></div>
 </div>
 <p>It is usually more informative to compare rates, rather than counts. Next, we describe different rates and when we might prefer to prioritize one of the other.</p>
 </div>
 <div class="section" id="precision-vs-recall">
 <h2><span class="section-number">19.5.2. </span>Precision vs Recall<a class="headerlink" href="#precision-vs-recall" title="Permalink to this headline">¶</a></h2>
-<p>In some settings, there might be a much higher cost to missing positive cases.  For example, if we are building a tumor classifier we want to make sure that we don’t miss any malignant tumors. So, we do not mind classifying benign a tumor as malignant because further study would be conducted by a pathologist to verify the malignant classification. In this case, we want to have a high true positive rate among the records that are actually positive. The rate is called <em>sensitivity</em> and also <em>recall</em>,</p>
+<p>In some settings, there might be a much higher cost to missing positive cases.  For example, if we are building a classifier to identify tumors,
+we want to make sure that we don’t miss any malignant tumors. Conversely, we’re less concerned about classifying a benign tumor as malignant because a pathologist would still need to take a closer look to verify the malignant classification. In this case, we want to have a high true positive rate among the records that are actually positive. The rate is called <em>sensitivity</em>, or <em>recall</em>:</p>
 <div class="math notranslate nohighlight">
 \[
 \text{Recall} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}} = \frac{\text{True Positives}}{\text{Actually True}}
@@ -1352,16 +1382,16 @@ predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
-<span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> 
-                                                <span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">metrics</span><span class="o">.</span><span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>To see how precision and recall relate, we plot them both against the threshold:</p>
-<div class="cell docutils container">
+<p>To see how precision and recall relate, we plot them both against the threshold <span class="math notranslate nohighlight">\( \tau \)</span>:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">))</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Precision&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">precision</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Recall&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">recall</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Threshold&quot;</span><span class="p">)</span>
@@ -1371,12 +1401,12 @@ predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_dr_22_0.svg" src="../../_images/class_dr_22_0.svg" /></div>
+<img alt="../../_images/class_dr_23_0.svg" src="../../_images/class_dr_23_0.svg" /></div>
 </div>
-<p>If we want to ensure that at least 75% of the fallen trees are classified as fallen, we can find the threshold where this occurs:</p>
+<p>Using precision and recall gives us more control over what kinds of errors matter. For example, let’s suppose we want to ensure that at least 75% of the fallen trees are classified as fallen. We can find the threshold where this occurs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fall75_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">recall</span> <span class="o">&gt;=</span> <span class="mf">0.75</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fall75_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">recall</span> <span class="o">&gt;=</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
 <span class="n">fall75_threshold</span> <span class="o">=</span> <span class="n">threshold</span><span class="p">[</span><span class="n">fall75_ind</span><span class="p">]</span>
 <span class="n">fall75_precision</span> <span class="o">=</span> <span class="n">precision</span><span class="p">[</span><span class="n">fall75_ind</span><span class="p">]</span>
@@ -1387,29 +1417,30 @@ predict 1 if <span class="math notranslate nohighlight">\(\sigma(\hat{\theta}_0 
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Threshold: &quot;</span><span class="p">,</span> <span class="n">fall75_threshold</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Precision: &quot;</span><span class="p">,</span> <span class="n">fall75_precision</span><span class="p">,</span>
-     <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Recall: &quot;</span><span class="p">,</span> <span class="n">fall75_recall</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Threshold: </span><span class="si">{</span><span class="n">fall75_threshold</span><span class="si">:</span><span class="s1">.2</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Precision: </span><span class="si">{</span><span class="n">fall75_precision</span><span class="si">:</span><span class="s1">.2</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Recall:    </span><span class="si">{</span><span class="n">fall75_recall</span><span class="si">:</span><span class="s1">.2</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Threshold:  0.33058005233759363 
-Precision:  0.5949367088607594 
-Recall:  0.8068669527896996
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Threshold: 0.33
+Precision: 0.59
+Recall:    0.81
 </pre></div>
 </div>
 </div>
 </div>
-<p>We find that about 41% (1- precision) of the trees that we classify as fallen are actually standing. In addition, we find the fraction of trees below this threshold to be:</p>
+<p>We find that about 41% (1 - precision) of the trees that we classify as fallen are actually standing. In addition, we find the fraction of trees below this threshold to be:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Proportion of samples below threshold:&quot;</span><span class="p">,</span> 
-      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">fall75_thresh</span><span class="p">)</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">fall75_threshold</span><span class="p">)</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Proporition of samples below threshold: 0.52
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Proportion of samples below threshold: 0.52
 </pre></div>
 </div>
 </div>
@@ -1422,8 +1453,8 @@ Recall:  0.8068669527896996
 <p>The specificity for our threshold is:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">act_neg</span> <span class="o">=</span> <span class="n">y</span> <span class="o">==</span><span class="mi">0</span>
-<span class="n">true_neg</span> <span class="o">=</span> <span class="p">(</span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">fall75_thresh</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">act_neg</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">act_neg</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">true_neg</span> <span class="o">=</span> <span class="p">(</span><span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">fall75_threshold</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">act_neg</span>
 </pre></div>
 </div>
 </div>
@@ -1441,7 +1472,7 @@ Recall:  0.8068669527896996
 </div>
 </div>
 <p>In other words, 70% of the trees classified as standing are actually standing.</p>
-<p>For a simple 2 by 2 table of counts, there are many different ways to look at it. Ideally, we want all of these rates to be high. This happens when the data fall entirely along the diagonal for the table and we have only true negatives and true positives. Unfortunately, that doesn’t usually happen. In our example, trees of the same diameter include a mix of fallen and standing so we can’t perfectly classify trees based on their diameter. In practice, when we choose a threshold, we need to consider the context and balance these notions of precision and recall.</p>
+<p>As we’ve seen, there are several ways to use the 2 by 2 confusion matrix. Ideally, we want accuracy, precision, and recall to all be high. This happens when the most predictions fall along the diagonal for the table, which also means and we have mostly true negatives and true positives. Unfortunately, in most scenarios our models will have some amount of error. In our example, trees of the same diameter include a mix of fallen and standing so we can’t perfectly classify trees based on their diameter. In practice, when data scientists choose a threshold, they need to consider their context to decide whether to prioritize precision or recall.</p>
 </div>
 </div>
 

@@ -1198,8 +1198,8 @@
                 
   <div class="section" id="example-wind-damaged-trees">
 <h1><span class="section-number">19.1. </span>Example: Wind Damaged Trees<a class="headerlink" href="#example-wind-damaged-trees" title="Permalink to this headline">¶</a></h1>
-<p>In 1999, a huge storm with winds over 90 mph damaged millions of trees in the <a class="reference external" href="https://www.fs.usda.gov/detail/superior/specialplaces/?cid=fseprd555184">Boundary Waters Canoe Area Wilderness</a> (BWCAW), which has the largest tract of virgin forest in the eastern US. In an effort to understand the susceptibility of trees to wind damage, <a class="reference external" href="https://www.proquest.com/docview/305463532?pq-origsite=gscholar&amp;fromopenview=true">Rich</a> carried out a ground survey of the BWCAW. Researchers have used this dataset to model windthrow–the uprooting of trees in strong winds.</p>
-<p>The population under study are the trees in the BWCAW. The access frame is a transect, a straight line that cuts through the natural landscape, beginning close to a lake and traveling orthogonal to the gradient of the land for 250-400 meters. Along these transects, surveyors stop every 25 meters and examine a 5x5 meter plot. At each plot, trees were counted, categorized as blown-down or standing, measured in diameter at 6 ft from the ground, and their species recorded.</p>
+<p>In 1999, a huge storm with winds over 90 mph damaged millions of trees in the <a class="reference external" href="https://www.fs.usda.gov/detail/superior/specialplaces/?cid=fseprd555184">Boundary Waters Canoe Area Wilderness</a> (BWCAW), which has the largest tract of virgin forest in the eastern US. In an effort to understand the susceptibility of trees to wind damage, a researcher named <a class="reference external" href="https://www.proquest.com/docview/305463532?pq-origsite=gscholar&amp;fromopenview=true">Roy Lawrence Rich</a> carried out a ground survey of the BWCAW. In the years following this study, other researchers used this dataset to model windthrow–the uprooting of trees in strong winds.</p>
+<p>The population under study are the trees in the BWCAW. The access frame is a <em>transect</em>, a straight line that cuts through the natural landscape, beginning close to a lake and traveling orthogonal to the gradient of the land for 250-400 meters. Along these transects, surveyors stop every 25 meters and examine a 5x5 meter plot. At each plot, trees were counted, categorized as blown-down or standing, measured in diameter at 6 ft from the ground, and their species recorded.</p>
 <p>Sampling protocols like this are common for studying natural resources. In the BWCAW, over 80% of the land in the region is within 500 meters of a lake so the access frame nearly covers the population. The study took place the 2000 and 2001 summers, and no other natural disasters happened between the 1999 storm and when the data were collected.</p>
 <p>Measurements were collected on over 3600 trees, but in this example, we examine just the black spruce. There are over 650 of them. We read these data in:</p>
 <div class="cell docutils container">
@@ -1348,7 +1348,7 @@
 </div></div></div>
 </div>
 <p>Based on the quartiles, the distribution of tree diameter seems skewed right. Let’s compare  the distribution of diameter for the standing and fallen trees with histograms:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">trees</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;status == &quot;fallen&quot; &#39;</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;diameter&quot;</span><span class="p">,</span> 
                   <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span> <span class="n">nbins</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span>
@@ -1366,38 +1366,43 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_example_9_0.svg" src="../../_images/class_example_9_0.svg" /></div>
+<img alt="../../_images/class_example_11_0.svg" src="../../_images/class_example_11_0.svg" /></div>
 </div>
 <p>The distribution of the diameter of the trees that fell in the storm is centered at 12 cm with a right skew. In comparison, the standing trees were nearly all under 10 cm in diameter with a mode at about 6 cm (only trees with a diameter of at least 5 cm are included in the study).</p>
-<p>Another feature to investigate is the strength of the storm, and we plot the storm strength against tree diameter using the symbol and marker color to distinguish the standing trees from the fallen. Since the diameter is essentially measured to. the nearest cm, many trees have the same diameter, so we add a bit of noise to the diameter values to help reduce over plotting. This technique is called <em>jittering</em>. We also adjust the opacity of the marker colors to reveal the denser regions on the plot:</p>
-<div class="cell docutils container">
+<p>Another feature to investigate is the strength of the storm, and we plot the storm strength against tree diameter using the symbol and marker color to distinguish the standing trees from the fallen. Since the diameter is essentially measured to the nearest cm, many trees have the same diameter, so we add a bit of noise to the diameter values to help reduce over plotting. This technique is called <em>jittering</em>. We also adjust the opacity of the marker colors to reveal the denser regions on the plot:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">jitter</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">amt</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">data</span> <span class="o">+</span> <span class="n">amt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">-</span> <span class="n">amt</span><span class="o">/</span><span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">data</span> <span class="o">+</span> <span class="n">amt</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">trees</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">jitter</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">],</span> <span class="n">amt</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;storm&#39;</span><span class="p">,</span> 
-                 <span class="n">color</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span>
-                 <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">trees</span><span class="p">,</span>
+                 <span class="n">x</span><span class="o">=</span><span class="n">jitter</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">],</span> <span class="n">amt</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+                 <span class="n">y</span><span class="o">=</span><span class="s1">&#39;storm&#39;</span><span class="p">,</span> 
+                 <span class="n">color</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span>
+                 <span class="n">symbol</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span>
+                 <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span>
+                 <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">opacity</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;Tree Diameter (cm)&quot;</span><span class="p">,</span>
                   <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Local Strength of Storm&quot;</span><span class="p">,</span>
-                 <span class="n">legend_title</span><span class="o">=</span><span class="s2">&quot;Tree Status&quot;</span><span class="p">)</span>
+                  <span class="n">legend_title</span><span class="o">=</span><span class="s2">&quot;Tree Status&quot;</span><span class="p">)</span>
 
 <span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_example_12_0.svg" src="../../_images/class_example_12_0.svg" /></div>
+<img alt="../../_images/class_example_14_0.svg" src="../../_images/class_example_14_0.svg" /></div>
 </div>
-<p>Both the tree diameter and the strength of the storm appear related to whether or not the tree is standing. To build a model for windthrow, the feature that we want to predict, a tree’s status, is a nominal feature. We consider how this impacts the prediction problem next.</p>
+<p>From this plot, it looks like both the tree diameter and the strength of the storm are related to windthrow: whether the tree was uprooted or left standing. Notice that windthrow, the feature we want to predict, is a nominal variable. In the next section, we’ll consider how this impacts the prediction problem.</p>
 </div>
 
     <script type="text/x-thebe-config">

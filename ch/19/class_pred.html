@@ -1180,6 +1180,24 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-constant-model">
+   19.2.1. A Constant Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#examining-the-relationship-between-size-and-windthrow">
+   19.2.2. Examining the Relationship Between Size and Windthrow
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -1192,6 +1210,24 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-constant-model">
+   19.2.1. A Constant Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#examining-the-relationship-between-size-and-windthrow">
+   19.2.2. Examining the Relationship Between Size and Windthrow
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -1200,15 +1236,17 @@
                 
   <div class="section" id="modeling-and-classification">
 <h1><span class="section-number">19.2. </span>Modeling and Classification<a class="headerlink" href="#modeling-and-classification" title="Permalink to this headline">¶</a></h1>
-<p>The modeling task we face is to explain the susceptibility of trees to windthrow.
-Another way of putting it is that we need to build a model for a two-level nominal feature, fallen or standing. When the response variable is nominal, this modeling task is called <em>classification</em>, and in the case when there are only two levels, we call it <em>binary classification</em>.</p>
-<p>In classification, we want to track how often we predict the correct category.  A count of the correct predictions is sometimes called the <em>zero-one error</em> because the loss function takes on one of two possible values: one when an incorrect prediction is made and zero for a correct prediction. If <span class="math notranslate nohighlight">\( y \)</span> is the observed value and <span class="math notranslate nohighlight">\( \theta \)</span> is the prediction, then we can express this loss function as follows:</p>
+<p>We’d like to create a model that explains the susceptibility of trees to windthrow. In other words, we need to build a model for a two-level nominal feature, fallen or standing. When the response variable is nominal, this modeling task is called <em>classification</em>. In this case there are only two levels, so this task is more specifically called <em>binary classification</em>.</p>
+<div class="section" id="a-constant-model">
+<h2><span class="section-number">19.2.1. </span>A Constant Model<a class="headerlink" href="#a-constant-model" title="Permalink to this headline">¶</a></h2>
+<p>Let’s start by considering the simplest model: a constant model that always predicts one class. We’ll use <span class="math notranslate nohighlight">\( C \)</span> to denote the constant model’s prediction. For our windthrow dataset, this model will either predict <span class="math notranslate nohighlight">\( C = \text{standing} \)</span> or <span class="math notranslate nohighlight">\( C = \text{fallen} \)</span> for every input.</p>
+<p>In classification, we want to track how often our model predicts the correct category. For now, we’ll do this simply: we’ll use a count of the correct predictions. This is sometimes called the <em>zero-one error</em> because the loss function takes on one of two possible values: 1 when an incorrect prediction is made and 0 for a correct prediction. For a given observed outcome <span class="math notranslate nohighlight">\( y_i \)</span> and prediction <span class="math notranslate nohighlight">\( C \)</span>, we can express this loss function as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned} 
-{\ell}(\theta, y) = 
-\begin{cases} 0 &amp;  &amp;\text{when }\theta \text{ matches } y\\ 
-       1 &amp;  &amp; \text{when } \theta \text{ is a mismatch for }y
+{\ell}(C, y) = 
+\begin{cases} 0 &amp;  &amp;\text{when } C \text{ matches } y\\ 
+       1 &amp;  &amp; \text{when } C \text{ is a mismatch for }y
 \end{cases}
 \end{aligned} 
 \end{split}\]</div>
@@ -1216,15 +1254,15 @@ Another way of putting it is that we need to build a model for a two-level nomin
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-L(\theta, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^n {\ell}(\theta, y) \\
+L(C, \mathbf{y}) &amp;= \frac{1}{n} \sum_{i=1}^n {\ell}(C, y) \\
   &amp;= \frac{\# \text{ mismatches}}{n} 
 \end{aligned}
 \end{split}\]</div>
-<p>In the case of a constant model (see <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>), the minimizing value for <span class="math notranslate nohighlight">\(\theta\)</span> must be one of the two possible categories. For any other value, all of our predictions are incorrect and the average loss is 1. Of the two possibilities, the most prevalent gives the smallest average loss.</p>
+<p>For the constant model (see <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a>), the model minimizes the loss when <span class="math notranslate nohighlight">\( C \)</span> is set to the most prevalent category. We encourage interested readers prove this fact as an exercise.</p>
 <p>In the case of the black spruce, we have the following proportions of standing and fallen trees:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1237,14 +1275,98 @@ Name: status, dtype: float64
 </div>
 </div>
 <p>So our prediction is that a tree stands, and the average loss for our dataset is <span class="math notranslate nohighlight">\(0.35\)</span>.</p>
-<p>This prediction is not particularly helpful or insightful. In our EDA of the trees data frame, we saw that the size of the tree is correlated with whether the tree stands or falls. Ideally we would incorporate this information into the model.</p>
-<p>For convenience, we transform the nominal feature into a numeric data type where 1 stands for a fallen tree  and 0 for standing:</p>
+<p>That said, this prediction is not particularly helpful or insightful. For example, in our EDA of the trees dataset, we saw that the size of the tree is correlated with whether the tree stands or falls. Ideally, we could incorporate this information into the model, but the constant model doesn’t let us do this. Let’s build some intuition for how we can incorporate predictors into our model.</p>
+</div>
+<div class="section" id="examining-the-relationship-between-size-and-windthrow">
+<h2><span class="section-number">19.2.2. </span>Examining the Relationship Between Size and Windthrow<a class="headerlink" href="#examining-the-relationship-between-size-and-windthrow" title="Permalink to this headline">¶</a></h2>
+<p>We want to take a closer look at how tree size is related to windthrow.
+For convenience, we transform the nominal windthrow feature into a 0-1 numeric feature where 1 stands for a fallen tree and 0 for standing:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fallen&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">trees</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>diameter</th>
+      <th>storm</th>
+      <th>status</th>
+      <th>status_0_1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>9.0</td>
+      <td>0.02</td>
+      <td>standing</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>11.0</td>
+      <td>0.03</td>
+      <td>standing</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>9.0</td>
+      <td>0.03</td>
+      <td>standing</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>656</th>
+      <td>9.0</td>
+      <td>0.94</td>
+      <td>fallen</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>657</th>
+      <td>17.0</td>
+      <td>0.94</td>
+      <td>fallen</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>658</th>
+      <td>8.0</td>
+      <td>0.98</td>
+      <td>fallen</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>659 rows × 4 columns</p>
+</div></div></div>
 </div>
 <p>This representation is useful in many ways. For example, the average of <code class="docutils literal notranslate"><span class="pre">status_0_1</span></code> is the proportion of fallen trees in the dataset.</p>
 <div class="cell docutils container">
@@ -1260,8 +1382,9 @@ Name: status, dtype: float64
 </div>
 </div>
 </div>
-<p>Typically when we want to model a relationship, we begin by making a scatter plot of the outcome variable against explanatory variable(s) (see <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>). But, now our outcome variable is a nominal feature. Again, the 0-1 representation of this feature is convenient for plotting. Below we plot the tree status against diameter, but we add a small amount of random noise to the status to help us see the density of 0 and 1 values at each diameter. As before, we jitter the diameter values too and adjust the opacity of the markers to reduce over-plotting. We also add a horizontal line at the proportion of fallen trees:</p>
-<div class="cell docutils container">
+<p>Having this 0-1 feature also lets us make a plot to show the relationship between tree diameter and windthrow. This is analogous to our process for linear regression, where we make scatter plots of the outcome variable against explanatory variable(s) (see <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>).</p>
+<p>Below we plot the tree status against diameter, but we add a small amount of random noise to the status to help us see the density of 0 and 1 values at each diameter. As before, we jitter the diameter values too and adjust the opacity of the markers to reduce over-plotting. We also add a horizontal line at the proportion of fallen trees:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">jitter</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">],</span> <span class="n">amt</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> 
                  <span class="n">y</span> <span class="o">=</span> <span class="n">jitter</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">]),</span> 
@@ -1277,44 +1400,42 @@ Name: status, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_pred_16_0.svg" src="../../_images/class_pred_16_0.svg" /></div>
+<img alt="../../_images/class_pred_20_0.svg" src="../../_images/class_pred_20_0.svg" /></div>
 </div>
 <p>This scatter plot shows that the smaller trees are more likely to be standing than the larger trees. Notice that the average status for trees (0.35) essentially fits a constant model to the response variable. If we consider tree diameter as an explanatory feature, we should be able to improve the model.</p>
-<p>A starting place might be to compute a constant (the proportion of fallen trees) for different diameters. The following block of code divides tree diameter into intervals and computes the proportion of fallen trees in each bin.</p>
+<p>A starting place might be to compute the proportion of fallen trees for different diameters. The following block of code divides tree diameter into intervals and computes the proportion of fallen trees in each bin.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">splits</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
-<span class="n">pr_split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">splits</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">ct_split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">splits</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">splits</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-    <span class="n">sub_trees</span> <span class="o">=</span> <span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">][((</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">splits</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> 
-                                     <span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">splits</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))]</span>
-    <span class="n">pr_split</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sub_trees</span><span class="p">)</span>  
-    <span class="n">ct_split</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_trees</span><span class="p">)</span> 
-    
-<span class="n">tree_bins</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;proportion&#39;</span><span class="p">:</span> <span class="n">pr_split</span><span class="p">,</span> 
-                          <span class="s1">&#39;count&#39;</span><span class="p">:</span><span class="n">ct_split</span><span class="p">,</span> <span class="s1">&#39;diameter&#39;</span><span class="p">:</span><span class="n">splits</span><span class="p">[</span><span class="mi">1</span><span class="p">:]})</span>    
+<span class="n">tree_bins</span> <span class="o">=</span> <span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">],</span> <span class="n">splits</span><span class="p">))</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="s1">&#39;proportion&#39;</span><span class="p">})</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">right</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <p>We can plot these proportions against tree diameter:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tree_bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-        <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;diameter&#39;</span><span class="p">:</span><span class="s2">&quot;Tree Diameter (cm)&quot;</span><span class="p">,</span> <span class="s1">&#39;proportion&#39;</span><span class="p">:</span><span class="s2">&quot;Proportion Down&quot;</span><span class="p">},</span>
-         <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tree_bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span>
+                 <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                 <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;diameter&#39;</span><span class="p">:</span><span class="s2">&quot;Tree Diameter (cm)&quot;</span><span class="p">,</span>
+                         <span class="s1">&#39;proportion&#39;</span><span class="p">:</span><span class="s2">&quot;Proportion Down&quot;</span><span class="p">},</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">yaxis_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">yaxis_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_pred_21_0.svg" src="../../_images/class_pred_21_0.svg" /></div>
+<img alt="../../_images/class_pred_25_0.svg" src="../../_images/class_pred_25_0.svg" /></div>
 </div>
-<p>The size of the markers reflects the number of trees in the diameter bin. We can use these proportions to improve our model. For example, for a tree is 6 cm in diameter, we would classify it as standing, whereas for a 20 cm tree, our classification would be fallen. A natural starting place for binary classification is to model the observed proportions and then use these proportions to classify. We develop a model for the proportions next.</p>
+<p>The size of the markers reflects the number of trees in the diameter bin. We can use these proportions to improve our model. For example, for a tree is 6 cm in diameter, we would classify it as standing, whereas for a 20 cm tree, our classification would be fallen. A natural starting place for binary classification is to model the observed proportions and then use these proportions to classify. Next, we’ll develop a model for these proportions.</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">

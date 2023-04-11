@@ -1195,6 +1195,11 @@
    19.3.2. Log Odds
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-a-logistic-curve">
+   19.3.3. Using a Logistic Curve
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -1225,6 +1230,11 @@
    19.3.2. Log Odds
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-a-logistic-curve">
+   19.3.3. Using a Logistic Curve
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -1236,8 +1246,10 @@
                 
   <div class="section" id="modeling-proportions-and-probabilities">
 <h1><span class="section-number">19.3. </span>Modeling Proportions (and Probabilities)<a class="headerlink" href="#modeling-proportions-and-probabilities" title="Permalink to this headline">¶</a></h1>
-<p>The relationship between tree diameter and the proportion of downed trees does not appear linear. In fact, if we fit a simple linear model to these data, we get several undesirable features.</p>
-<p>Following, the techniques of modeling from <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>, we fit a linear model of tree status to diameter:</p>
+<p>In modeling, we need to choose three things: a model, a loss function, and a method to minimize the loss on our training set. In the previous section, we chose a constant model, the 0-1 loss, and a proof to fit the model. However, the constant model doesn’t incorporate predictor variables.
+In this section, we’ll address this issue by introducing a new model called the <em>logistic regression</em> model.</p>
+<p>First, notice that the relationship between tree diameter and the proportion of downed trees does not appear linear. For demonstration, we’ll fit a simple linear model to these data to show that this model has several undesirable features.</p>
+<p>Using the techniques from <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>, we fit a linear model of tree status to diameter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
@@ -1256,7 +1268,7 @@
 </div>
 </div>
 <p>Then we add this fitted line to our scatter plot of proportions:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_plt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">50</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1269,7 +1281,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_log_model_9_0.svg" src="../../_images/class_log_model_9_0.svg" /></div>
+<img alt="../../_images/class_log_model_11_0.svg" src="../../_images/class_log_model_11_0.svg" /></div>
 </div>
 <p>Clearly, the model doesn’t fit the proportions well at all. There are several problems:</p>
 <ul class="simple">
@@ -1277,7 +1289,7 @@
 <li><p>The model doesn’t pick up the curvature in the proportions.</p></li>
 <li><p>An extreme point (such as a tree that’s 30 cm across) shifts the model to the right, away from the bulk of the data.</p></li>
 </ul>
-<p>At the very least this model should probably predict a number between zero and one. To do this, we could constrain the fitted values to be between 0 and 1. But, the other issues would not be resolved. We need a better model. Enter the logistic model.</p>
+<p>To address these issues, we’ll introduce the <em>logistic model</em>.</p>
 <div class="section" id="a-logistic-model">
 <h2><span class="section-number">19.3.1. </span>A Logistic Model<a class="headerlink" href="#a-logistic-model" title="Permalink to this headline">¶</a></h2>
 <p>The logistic model is one of the most widely used basic models for classification and a simple extension of the linear model. The <em>logistic function</em>, often called the <em>sigmoid function</em>, is defined as:</p>
@@ -1287,7 +1299,7 @@
 \]</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The <em>sigmoid</em> function is typically denoted by <span class="math notranslate nohighlight">\(\sigma(t)\)</span>. Sadly, the Greek letter <span class="math notranslate nohighlight">\(\sigma\)</span> is widely used to mean a lot of things in data science and statistics, like the standard deviation, logistic function, and a permutation. You will have to be careful when seeing  <span class="math notranslate nohighlight">\( \sigma \)</span> and guess its meaning from context.</p>
+<p>The <em>sigmoid</em> function is typically denoted by <span class="math notranslate nohighlight">\(\sigma(t)\)</span>. Sadly, the Greek letter <span class="math notranslate nohighlight">\(\sigma\)</span> is widely used to mean a lot of things in data science and statistics, like the standard deviation, logistic function, and a permutation. You’ll have to be careful when seeing <span class="math notranslate nohighlight">\( \sigma \)</span> and use context to understand its meaning.</p>
 </div>
 <p>We can plot the logistic function to reveal it’s s-shape (sigmoid-shape) and confirm that it outputs numbers between 0 and 1. The function monotonically increases with <span class="math notranslate nohighlight">\( t \)</span>, and large values of <span class="math notranslate nohighlight">\( t \)</span> get close to 1.</p>
 <div class="cell docutils container">
@@ -1311,7 +1323,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_log_model_17_0.svg" src="../../_images/class_log_model_17_0.svg" /></div>
+<img alt="../../_images/class_log_model_19_0.svg" src="../../_images/class_log_model_19_0.svg" /></div>
 </div>
 <p>Since the logistic function maps to the interval between 0 and 1, it is commonly used when modeling probabilities. And, we can write the logistic model as a function of a line, <span class="math notranslate nohighlight">\(\theta_0 + \theta_1 x\)</span>:</p>
 <div class="math notranslate nohighlight">
@@ -1319,27 +1331,33 @@
 \sigma\left(\theta_0 + \theta_1 x\right) = \frac{1}{1+\exp(-\theta_0 - \theta_1 x)}
 \]</div>
 <p>To help build your intuition for the shape of this function, the following plot shows the logistic function as we vary <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">theta1</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">]:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">row</span> <span class="o">=</span> <span class="n">col</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">theta1</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
     <span class="k">for</span> <span class="n">theta0</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">theta0</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="n">theta1</span><span class="si">}</span><span class="s2"> x&quot;</span><span class="p">,</span> 
-                                 <span class="n">x</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">logistic</span><span class="p">(</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">theta1</span><span class="o">*</span><span class="n">t</span><span class="p">)))</span>
+                                 <span class="n">x</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">logistic</span><span class="p">(</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">theta1</span><span class="o">*</span><span class="n">t</span><span class="p">)),</span>
+                      <span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
         
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>        
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>        
 <span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_log_model_21_0.svg" src="../../_images/class_log_model_21_0.svg" /></div>
+<img alt="../../_images/class_log_model_23_0.svg" src="../../_images/class_log_model_23_0.svg" /></div>
 </div>
-<p>We can see that changing the magnitude of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> changes the sharpness of the curve; the further away from <span class="math notranslate nohighlight">\( 0 \)</span>, the steeper the curve. And, flipping the sign of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> reflects the curve over the y-axis. The logistic function is quite versatile in shape. It also has a nice interpretation, which we describe next.</p>
+<p>We can see that changing the magnitude of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> changes the sharpness of the curve; the further away from <span class="math notranslate nohighlight">\( 0 \)</span>, the steeper the curve. Flipping the sign of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> reflects the curve over the y-axis. Changing <span class="math notranslate nohighlight">\( \theta_0 \)</span> shifts the curve left and right.</p>
+<p>The logistic function can be seen as a <em>transformation</em>: it transforms a linear function into a nonlinear smooth curve, and the output always lies between 0 and 1. In fact, the output of a logistic function has a deeper probabilistic interpretation, which we describe next.</p>
 </div>
 <div class="section" id="log-odds">
 <h2><span class="section-number">19.3.2. </span>Log Odds<a class="headerlink" href="#log-odds" title="Permalink to this headline">¶</a></h2>
-<p>The logistic model is also called the <em>log odds</em> model because the logistic function coincides with a linear function of the log odds. Recall the odds are the ratio, <span class="math notranslate nohighlight">\(p/(1-p)\)</span> for a probability <span class="math notranslate nohighlight">\( p \)</span>. We can see this in the following equations. To show this, we multiply the numerator and denominator of the sigmoid function by <span class="math notranslate nohighlight">\(\exp(t)\)</span></p>
+<p>Recall the odds are the ratio, <span class="math notranslate nohighlight">\(p/(1-p)\)</span> for a probability <span class="math notranslate nohighlight">\( p \)</span>. For example, for a fair coin the odds of getting heads is 1, and for a coin that’s twice as likely to flip heads as tails, the odds of getting heads is 2. The logistic model is also called the <em>log odds</em> model because the logistic function coincides with a linear function of the log odds.</p>
+<p>We can see this in the following equations. To show this, we multiply the numerator and denominator of the sigmoid function by <span class="math notranslate nohighlight">\(\exp(t)\)</span></p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -1362,7 +1380,7 @@
 \log \left( \frac{\sigma(\theta_0 + \theta_1x)}{1-\sigma(\theta_0 + \theta_1x)} \right) &amp; = \log(\exp{(\theta_0 + \theta_1x)}) = \theta_0 + \theta_1x\\
 \end{aligned}
 \end{split}\]</div>
-<p>This representation of the logistic in terms of log odds gives a useful interpretation for the coefficient. Suppose the explanatory variable increases by 1. Then the odds change as follows</p>
+<p>This representation of the logistic in terms of log odds gives a useful interpretation for the coefficient. Suppose the explanatory variable increases by 1. Then the odds change as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -1370,22 +1388,42 @@
  =&amp; ~ \exp(\theta_1) \times \exp{(\theta_0 + \theta_1x)}
 \end{aligned}
 \end{split}\]</div>
-<p>So the odds increase or decrease by a factor of <span class="math notranslate nohighlight">\( \exp(\theta_1) \)</span>.</p>
-<p>One last note is that the <span class="math notranslate nohighlight">\(\log\)</span> function that we use here is the natural logarithm.
-The natural log is the default in data science and so we don’t bother with writing it as <span class="math notranslate nohighlight">\(\ln\)</span>.</p>
-<p>Below, we have added a logistic curve to the plot of proportions of fallen trees.</p>
+<p>So, the odds increase or decrease by a factor of <span class="math notranslate nohighlight">\( \exp(\theta_1) \)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Here, the <span class="math notranslate nohighlight">\(\log\)</span> function is the natural logarithm. The natural log is the default in data science so we typically don’t bother to write it as <span class="math notranslate nohighlight">\(\ln\)</span>.</p>
+</div>
+</div>
+<div class="section" id="using-a-logistic-curve">
+<h2><span class="section-number">19.3.3. </span>Using a Logistic Curve<a class="headerlink" href="#using-a-logistic-curve" title="Permalink to this headline">¶</a></h2>
+<p>In this plot below, we’ve added a logistic curve on top of the plot of proportions of fallen trees.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_plt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">50</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="n">trees</span><span class="p">[</span><span class="s1">&#39;log_diam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="s1">&#39;diameter&#39;</span><span class="p">])</span> 
+<span class="n">X</span> <span class="o">=</span> <span class="n">trees</span><span class="p">[[</span><span class="s1">&#39;log_diam&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">trees</span><span class="p">[</span><span class="s1">&#39;status_0_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+<span class="n">lr_model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">lr_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_plt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">50</span><span class="p">)</span> <span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">p_hats</span> <span class="o">=</span> <span class="n">lr_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_plt</span><span class="p">)</span>
 <span class="n">X_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">X_plt</span><span class="p">)</span>
 
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tree_bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span>
+                 <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;diameter&#39;</span><span class="p">:</span><span class="s2">&quot;Tree Diameter (cm)&quot;</span><span class="p">,</span>
+                         <span class="s1">&#39;proportion&#39;</span><span class="p">:</span><span class="s2">&quot;Proportion Down&quot;</span><span class="p">},</span>
+                 <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tree_bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;diameter&#39;</span><span class="p">:</span><span class="s2">&quot;Tree Diameter (cm)&quot;</span><span class="p">,</span> <span class="s1">&#39;proportion&#39;</span><span class="p">:</span><span class="s2">&quot;Proportion Down&quot;</span><span class="p">},</span>
-        <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_orig</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">p_hats</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_orig</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">p_hats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
                          <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>              
@@ -1394,22 +1432,24 @@ The natural log is the default in data science and so we don’t bother with wri
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_log_model_28_0.svg" src="../../_images/class_log_model_28_0.svg" /></div>
+<img alt="../../_images/class_log_model_34_0.svg" src="../../_images/class_log_model_34_0.svg" /></div>
 </div>
-<p>The curve follows the proportions reasonably well. In fact, we selected this particular logistic by fitting it to the data. The fitted logistic regression is</p>
-<div class="cell docutils container">
+<p>We can see that the curve follows the proportions reasonably well. In fact, we selected this particular logistic by fitting it to the data. The fitted logistic regression is:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">7.39</span> <span class="o">-</span> <span class="mf">3.04</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">t0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lr_model</span><span class="o">.</span><span class="n">intercept_</span>
+<span class="p">[[</span><span class="n">t1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">lr_model</span><span class="o">.</span><span class="n">coef_</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;σ(</span><span class="si">{</span><span class="n">t0</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">t1</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">x)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.12531303145932227
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>σ(-7.4 + 3.0x)
 </pre></div>
 </div>
 </div>
 </div>
-<p>The curve follows the proportions reasonably well. In fact, we selected this particular logistic by fitting it to the data. To do this, we chose a loss function and minimized the average loss for our data with respect to the model parameters. Our choice of loss function is the topic of the next section.</p>
+<p>To fit logistic curves to data, we’ll need to proceed to our second step in modeling: selecting an appropriate loss function.</p>
 </div>
 </div>
 
