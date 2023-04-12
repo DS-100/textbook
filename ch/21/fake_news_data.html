@@ -1198,9 +1198,12 @@
                 
   <div class="section" id="obtaining-and-wrangling-the-data">
 <span id="sec-fake-news-data"></span><h1><span class="section-number">21.2. </span>Obtaining and Wrangling the Data<a class="headerlink" href="#obtaining-and-wrangling-the-data" title="Permalink to this headline">¶</a></h1>
-<p>Let’s get the data into Python.
-The dataset has <a class="reference external" href="https://github.com/KaiDMML/FakeNewsNet/tree/654361e1c8d5baa751baf1dac5032df621652280">a GitHub page</a> with the code that downloads the data.
-Running the script to download the Politifact data takes about an hour.
+<p>Let’s get the data into Python using FakeNewsNet dataset’s [GitHub page][fnn-code]. Reading over the repository description and code, we find that the repository doesn’t actually store the news articles itself. Instead, running the repository code will scrape news articles from online web pages directly (using techniques we covered in <a class="reference internal" href="../14/web_intro.html#ch-web"><span class="std std-numref">Chapter 14</span></a>. This presents a challenge: if an article is no longer available online, it likely will be missing from our dataset. Noting this down, let’s proceed with downloading the data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The FakeNewsNet code highlights one challenge in reproducible research—online datasets change over time, but it can be difficult (or even illegal) to store and share copies of this data. For example, other parts of the FakeNewsNet dataset uses Twitter posts, but the dataset creators would violate Twitter’s terms and services if they stored copies of the posts in their repository. When working with data gathered from the web, we suggest writing down the date the data were gathered and reading the terms and services of the data sources carefully.</p>
+</div>
+<p>Running the script to download the Politifact data takes about an hour.
 After running the script, we placed the data files into the <code class="docutils literal notranslate"><span class="pre">data/politifact</span></code> folder.
 The articles that Politifact labeled as fake and real
 are in <code class="docutils literal notranslate"><span class="pre">data/politifact/fake</span></code> and <code class="docutils literal notranslate"><span class="pre">data/politifact/real</span></code>.
@@ -1434,7 +1437,7 @@ keep going with the analysis. For example:</p>
 <li><p>Some articles couldn’t be downloaded. When this happened, the <code class="docutils literal notranslate"><span class="pre">url</span></code> column contains <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p></li>
 <li><p>Some articles don’t have text (e.g. a webpage with only video content). We’ll drop these articles from our analysis.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">publish_date</span></code> column stores timestamps in Unix format (seconds since the Unix epoch), not as  <code class="docutils literal notranslate"><span class="pre">pandas.Timestamp</span></code> objects.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">url</span></code> column has the full URL (e.g. <code class="docutils literal notranslate"><span class="pre">dailybuzzlive.com/cannibals-arrested-florida/</span></code>), but we’re interested in the base URL (e.g. <code class="docutils literal notranslate"><span class="pre">dailybuzzlive.com</span></code>).</p></li>
+<li><p>We’re interested in the base URL of a webpage (e.g. <code class="docutils literal notranslate"><span class="pre">dailybuzzlive.com</span></code>). However, the <code class="docutils literal notranslate"><span class="pre">source</span></code> field in the JSON has many missing values compared to the <code class="docutils literal notranslate"><span class="pre">url</span></code> column. So, we need to extract the base URL using the full URL in the <code class="docutils literal notranslate"><span class="pre">url</span></code> column (e.g. <code class="docutils literal notranslate"><span class="pre">dailybuzzlive.com/cannibals-arrested-florida/</span></code>).</p></li>
 <li><p>Some articles were downloaded from an archival website (<code class="docutils literal notranslate"><span class="pre">web.archive.org</span></code>). When this happens, we want to extract the actual base URL from the original by removing the <code class="docutils literal notranslate"><span class="pre">web.archive.org</span></code> prefix.</p></li>
 <li><p>For our classifier, we want to concatenate the <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">text</span></code> columns into a single <code class="docutils literal notranslate"><span class="pre">content</span></code> column.</p></li>
 </ol>

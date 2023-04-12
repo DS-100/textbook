@@ -1193,6 +1193,11 @@
    21.3.2. Exploring the Publish Times
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exploring-words-in-articles">
+   21.3.3. Exploring Words in Articles
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -1223,6 +1228,11 @@
    21.3.2. Exploring the Publish Times
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exploring-words-in-articles">
+   21.3.3. Exploring Words in Articles
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -1234,10 +1244,10 @@
                 
   <div class="section" id="exploring-the-data">
 <span id="sec-fake-news-exploring"></span><h1><span class="section-number">21.3. </span>Exploring the Data<a class="headerlink" href="#exploring-the-data" title="Permalink to this headline">¶</a></h1>
-<p>The fake news dataset we’re exploring now is one part of a larger dataset called <a class="reference external" href="https://arxiv.org/abs/1809.01286">FakeNewsNet</a>. As such, the original
+<p>The dataset of news articles we’re exploring now is just one part of the larger FakeNewsNet dataset. As such, the original
 research paper doesn’t provide detailed information about our subset of data.
-To understand the data more, we’ll have to explore it ourselves.</p>
-<p>Before starting exploratory data analysis, we’ll apply our standard practice of splitting the data into a training and test set:</p>
+To understand the data more, we have to explore it ourselves.</p>
+<p>Before starting exploratory data analysis, we’ll apply our standard practice of splitting the data into a training and test set. We’ll perform EDA using only the training set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
@@ -1350,9 +1360,9 @@ memory usage: 18.2+ KB
 abcnews.go.com            20
 nytimes.com               17
                           ..
-stgeorgegazette.com        1
-theuspoliticalnews.com     1
-newsuptoday.com            1
+usnews.com                 1
+urbanintellectuals.com     1
+truetrumpers.com           1
 Name: baseurl, Length: 337, dtype: int64
 </pre></div>
 </div>
@@ -1410,7 +1420,7 @@ Name: baseurl, Length: 337, dtype: int64
 </div>
 <div class="section" id="exploring-the-publish-times">
 <h2><span class="section-number">21.3.2. </span>Exploring the Publish Times<a class="headerlink" href="#exploring-the-publish-times" title="Permalink to this headline">¶</a></h2>
-<p>Plotting the timestamps on a histogram shows that most articles were published after 2000, although there seem to be at least one article published before 1940:</p>
+<p>Plotting the timestamps on a histogram shows that most articles were published after 2000, although there seems to be at least one article published before 1940:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">X_train</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
@@ -1432,7 +1442,72 @@ Name: baseurl, Length: 337, dtype: int64
 <img alt="../../_images/fake_news_exploring_27_0.svg" src="../../_images/fake_news_exploring_27_0.svg" /></div>
 </div>
 <p>As we expect, most articles in the dataset were published between 2007 (the year Politifact was founded) and 2020 (the year the FakeNewsNet paper was published). We also find out that the timestamps are concentrated on the years 2016-2018, the years following the controversial 2016 US Presidential Election.</p>
-<p>This brief exploratory analysis helps us understand when our news articles were published and that the dataset captures a broad range of publishing websites. Next, we’ll use the content of the news articles themselves to make predictions about whether articles are fake or real.</p>
+</div>
+<div class="section" id="exploring-words-in-articles">
+<h2><span class="section-number">21.3.3. </span>Exploring Words in Articles<a class="headerlink" href="#exploring-words-in-articles" title="Permalink to this headline">¶</a></h2>
+<p>We’d like to see whether there’s a relationship between the words used in the articles and whether the article was labeled as <code class="docutils literal notranslate"><span class="pre">fake</span></code>. One simple way to do this is to look at individual words like <code class="docutils literal notranslate"><span class="pre">military</span></code>, then count up how many articles that mentioned <code class="docutils literal notranslate"><span class="pre">military</span></code> were labeled <code class="docutils literal notranslate"><span class="pre">fake</span></code>. We can use our domain knowledge of political topics to pick out a few candidate words to explore. Then, we define a function that creates a new feature for each word which contains <code class="docutils literal notranslate"><span class="pre">True</span></code> if the word appeared in the article and <code class="docutils literal notranslate"><span class="pre">False</span></code> if not.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">word_features</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># names of presidential candidates</span>
+    <span class="s1">&#39;trump&#39;</span><span class="p">,</span> <span class="s1">&#39;donald&#39;</span><span class="p">,</span> <span class="s1">&#39;hillary&#39;</span><span class="p">,</span> <span class="s1">&#39;clinton&#39;</span><span class="p">,</span>
+    
+    <span class="c1"># other possibly useful words</span>
+    <span class="s1">&#39;military&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;vote&#39;</span><span class="p">,</span> <span class="s1">&#39;congress&#39;</span><span class="p">,</span> <span class="s1">&#39;fbi&#39;</span><span class="p">,</span> <span class="s1">&#39;shutdown&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;investig&#39;</span><span class="p">,</span> <span class="s1">&#39;antifa&#39;</span><span class="p">,</span> <span class="s1">&#39;joke&#39;</span><span class="p">,</span> <span class="s1">&#39;princ&#39;</span><span class="p">,</span> <span class="s1">&#39;homeless&#39;</span><span class="p">,</span> <span class="s1">&#39;cnn&#39;</span><span class="p">,</span> <span class="s1">&#39;the&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># This function creates one new binary feature for each word in word_features,</span>
+<span class="c1"># marking the presence of a word in an article.</span>
+<span class="k">def</span> <span class="nf">make_word_features</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">word_features</span><span class="p">):</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">{</span> <span class="n">word</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can use this function to calculate the number of articles that contains each word. Then, we can find the proportion of these articles that were labeled <code class="docutils literal notranslate"><span class="pre">fake</span></code>. We visualize these calculations in the plots below. In the left plot, we mark the proportion of <code class="docutils literal notranslate"><span class="pre">fake</span></code> articles in the entire training set using a dotted line. We can use this dotted line to understand how informative each word feature is: a highly informative word will have a point that lies far away from the line.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fake_props</span> <span class="o">=</span> <span class="p">(</span><span class="n">make_word_features</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="s1">&#39;fake&#39;</span><span class="p">))</span>
+ <span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;word&#39;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;appeared&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;appeared == True&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;word&#39;</span><span class="p">)</span>
+ <span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+ <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="s1">&#39;prop_fake&#39;</span><span class="p">})</span>
+ <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;prop_fake&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+ <span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">id_vars</span><span class="o">=</span><span class="s1">&#39;word&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">catplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fake_props</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;word&#39;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span>
+                <span class="n">s</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="p">[[</span><span class="n">prop_ax</span><span class="p">,</span> <span class="n">_</span><span class="p">]]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">axes</span>
+<span class="n">prop_ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">prop_ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">))</span>
+
+<span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Proportion articles marked fake&#39;</span><span class="p">,</span> <span class="s1">&#39;Number of articles with word&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="n">titles</span><span class="p">):</span>
+
+    <span class="c1"># Set a different title for each axes</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Make the grid horizontal instead of vertical</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/fake_news_exploring_33_0.svg" src="../../_images/fake_news_exploring_33_0.svg" /></div>
+</div>
+<p>Notice that all articles that mention the word <code class="docutils literal notranslate"><span class="pre">antifa</span></code> are marked <code class="docutils literal notranslate"><span class="pre">fake</span></code>. However, <code class="docutils literal notranslate"><span class="pre">antifa</span></code> only appears in a few articles. Although <code class="docutils literal notranslate"><span class="pre">antifa</span></code> seems strongly related to fake articles, it might only be useful for a few articles. On the other hand, the word <code class="docutils literal notranslate"><span class="pre">the</span></code> appears in nearly every article, but is uninformative for distinguishing between <code class="docutils literal notranslate"><span class="pre">real</span></code> and <code class="docutils literal notranslate"><span class="pre">fake</span></code> articles.
+In the ideal case, we would find words that appear in many articles and are highly predictive, and we could perform more EDA to find these words.</p>
+<p>This exploratory analysis brought us understanding of the timeframe that our news articles were published, the broad range of publishing websites captured in the data, and candidate words to use for prediction. Next, we’ll fit models for predicting whether articles are fake or real.</p>
 </div>
 </div>
 
