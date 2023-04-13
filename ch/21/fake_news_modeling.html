@@ -44,6 +44,8 @@
     <script src="../../_static/custom.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -1244,11 +1246,10 @@
                 
   <div class="section" id="modeling">
 <span id="sec-fake-news-modeling"></span><h1><span class="section-number">21.4. </span>Modeling<a class="headerlink" href="#modeling" title="Permalink to this headline">¶</a></h1>
-<p>Now that we’ve obtained, cleaned, and explored our data, let’s fit models to predict whether articles are real or fake. Since we’re classifying articles, we’ll use logistic regression. We’ll fit three different models that increase in complexity. First, we’ll fit a model that just uses a single hand-picked word as a binary feature. Then, we’ll fit a model that uses multiple hand-picked words. Finally, we’ll fit a model that uses all the words in the training set, vectorized using the tf-idf transform. Let’s start with the simple single-word model.</p>
+<p>Now that we’ve obtained, cleaned, and explored our data, let’s fit models to predict whether articles are real or fake. In this section, we use logistic regression to approach this binary classification problem. We fit three different models that increase in complexity. First, we fit a model that just uses a single hand-picked word as a binary feature. Then, we fit a model that uses multiple hand-picked words. Finally, we fit a model that uses all the words in the training set, vectorized using the tf-idf transform. Let’s start with the simple single-word model.</p>
 <div class="section" id="a-single-word-model">
 <h2><span class="section-number">21.4.1. </span>A Single-Word Model<a class="headerlink" href="#a-single-word-model" title="Permalink to this headline">¶</a></h2>
-<p>From our EDA, we know that many articles were published soon after the 2016 US Presidential Election. In that election, the two candidates were named Donald Trump and Hillary Clinton. Readers who followed the election that year may already know that the election was quite divisive, which suggests that the word <code class="docutils literal notranslate"><span class="pre">trump</span></code> could be predictive of whether articles in our dataset are real or fake. To test this, we’ll fit a logistic regression classifier using a single binary feature: <code class="docutils literal notranslate"><span class="pre">1</span></code> if the word <code class="docutils literal notranslate"><span class="pre">trump</span></code> appears in the article and <code class="docutils literal notranslate"><span class="pre">0</span></code> if not. Since we’ll want to add more word features like this one later in this analysis, we’ll write the code so that it can extend to multiple words.</p>
-<p>We’ll start by defining functions to lowercase the article content and create binary word features.</p>
+<p>Our EDA showed that the word <code class="docutils literal notranslate"><span class="pre">vote</span></code> is related to whether an article is labeled <code class="docutils literal notranslate"><span class="pre">real</span></code> or <code class="docutils literal notranslate"><span class="pre">fake</span></code>. To test this, we’d like to fit a logistic regression model using a single binary feature: <code class="docutils literal notranslate"><span class="pre">1</span></code> if the word <code class="docutils literal notranslate"><span class="pre">vote</span></code> appears in the article and <code class="docutils literal notranslate"><span class="pre">0</span></code> if not. We start by defining a function to lowercase the article content and reuse the <code class="docutils literal notranslate"><span class="pre">make_word_features</span></code> function from our EDA to create binary features.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lowercase</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1259,9 +1260,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This function creates one new binary feature for each word in word_features,</span>
-<span class="c1"># marking the presence of a word in an article.</span>
-<span class="k">def</span> <span class="nf">make_word_features</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">words</span><span class="o">=</span><span class="n">word_features</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_word_features</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">words</span><span class="p">):</span>
     <span class="n">features</span> <span class="o">=</span> <span class="p">{</span> <span class="n">word</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="p">}</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
 </pre></div>
@@ -1279,9 +1278,9 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For our first classifier, we&#39;ll only use the word `trump`.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For our first classifier, we&#39;ll only use the word `vote`.</span>
 <span class="n">word_features</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;trump&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vote&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -1303,7 +1302,7 @@
 </div>
 </div>
 </div>
-<p>The pipeline above will lowercase the article content, create word features, and fit a logistic regression on the data. Using <code class="docutils literal notranslate"><span class="pre">LogisticRegressionCV</span></code> will by default use 5-fold cross-validation to select the best regularization parameter for the data.</p>
+<p>When used, the pipeline above lowercases the article content, creates word features, and fits a logistic regression model on the data using <span class="math notranslate nohighlight">\( L_2 \)</span> regularization. Using <code class="docutils literal notranslate"><span class="pre">LogisticRegressionCV</span></code> will by default use 5-fold cross-validation to select the best regularization parameter for the data.</p>
 <p>Now, we can use the pipeline to fit the training data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1315,9 +1314,9 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>68.7% accuracy on training set.
-CPU times: user 109 ms, sys: 20.1 ms, total: 129 ms
-Wall time: 108 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>64.9% accuracy on training set.
+CPU times: user 88 ms, sys: 17.5 ms, total: 106 ms
+Wall time: 88.9 ms
 </pre></div>
 </div>
 </div>
@@ -1328,7 +1327,8 @@ Wall time: 108 ms
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">plot_confusion_matrix</span>
 
 <span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
-                      <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+                      <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;real&#39;</span><span class="p">,</span> <span class="s1">&#39;fake&#39;</span><span class="p">],</span>
+                      <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1336,9 +1336,9 @@ Wall time: 108 ms
 <div class="cell_output docutils container">
 <img alt="../../_images/fake_news_modeling_16_0.svg" src="../../_images/fake_news_modeling_16_0.svg" /></div>
 </div>
-<p>Overall, the single-word classifier only classifies 68.7% of articles correctly. It often misclassifies <code class="docutils literal notranslate"><span class="pre">fake</span></code> articles as <code class="docutils literal notranslate"><span class="pre">real</span></code>.</p>
+<p>Overall, the single-word classifier only classifies 64.9% of articles correctly. It often misclassifies <code class="docutils literal notranslate"><span class="pre">real</span></code> articles as <code class="docutils literal notranslate"><span class="pre">fake</span></code>.</p>
 <p>Since this model is simple, we can take a look at the parameters to understand
-how it behaves completely.</p>
+how it behaves.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_reg</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;logisticregressioncv&#39;</span><span class="p">]</span>
@@ -1378,8 +1378,8 @@ how it behaves completely.</p>
   </thead>
   <tbody>
     <tr>
-      <th>trump</th>
-      <td>-0.97</td>
+      <th>vote</th>
+      <td>1.0</td>
     </tr>
   </tbody>
 </table>
@@ -1393,17 +1393,17 @@ how it behaves completely.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: 0.45
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept: -0.08
 </pre></div>
 </div>
 </div>
 </div>
-<p>Since the model has an intercept of 0.45 and the model weight for the <code class="docutils literal notranslate"><span class="pre">trump</span></code> feature is <code class="docutils literal notranslate"><span class="pre">-0.97</span></code>, the model will always predict that articles that contain the word <code class="docutils literal notranslate"><span class="pre">trump</span></code> are <code class="docutils literal notranslate"><span class="pre">fake</span></code> and articles that don’t contain <code class="docutils literal notranslate"><span class="pre">trump</span></code> are <code class="docutils literal notranslate"><span class="pre">real</span></code>. We encourage readers to verify this for themselves using the definition of the logistic regression model.</p>
+<p>Since the model has an intercept of -0.08 and the model weight for the <code class="docutils literal notranslate"><span class="pre">vote</span></code> feature is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, the model always predicts that articles that contain the word <code class="docutils literal notranslate"><span class="pre">vote</span></code> are <code class="docutils literal notranslate"><span class="pre">real</span></code> and articles that don’t contain <code class="docutils literal notranslate"><span class="pre">vote</span></code> are <code class="docutils literal notranslate"><span class="pre">fake</span></code>. We encourage readers to verify this for themselves using the definition of the logistic regression model.</p>
 <p>Let’s make our model a bit more sophisticated by introducing additional word features.</p>
 </div>
 <div class="section" id="multiple-word-model">
 <h2><span class="section-number">21.4.2. </span>Multiple Word Model<a class="headerlink" href="#multiple-word-model" title="Permalink to this headline">¶</a></h2>
-<p>We can reuse much of the same code to create a model that uses multiple binary word features. To create our features, we’ll use some domain knowledge about controversial topics during the 2016-2018 period:</p>
+<p>Next, we create a model that uses the words we examined in our EDA of the training set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">word_features</span> <span class="o">=</span> <span class="p">[</span>
@@ -1418,7 +1418,7 @@ how it behaves completely.</p>
 </div>
 </div>
 </div>
-<p>There are 16 features in this model. Let’s fit a model using these features.</p>
+<p>Since there are 16 words, we create 16 features for this next model. Let’s fit a model using these features.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span>
@@ -1446,19 +1446,20 @@ how it behaves completely.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>74.0% accuracy on training set.
-CPU times: user 1.76 s, sys: 18.1 ms, total: 1.78 s
-Wall time: 769 ms
+CPU times: user 1.81 s, sys: 15.2 ms, total: 1.83 s
+Wall time: 742 ms
 </pre></div>
 </div>
 </div>
 </div>
-<p>This model performed significantly better than the one-word model on the training set. Let’s plot a confusion matrix again:</p>
+<p>This model is about 9% more accurate than the one-word model on the training set. Let’s plot a confusion matrix again:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">plot_confusion_matrix</span>
 
 <span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
-                      <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+                      <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;real&#39;</span><span class="p">,</span> <span class="s1">&#39;fake&#39;</span><span class="p">],</span>
+                      <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1466,7 +1467,7 @@ Wall time: 769 ms
 <div class="cell_output docutils container">
 <img alt="../../_images/fake_news_modeling_29_0.svg" src="../../_images/fake_news_modeling_29_0.svg" /></div>
 </div>
-<p>We can see that this classifier does a better job classifying <code class="docutils literal notranslate"><span class="pre">fake</span></code> articles accurately. However, it makes more mistakes than the simple one-word model when classifying <code class="docutils literal notranslate"><span class="pre">real</span></code> articles – 89 of <code class="docutils literal notranslate"><span class="pre">real</span></code> articles were classified as `fake.</p>
+<p>We can see that this classifier does a better job classifying <code class="docutils literal notranslate"><span class="pre">real</span></code> articles accurately. However, it makes more mistakes than the simple one-word model when classifying <code class="docutils literal notranslate"><span class="pre">fake</span></code> articles – 63 of the <code class="docutils literal notranslate"><span class="pre">fake</span></code> articles were classified as `real.</p>
 <p>Let’s take a look at the model’s coefficients:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1581,7 +1582,7 @@ Wall time: 769 ms
 </div>
 <div class="section" id="predicting-with-the-tf-idf-transform">
 <h2><span class="section-number">21.4.3. </span>Predicting with the tf-idf Transform<a class="headerlink" href="#predicting-with-the-tf-idf-transform" title="Permalink to this headline">¶</a></h2>
-<p>Let’s use the tf-idf transform from <code class="xref std std-numref docutils literal notranslate"><span class="pre">Section</span> <span class="pre">%s</span></code> to vectorize the entire text of all articles in the training set. This means that our classifier will be able to use all the words in the training set’s news articles for prediction. As we’ve done when we introduced tf-idf, we’ll first remove stopwords, tokenize the words, then use the <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code> from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
+<p>For the third and final model, we use the tf-idf transform from <code class="xref std std-numref docutils literal notranslate"><span class="pre">Section</span> <span class="pre">%s</span></code> to vectorize the entire text of all articles in the training set. This means that our classifier will be able to use all the words in the training set’s news articles for prediction. As we’ve done when we introduced tf-idf, we first remove stopwords, tokenize the words, then use the <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code> from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
@@ -1635,14 +1636,28 @@ Wall time: 769 ms
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Pipeline]  (step 1 of 3) Processing functiontransformer, total=   0.0s
-[Pipeline] . (step 2 of 3) Processing columntransformer, total=  14.0s
-[Pipeline]  (step 3 of 3) Processing logisticregressioncv, total=   5.7s
+[Pipeline] . (step 2 of 3) Processing columntransformer, total=  13.4s
+[Pipeline]  (step 3 of 3) Processing logisticregressioncv, total=   5.5s
 100.0% accuracy on training set.
-CPU times: user 49.9 s, sys: 263 ms, total: 50.1 s
-Wall time: 34.1 s
+CPU times: user 48.3 s, sys: 181 ms, total: 48.4 s
+Wall time: 32.3 s
 </pre></div>
 </div>
 </div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">plot_confusion_matrix</span>
+
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">model3</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+                      <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;real&#39;</span><span class="p">,</span> <span class="s1">&#39;fake&#39;</span><span class="p">],</span>
+                      <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/fake_news_modeling_41_0.svg" src="../../_images/fake_news_modeling_41_0.svg" /></div>
 </div>
 <p>We find that this model achieves 100% accuracy on the training set. We can take a look at the tf-idf transformer to better understand the model. Let’s start by finding out how many unique tokens the classifier uses:</p>
 <div class="cell docutils container">
@@ -1704,7 +1719,7 @@ Wall time: 34.1 s
     <tr>
       <th>0</th>
       <td>!</td>
-      <td>-9.10</td>
+      <td>-9.09</td>
     </tr>
     <tr>
       <th>23773</th>
@@ -1719,7 +1734,7 @@ Wall time: 34.1 s
     <tr>
       <th>7370</th>
       <td>comment</td>
-      <td>-8.26</td>
+      <td>-8.25</td>
     </tr>
     <tr>
       <th>21361</th>
@@ -1729,12 +1744,12 @@ Wall time: 34.1 s
     <tr>
       <th>12531</th>
       <td>investig</td>
-      <td>-7.94</td>
+      <td>-7.95</td>
     </tr>
     <tr>
       <th>13601</th>
       <td>like</td>
-      <td>-7.82</td>
+      <td>-7.81</td>
     </tr>
   </tbody>
 </table><table border="1" class="dataframe">
@@ -1754,22 +1769,22 @@ Wall time: 34.1 s
     <tr>
       <th>6559</th>
       <td>candid</td>
-      <td>7.63</td>
+      <td>7.64</td>
     </tr>
     <tr>
       <th>144</th>
       <td>--</td>
-      <td>7.68</td>
+      <td>7.67</td>
     </tr>
     <tr>
       <th>16172</th>
       <td>page</td>
-      <td>7.90</td>
+      <td>7.91</td>
     </tr>
     <tr>
       <th>14228</th>
       <td>mccain</td>
-      <td>8.29</td>
+      <td>8.30</td>
     </tr>
     <tr>
       <th>20961</th>
@@ -1779,17 +1794,17 @@ Wall time: 34.1 s
     <tr>
       <th>142</th>
       <td>,</td>
-      <td>9.39</td>
+      <td>9.41</td>
     </tr>
     <tr>
       <th>18051</th>
       <td>republican</td>
-      <td>9.42</td>
+      <td>9.43</td>
     </tr>
     <tr>
       <th>18642</th>
       <td>sater</td>
-      <td>10.85</td>
+      <td>10.86</td>
     </tr>
     <tr>
       <th>22233</th>
@@ -1801,8 +1816,8 @@ Wall time: 34.1 s
         </div>
 </div></div>
 </div>
-<p>Displaying these features shows a few quirks about this model. For example, we see that several influential features correspond to punctuation in the original text. It’s unclear whether we should clean out the punctuation in the model. On one hand, punctuation doesn’t seem to convey as much information as words do. On the other, it seems plausible that lots of explanation points in an article could help a model decide whether the article is real or fake. In this case, we’ve decided to keep punctuation, but curious readers can repeat this analysis after stripping the punctuation out to see how the resulting model is affected.</p>
-<p>Let’s conclude by displaying the test set error for all three models:</p>
+<p>Displaying these features shows a few quirks about this model. For example, we see that several influential features correspond to punctuation in the original text. It’s unclear whether we should clean out the punctuation in the model. On one hand, punctuation doesn’t seem to convey as much meaning as words do. On the other, it seems plausible that, for example, lots of explanation points in an article could help a model decide whether the article is real or fake. In this case, we’ve decided to keep punctuation, but curious readers can repeat this analysis after stripping the punctuation out to see how the resulting model is affected.</p>
+<p>We conclude by displaying the test set error for all three models:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -1838,7 +1853,7 @@ Wall time: 34.1 s
   <tbody>
     <tr>
       <th>model1</th>
-      <td>0.64</td>
+      <td>0.61</td>
     </tr>
     <tr>
       <th>model2</th>
@@ -1852,7 +1867,7 @@ Wall time: 34.1 s
 </table>
 </div></div></div>
 </div>
-<p>As we might expect, the models became more accurate as we introduced more features. The final model that used tf-idf performed significantly better than the models with binary hand-picked word features. This illustrates a common tradeoff in modeling: given enough data, more complex models can often outperform simpler ones, especially in situations like our case study where simpler models have too much model bias to perform well. However, complex models can be more difficult to interpret. For example, our tf-idf model had over 23,804 features which makes it harder to concisely explain to another person how our model makes its decisions.</p>
+<p>As we might expect, the models became more accurate as we introduced more features. The model that used tf-idf performed much better than the models with binary hand-picked word features. This illustrates a common tradeoff in modeling: given enough data, more complex models can often outperform simpler ones, especially in situations like this case study where simpler models have too much model bias to perform well. However, complex models can be more difficult to interpret. For example, our tf-idf model had over 23,804 features, which makes it harder to concisely explain to another person how our model makes its decisions. In addition, the tf-idf model takes much longer to make predictions—it’s over 100 times slower compared to model 2. All of these factors need to be considered when deciding which model to use in practice.</p>
 <p>In addition, we need to be careful about what our models are useful for. In this case, our models use the content of the news articles for prediction, making them highly dependent on the words that appear in the training set. However, our models will likely not perform as well on future news articles that use words that didn’t appear in the training set. For example, our models use the US election candidates’ names in 2016 for prediction, but won’t know to incorporate the names of the candidates in 2020 or 2024. To use our models in the longer term, we would need to address this issue of <em>drift</em>.</p>
 <p>That said, it’s surprising that a logistic regression model can perform well with a relatively small amount of feature engineering (tf-idf). We’ve addressed our original research question: our tf-idf model appears effective for detecting fake news in our dataset, and could plausibly generalize to other news published in the same time period covered in the training data.</p>
 </div>
