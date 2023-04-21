@@ -1417,17 +1417,13 @@ with the <code class="docutils literal notranslate"><span class="pre">baby</span
 <p>2020722 rows × 4 columns</p>
 </div></div></div>
 </div>
-<p>Imagine going down each row in <code class="docutils literal notranslate"><span class="pre">baby</span></code> and asking, is this name in the <code class="docutils literal notranslate"><span class="pre">nyt</span></code>
-table? If so, then add the value in the <code class="docutils literal notranslate"><span class="pre">category</span></code> column to the row. That’s
-the basic idea behind a join. Let’s look at a few simpler examples first.</p>
+<p>For intuition, we can imagine going down each row in <code class="docutils literal notranslate"><span class="pre">baby</span></code> and asking: is this name in the <code class="docutils literal notranslate"><span class="pre">nyt</span></code> table? If so, then add the value in the <code class="docutils literal notranslate"><span class="pre">category</span></code> column to the row. This is the basic idea behind a join. Let’s look at a few examples on smaller dataframes first.</p>
 <div class="section" id="inner-joins">
 <h2><span class="section-number">6.3.1. </span>Inner Joins<a class="headerlink" href="#inner-joins" title="Permalink to this headline">¶</a></h2>
-<p>We’ll make smaller versions of the <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code> tables so it’s easier to
-see what happens when we join tables together.</p>
+<p>We start by making smaller versions of the <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code> tables so it’s easier to see what happens when we join tables together.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nyt_small</span> <span class="o">=</span> <span class="n">nyt</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">nyt_small</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nyt_small</span>
 </pre></div>
 </div>
 </div>
@@ -1476,12 +1472,7 @@ see what happens when we join tables together.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">names_to_keep</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Julius&#39;</span><span class="p">,</span> <span class="s1">&#39;Karen&#39;</span><span class="p">,</span> <span class="s1">&#39;Noah&#39;</span><span class="p">]</span>
-<span class="n">baby_small</span> <span class="o">=</span> <span class="p">(</span><span class="n">baby</span>
- <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Year == 2020 and Name in @names_to_keep&quot;</span><span class="p">)</span>
- <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">baby_small</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby_small</span>
 </pre></div>
 </div>
 </div>
@@ -1621,6 +1612,10 @@ see what happens when we join tables together.</p>
 <p>Notice that the new table has the columns of both <code class="docutils literal notranslate"><span class="pre">baby_small</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>
 tables. The rows with the name Noah are gone. And the remaining rows have their
 matching <code class="docutils literal notranslate"><span class="pre">category</span></code> from <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Readers should also be aware <code class="docutils literal notranslate"><span class="pre">pandas</span></code> that has a <code class="docutils literal notranslate"><span class="pre">.join()</span></code> method for joining two dataframes together. However, the <code class="docutils literal notranslate"><span class="pre">.merge()</span></code> method has more flexibility for how the dataframes are joined, which is why we focus on <code class="docutils literal notranslate"><span class="pre">.merge()</span></code>. We encourage readers to consult the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> documentation for the exact difference between the two.</p>
+</div>
 <p>When we join two tables together, we tell <code class="docutils literal notranslate"><span class="pre">pandas</span></code> the column(s) from each
 table that we want to use to join (the <code class="docutils literal notranslate"><span class="pre">left_on</span></code> and <code class="docutils literal notranslate"><span class="pre">right_on</span></code> arguments).
 <code class="docutils literal notranslate"><span class="pre">pandas</span></code> matches rows together when the values in the joining columns match, as
@@ -1639,7 +1634,7 @@ rows with a match in both tables stay in the final result.</p>
 </div>
 <div class="section" id="left-right-and-outer-joins">
 <h2><span class="section-number">6.3.2. </span>Left, Right, and Outer Joins<a class="headerlink" href="#left-right-and-outer-joins" title="Permalink to this headline">¶</a></h2>
-<p>We will sometimes want to keep rows without a match instead of dropping them
+<p>We sometimes want to keep rows without a match instead of dropping them
 entirely. There are other types of joins—left, right, and outer—that keep
 rows even when they don’t have a match.</p>
 <p>In a <em>left join</em>, rows in the left table without a match are kept in the final
@@ -1920,7 +1915,8 @@ a match.</p>
 <p>Now, let’s return to the full dataframes <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baby</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># .head() slices out the first few rows - convenient for saving space</span>
+<span class="n">baby</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1964,49 +1960,13 @@ a match.</p>
       <td>18252</td>
       <td>2020</td>
     </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-      <td>M</td>
-      <td>14147</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>2020719</th>
-      <td>Verona</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-    </tr>
-    <tr>
-      <th>2020720</th>
-      <td>Vertie</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-    </tr>
-    <tr>
-      <th>2020721</th>
-      <td>Wilma</td>
-      <td>F</td>
-      <td>5</td>
-      <td>1880</td>
-    </tr>
   </tbody>
 </table>
-<p>2020722 rows × 4 columns</p>
 </div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nyt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nyt</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2044,34 +2004,8 @@ a match.</p>
       <td>Lilith</td>
       <td>forbidden</td>
     </tr>
-    <tr>
-      <th>2</th>
-      <td>Danger</td>
-      <td>forbidden</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>Venus</td>
-      <td>celestial</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>Celestia</td>
-      <td>celestial</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>Skye</td>
-      <td>celestial</td>
-    </tr>
   </tbody>
 </table>
-<p>23 rows × 2 columns</p>
 </div></div></div>
 </div>
 <p>We want to know how the popularity of name categories in <code class="docutils literal notranslate"><span class="pre">nyt</span></code> have changed
@@ -2182,7 +2116,7 @@ over time. To answer this question:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_joining_30_0.svg" src="../../_images/pandas_joining_30_0.svg" /></div>
+<img alt="../../_images/pandas_joining_33_0.svg" src="../../_images/pandas_joining_33_0.svg" /></div>
 </div>
 <p>As the NYT article claims, “baby boomer” names have become less popular after
 2000, while mythological names have become more popular.</p>
@@ -2201,7 +2135,7 @@ they support the claims made in the New York Times article.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/pandas_joining_32_0.svg" src="../../_images/pandas_joining_32_0.svg" /></div>
+<img alt="../../_images/pandas_joining_35_0.svg" src="../../_images/pandas_joining_35_0.svg" /></div>
 </div>
 <p>In this section, we introduced joins for dataframes.
 When joining dataframes together, we match rows using the <code class="docutils literal notranslate"><span class="pre">.merge()</span></code> function.
