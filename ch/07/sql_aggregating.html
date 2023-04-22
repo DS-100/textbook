@@ -370,7 +370,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="sql_transforming.html">
-     7.4. Transforming
+     7.4. Transforming and Common Table Expressions
     </a>
    </li>
    <li class="toctree-l2">
@@ -1184,8 +1184,16 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#basic-group-aggregate">
-   7.2.1. Basic Group-Aggregate
+  <a class="reference internal nav-link" href="#basic-group-aggregate-using-group-by">
+   7.2.1. Basic Group-Aggregate using
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     GROUP
+    </span>
+    <span class="pre">
+     BY
+    </span>
+   </code>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1196,11 +1204,6 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#other-aggregation-functions">
    7.2.3. Other Aggregation Functions
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-have-people-become-more-creative-with-baby-names">
-   7.2.4. Example: Have People Become More Creative With Baby Names?
   </a>
  </li>
 </ul>
@@ -1224,8 +1227,16 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#basic-group-aggregate">
-   7.2.1. Basic Group-Aggregate
+  <a class="reference internal nav-link" href="#basic-group-aggregate-using-group-by">
+   7.2.1. Basic Group-Aggregate using
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     GROUP
+    </span>
+    <span class="pre">
+     BY
+    </span>
+   </code>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1238,11 +1249,6 @@
    7.2.3. Other Aggregation Functions
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#example-have-people-become-more-creative-with-baby-names">
-   7.2.4. Example: Have People Become More Creative With Baby Names?
-  </a>
- </li>
 </ul>
 
                         </nav>
@@ -1253,17 +1259,12 @@
               <div>
                 
   <div class="section" id="aggregating">
-<h1><span class="section-number">7.2. </span>Aggregating<a class="headerlink" href="#aggregating" title="Permalink to this headline">¶</a></h1>
-<p>This section introduces operations for aggregating rows in a relation. Data
-scientists aggregate rows together to make summaries of data. For instance, a
-dataset containing daily sales can be aggregated to show monthly sales instead.
-Specifically, we’ll introduce <em>grouping</em>, a common operation for aggregating
-data.</p>
-<p>We’ll work with the baby names data, as introduced in the previous section:</p>
+<span id="sec-sql-aggregating"></span><h1><span class="section-number">7.2. </span>Aggregating<a class="headerlink" href="#aggregating" title="Permalink to this headline">¶</a></h1>
+<p>This section introduces grouping and aggregating in SQL.
+We’ll work with the baby names data, as in the previous section:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up connection to database</span>
-<span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlalchemy</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///babynames.db&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1361,8 +1362,8 @@ data.</p>
 <p>10 rows × 4 columns</p>
 </div></div></div>
 </div>
-<div class="section" id="basic-group-aggregate">
-<h2><span class="section-number">7.2.1. </span>Basic Group-Aggregate<a class="headerlink" href="#basic-group-aggregate" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basic-group-aggregate-using-group-by">
+<h2><span class="section-number">7.2.1. </span>Basic Group-Aggregate using <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code><a class="headerlink" href="#basic-group-aggregate-using-group-by" title="Permalink to this headline">¶</a></h2>
 <p>Let’s say we want to find out the total number of babies born as recorded in
 this data. This is simply the sum of the <code class="docutils literal notranslate"><span class="pre">Count</span></code> column. SQL provides
 functions that we use in the <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> statement, like <code class="docutils literal notranslate"><span class="pre">SUM</span></code>:</p>
@@ -1408,20 +1409,8 @@ functions that we use in the <code class="docutils literal notranslate"><span cl
 </table>
 </div></div></div>
 </div>
-<p>Summing up the name counts is one simple way to aggregate the data—it
-combines data from multiple rows.</p>
-<p>But let’s say we instead want to answer a more interesting question: are U.S.
-births trending upwards over time? To answer this question, we can sum the
-<code class="docutils literal notranslate"><span class="pre">Count</span></code> column within each year rather than taking the sum over the entire
-dataset. In other words, we split the data into groups based on <code class="docutils literal notranslate"><span class="pre">Year</span></code>, then
-sum up the <code class="docutils literal notranslate"><span class="pre">Count</span></code> values within each group.
-This process is depicted in <a class="reference internal" href="#sql-groupby-births"><span class="std std-ref">A depiction of grouping then aggregating for example data.</span></a>.</p>
-<div class="figure align-default" id="sql-groupby-births">
-<img alt="sql-groupby-births" src="../../_images/sql-groupby-births.svg" /><p class="caption"><span class="caption-number">Fig. 7.2 </span><span class="caption-text">A depiction of grouping then aggregating for example data.</span><a class="headerlink" href="#sql-groupby-births" title="Permalink to this image">¶</a></p>
-</div>
-<p>We call this operation <strong>grouping</strong> followed by <strong>aggregating</strong>. In SQL, we
-specify what column we wish to use for grouping through the <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> clause,
-then using aggregation functions in <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>:</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> chapter, we used grouping and aggregation to figure out whether U.S. births are trending upwards over time. We grouped the dataset by year using <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code>, then summed up the counts within each group using <code class="docutils literal notranslate"><span class="pre">.sum()</span></code>.</p>
+<p>In SQL, we instead group using the <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> clause, then call aggregation functions in <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -1498,30 +1487,7 @@ then using aggregation functions in <code class="docutils literal notranslate"><
 <p>141 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Notice that the code is nearly the same as the non-grouped version, except that
-it contains a <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> clause using the <code class="docutils literal notranslate"><span class="pre">Year</span></code> column. We also add the <code class="docutils literal notranslate"><span class="pre">Year</span></code>
-column to the <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> clause so that each row of the result also contains the
-year.</p>
-<p>The result is a relation with the total babies born for each year in the data.
-Notice that the Year column contains the unique <code class="docutils literal notranslate"><span class="pre">Year</span></code> values—there are no
-duplicate <code class="docutils literal notranslate"><span class="pre">Year</span></code> values anymore since we grouped them together. Now we can plot
-the counts over time:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts_by_year</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-<span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">counts_by_year</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;SUM(Count)&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_aggregating_12_0.svg" src="../../_images/sql_aggregating_12_0.svg" /></div>
-</div>
-<p>What do we see in this plot? First, we might notice that there seem to be
-suspiciously few babies born before 1920. One likely explanation is that the
-Social Security Administration was created in 1935, so its data for prior
-births could be less complete.</p>
-<p>We might also notice the dip when World War II began in 1939, and the
-post-war Baby Boomer era from 1946-1964.</p>
+<p>As with dataframe grouping, notice that the Year column contains the unique <code class="docutils literal notranslate"><span class="pre">Year</span></code> values—there are no duplicate <code class="docutils literal notranslate"><span class="pre">Year</span></code> values anymore since we grouped them together. When grouping in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, the grouping columns become the index of the resulting dataframe. However, relations don’t have row labels, so the <code class="docutils literal notranslate"><span class="pre">Year</span></code> values are just a column in the resulting relation.</p>
 <p>Here’s the basic recipe for grouping in <code class="docutils literal notranslate"><span class="pre">SQL</span></code>:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span>
 <span class="w">  </span><span class="n">col1</span><span class="p">,</span><span class="w">           </span><span class="c1">-- column used for grouping</span>
@@ -1530,6 +1496,8 @@ post-war Baby Boomer era from 1946-1964.</p>
 <span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">col1</span><span class="w">     </span><span class="c1">-- the column(s) to group by</span>
 </pre></div>
 </div>
+<p>Note that the order of clauses in a SQL statement is important. To avoid a syntax error, <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> needs to appear first, then <code class="docutils literal notranslate"><span class="pre">FROM</span></code>, then <code class="docutils literal notranslate"><span class="pre">WHERE</span></code>, then <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code>.</p>
+<p>When using <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> we need to be careful about the columns given to <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>. In general, we can only include columns without an aggregation when we use those columns to group. For example, in the example above we grouped by the <code class="docutils literal notranslate"><span class="pre">Year</span></code> column, so we can include <code class="docutils literal notranslate"><span class="pre">Year</span></code> in the <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> clause. All other columns included in <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> should be aggregated, as we did above with <code class="docutils literal notranslate"><span class="pre">SUM(Count)</span></code>. If we included a “bare” column like <code class="docutils literal notranslate"><span class="pre">Name</span></code> that wasn’t used for grouping, it’s ambiguous which name within the group should be returned. Although bare columns won’t cause an error for SQLite, they cause other SQL engines to error so we recommend avoiding them.</p>
 </div>
 <div class="section" id="grouping-on-multiple-columns">
 <h2><span class="section-number">7.2.2. </span>Grouping on Multiple Columns<a class="headerlink" href="#grouping-on-multiple-columns" title="Permalink to this headline">¶</a></h2>
@@ -1621,90 +1589,19 @@ babies were born over time.</p>
 <p>282 rows × 3 columns</p>
 </div></div></div>
 </div>
-<p>Notice how the code closely follows the grouping recipe.</p>
+<p>Notice that the code above is very similar to grouping by a single column, except that it gives multiple columns to <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> to group by both <code class="docutils literal notranslate"><span class="pre">Year</span></code> and <code class="docutils literal notranslate"><span class="pre">Sex</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, SQLite doesn’t provide a simple way to pivot a relation.
+Instead, we can use <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> on two columns in SQL, read the result into a
+dataframe, and then use the <code class="docutils literal notranslate"><span class="pre">unstack()</span></code> dataframe method.</p>
+</div>
 </div>
 <div class="section" id="other-aggregation-functions">
 <h2><span class="section-number">7.2.3. </span>Other Aggregation Functions<a class="headerlink" href="#other-aggregation-functions" title="Permalink to this headline">¶</a></h2>
-<p>The SQLite database has several other built-in aggregation functions, such as
-<code class="docutils literal notranslate"><span class="pre">COUNT</span></code>, <code class="docutils literal notranslate"><span class="pre">AVG</span></code>, <code class="docutils literal notranslate"><span class="pre">MIN</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAX</span></code>. The full list of functions is available on
-the SQLite website <a class="footnote-reference brackets" href="#agg-funcs" id="id1">1</a>.</p>
-<p>We’ve already seen the <code class="docutils literal notranslate"><span class="pre">SUM</span></code> function:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT Year, SUM(Count)</span>
-<span class="s1">FROM baby</span>
-<span class="s1">GROUP BY Year</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Year</th>
-      <th>SUM(Count)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1880</td>
-      <td>194419</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1881</td>
-      <td>185772</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1882</td>
-      <td>213385</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>138</th>
-      <td>2018</td>
-      <td>3487193</td>
-    </tr>
-    <tr>
-      <th>139</th>
-      <td>2019</td>
-      <td>3437438</td>
-    </tr>
-    <tr>
-      <th>140</th>
-      <td>2020</td>
-      <td>3287724</td>
-    </tr>
-  </tbody>
-</table>
-<p>141 rows × 2 columns</p>
-</div></div></div>
-</div>
+<p>SQLite has several other built-in aggregation functions besides <code class="docutils literal notranslate"><span class="pre">SUM</span></code>, such as
+<code class="docutils literal notranslate"><span class="pre">COUNT</span></code>, <code class="docutils literal notranslate"><span class="pre">AVG</span></code>, <code class="docutils literal notranslate"><span class="pre">MIN</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAX</span></code>. For the full list of functions, consult <a class="reference external" href="https://www.sqlite.org/lang_aggfunc.html">the
+SQLite website</a>.</p>
 <p>To use another aggregation function, we call it in the <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> clause. For
 instance, we can use <code class="docutils literal notranslate"><span class="pre">MAX</span></code> instead of <code class="docutils literal notranslate"><span class="pre">SUM</span></code>:</p>
 <div class="cell docutils container">
@@ -1785,249 +1682,15 @@ instance, we can use <code class="docutils literal notranslate"><span class="pre
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The available aggregation functions are one of the first places a data
+<p>The built-in aggregation functions are one of the first places a data
 scientist may encounter differences in SQL implementations. For instance,
-SQLite has a relatively minimal set of aggregation functions, while PostgreSQL
-has many more <a class="footnote-reference brackets" href="#pg-agg-funcs" id="id2">2</a>. Most SQL implementations provide <code class="docutils literal notranslate"><span class="pre">SUM</span></code>, <code class="docutils literal notranslate"><span class="pre">COUNT</span></code>,
+SQLite has a relatively minimal set of aggregation functions while <a class="reference external" href="https://www.postgresql.org/docs/current/functions-aggregate.html">PostgreSQL
+has many more</a>. That said, almost all SQL implementations provide <code class="docutils literal notranslate"><span class="pre">SUM</span></code>, <code class="docutils literal notranslate"><span class="pre">COUNT</span></code>,
 <code class="docutils literal notranslate"><span class="pre">MIN</span></code>, <code class="docutils literal notranslate"><span class="pre">MAX</span></code>, and <code class="docutils literal notranslate"><span class="pre">AVG</span></code>.</p>
-</div>
-</div>
-<div class="section" id="example-have-people-become-more-creative-with-baby-names">
-<h2><span class="section-number">7.2.4. </span>Example: Have People Become More Creative With Baby Names?<a class="headerlink" href="#example-have-people-become-more-creative-with-baby-names" title="Permalink to this headline">¶</a></h2>
-<p>Have people become more creative with baby names over time? One way to measure
-this is to see whether the number of <em>unique</em> baby names per year has increased
-over time.</p>
-<p>To do this aggregation in SQL, we use the <code class="docutils literal notranslate"><span class="pre">COUNT</span></code> function and the <code class="docutils literal notranslate"><span class="pre">DISTINCT</span></code>
-keyword. The <code class="docutils literal notranslate"><span class="pre">DISTINCT</span></code> keyword tells SQL to only keep the unique values within
-a set of columns.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Finds the unique baby names</span>
-<span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT DISTINCT Name</span>
-<span class="s1">FROM baby</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Liam</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Noah</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>100361</th>
-      <td>Crete</td>
-    </tr>
-    <tr>
-      <th>100362</th>
-      <td>Roll</td>
-    </tr>
-    <tr>
-      <th>100363</th>
-      <td>Zilpah</td>
-    </tr>
-  </tbody>
-</table>
-<p>100364 rows × 1 columns</p>
-</div></div></div>
-</div>
-<p>To count the number of distinct names, we can aggregate using the <code class="docutils literal notranslate"><span class="pre">COUNT</span></code>
-function. We’ll also use the <code class="docutils literal notranslate"><span class="pre">AS</span></code> keyword to rename the resulting column.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Finds the number of unique baby names</span>
-<span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT COUNT(DISTINCT Name) AS n_names</span>
-<span class="s1">FROM baby</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>n_names</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>100364</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<p>Finally, we group by the <code class="docutils literal notranslate"><span class="pre">Year</span></code> column to aggregate over each year rather than
-over the entire dataset:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT Year, COUNT(DISTINCT Name) AS n_names</span>
-<span class="s1">FROM baby</span>
-<span class="s1">GROUP BY Year</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">unique_names_by_year</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-<span class="n">unique_names_by_year</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Year</th>
-      <th>n_names</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1880</td>
-      <td>1889</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1881</td>
-      <td>1829</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1882</td>
-      <td>2012</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>138</th>
-      <td>2018</td>
-      <td>29619</td>
-    </tr>
-    <tr>
-      <th>139</th>
-      <td>2019</td>
-      <td>29417</td>
-    </tr>
-    <tr>
-      <th>140</th>
-      <td>2020</td>
-      <td>28613</td>
-    </tr>
-  </tbody>
-</table>
-<p>141 rows × 2 columns</p>
-</div></div></div>
-</div>
-<p>Now, we can plot the number of unique names over time:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">unique_names_by_year</span><span class="p">,</span>
-        <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;n_names&#39;</span><span class="p">,</span>
-        <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;n_names&#39;</span><span class="p">:</span> <span class="s1">&#39;# unique names&#39;</span><span class="p">},</span>
-        <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_aggregating_31_0.svg" src="../../_images/sql_aggregating_31_0.svg" /></div>
-</div>
-<p>We see that the number of unique names has generally increased over time, even
-though the number of babies born has mostly stabilized since the 1960s.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Unlike <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, SQLite doesn’t provide a simple way to pivot a relation.
-Instead, we use <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> on two columns in SQL, read the result into a
-dataframe, and then use the <code class="docutils literal notranslate"><span class="pre">unstack()</span></code> dataframe method <a class="footnote-reference brackets" href="#unstack" id="id3">3</a>.</p>
 </div>
 <p>This section covered common ways to aggregate data in SQL using
 the <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> keyword with one or more columns.
 In the next section, we’ll explain how to join relations together.</p>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="agg-funcs"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://www.sqlite.org/lang_aggfunc.html">https://www.sqlite.org/lang_aggfunc.html</a></p>
-</dd>
-<dt class="label" id="pg-agg-funcs"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://www.postgresql.org/docs/current/functions-aggregate.html">https://www.postgresql.org/docs/current/functions-aggregate.html</a></p>
-</dd>
-<dt class="label" id="unstack"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
-<dd><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.unstack.html">https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.unstack.html</a></p>
-</dd>
-</dl>
 </div>
 </div>
 

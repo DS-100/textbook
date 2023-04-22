@@ -370,7 +370,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="sql_transforming.html">
-     7.4. Transforming
+     7.4. Transforming and Common Table Expressions
     </a>
    </li>
    <li class="toctree-l2">
@@ -1184,8 +1184,19 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#about-the-data">
-   7.1.1. About the Data
+  <a class="reference internal nav-link" href="#sql-basics-select-and-from">
+   7.1.1. SQL Basics:
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     SELECT
+    </span>
+   </code>
+   and
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     FROM
+    </span>
+   </code>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1229,8 +1240,19 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#about-the-data">
-   7.1.1. About the Data
+  <a class="reference internal nav-link" href="#sql-basics-select-and-from">
+   7.1.1. SQL Basics:
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     SELECT
+    </span>
+   </code>
+   and
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     FROM
+    </span>
+   </code>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1263,35 +1285,26 @@
               <div>
                 
   <div class="section" id="subsetting">
-<h1><span class="section-number">7.1. </span>Subsetting<a class="headerlink" href="#subsetting" title="Permalink to this headline">¶</a></h1>
-<p>This section introduces operations for taking subsets of relations. When data
-scientists begin working with a relation, they often want to subset the specific
-data that they plan to use. For example, a data scientist can <em>slice</em> out the
-ten relevant features from a relation with hundreds of columns. Or, they can
-<em>filter</em> a relation to remove rows with incomplete data. For the rest of this
-chapter, we’ll introduce relation operations using a dataset of baby names.</p>
+<span id="sec-sql-subsetting"></span><h1><span class="section-number">7.1. </span>Subsetting<a class="headerlink" href="#subsetting" title="Permalink to this headline">¶</a></h1>
 <p>To work with relations, we’ll introduce a domain-specific programming language
 called <strong>SQL</strong> (Structured Query Language). We commonly pronounce “SQL” like
 “sequel” instead of spelling out the acronym. SQL is a specialized language for
-working with relations—as such, SQL has its own syntax that makes it easier
-to write programs that operate on relational data.</p>
-<div class="section" id="about-the-data">
-<h2><span class="section-number">7.1.1. </span>About the Data<a class="headerlink" href="#about-the-data" title="Permalink to this headline">¶</a></h2>
-<p>There’s a <a class="reference external" href="https://www.nytimes.com/2021/06/12/style/lilibet-popular-baby-names.html">2021 New York Times article</a> that talks about Prince Harry and
-Meghan’s unique choice for their new baby daughter’s name: Lilibet. The article has an interview with Pamela Redmond,
-an expert on baby names, who talks about interesting trends in how people name
-their kids. For example, she says that names that start with the letter “L”
-have become very popular in recent years, while names that start with the
-letter “J” were most popular in the 1970s and 1980s. Are these claims reflected
-in data? We can use SQL to find out.</p>
+working with relations—as such, SQL has a different syntax than Python
+for writing programs that operate on relational data.</p>
 <p>In this chapter, we’ll use SQL queries within Python programs. This illustrates
 a common workflow—data scientists often process and subset data in SQL before
 loading the data into Python for further analysis. SQL databases make it easier
 to work with large amounts of data compared to <code class="docutils literal notranslate"><span class="pre">pandas</span></code> programs. However,
 loading data into <code class="docutils literal notranslate"><span class="pre">pandas</span></code> makes it easier to visualize the data and build
 statistical models.</p>
-<p>So, in this chapter we’ll use the <code class="docutils literal notranslate"><span class="pre">pandas.read_sql</span></code> function which runs a SQL
-query and stores the output in a dataframe. Using this function requires some
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Why do SQL systems tend to work better with larger datasets? In short, SQL systems have sophisticated algorithms for managing data stored on disk. For example, when working with a large dataset SQL systems will transparently load and manipulate small portions of data at a time; doing this in <code class="docutils literal notranslate"><span class="pre">pandas</span></code> can be quite difficult in comparison. We cover this topic in more detail in the <a class="reference internal" href="../08/files_intro.html#ch-files"><span class="std std-ref">Wrangling Files</span></a> chapter.</p>
+</div>
+<div class="section" id="sql-basics-select-and-from">
+<h2><span class="section-number">7.1.1. </span>SQL Basics: <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> and <code class="docutils literal notranslate"><span class="pre">FROM</span></code><a class="headerlink" href="#sql-basics-select-and-from" title="Permalink to this headline">¶</a></h2>
+<p>We’ll use the <code class="docutils literal notranslate"><span class="pre">pd.read_sql</span></code> function which runs a SQL
+query and stores the output in a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> dataframe. Using this function requires some
 setup. We start by importing the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> and <code class="docutils literal notranslate"><span class="pre">sqlalchemy</span></code> Python packages.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1313,15 +1326,10 @@ this format.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>SQL is a programming language that is implemented differently across database
-systems. In this book, we use SQLite, one popular database system. Other
+<p>In this book, we use SQLite, an extremely useful database system for working with data stored locally. Other
 systems make different tradeoffs that are useful for different domains. For
-instance, PostgreSQL and MySQL are systems that are useful for large web
-applications where many end users are writing data at the same time.</p>
-<p>To make matters more complicated, each SQL system has slight differences. In
-this book, we’ll rely on core parts of SQL syntax that are unlikely to change
-across implementations. While we won’t go over other systems in detail, we’ll
-point out where different SQL systems may differ in capabilities.</p>
+instance, PostgreSQL and MySQL are more complex systems that are useful for large web applications where many end users are writing data at the same time.
+Although each SQL system has slight differences, they provide the same core SQL functionality. Readers may also be aware that Python provides SQLite support in its standard <code class="docutils literal notranslate"><span class="pre">sqlite3</span></code> library. We choose to use <code class="docutils literal notranslate"><span class="pre">sqlalchemy</span></code> because it’s easier to reuse the code for other SQL systems beyond SQLite.</p>
 </div>
 <p>Now, we can use <code class="docutils literal notranslate"><span class="pre">pd.read_sql</span></code> to run SQL queries on this database. This
 database has two relations: <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code>. Here’s a simple example that
@@ -1424,21 +1432,7 @@ SQL keywords. We read the query above like:</p>
 <span class="k">FROM</span><span class="w"> </span><span class="n">baby</span><span class="p">;</span><span class="w">  </span><span class="c1">-- ...from the baby relation</span>
 </pre></div>
 </div>
-<p>The data in the <code class="docutils literal notranslate"><span class="pre">baby</span></code> relation comes from the <a class="reference external" href="https://www.ssa.gov/oact/babynames/index.html">US Social Security department</a>,
-which records the baby name and birth sex for birth certificate purposes. They
-make the baby names data available on their website.</p>
-<p>The Social Security website has a <a class="reference external" href="https://www.ssa.gov/oact/babynames/background.html">page</a> that describes the data in more detail. We won’t go
-in-depth in this chapter about the data’s limitations, but we’ll point out
-this relevant quote from the website:</p>
-<blockquote>
-<div><p>All names are from Social Security card applications for births that occurred
-in the United States after 1879. Note that many people born before 1937 never
-applied for a Social Security card, so their names are not included in our
-data. For others who did apply, our records may not show the place of birth,
-and again their names are not included in our data.</p>
-<p>All data are from a 100% sample of our records on Social Security card
-applications as of March 2021.</p>
-</div></blockquote>
+<p>The <code class="docutils literal notranslate"><span class="pre">baby</span></code> relation contains the same data as the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataframe in the <a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-ref">Working With Dataframes Using pandas</span></a> chapter: the names of all babies registered by the US Social Security department.</p>
 </div>
 <div class="section" id="whats-a-relation">
 <h2><span class="section-number">7.1.2. </span>What’s a Relation?<a class="headerlink" href="#whats-a-relation" title="Permalink to this headline">¶</a></h2>
@@ -1453,9 +1447,7 @@ ordered.</p>
 <p>Relations have a long history. More formal treatments of relations use the term
 “tuple” to refer to the rows of a relation, and “attribute” to refer to the
 columns. There is also a rigorous way to define data operations using
-relational algebra, which is derived from mathematical set algebra. Interested
-data scientists can find a more in-depth treatment of relations in books on
-database systems such as the one by <a class="reference external" href="https://books.google.com/books?id=pk5GAQAAIAAJ">Garcia-Molina, Ullman, and Widom</a>.</p>
+relational algebra, which is derived from mathematical set algebra.</p>
 </div>
 <div class="section" id="slicing">
 <h2><span class="section-number">7.1.3. </span>Slicing<a class="headerlink" href="#slicing" title="Permalink to this headline">¶</a></h2>
@@ -1679,13 +1671,7 @@ of a relation.</p>
 </div>
 <div class="section" id="filtering-rows">
 <h2><span class="section-number">7.1.4. </span>Filtering Rows<a class="headerlink" href="#filtering-rows" title="Permalink to this headline">¶</a></h2>
-<p>So far, we’ve shown how to use <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> and <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> to slice columns and rows
-of a relation.</p>
-<p>However, data scientists often want to <em>filter</em> rows—they want to take
-subsets of rows using some criteria. Let’s say you want to find the most
-popular baby names in 2020. To do this, you can filter rows to keep only the
-rows where the <code class="docutils literal notranslate"><span class="pre">Year</span></code> is 2020.</p>
-<p>To filter a relation, use the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> keyword with a predicate:</p>
+<p>Now, we turn to <em>filtering</em> rows—taking subsets of rows using one or more criteria. In <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we slice dataframes using Boolean series objects. In SQL, we instead use the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> keyword with a predicate. The query below filters the <code class="docutils literal notranslate"><span class="pre">baby</span></code> relation to have only the baby names in 2020:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -1810,6 +1796,7 @@ instance, to find the names that have more than 10000 babies in either 2020 or
 <span class="s1">WHERE Count &gt; 10000</span>
 <span class="s1">  AND (Year = 2020</span>
 <span class="s1">       OR Year = 2019);</span>
+<span class="s1">-- Notice that we use parentheses to enforce evaluation order</span>
 <span class="s1">&#39;&#39;&#39;</span>
 
 <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
@@ -1997,19 +1984,11 @@ option (short for DESCending).</p>
 </div>
 <div class="section" id="example-how-recently-has-luna-become-a-popular-name">
 <h2><span class="section-number">7.1.5. </span>Example: How recently has Luna become a popular name?<a class="headerlink" href="#example-how-recently-has-luna-become-a-popular-name" title="Permalink to this headline">¶</a></h2>
-<p>The New York Times article mentions that the name “Luna” was almost nonexistent
+<p>As we mention in the chapter introducing <code class="docutils literal notranslate"><span class="pre">pandas</span></code>,
+a New York Times article mentions that the name “Luna” was almost nonexistent
 before 2000 but has since grown to become a very popular name for girls.
 When exactly did Luna become popular?
-We can check this using slicing and filtering.
-When approaching a data manipulation
-task, we recommend breaking the problem down into smaller steps. For
-example, we could think:</p>
-<ol class="simple">
-<li><p>Filter: keep only rows with <code class="docutils literal notranslate"><span class="pre">'Luna'</span></code> in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column, and <code class="docutils literal notranslate"><span class="pre">'F'</span></code> in the
-<code class="docutils literal notranslate"><span class="pre">Sex</span></code> column.</p></li>
-<li><p>Slice: keep the <code class="docutils literal notranslate"><span class="pre">Count</span></code> and <code class="docutils literal notranslate"><span class="pre">Year</span></code> columns.</p></li>
-</ol>
-<p>Now, it’s a matter of translating each step into code.</p>
+We can check this in SQL using slicing and filtering.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -2116,47 +2095,7 @@ it into a <code class="docutils literal notranslate"><span class="pre">pandas</s
 <div class="cell_output docutils container">
 <img alt="../../_images/sql_subsetting_36_0.svg" src="../../_images/sql_subsetting_36_0.svg" /></div>
 </div>
-<p>It’s just as the article says. Luna wasn’t popular at all until the year 2000
-or so. Think about that—if someone tells you that their name is Luna, you can
-take a pretty good guess at their age even without any other information about
-them!</p>
-<p>Just for fun, here’s the same plot for the name Siri.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT *</span>
-<span class="s1">FROM baby</span>
-<span class="s1">WHERE Name = &quot;Siri&quot;</span>
-<span class="s1">  AND Sex = &quot;F&quot;;</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">siri</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-<span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">siri</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_subsetting_38_0.svg" src="../../_images/sql_subsetting_38_0.svg" /></div>
-</div>
-<p>Why might the popularity have dropped so suddenly after 2010?
-Well, Siri happens to be the
-name of Apple’s voice assistant and was introduced in 2011.
-Let’s draw a line for the year 2011 and take a look…</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">siri</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">add_vline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2011</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_subsetting_40_0.svg" src="../../_images/sql_subsetting_40_0.svg" /></div>
-</div>
-<p>It looks like parents don’t want their kids to be confused when other
-people say “Hey Siri” to their phones.</p>
-<p>This section introduced relations in SQL.
-We’ve covered the common ways that data scientists subset relations—slicing
-with column labels and filtering using a boolean condition.
+<p>In this section, we introduce the common ways that data scientists subset relations—slicing with column labels and filtering using a boolean condition.
 In the next section, we explain how to aggregate rows together.</p>
 </div>
 </div>

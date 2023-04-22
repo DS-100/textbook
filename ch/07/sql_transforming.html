@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.4. Transforming &#8212; Learning Data Science</title>
+    <title>7.4. Transforming and Common Table Expressions &#8212; Learning Data Science</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -370,7 +370,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     7.4. Transforming
+     7.4. Transforming and Common Table Expressions
     </a>
    </li>
    <li class="toctree-l2">
@@ -1214,7 +1214,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Transforming</h1>
+                <h1>Transforming and Common Table Expressions</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -1254,13 +1254,9 @@
             
               <div>
                 
-  <div class="section" id="transforming">
-<h1><span class="section-number">7.4. </span>Transforming<a class="headerlink" href="#transforming" title="Permalink to this headline">¶</a></h1>
-<p>Data scientists transform columns when they need to change each value in a
-feature in the same way. For example, if a feature contains heights of people
-in feet, a data scientist might want to transform the heights to centimeters.
-In this section, we’ll show how to <em>apply</em> functions that transform columns of
-data using SQL.</p>
+  <div class="section" id="transforming-and-common-table-expressions">
+<span id="sec-sql-transforming"></span><h1><span class="section-number">7.4. </span>Transforming and Common Table Expressions<a class="headerlink" href="#transforming-and-common-table-expressions" title="Permalink to this headline">¶</a></h1>
+<p>In this section, we show how to call functions to transform columns of data using built-in SQL functions. We also demonstrate how to use common table expressions to build up complex queries from simpler ones. As usual, we start by loading the database.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up connection to database</span>
@@ -1270,119 +1266,13 @@ data using SQL.</p>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT *</span>
-<span class="s1">FROM baby</span>
-<span class="s1">LIMIT 10;</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-      <th>Year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Liam</td>
-      <td>M</td>
-      <td>19659</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Noah</td>
-      <td>M</td>
-      <td>18252</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-      <td>M</td>
-      <td>14147</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Lucas</td>
-      <td>M</td>
-      <td>11281</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Henry</td>
-      <td>M</td>
-      <td>10705</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Alexander</td>
-      <td>M</td>
-      <td>10151</td>
-      <td>2020</td>
-    </tr>
-  </tbody>
-</table>
-<p>10 rows × 4 columns</p>
-</div></div></div>
-</div>
-<p>In the baby names New York Times article <span id="id1">[<a class="reference internal" href="../../references.html#id9">Williams, 2021</a>]</span>, Pamela
-mentions that names starting with the letter “L” and “K” became popular
-after 2000. On the other hand, names starting with the letter “J” peaked in
-popularity in the 1970s and 1980s and have dropped off in popularity since. We
-can verify these claims using the <code class="docutils literal notranslate"><span class="pre">baby</span></code> dataset.</p>
-<p>We approach this problem using the following steps:</p>
-<ol class="simple">
-<li><p>Transform the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column into a new column that contains the first
-letters of each value in <code class="docutils literal notranslate"><span class="pre">Name</span></code>.</p></li>
-<li><p>Group the dataframe by the first letter and year.</p></li>
-<li><p>Aggregate the name counts by summing.</p></li>
-</ol>
-<p>To complete the first step, we’ll apply a function to the <code class="docutils literal notranslate"><span class="pre">Name</span></code> column.</p>
 <div class="section" id="sql-functions">
 <h2><span class="section-number">7.4.1. </span>SQL Functions<a class="headerlink" href="#sql-functions" title="Permalink to this headline">¶</a></h2>
-<p>SQLite provides scalar functions, or functions that transform single data
+<p>SQLite provides a variety of scalar functions, or functions that transform single data
 values. When called on a column of data, SQLite will apply these functions on
 each value in the column. In contrast, aggregation functions like <code class="docutils literal notranslate"><span class="pre">SUM</span></code> and
 <code class="docutils literal notranslate"><span class="pre">COUNT</span></code> take a column of values as input and compute a single value as output.</p>
-<p>SQLite provides a comprehensive list of the built-in scalar functions on its
-website <a class="footnote-reference brackets" href="#funcs" id="id2">1</a>. For instance, to find the lengths of each name, we use the
+<p>SQLite provides a comprehensive list of the built-in scalar functions in <a class="reference external" href="https://www.sqlite.org/lang_corefunc.html">its online documentation</a>. For instance, to find the number of characters in each name, we use the
 <code class="docutils literal notranslate"><span class="pre">LENGTH</span></code> function.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1466,15 +1356,15 @@ column.</p>
 <p class="admonition-title">Note</p>
 <p>Like aggregation functions, each implementation of SQL provides a different set
 of scalar functions. SQLite has a relatively minimal set of functions, while
-PostgreSQL has many more <a class="footnote-reference brackets" href="#pg-funcs" id="id3">2</a>. Most SQL implementations provide some
+<a class="reference external" href="https://www.postgresql.org/docs/9.2/functions.html">PostgreSQL has many more</a>. That said, almost all SQL implementations provide some
 equivalent to SQLite’s <code class="docutils literal notranslate"><span class="pre">LENGTH</span></code>, <code class="docutils literal notranslate"><span class="pre">ROUND</span></code>, <code class="docutils literal notranslate"><span class="pre">SUBSTR</span></code>, and <code class="docutils literal notranslate"><span class="pre">LIKE</span></code> functions.</p>
 </div>
-<p>Calling a scalar function uses the same syntax as an aggregation function. This
+<p>Although scalar functions use the same syntax as an aggregation function, they behave differently. This
 can result in confusing output if the two are mixed together in a single query:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT Name, LENGTH(Name), COUNT(Name)</span>
+<span class="s1">SELECT Name, LENGTH(Name), AVG(Count)</span>
 <span class="s1">FROM baby</span>
 <span class="s1">LIMIT 10;</span>
 <span class="s1">&#39;&#39;&#39;</span>
@@ -1504,7 +1394,7 @@ can result in confusing output if the two are mixed together in a single query:<
       <th></th>
       <th>Name</th>
       <th>LENGTH(Name)</th>
-      <th>COUNT(Name)</th>
+      <th>AVG(Count)</th>
     </tr>
   </thead>
   <tbody>
@@ -1512,13 +1402,13 @@ can result in confusing output if the two are mixed together in a single query:<
       <th>0</th>
       <td>Liam</td>
       <td>4</td>
-      <td>2020722</td>
+      <td>174.47</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
-<p>For this reason, we must be careful when when scalar and aggregation functions
+<p>Here, the <code class="docutils literal notranslate"><span class="pre">AVG(Name)</span></code> computes the average of the entire <code class="docutils literal notranslate"><span class="pre">Count</span></code> column, but the output is confusing—a reader could easily think the average is related to the name <code class="docutils literal notranslate"><span class="pre">Liam</span></code>. For this reason, we must be careful when when scalar and aggregation functions
 appear together within a <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> statement.</p>
 <p>To extract the first letter of each name, we can use the <code class="docutils literal notranslate"><span class="pre">SUBSTR</span></code> function
 (short for “substring”). As described in the documentation, the <code class="docutils literal notranslate"><span class="pre">SUBSTR</span></code>
@@ -1601,7 +1491,7 @@ length of the substring.</p>
 <p>10 rows × 2 columns</p>
 </div></div></div>
 </div>
-<p>Now, we can use the <code class="docutils literal notranslate"><span class="pre">AS</span></code> keyword to rename the column:</p>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">AS</span></code> keyword to rename the column:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -1942,7 +1832,7 @@ first letter and year, then aggregate the <code class="docutils literal notransl
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/sql_transforming_24_0.svg" src="../../_images/sql_transforming_24_0.svg" /></div>
+<img alt="../../_images/sql_transforming_22_0.svg" src="../../_images/sql_transforming_22_0.svg" /></div>
 </div>
 <p>The plot shows that “L” names were popular in the 1960s, dipped in the decades
 after, but have indeed resurged in popularity after 2000.</p>
@@ -1957,7 +1847,7 @@ after, but have indeed resurged in popularity after 2000.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/sql_transforming_26_0.svg" src="../../_images/sql_transforming_26_0.svg" /></div>
+<img alt="../../_images/sql_transforming_24_0.svg" src="../../_images/sql_transforming_24_0.svg" /></div>
 </div>
 <p>The NYT article says that “J” names were popular in the 1970s and 80s. The plot
 agrees, and also shows that they have become less popular after 2000.</p>
@@ -1967,15 +1857,6 @@ To transform values in a relation, we commonly use SQL functions like
 We also explained how to build up complex queries using the <code class="docutils literal notranslate"><span class="pre">WITH</span></code> clause.
 In the next section, we’ll compare relations with other ways to represent and
 manipulate data tables.</p>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="funcs"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
-<dd><p><a class="reference external" href="https://www.sqlite.org/lang_corefunc.html">https://www.sqlite.org/lang_corefunc.html</a></p>
-</dd>
-<dt class="label" id="pg-funcs"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
-<dd><p><a class="reference external" href="https://www.postgresql.org/docs/9.2/functions.html">https://www.postgresql.org/docs/9.2/functions.html</a></p>
-</dd>
-</dl>
 </div>
 </div>
 

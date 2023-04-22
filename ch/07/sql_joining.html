@@ -53,7 +53,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="7.4. Transforming" href="sql_transforming.html" />
+    <link rel="next" title="7.4. Transforming and Common Table Expressions" href="sql_transforming.html" />
     <link rel="prev" title="7.2. Aggregating" href="sql_aggregating.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -370,7 +370,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="sql_transforming.html">
-     7.4. Transforming
+     7.4. Transforming and Common Table Expressions
     </a>
    </li>
    <li class="toctree-l2">
@@ -1189,8 +1189,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#left-right-and-outer-joins">
-   7.3.2. Left, Right, and Outer Joins
+  <a class="reference internal nav-link" href="#left-and-right-joins">
+   7.3.2. Left and Right Joins
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1224,8 +1224,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#left-right-and-outer-joins">
-   7.3.2. Left, Right, and Outer Joins
+  <a class="reference internal nav-link" href="#left-and-right-joins">
+   7.3.2. Left and Right Joins
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -1243,20 +1243,9 @@
               <div>
                 
   <div class="section" id="joining">
-<h1><span class="section-number">7.3. </span>Joining<a class="headerlink" href="#joining" title="Permalink to this headline">¶</a></h1>
-<p>Data scientists very frequently want to <em>join</em> two or more relations together
-in order to connect records between relations. For instance, an online
-bookstore might have one relation with the books each user has ordered and a
-second relation with the genres of each book. By joining the two relations
-together, the data scientist can see what genres each user prefers.</p>
-<p>We’ll continue looking at the baby names data. We’ll use joins to check some
-trends mentioned in the <a class="reference external" href="https://www.nytimes.com/2021/06/12/style/lilibet-popular-baby-names.html">New York Times article</a>) about baby names. The article talks about how certain categories of
-names have become more or less popular over time. For instance, it mentions
-that mythological names like Julius and Cassius have become popular, while baby
-boomer names like Susan and Debbie have become less popular. How has the
-popularity of these categories changed over time?</p>
-<p>We’ve taken the names and categories in the NYT article and put them in a small
-relation named <code class="docutils literal notranslate"><span class="pre">nyt</span></code>:</p>
+<span id="sec-sql-joining"></span><h1><span class="section-number">7.3. </span>Joining<a class="headerlink" href="#joining" title="Permalink to this headline">¶</a></h1>
+<p>To connect records between two data tables, SQL relations can be joined together just like dataframes. In this section, we introduce SQL joins to replicate our analysis of the baby names data. Recall that <a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-numref">Chapter 6</span></a> mentions a New York Times article that talks about how certain name categories, like mythological and baby boomer names, have become more or less popular over time.</p>
+<p>We’ve taken the names and categories in the NYT article and put them in a small relation named <code class="docutils literal notranslate"><span class="pre">nyt</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up connection to database</span>
@@ -1353,106 +1342,10 @@ of twenty CSV files. Instead, it could be simpler to store all the data tables
 in a SQLite database stored in a single file.</p>
 </div>
 <p>To see how popular the categories of names are, we join the <code class="docutils literal notranslate"><span class="pre">nyt</span></code> relation with
-the <code class="docutils literal notranslate"><span class="pre">baby</span></code> relation to get the name counts from <code class="docutils literal notranslate"><span class="pre">baby</span></code>. We’ll start by
-displaying the first few rows of the <code class="docutils literal notranslate"><span class="pre">baby</span></code> relation:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT *</span>
-<span class="s1">FROM baby</span>
-<span class="s1">LIMIT 10;</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-      <th>Year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Liam</td>
-      <td>M</td>
-      <td>19659</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Noah</td>
-      <td>M</td>
-      <td>18252</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-      <td>M</td>
-      <td>14147</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Lucas</td>
-      <td>M</td>
-      <td>11281</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Henry</td>
-      <td>M</td>
-      <td>10705</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Alexander</td>
-      <td>M</td>
-      <td>10151</td>
-      <td>2020</td>
-    </tr>
-  </tbody>
-</table>
-<p>10 rows × 4 columns</p>
-</div></div></div>
-</div>
-<p>Imagine going down each row in <code class="docutils literal notranslate"><span class="pre">baby</span></code> and asking, is this name in the <code class="docutils literal notranslate"><span class="pre">nyt</span></code>
-table? If so, then add the value in the <code class="docutils literal notranslate"><span class="pre">category</span></code> column to the row. That’s
-the basic idea behind a join. Let’s look at a few simpler examples first.</p>
+the <code class="docutils literal notranslate"><span class="pre">baby</span></code> relation to get the name counts from <code class="docutils literal notranslate"><span class="pre">baby</span></code>.</p>
 <div class="section" id="inner-joins">
 <h2><span class="section-number">7.3.1. </span>Inner Joins<a class="headerlink" href="#inner-joins" title="Permalink to this headline">¶</a></h2>
-<p>We’ve made smaller versions of the <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code> tables so it’s easier to
+<p>As in the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> chapter, we’ve made smaller versions of the <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code> tables so it’s easier to
 see what happens when we join tables together. The relations are called
 <code class="docutils literal notranslate"><span class="pre">baby_small</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>.</p>
 <div class="cell docutils container">
@@ -1585,14 +1478,12 @@ see what happens when we join tables together. The relations are called
 </table>
 </div></div></div>
 </div>
-<p>To join tables in SQL, we use the <code class="docutils literal notranslate"><span class="pre">JOIN</span></code> clause to say which tables we want to
-join, and the <code class="docutils literal notranslate"><span class="pre">ON</span></code> clause to specify a predicate for joining the tables. Here’s
-an example:</p>
+<p>To join relations in SQL, we use the <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> clause to say which tables we want to join, and the <code class="docutils literal notranslate"><span class="pre">ON</span></code> clause to specify a predicate for joining the tables. Here’s an example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
 <span class="s1">SELECT *</span>
-<span class="s1">FROM baby_small JOIN nyt_small</span>
+<span class="s1">FROM baby_small INNER JOIN nyt_small</span>
 <span class="s1">  ON baby_small.Name = nyt_small.nyt_name</span>
 <span class="s1">&#39;&#39;&#39;</span>
 
@@ -1659,43 +1550,22 @@ an example:</p>
 </table>
 </div></div></div>
 </div>
-<p>Notice that the new table has the columns of both <code class="docutils literal notranslate"><span class="pre">baby_small</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>
-tables. The rows with the name Noah are gone. And the remaining rows have their
-matching <code class="docutils literal notranslate"><span class="pre">category</span></code> from <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>.</p>
-<p>The query above can be read as follows:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span>
-<span class="k">FROM</span><span class="w"> </span><span class="n">baby_small</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">nyt_small</span><span class="w">   </span><span class="c1">-- the tables to join</span>
-<span class="w">  </span><span class="k">ON</span><span class="w"> </span><span class="n">baby_small</span><span class="p">.</span><span class="n">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nyt_small</span><span class="p">.</span><span class="n">nyt_name</span>
-<span class="w">  </span><span class="c1">-- only join rows together when the names are equal</span>
-</pre></div>
-</div>
-<p>When we join two tables together, we tell SQL the column(s) from each
+<p>Notice that this result is the same as doing an inner join in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>: the new table has the columns of both <code class="docutils literal notranslate"><span class="pre">baby_small</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>
+tables. The rows with the name Noah are gone, and the remaining rows have their matching <code class="docutils literal notranslate"><span class="pre">category</span></code> from <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>.</p>
+<p>To join two tables together, we tell SQL the column(s) from each
 table that we want to use to join using a predicate with the <code class="docutils literal notranslate"><span class="pre">ON</span></code> keyword.
-SQL matches rows together when the values in the joining columns match, as
-shown in <a class="reference internal" href="#fig-sql-inner-join"><span class="std std-numref">Fig. 7.3</span></a>.</p>
+SQL matches rows together when the values in the joining columns fulfill the predicate, as
+shown in <a class="reference internal" href="#fig-sql-inner-join"><span class="std std-numref">Fig. 7.2</span></a>.</p>
 <div class="figure align-default" id="fig-sql-inner-join">
-<img alt="sql-inner-join" src="../../_images/sql-inner-join.svg" /><p class="caption"><span class="caption-number">Fig. 7.3 </span><span class="caption-text">To join, SQL matches rows using the values in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_name</span></code>
-columns. For inner joins (the default), rows that don’t have matching values
+<img alt="sql-inner-join" src="../../_images/sql-inner-join.svg" /><p class="caption"><span class="caption-number">Fig. 7.2 </span><span class="caption-text">To join, SQL matches rows using the values in the <code class="docutils literal notranslate"><span class="pre">Name</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt_name</span></code>
+columns. For inner joins, any row that doesn’t have a matching value
 are dropped.</span><a class="headerlink" href="#fig-sql-inner-join" title="Permalink to this image">¶</a></p>
 </div>
-<p>By default, SQL does an <em>inner join</em>. If either table has rows that don’t
-have matches in the other table, SQL drops those rows from the result. In
-this case, the Noah rows in <code class="docutils literal notranslate"><span class="pre">baby_small</span></code> don’t have matches in
-<code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>, so they are dropped. Also, the Freya row in <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code>
-doesn’t have matches in <code class="docutils literal notranslate"><span class="pre">baby_small</span></code>, so it’s dropped as well. Only the
-rows with a match in both tables stay in the final result.</p>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, SQL gives more flexibility on how rows are joined. The <code class="docutils literal notranslate"><span class="pre">pd.merge()</span></code> method can only join using simple equality, but the predicate in the <code class="docutils literal notranslate"><span class="pre">ON</span></code> clause can be arbitrarily complex. As an example, we take advantage of this extra versatility in <a class="reference internal" href="../12/pa_collocated.html#sec-pa-collocated"><span class="std std-numref">Section 12.2</span></a>.</p>
 </div>
-<div class="section" id="left-right-and-outer-joins">
-<h2><span class="section-number">7.3.2. </span>Left, Right, and Outer Joins<a class="headerlink" href="#left-right-and-outer-joins" title="Permalink to this headline">¶</a></h2>
-<p>We sometimes want to keep rows without a match instead of dropping them
-entirely. There are other types of joins—left, right, and outer—that keep
-rows even when they don’t have a match.</p>
-<p>In a <em>left join</em>, rows in the left table without a match are kept in the final
-result, as shown in <a class="reference internal" href="#fig-sql-left-join"><span class="std std-numref">Fig. 7.4</span></a>.</p>
-<div class="figure align-default" id="fig-sql-left-join">
-<img alt="sql-left-join" src="../../_images/sql-left-join.svg" /><p class="caption"><span class="caption-number">Fig. 7.4 </span><span class="caption-text">In a left join, rows in the left table that don’t have matching values are kept.</span><a class="headerlink" href="#fig-sql-left-join" title="Permalink to this image">¶</a></p>
-</div>
-<p>To do a left join in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, use <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code> instead of <code class="docutils literal notranslate"><span class="pre">JOIN</span></code>:</p>
+<div class="section" id="left-and-right-joins">
+<h2><span class="section-number">7.3.2. </span>Left and Right Joins<a class="headerlink" href="#left-and-right-joins" title="Permalink to this headline">¶</a></h2>
+<p>Like <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, SQL also supports left joins. Instead of saying <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code>, we instead use <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -1785,15 +1655,10 @@ result, as shown in <a class="reference internal" href="#fig-sql-left-join"><spa
 </table>
 </div></div></div>
 </div>
-<p>Notice that the Noah rows are kept in the final table. Since those rows didn’t
-have a match in the <code class="docutils literal notranslate"><span class="pre">nyt_small</span></code> dataframe, SQL leaves <code class="docutils literal notranslate"><span class="pre">NULL</span></code> values in the
-<code class="docutils literal notranslate"><span class="pre">nyt_name</span></code> and <code class="docutils literal notranslate"><span class="pre">category</span></code> columns (which are then converted to <code class="docutils literal notranslate"><span class="pre">None</span></code> values
-when read into a <code class="docutils literal notranslate"><span class="pre">pandas</span></code> dataframe). Also, notice that the Freya row in
-<code class="docutils literal notranslate"><span class="pre">nyt_small</span></code> is still dropped.</p>
-<p>A <em>right join</em> works similarly to the left join, except that non-matching rows
-in the right table are kept instead of the left table. SQLite doesn’t support
-right joins directly, but we can perform the same join by reversing the order
-of relations when we use <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code>:</p>
+<p>As we might expect, the “left” side of the join refers to the table that appears on the left side of the <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code> keyword.
+We can see the <code class="docutils literal notranslate"><span class="pre">Noah</span></code> rows are kept in the resulting relation even when they don’t have a match in the right-hand relation.</p>
+<p>Note that SQLite doesn’t support
+right joins directly, but we can perform the same join by swapping the order of relations, then using <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -1874,184 +1739,14 @@ of relations when we use <code class="docutils literal notranslate"><span class=
 </table>
 </div></div></div>
 </div>
-<p>Finally, an <em>outer join</em> keeps rows from both tables even when they don’t have
-a match. SQLite doesn’t have a built-in keyword for outer joins. In cases where
-an outer join is needed, we have to either use a different SQL engine or
-perform an outer join via <code class="docutils literal notranslate"><span class="pre">pandas</span></code>. However, in our (the author’s) experience,
-outer joins are rarely used in practice compared to inner and left joins.</p>
+<p>SQLite doesn’t have a built-in keyword for outer joins. In cases where
+an outer join is needed, we have to either use a different SQL engine or perform an outer join via <code class="docutils literal notranslate"><span class="pre">pandas</span></code>. However, in our (the author’s) experience, outer joins are rarely used in practice compared to inner and left joins.</p>
 </div>
 <div class="section" id="example-popularity-of-nyt-name-categories">
 <h2><span class="section-number">7.3.3. </span>Example: Popularity of NYT Name Categories<a class="headerlink" href="#example-popularity-of-nyt-name-categories" title="Permalink to this headline">¶</a></h2>
 <p>Now, let’s return to the full <code class="docutils literal notranslate"><span class="pre">baby</span></code> and <code class="docutils literal notranslate"><span class="pre">nyt</span></code> relations.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT *</span>
-<span class="s1">FROM baby</span>
-<span class="s1">LIMIT 10</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Count</th>
-      <th>Year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Liam</td>
-      <td>M</td>
-      <td>19659</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Noah</td>
-      <td>M</td>
-      <td>18252</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Oliver</td>
-      <td>M</td>
-      <td>14147</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Lucas</td>
-      <td>M</td>
-      <td>11281</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Henry</td>
-      <td>M</td>
-      <td>10705</td>
-      <td>2020</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Alexander</td>
-      <td>M</td>
-      <td>10151</td>
-      <td>2020</td>
-    </tr>
-  </tbody>
-</table>
-<p>10 rows × 4 columns</p>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
-<span class="s1">SELECT *</span>
-<span class="s1">FROM nyt</span>
-<span class="s1">&#39;&#39;&#39;</span>
-
-<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>nyt_name</th>
-      <th>category</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Lucifer</td>
-      <td>forbidden</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Lilith</td>
-      <td>forbidden</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Danger</td>
-      <td>forbidden</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>Venus</td>
-      <td>celestial</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>Celestia</td>
-      <td>celestial</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>Skye</td>
-      <td>celestial</td>
-    </tr>
-  </tbody>
-</table>
-<p>23 rows × 2 columns</p>
-</div></div></div>
-</div>
 <p>We want to know how the popularity of name categories in <code class="docutils literal notranslate"><span class="pre">nyt</span></code> have changed
-over time. To answer this question:</p>
+over time. To answer this question, we should:</p>
 <ol class="simple">
 <li><p>Inner join <code class="docutils literal notranslate"><span class="pre">baby</span></code> with <code class="docutils literal notranslate"><span class="pre">nyt</span></code>, matching rows where the names are equal.</p></li>
 <li><p>Group the table by <code class="docutils literal notranslate"><span class="pre">category</span></code> and <code class="docutils literal notranslate"><span class="pre">Year</span></code></p></li>
@@ -2064,7 +1759,7 @@ over time. To answer this question:</p>
 <span class="s1">  category,</span>
 <span class="s1">  Year,</span>
 <span class="s1">  SUM(Count) AS count           -- [3]</span>
-<span class="s1">FROM baby JOIN nyt              -- [1]</span>
+<span class="s1">FROM baby INNER JOIN nyt        -- [1]</span>
 <span class="s1">  ON baby.Name = nyt.nyt_name   -- [1]</span>
 <span class="s1">GROUP BY category, Year         -- [2]</span>
 <span class="s1">&#39;&#39;&#39;</span>
@@ -2146,53 +1841,12 @@ over time. To answer this question:</p>
 <p>650 rows × 3 columns</p>
 </div></div></div>
 </div>
-<p>The bracketed numbers (<code class="docutils literal notranslate"><span class="pre">[1]</span></code>, <code class="docutils literal notranslate"><span class="pre">[2]</span></code>, <code class="docutils literal notranslate"><span class="pre">[3]</span></code>) in the query above show how each
-step in our plan maps to the parts of the SQL query. Notice that the numbers
-appear out of order. We often think of the <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> statement as the <em>last</em>
-piece of the query to execute although it appears first.</p>
-<p>Now, we can plot the popularity of individual categories:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boomers</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">cate_counts</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;category == &quot;boomer&quot;&#39;</span><span class="p">),</span>
-                  <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">)</span>
-<span class="n">myths</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">cate_counts</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;category == &quot;mythology&quot;&#39;</span><span class="p">),</span>
-                <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">)</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">left_right</span><span class="p">(</span><span class="n">boomers</span><span class="p">,</span> <span class="n">myths</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-                 <span class="n">subplot_titles</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Boomer Names&#39;</span><span class="p">,</span> <span class="s1">&#39;Mythological Names&#39;</span><span class="p">])</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">fig</span>
-</pre></div>
+<p>The bracketed numbers (<code class="docutils literal notranslate"><span class="pre">[1]</span></code>, <code class="docutils literal notranslate"><span class="pre">[2]</span></code>, <code class="docutils literal notranslate"><span class="pre">[3]</span></code>) in the query above show how each step in our plan maps to the parts of the SQL query. The code above recreates the dataframe from <a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-numref">Chapter 6</span></a>, where we created plots to verify the claims of the New York Times article. For brevity, we omit duplicating the plots here.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Notice that in the SQL code above, the numbers appear out of order—<code class="docutils literal notranslate"><span class="pre">[3]</span></code>, <code class="docutils literal notranslate"><span class="pre">[1]</span></code>, then <code class="docutils literal notranslate"><span class="pre">[2]</span></code>. We often think of the <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> statement as the <em>last</em> piece of the query to execute although it appears first.</p>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_joining_33_0.svg" src="../../_images/sql_joining_33_0.svg" /></div>
-</div>
-<p>As the NYT article claims, “baby boomer” names have become less popular after
-2000, while mythological names have become more popular.</p>
-<p>We can also plot the popularities of all the categories
-at once. Take a look at the plots below and see whether
-they support the claims made in the New York Times article.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">cate_counts</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span>
-              <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="n">facet_col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-              <span class="n">facet_row_spacing</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">matches</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_joining_35_0.svg" src="../../_images/sql_joining_35_0.svg" /></div>
-</div>
-<p>In this section, we introduced joins for relations.
-When joining relations together, we match rows using the <code class="docutils literal notranslate"><span class="pre">JOIN</span></code> keyword and
-a boolean predicate.
-SQL also allows us to specify the type of join (<code class="docutils literal notranslate"><span class="pre">INNER</span></code>, <code class="docutils literal notranslate"><span class="pre">LEFT</span></code>)
-when performing a join.
-In the next section, we’ll explain how to transform values in a relation.</p>
+<p>In this section, we introduced joins for relations. When joining relations together, we match rows using the <code class="docutils literal notranslate"><span class="pre">INNER</span> <span class="pre">JOIN</span></code> or <code class="docutils literal notranslate"><span class="pre">LEFT</span> <span class="pre">JOIN</span></code> keywords and a boolean predicate. In the next section, we’ll explain how to transform values in a relation.</p>
 </div>
 </div>
 
@@ -2231,7 +1885,7 @@ In the next section, we’ll explain how to transform values in a relation.</p>
     <a class='right-next' id="next-link" href="sql_transforming.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">7.4. </span>Transforming</p>
+        <p class="prev-next-title"><span class="section-number">7.4. </span>Transforming and Common Table Expressions</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
