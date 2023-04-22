@@ -1246,9 +1246,9 @@
                 
   <div class="section" id="modeling-proportions-and-probabilities">
 <h1><span class="section-number">19.3. </span>Modeling Proportions (and Probabilities)<a class="headerlink" href="#modeling-proportions-and-probabilities" title="Permalink to this headline">¶</a></h1>
-<p>In modeling, we need to choose three things: a model, a loss function, and a method to minimize the loss on our training set. In the previous section, we chose a constant model, the 0-1 loss, and a proof to fit the model. However, the constant model doesn’t incorporate predictor variables.
-In this section, we’ll address this issue by introducing a new model called the <em>logistic regression</em> model.</p>
-<p>First, notice that the relationship between tree diameter and the proportion of downed trees does not appear linear. For demonstration, we’ll fit a simple linear model to these data to show that this model has several undesirable features.</p>
+<p>Recall that when we model, we need to choose three things: a model, a loss function, and a method to minimize the average loss on our training set. In the previous section, we chose a constant model, the 0-1 loss, and a proof to fit the model. However, the constant model doesn’t incorporate predictor variables.
+In this section, we address this issue by introducing a new model called the <em>logistic</em> model.</p>
+<p>To motivate these models, notice that the relationship between tree diameter and the proportion of downed trees does not appear linear. For demonstration, let’s fit a simple linear model to these data to show that it has several undesirable features.</p>
 <p>Using the techniques from <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>, we fit a linear model of tree status to diameter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1287,9 +1287,9 @@ In this section, we’ll address this issue by introducing a new model called th
 <ul class="simple">
 <li><p>The model gives proportions greater than 1 for large trees.</p></li>
 <li><p>The model doesn’t pick up the curvature in the proportions.</p></li>
-<li><p>An extreme point (such as a tree that’s 30 cm across) shifts the model to the right, away from the bulk of the data.</p></li>
+<li><p>An extreme point (such as a tree that’s 30 cm across) shifts the fitted line to the right, away from the bulk of the data.</p></li>
 </ul>
-<p>To address these issues, we’ll introduce the <em>logistic model</em>.</p>
+<p>To address these issues, we introduce the <em>logistic model</em>.</p>
 <div class="section" id="a-logistic-model">
 <h2><span class="section-number">19.3.1. </span>A Logistic Model<a class="headerlink" href="#a-logistic-model" title="Permalink to this headline">¶</a></h2>
 <p>The logistic model is one of the most widely used basic models for classification and a simple extension of the linear model. The <em>logistic function</em>, often called the <em>sigmoid function</em>, is defined as:</p>
@@ -1301,7 +1301,7 @@ In this section, we’ll address this issue by introducing a new model called th
 <p class="admonition-title">Warning</p>
 <p>The <em>sigmoid</em> function is typically denoted by <span class="math notranslate nohighlight">\(\sigma(t)\)</span>. Sadly, the Greek letter <span class="math notranslate nohighlight">\(\sigma\)</span> is widely used to mean a lot of things in data science and statistics, like the standard deviation, logistic function, and a permutation. You’ll have to be careful when seeing <span class="math notranslate nohighlight">\( \sigma \)</span> and use context to understand its meaning.</p>
 </div>
-<p>We can plot the logistic function to reveal it’s s-shape (sigmoid-shape) and confirm that it outputs numbers between 0 and 1. The function monotonically increases with <span class="math notranslate nohighlight">\( t \)</span>, and large values of <span class="math notranslate nohighlight">\( t \)</span> get close to 1.</p>
+<p>We can plot the logistic function to reveal it’s s-shape (sigmoid-shape) and confirm that it outputs numbers between 0 and 1. The function monotonically increases with <span class="math notranslate nohighlight">\( t \)</span>, and large values of <span class="math notranslate nohighlight">\( t \)</span> get close to 1:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logistic</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
@@ -1310,22 +1310,7 @@ In this section, we’ll address this issue by introducing a new model called th
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span>
-<span class="n">sigmoid_line</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Logistic Function&quot;</span><span class="p">,</span>
-    <span class="n">x</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">logistic</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">)</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">([</span><span class="n">sigmoid_line</span><span class="p">])</span>      
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">fig</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/class_log_model_19_0.svg" src="../../_images/class_log_model_19_0.svg" /></div>
-</div>
-<p>Since the logistic function maps to the interval between 0 and 1, it is commonly used when modeling probabilities. And, we can write the logistic model as a function of a line, <span class="math notranslate nohighlight">\(\theta_0 + \theta_1 x\)</span>:</p>
+<p>Since the logistic function maps to the interval between 0 and 1, it is commonly used when modeling proportions and probabilities. Also, we can write the logistic as a function of a line, <span class="math notranslate nohighlight">\(\theta_0 + \theta_1 x\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
 \sigma\left(\theta_0 + \theta_1 x\right) = \frac{1}{1+\exp(-\theta_0 - \theta_1 x)}
@@ -1351,12 +1336,12 @@ In this section, we’ll address this issue by introducing a new model called th
 <div class="cell_output docutils container">
 <img alt="../../_images/class_log_model_23_0.svg" src="../../_images/class_log_model_23_0.svg" /></div>
 </div>
-<p>We can see that changing the magnitude of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> changes the sharpness of the curve; the further away from <span class="math notranslate nohighlight">\( 0 \)</span>, the steeper the curve. Flipping the sign of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> reflects the curve over the y-axis. Changing <span class="math notranslate nohighlight">\( \theta_0 \)</span> shifts the curve left and right.</p>
+<p>We can see that changing the magnitude of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> changes the sharpness of the curve; the further away from 0, the steeper the curve. Flipping the sign of <span class="math notranslate nohighlight">\( {\theta}_1 \)</span> reflects the curve about the vertical line <span class="math notranslate nohighlight">\(x=0\)</span>. Changing <span class="math notranslate nohighlight">\( \theta_0 \)</span> shifts the curve left and right.</p>
 <p>The logistic function can be seen as a <em>transformation</em>: it transforms a linear function into a nonlinear smooth curve, and the output always lies between 0 and 1. In fact, the output of a logistic function has a deeper probabilistic interpretation, which we describe next.</p>
 </div>
 <div class="section" id="log-odds">
 <h2><span class="section-number">19.3.2. </span>Log Odds<a class="headerlink" href="#log-odds" title="Permalink to this headline">¶</a></h2>
-<p>Recall the odds are the ratio, <span class="math notranslate nohighlight">\(p/(1-p)\)</span> for a probability <span class="math notranslate nohighlight">\( p \)</span>. For example, for a fair coin the odds of getting heads is 1, and for a coin that’s twice as likely to flip heads as tails, the odds of getting heads is 2. The logistic model is also called the <em>log odds</em> model because the logistic function coincides with a linear function of the log odds.</p>
+<p>Recall the odds are the ratio, <span class="math notranslate nohighlight">\(p/(1-p)\)</span> for a probability <span class="math notranslate nohighlight">\( p \)</span>. For example, for a fair coin the odds of getting heads is 1, and for a coin that’s twice as likely to flip heads as tails (<span class="math notranslate nohighlight">\(p=2/3\)</span>), the odds of getting heads is 2. The logistic model is also called the <em>log odds</em> model because the logistic function coincides with a linear function of the log odds.</p>
 <p>We can see this in the following equations. To show this, we multiply the numerator and denominator of the sigmoid function by <span class="math notranslate nohighlight">\(\exp(t)\)</span></p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -1373,14 +1358,14 @@ In this section, we’ll address this issue by introducing a new model called th
 \log \left( \frac{\sigma(t)}{1-\sigma(t)} \right) &amp; = \log(\exp{(t)}) = t\\
 \end{aligned}
 \end{split}\]</div>
-<p>And, for <span class="math notranslate nohighlight">\(\sigma(\theta_0 + \theta_1x)\)</span>, we find a linear function of <span class="math notranslate nohighlight">\(x\)</span>:</p>
+<p>So, for <span class="math notranslate nohighlight">\(\sigma(\theta_0 + \theta_1x)\)</span>, we find the log odds is a linear function of <span class="math notranslate nohighlight">\(x\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 \log \left( \frac{\sigma(\theta_0 + \theta_1x)}{1-\sigma(\theta_0 + \theta_1x)} \right) &amp; = \log(\exp{(\theta_0 + \theta_1x)}) = \theta_0 + \theta_1x\\
 \end{aligned}
 \end{split}\]</div>
-<p>This representation of the logistic in terms of log odds gives a useful interpretation for the coefficient. Suppose the explanatory variable increases by 1. Then the odds change as follows:</p>
+<p>This representation of the logistic in terms of log odds gives a useful interpretation for the coefficient <span class="math notranslate nohighlight">\(\theta_1\)</span>. Suppose the explanatory variable increases by 1. Then the odds change as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -1388,15 +1373,16 @@ In this section, we’ll address this issue by introducing a new model called th
  =&amp; ~ \exp(\theta_1) \times \exp{(\theta_0 + \theta_1x)}
 \end{aligned}
 \end{split}\]</div>
-<p>So, the odds increase or decrease by a factor of <span class="math notranslate nohighlight">\( \exp(\theta_1) \)</span>.</p>
+<p>We see that the odds increase or decrease by a factor of <span class="math notranslate nohighlight">\( \exp(\theta_1) \)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Here, the <span class="math notranslate nohighlight">\(\log\)</span> function is the natural logarithm. The natural log is the default in data science so we typically don’t bother to write it as <span class="math notranslate nohighlight">\(\ln\)</span>.</p>
 </div>
+<p>Next, let’s add a logistic curve to our plot of proportions to get a sense of how well it might fit the data.</p>
 </div>
 <div class="section" id="using-a-logistic-curve">
 <h2><span class="section-number">19.3.3. </span>Using a Logistic Curve<a class="headerlink" href="#using-a-logistic-curve" title="Permalink to this headline">¶</a></h2>
-<p>In this plot below, we’ve added a logistic curve on top of the plot of proportions of fallen trees.</p>
+<p>In the plot below, we’ve added a logistic curve on top of the plot of proportions of fallen trees:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
@@ -1432,7 +1418,7 @@ In this section, we’ll address this issue by introducing a new model called th
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/class_log_model_34_0.svg" src="../../_images/class_log_model_34_0.svg" /></div>
+<img alt="../../_images/class_log_model_35_0.svg" src="../../_images/class_log_model_35_0.svg" /></div>
 </div>
 <p>We can see that the curve follows the proportions reasonably well. In fact, we selected this particular logistic by fitting it to the data. The fitted logistic regression is:</p>
 <div class="cell tag_hide-input docutils container">
@@ -1449,7 +1435,7 @@ In this section, we’ll address this issue by introducing a new model called th
 </div>
 </div>
 </div>
-<p>To fit logistic curves to data, we’ll need to proceed to our second step in modeling: selecting an appropriate loss function.</p>
+<p>To fit logistic curves to data, we need to proceed to our second step in modeling: selecting an appropriate loss function.</p>
 </div>
 </div>
 
