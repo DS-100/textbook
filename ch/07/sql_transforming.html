@@ -53,7 +53,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="7.5. How are Relations Different from Other Data Representations?" href="sql_other_reps.html" />
+    <link rel="next" title="7.5. Summary" href="sql_summary.html" />
     <link rel="prev" title="7.3. Joining" href="sql_joining.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -374,13 +374,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="sql_other_reps.html">
-     7.5. How are Relations Different from Other Data Representations?
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="sql_summary.html">
-     7.6. Summary
+     7.5. Summary
     </a>
    </li>
   </ul>
@@ -1592,26 +1587,27 @@ length of the substring.</p>
 <p>10 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>This completes step 1 of our analysis plan. SQL provides several options to
-break queries into smaller steps, which is helpful in a more complex analysis
-like this one. One option is to create an entirely new relation using the
-<code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code> statement. Another option is to use the <code class="docutils literal notranslate"><span class="pre">WITH</span></code> keyword to
-create a temporary relation just for the query at hand. We’ll demonstrate
-the <code class="docutils literal notranslate"><span class="pre">WITH</span></code> keyword for this example.</p>
+<p>After calculating the first letter of each name, our analysis aims to understand the popularity of first letters over time. To do this, we want to take the output of this SQL query and use it as a single step within a longer chain of operations.</p>
+<p>SQL provides several options to break queries into smaller steps, which is helpful in more complex analyses like this one. The most common options for doing this are to create a new relation using a <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code> statement, create a new view using <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">VIEW</span></code>, or create a temporary relation using <code class="docutils literal notranslate"><span class="pre">WITH</span></code>. Each of these methods have different use cases. For simplicity, we only describe the <code class="docutils literal notranslate"><span class="pre">WITH</span></code> statement in this section and suggest readers to look over the SQLite documentation for details.</p>
 </div>
 <div class="section" id="multistep-queries-using-a-with-clause">
 <h2><span class="section-number">7.4.2. </span>Multistep Queries Using a <code class="docutils literal notranslate"><span class="pre">WITH</span></code> Clause<a class="headerlink" href="#multistep-queries-using-a-with-clause" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">WITH</span></code> clause lets us assign a name to any <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> query. Then, we can
-treat that query as though it exists as a relation in the database. For
+treat that query as though it exists as a relation in the database just for the duration of the query.
+SQLite calls these temporary relations <em>Common Table Expressions</em>.
+For
 instance, we can take the query above that calculates the first letter of each
 name and call it <code class="docutils literal notranslate"><span class="pre">letters</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
+<span class="s1">-- Create a temporary relation called letters by calculating</span>
+<span class="s1">-- the first letter for each name in baby</span>
 <span class="s1">WITH letters AS (</span>
 <span class="s1">  SELECT *, SUBSTR(Name, 1, 1) AS Firsts</span>
 <span class="s1">  FROM baby</span>
 <span class="s1">)</span>
+<span class="s1">-- Then, select the first ten rows from letters</span>
 <span class="s1">SELECT *</span>
 <span class="s1">FROM letters</span>
 <span class="s1">LIMIT 10;</span>
@@ -1709,29 +1705,15 @@ name and call it <code class="docutils literal notranslate"><span class="pre">le
 <p>10 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>We can read this query as follows:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Create a temporary relation called letters by calculating the first</span>
-<span class="c1">-- letters for each name in baby</span>
-<span class="k">WITH</span><span class="w"> </span><span class="n">letters</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="w">               </span>
-<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w">   </span>
-<span class="w">    </span><span class="n">SUBSTR</span><span class="p">(</span><span class="n">Name</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">Firsts</span><span class="w"> </span>
-<span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">baby</span>
-<span class="p">)</span>
-<span class="c1">-- Then, select the first ten rows from letters</span>
-<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span>
-<span class="k">FROM</span><span class="w"> </span><span class="n">letters</span>
-<span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">WITH</span></code> statements are highly useful since they can be chained together. We can
+<p><code class="docutils literal notranslate"><span class="pre">WITH</span></code> statements are very useful since they can be chained together. We can
 create multiple temporary relations in a <code class="docutils literal notranslate"><span class="pre">WITH</span></code> statement that each perform a
 bit of work on the previous result, which lets us gradually build complicated
 queries a step at a time.</p>
 </div>
 <div class="section" id="example-popularity-of-l-names">
 <h2><span class="section-number">7.4.3. </span>Example: Popularity of “L” Names<a class="headerlink" href="#example-popularity-of-l-names" title="Permalink to this headline">¶</a></h2>
-<p>Now, we can perform the next steps in our analysis. We’ll group the relation by the
-first letter and year, then aggregate the <code class="docutils literal notranslate"><span class="pre">Count</span></code> column using a sum.</p>
+<p>We can use <code class="docutils literal notranslate"><span class="pre">WITH</span></code> statements to look at the popularity of names that start with the letter “L” over time. We’ll group the temporary <code class="docutils literal notranslate"><span class="pre">letters</span></code> relation by the
+first letter and year, then aggregate the <code class="docutils literal notranslate"><span class="pre">Count</span></code> column using a sum, then filter to get only names with the letter “L”:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39; </span>
@@ -1741,6 +1723,7 @@ first letter and year, then aggregate the <code class="docutils literal notransl
 <span class="s1">)</span>
 <span class="s1">SELECT Firsts, Year, SUM(Count) AS Count</span>
 <span class="s1">FROM letters</span>
+<span class="s1">WHERE Firsts = &quot;L&quot;</span>
 <span class="s1">GROUP BY Firsts, Year;</span>
 <span class="s1">&#39;&#39;&#39;</span>
 
@@ -1776,21 +1759,21 @@ first letter and year, then aggregate the <code class="docutils literal notransl
   <tbody>
     <tr>
       <th>0</th>
-      <td>A</td>
+      <td>L</td>
       <td>1880</td>
-      <td>16740</td>
+      <td>12799</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>A</td>
+      <td>L</td>
       <td>1881</td>
-      <td>16257</td>
+      <td>12770</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>A</td>
+      <td>L</td>
       <td>1882</td>
-      <td>18790</td>
+      <td>14923</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1799,64 +1782,33 @@ first letter and year, then aggregate the <code class="docutils literal notransl
       <td>...</td>
     </tr>
     <tr>
-      <th>3638</th>
-      <td>Z</td>
+      <th>138</th>
+      <td>L</td>
       <td>2018</td>
-      <td>55996</td>
+      <td>246251</td>
     </tr>
     <tr>
-      <th>3639</th>
-      <td>Z</td>
+      <th>139</th>
+      <td>L</td>
       <td>2019</td>
-      <td>55293</td>
+      <td>249315</td>
     </tr>
     <tr>
-      <th>3640</th>
-      <td>Z</td>
+      <th>140</th>
+      <td>L</td>
       <td>2020</td>
-      <td>54011</td>
+      <td>239760</td>
     </tr>
   </tbody>
 </table>
-<p>3641 rows × 3 columns</p>
+<p>141 rows × 3 columns</p>
 </div></div></div>
 </div>
-<p>Finally, we use <code class="docutils literal notranslate"><span class="pre">plotly</span></code> to plot the popularity of “L” names over time:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">letter_counts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">letter_counts</span><span class="p">[</span><span class="s1">&#39;Firsts&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">],</span>
-              <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Popularity of &quot;L&quot; names&#39;</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_transforming_22_0.svg" src="../../_images/sql_transforming_22_0.svg" /></div>
-</div>
-<p>The plot shows that “L” names were popular in the 1960s, dipped in the decades
-after, but have indeed resurged in popularity after 2000.</p>
-<p>What about “J” names?</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">letter_counts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">letter_counts</span><span class="p">[</span><span class="s1">&#39;Firsts&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;J&#39;</span><span class="p">],</span>
-              <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Popularity of &quot;J&quot; names&#39;</span><span class="p">,</span>
-              <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/sql_transforming_24_0.svg" src="../../_images/sql_transforming_24_0.svg" /></div>
-</div>
-<p>The NYT article says that “J” names were popular in the 1970s and 80s. The plot
-agrees, and also shows that they have become less popular after 2000.</p>
+<p>This relation contains the same data as the one from <a class="reference internal" href="../06/pandas_intro.html#ch-pandas"><span class="std std-numref">Chapter 6</span></a>. In that section, we make a plot of the <code class="docutils literal notranslate"><span class="pre">Count</span></code> column over time, which we omit here for brevity.</p>
 <p>In this section, we introduced data transformations.
 To transform values in a relation, we commonly use SQL functions like
 <code class="docutils literal notranslate"><span class="pre">LENGTH()</span></code> or <code class="docutils literal notranslate"><span class="pre">SUBSTR()</span></code>.
-We also explained how to build up complex queries using the <code class="docutils literal notranslate"><span class="pre">WITH</span></code> clause.
-In the next section, we’ll compare relations with other ways to represent and
-manipulate data tables.</p>
+We also explained how to build up complex queries using the <code class="docutils literal notranslate"><span class="pre">WITH</span></code> clause.</p>
 </div>
 </div>
 
@@ -1892,10 +1844,10 @@ manipulate data tables.</p>
             <p class="prev-next-title"><span class="section-number">7.3. </span>Joining</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="sql_other_reps.html" title="next page">
+    <a class='right-next' id="next-link" href="sql_summary.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">7.5. </span>How are Relations Different from Other Data Representations?</p>
+        <p class="prev-next-title"><span class="section-number">7.5. </span>Summary</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
