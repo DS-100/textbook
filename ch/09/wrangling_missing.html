@@ -1232,28 +1232,27 @@ addressing nonresponse does not reduce nonresponse bias. Also in that chapter,
 we discussed ways to prevent nonresponse. These preventive measures include
 using  incentives to encourage response, keeping surveys short, writing clear
 questions, training interviewers, and investing in extensive follow up
-procedures. Unfortunately, some amount of nonresponse is unavoidable.</p>
+procedures. Unfortunately, despite these efforts, some amount of nonresponse is unavoidable.</p>
 <p>When a record is not entirely missing, but a particular field in a record is
 unavailable, we have nonresponse at the field-level.  Some datasets use a
 special coding to signify that the information is missing.  We saw that the Mauna
 Loa data uses <code class="docutils literal notranslate"><span class="pre">-99.99</span></code> to indicate a missing CO2 measurement. We found only 7 of these
 values among 738 rows in the table.
 In this case, we showed that these missing values have little impact on the analysis.</p>
-<p>The values for a feature are <em>missing completely at random</em> when those records with the missing data are like a randomly chosen subset of records. That is, whether or not a record has a missing value does not depend on the unobserved
+<p>The values for a feature are called <em>missing completely at random</em> when those records with the missing data are like a randomly chosen subset of records. That is, whether or not a record has a missing value does not depend on the unobserved
 feature, the values of other features, or the sampling design.
 For example, if someone accidentally breaks the laboratory equipment at Manua Loa and CO2 is not
 recorded for a day, there is no reason to think that the level of CO2 that day
 had something to do with the lost measurements.</p>
-<p>At other times, we consider values <em>missing at random given covariates</em> when
-the nonresponse depends only on observed features.
+<p>At other times, we consider values <em>missing at random given covariates</em> (covariates are other features in the dataset).
 For example, the type of an ER visit in the DAWN survey is missing at random given
 covariates if, say, the nonresponse depends only on race and sex (and not on the type of visit or anything else).
 In these limited cases, the observed data can be weighted to accommodate for nonresponse.</p>
 <p>In some surveys, missing information is further categorized as to whether the
 respondent refused to answer,  was unsure of the answer, or the interviewer
 didn’t ask the question. Each of these types of missing values is recorded
-using a different value. For example, many questions in the DAWN survey use a
-code of <code class="docutils literal notranslate"><span class="pre">-7</span></code> for not applicable, <code class="docutils literal notranslate"><span class="pre">-8</span></code> for not documented, and <code class="docutils literal notranslate"><span class="pre">-9</span></code> for missing<a class="footnote-reference brackets" href="#dawncodebook" id="id1">1</a>.
+using a different value. For example, according to the <a class="reference external" href="https://www.datafiles.samhsa.gov/sites/default/files/field-uploads-protected/studies/DAWN-2010/DAWN-2010-datasets/DAWN-2010-DS0001/DAWN-2010-DS0001-info/DAWN-2010-DS0001-info-codebook.pdf">codebook</a>, many questions in the DAWN survey use a
+code of <code class="docutils literal notranslate"><span class="pre">-7</span></code> for not applicable, <code class="docutils literal notranslate"><span class="pre">-8</span></code> for not documented, and <code class="docutils literal notranslate"><span class="pre">-9</span></code> for missing[^DawnCodebook].
 Codings such as these can help us further refine our study of nonresponse.</p>
 <p>After nonresponse has occurred, it is sometimes possible to use models to
 predict the missing data. We describe this process next.
@@ -1267,9 +1266,7 @@ imputing values are <em>deductive</em>, <em>mean</em>, and <em>hot-deck</em> imp
 <p>In deductive imputation, we fill in a value through logical relationships with other features.
 For example, below is a row in the business data frame for San Francisco restaurant
 inspections. The zip code is erroneously marked as “Ca” and latitude and
-longitude are missing. We can look up the address on the USPS Website to get
-the correct zip code and we can use Google Maps to find the latitude and
-longitude of the restaurant to fill in these missing values.</p>
+longitude are missing:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span><span class="p">[</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;postal_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Ca&quot;</span><span class="p">]</span>
@@ -1324,6 +1321,9 @@ longitude of the restaurant to fill in these missing values.</p>
 <p>1 rows × 9 columns</p>
 </div></div></div>
 </div>
+<p>We can look up the address on the USPS Website to get
+the correct zip code and we can use Google Maps to find the latitude and
+longitude of the restaurant to fill in these missing values.</p>
 <p>Mean imputation uses an average value from rows in the dataset that aren’t missing.
 As a simple example, if a dataset on test scores is missing scores for some students,
 mean imputation would fill in the missing value using the mean of the non-missing scores.
@@ -1341,11 +1341,11 @@ relationship between the features might weaken because we have added randomness.
 dataset that have similar values in other features.
 More sophisticated imputation techniques use nearest-neighbor methods to find
 similar subgroups of records and others use regression techniques to predict
-the missing value <span id="id2">[<a class="reference internal" href="../../references.html#id31">Little and Rubin, 2019</a>]</span>.</p>
+the missing value.</p>
 <p>With all of these types of imputation, we should create a new feature that
 contains the altered data or a new feature to indicate whether or not the
 response in the original feature has been imputed so that we can track our changes.</p>
-<p>Decisions to keep or drop a record, to change a value, or to remove a feature,
+<p>Decisions to keep or drop a record with a missing value, to change a value, or to remove a feature,
 may seem small, but they can be critical. One anomalous record can seriously
 impact your findings. Whatever you decide, be sure to check the impact of
 dropping or changing features and records. And, be transparent and thorough in
@@ -1353,12 +1353,6 @@ reporting any modifications you make to the data. It’s best to make these
 changes programmatically to reduce potential errors and enable others to
 confirm exactly what you have done by reviewing your code.</p>
 <p>The same transparency and reproducible precautions hold for data transformations, which we discuss next.</p>
-<hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="dawncodebook"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>The <a class="reference external" href="https://www.datafiles.samhsa.gov/sites/default/files/field-uploads-protected/studies/DAWN-2010/DAWN-2010-datasets/DAWN-2010-DS0001/DAWN-2010-DS0001-info/DAWN-2010-DS0001-info-codebook.pdf">DAWN codebook</a> provides these codings for all features.</p>
-</dd>
-</dl>
 </div>
 </div>
 
