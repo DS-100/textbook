@@ -574,17 +574,17 @@ document.write(`
 section to direct our investigations. Although EDA typically begins in the data
 wrangling stage, for demonstration purposes the data we work with here
 have already been partially cleaned so that we can focus on exploring
-the features of interest. Note also that we do not discuss creating the
+the features of interest. Note also that we do not discuss refining the
 visualizations in much detail; that topic is covered in <a class="reference internal" href="../11/viz_intro.html#ch-viz"><span class="std std-numref">Chapter 11</span></a>.</p>
-<p>Our data were scraped from the San Francisco Chronicle (SFChron) Website[^SFChron].
+<p>Our data were scraped from the <a class="reference external" href="https://www.sfchronicle.com/realestate/">San Francisco Chronicle</a> (SFChron) Website.
 They form a complete list of homes sold in the area from Apr 2003 to December 2008.
-Since we have no plans to generalize our findings beyond the time period and the location, we are working with a census so in terms of scope: the population matches the access frame and the sample consists of the entire population.</p>
+Since we have no plans to generalize our findings beyond the time period and the location and we are working with a census, the population matches the access frame and the sample consists of the entire population.</p>
 <p>As for granularity, each record represents a sale of a home in the SF Bay Area
 during the specified time period.  This means that if a home was sold
 twice during this time, then there are two records in the table. And, if a
 home in the Bay Area was not up for sale during this time, then it does not appear in
 the dataset.</p>
-<p>The data are in the data frame <code class="docutils literal notranslate"><span class="pre">sfh_df</span></code>.</p>
+<p>The data are in the data frame <code class="docutils literal notranslate"><span class="pre">sfh_df</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh_df</span>
@@ -704,7 +704,7 @@ the dataset.</p>
 </div></div></div>
 </div>
 <p>The dataset does not have an accompanying codebook, but we
-can determine the features and their storage types by inspection.</p>
+can determine the features and their storage types by inspection:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh_df</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
@@ -733,12 +733,12 @@ memory usage: 35.8+ MB
 </div>
 <p>Based on the names of the fields, we expect the primary key to consist of some
 combination of city, zip, street address, and date.</p>
-<p>Sale price is our focus. So let’s begin by exploring the distribution of sale price.
+<p>Sale price is our focus so let’s begin by exploring its distribution.
 To develop your intuition about distributions, make a guess about the shape of the distribution
 before you start reading the next section. Don’t worry about the range of prices, just sketch the general shape.</p>
 <section id="understanding-price">
 <h2><span class="section-number">10.6.1. </span>Understanding Price<a class="headerlink" href="#understanding-price" title="Permalink to this heading">#</a></h2>
-<p>It seems like a good guess is that the distribution of sale price is a highly skewed to the right with a few very expensive houses. The summary statistics shown below confirm this skewness.</p>
+<p>It seems a good guess for the shape of the distribution of sale price might be: highly skewed to the right with a few very expensive houses. The summary statistics shown below confirm this skewness:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -812,7 +812,7 @@ before you start reading the next section. Don’t worry about the range of pric
 Also the maximum is 40 times the median!
 We might wonder whether that $20m sale price is simply an anomalous value or
 whether there are many houses that sold at such a high price. To find out, we can zoom in on
-the right tail of the distribution and compute a few high percentiles.</p>
+the right tail of the distribution and compute a few high percentiles:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">percs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">95</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">98</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mf">99.5</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">]</span>
@@ -873,7 +873,7 @@ the right tail of the distribution and compute a few high percentiles.</p>
 </div></div></div>
 </div>
 <p>We see that 99.9% of the houses sold for under $4M so the $20M sale is indeed
-a rarity. Let’s examine the histogram of sale prices below $4M.</p>
+a rarity. Let’s examine the histogram of sale prices below $4M:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">under_4m</span> <span class="o">=</span> <span class="n">sfh_df</span><span class="p">[</span><span class="n">sfh_df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4_000_000</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -892,7 +892,7 @@ a rarity. Let’s examine the histogram of sale prices below $4M.</p>
 <img alt="../../_images/ba8c8aca99885731e79826811998c9423989590b23328d876081b8d557694b1d.svg" src="../../_images/ba8c8aca99885731e79826811998c9423989590b23328d876081b8d557694b1d.svg" /></div>
 </div>
 <p>Even without the top 0.1%, the distribution remains highly skewed to the right, with a single mode around $500k.
-Let’s plot the histogram of the log-transformed sale price. The logarithm transformation often does a good job at converting a right-skewed distribution into one that is more symmetric.</p>
+Let’s plot the histogram of the log-transformed sale price. The logarithm transformation often does a good job at converting a right-skewed distribution into one that is more symmetric:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">under_4m</span><span class="p">[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">under_4m</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">])</span>
@@ -933,7 +933,7 @@ impact on the distributions and relationships that we examine. To limit the
 influence of the very expensive and large houses, we also restrict the dataset to
 sales below $4m and houses smaller than 12,000 ft^2.  This subset  still
 contains large and expensive houses, but not outrageously so. Later, we
-further narrow our exploration to a few cities of interest.</p>
+further narrow our exploration to a few cities of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1069,9 +1069,8 @@ features to study along with price.</p>
 <p>In addition to the sale price, which is our main focus, a few other features that might be important to our investigation are the size of the house, lot (or property)
 size, and number of bedrooms. We explore the distributions of these features
 and their relationship to sale price and to each other.</p>
-<p>Since the size of the property is likely related to its price, it seems
-reasonable to guess that these features are also skewed to the right. The figure
-below shows the distribution of building size on the left and the log-transformed distribution on the right.</p>
+<p>Since the size of the house and the property are likely related to its price, it seems
+reasonable to guess that these features are also skewed to the right. We compare the distribution of building size on the regular and logged scales:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_bsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;bsqft&#39;</span><span class="p">]))</span>
@@ -1097,7 +1096,7 @@ many houses are over 2,500 ft^2 in size.
 We have confirmed our intuition: the log-transformed building size is
 nearly symmetric, although it maintains a slight skew. The same is the case for
 the distribution of lot size.</p>
-<p>Given both house and lot size have skewed distributions, a scatter plot of the two should most likely be on log scale too. We compare the scatter plot with and without the log-transformation below.</p>
+<p>Given both house and lot size have skewed distributions, a scatter plot of the two should most likely be on log scale too. We compare the scatter plot with and without the log-transformation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">log_lsqft</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;lsqft&#39;</span><span class="p">]))</span>
@@ -1108,7 +1107,7 @@ the distribution of lot size.</p>
 <p><a class="reference internal" href="../../_images/scatterPlot_price_bsqft.jpg"><img alt="../../_images/scatterPlot_price_bsqft.jpg" src="../../_images/scatterPlot_price_bsqft.jpg" style="width: 600px;" /></a></p>
 <p>The scatter plot on the left is in the original
 units, which makes it difficult to discern the relationship because most of the points are crowded into the bottom of the plotting region.
-On the other hand, the scatter plot on the right reveals a few interesting features:
+In contrast, the scatter plot on the right reveals a few interesting features:
 there is a horizontal line along the bottom of the scatter plot where it appears that many houses have the same lot size no matter the building size;
 and there appears to be a slight positive log-log linear association between lot and building size.</p>
 <p>Let’s look at some lower quantiles of lot size to try and figure out this unusual value:</p>
@@ -1171,14 +1170,14 @@ and there appears to be a slight positive log-log linear association between lot
 </table>
 </div></div></div>
 </div>
-<p>We found something interesting! About 2.5% of the houses have a lot size of 436
+<p>We found something interesting: about 2.5% of the houses have a lot size of 436
 ft^2. This is tiny and makes little sense so we make a note of the anomaly for further investigation.</p>
 <p>Another measure of house size is the number of bedrooms. Since this is a
 discrete quantitative variable, we can treat it as a qualitative feature and
 make a bar plot.</p>
 <p>Houses in the Bay Area tend to be on the smaller side so we venture to guess
-that the distribution will have a peak at three and skewed to the right with a
-few houses having 5 or 6 bedrooms.</p>
+that the distribution will have a peak at three and skew to the right with a
+few houses having 5 or 6 bedrooms. Let’s check:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">br_cat</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;br&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;counts&quot;</span><span class="p">)</span>
@@ -1191,8 +1190,8 @@ few houses having 5 or 6 bedrooms.</p>
 </div>
 <p>The bar plot confirms that we generally had the right idea. However, we find that there are some houses with over 30 bedrooms! That’s a bit hard to believe and points to another possible data quality problem. Since the records include the addresses of the houses, we can double check theses values on a real estate app.</p>
 <p>In the meantime, let’s just transform the number of bedrooms into an ordinal feature by
-reassigning all values larger than 8 to 8+. Then we recreate the bar plot with the
-transformed data.</p>
+reassigning all values larger than 8 to 8+, and recreate the bar plot with the
+transformed data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eight_up</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sfh</span><span class="p">[</span><span class="s1">&#39;br&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
@@ -1210,7 +1209,7 @@ transformed data.</p>
 2 or 4 bedrooms, and nearly the same have 1 or 5. There is asymmetry present
 with a few houses having 6 or more bedrooms.</p>
 <p>Now, we examine the relationship between the number of bedrooms and sale price.
-Before we proceed, we save the transformations done thus far.</p>
+Before we proceed, we save the transformations done thus far:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_vals</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1251,9 +1250,9 @@ different numbers of bedrooms. We can do this with box plots.</p>
 <p>The median sale price increases with the number of bedrooms from 1
 to 5 bedrooms, but for the largest houses (those with 6, 7, and 8+ bedrooms),
 the distribution of log-transformed sale price appears nearly the same.</p>
-<p>We would expect that houses with one bedroom are smaller than houses with, say,
+<p>We would expect that houses with one bedroom to be smaller than houses with, say,
 4 bedrooms. We might also guess that houses with 6 or more bedrooms are similar
-in size. To dive deeper, we consider a kind transformation that divides price by
+in size and price. To dive deeper, we consider a kind transformation that divides price by
 building size to give us the price per square foot.
 We want to check if this feature is constant for all houses; in other words, price
 is primarily determined by size. To do this we look at the relationship between size and
@@ -1262,7 +1261,7 @@ price and price per square foot and size.</p>
 against the building size (both log-transformed), and the plot on the right
 shows price per square foot (log-transformed) against building size. In addition, each
 plot has an added smooth curve that reflects the local average price or price
-per square foot) for buildings of roughly the same size.</p>
+per square foot) for buildings of roughly the same size:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sfh</span> <span class="o">=</span> <span class="n">sfh</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
@@ -1277,8 +1276,8 @@ per square foot) for buildings of roughly the same size.</p>
 that there is roughly a log-log association between these features.</p>
 <p>The righthand plot in this figure is interestingly nonlinear. We see that
 smaller houses cost more per square foot than larger ones, and the price per
-square foot for larger houses (houses with many bedrooms) is relatively flat.
-This feature appears to be quite interesting so we save the price per square foot transforms into <code class="docutils literal notranslate"><span class="pre">sfh</span></code>.</p>
+square foot for larger houses is relatively flat.
+This feature appears to be quite interesting so we save the price per square foot transforms into <code class="docutils literal notranslate"><span class="pre">sfh</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_ppsf</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -1306,10 +1305,10 @@ and examine relationships for a few cities next.</p>
 <p>You may have heard the expression:
 There are three things that matter in real estate: <em>location, location, location.</em>
 Comparing price across cities might bring additional insights to our investigation.</p>
-<p>We examine data for some cities in the East Bay: Richmond, El Cerrito, Albany,
+<p>We examine data for some cities in the San Francisco East Bay: Richmond, El Cerrito, Albany,
 Berkeley, Walnut Creek, Lamorinda (which is a combination of Lafayette, Moraga,
 and Orinda, three neighboring bedroom communities), and Piedmont.</p>
-<p>Let’s begin by comparing the distribution of sale price for these cities.</p>
+<p>Let’s begin by comparing the distribution of sale price for these cities:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cities</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Richmond&#39;</span><span class="p">,</span> <span class="s1">&#39;El Cerrito&#39;</span><span class="p">,</span> <span class="s1">&#39;Albany&#39;</span><span class="p">,</span> <span class="s1">&#39;Berkeley&#39;</span><span class="p">,</span>
@@ -1326,7 +1325,7 @@ and Orinda, three neighboring bedroom communities), and Piedmont.</p>
 </div>
 <p>The box plots show that Lamorinda and Piedmont tend to have more expensive homes and Richmond has the least
 expensive, but there is overlap in sale price for many cities.</p>
-<p>Next, we examine the relationship between price per square foot and house size more closely with a scatter plot for four of these cities.</p>
+<p>Next, we examine the relationship between price per square foot and house size more closely with faceted scatter plots, one for each of four cities.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">four_cities</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Berkeley&#39;</span><span class="p">,</span> <span class="s1">&#39;Lamorinda&#39;</span><span class="p">,</span> <span class="s1">&#39;Piedmont&#39;</span><span class="p">,</span> <span class="s1">&#39;Richmond&#39;</span><span class="p">]</span>
@@ -1350,7 +1349,7 @@ regardless of size, where, say, a house in Berkeley costs about $250 more per
 square foot than a house in Richmond.  We also see that Piedmont and Lamorinda
 are more expensive cities, and in both cities, there is not the same reduction
 in price per square foot for larger houses in comparison to smaller ones.
-These plots support the location-location-location saying.</p>
+These plots support the location-location-location adage.</p>
 <p>In EDA, we often revisit earlier plots to check whether new findings add
 insights to previous visualization. It is important to continually take stock of our findings and use them to guide us in further explorations. Let’s summarize our findings so far.</p>
 </section>
@@ -1362,13 +1361,13 @@ most notable are:</p>
 <li><p>Sale price and building size are highly skewed to the right with one mode.</p></li>
 <li><p>Price per square foot decreases nonlinearly with building size, with smaller
 houses costing more per square foot than larger houses, and the price per
-square foot being roughly constant for houses with three or more bedrooms.</p></li>
+square foot being roughly constant for large houses.</p></li>
 <li><p>More desirable locations add a bump in sale price that is roughly the same
 size for houses of different sizes.</p></li>
 </ul>
 <p>There are many additional explorations we can (and should) perform, and there are several checks that we should make. These include: investigating the 436 value for lot size and crosschecking unusual houses,
 like the 30 bedroom house and the $20m house, with online real estate apps.</p>
-<p>We narrowed our investigation down to one year and later to a few cities. This narrowing helped us control for features that might interfere with finding simpler relationships. For example, since the data were collected over several years, the date of sale may confound the relationship between sale price and number of bedrooms. At other times, we want to consider the effect of time on prices.
+<p>We narrowed our investigation down to one year and later to a few cities. This narrowing helped us control for features that might interfere with finding simple relationships. For example, since the data were collected over several years, the date of sale may confound the relationship between sale price and number of bedrooms. At other times, we want to consider the effect of time on prices.
 To examine price changes over time we often make line plots, and we adjust for inflation. We revisit these data in <a class="reference internal" href="../11/viz_intro.html#ch-viz"><span class="std std-numref">Chapter 11</span></a> when we consider data scope and look more closely at trends in time.</p>
 <p>Despite being brief, this section conveys the basic approach of
 EDA in action. For an extended case study on a different dataset, see
