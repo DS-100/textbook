@@ -582,8 +582,7 @@ It’s not hard for a vet to see when a donkey has too little anesthetic (it’l
 But, too much anesthetic can have serious consequences and can even be fatal.
 Because of this, we want an asymmetric loss function: it should have a bigger
 loss for an overestimate of weight compared to an underestimate. (The loss functions that we have used so far in this book have been symmetric.)</p>
-<p>We’ve created a loss function <code class="docutils literal notranslate"><span class="pre">anes_loss(x)</span></code> with this in mind.
-The plot below shows the asymmetry for the relative error: <span class="math notranslate nohighlight">\(100(y - \hat{y})/\hat{y}\)</span>, where <span class="math notranslate nohighlight">\(y\)</span> is the true value and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the prediction. For this plot, -10 on the x-axis reflects an overestimate of 10%.</p>
+<p>We’ve created a loss function <code class="docutils literal notranslate"><span class="pre">anes_loss(x)</span></code> with this in mind:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">anes_loss</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -593,6 +592,7 @@ The plot below shows the asymmetry for the relative error: <span class="math not
 </div>
 </div>
 </div>
+<p>The relative error is: <span class="math notranslate nohighlight">\(100(y - \hat{y})/\hat{y}\)</span>, where <span class="math notranslate nohighlight">\(y\)</span> is the true value and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the prediction. We can demonstrate the asymmetry of the loss function with a plot:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -614,8 +614,9 @@ The plot below shows the asymmetry for the relative error: <span class="math not
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/b2f6c1882460fa59b983c179209b6eb75f9b51aff00e260564124a71b023b0e5.svg" src="../../_images/b2f6c1882460fa59b983c179209b6eb75f9b51aff00e260564124a71b023b0e5.svg" /></div>
+<img alt="../../_images/5cf5f98ba7c74dbe49dddaf484948fd44847c95991c0eda4315e4f3c74ad5c83.svg" src="../../_images/5cf5f98ba7c74dbe49dddaf484948fd44847c95991c0eda4315e4f3c74ad5c83.svg" /></div>
 </div>
+<p>Note that a value of -10 on the x-axis reflects an overestimate of 10%.</p>
 <p>Next, let’s fit a simple linear model using this loss function.</p>
 </section>
 <section id="fitting-a-simple-linear-model">
@@ -625,7 +626,7 @@ The plot below shows the asymmetry for the relative error: <span class="math not
 \[
 \theta_0 + \theta_1 \text{Girth}.
 \]</div>
-<p>To find the best fit <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>, we first
+<p>To find the best fit <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span> to the data, we first
 create a design matrix that has girth and an intercept term.
 We also create the <span class="math notranslate nohighlight">\(y\)</span> vector of observed donkey weights.</p>
 <div class="cell docutils container">
@@ -701,9 +702,7 @@ We also create the <span class="math notranslate nohighlight">\(y\)</span> vecto
 </div></div></div>
 </div>
 <p>Now, we want to find the <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span> that minimize the average anesthetic loss over the data. To do this, we could use calculus as we did in
-<a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>.
-To make things simpler, this time we instead use the
-<code class="docutils literal notranslate"><span class="pre">minimize</span></code> method from the <code class="docutils literal notranslate"><span class="pre">scipy</span></code> package, which performs a numerical optimization (see <a class="reference internal" href="../20/gd_intro.html#ch-optimization"><span class="std std-numref">Chapter 20</span></a>).</p>
+<a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>, but we take a simpler approach and instead use the <code class="docutils literal notranslate"><span class="pre">minimize</span></code> method from the <code class="docutils literal notranslate"><span class="pre">scipy</span></code> package, which performs a numerical optimization (see <a class="reference internal" href="../20/gd_intro.html#ch-optimization"><span class="std std-numref">Chapter 20</span></a>):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
@@ -746,7 +745,7 @@ To make things simpler, this time we instead use the
 We can use the model to predict the donkey weights on our training set,
 then find the errors in the predictions.
 The residual plot below shows the model error as a percentage of the predicted value.
-It’s more important for the prediction errors to be small relative to the size of the donkey. In other words a 10 kg error is much worse for a 100 kg donkey than a 200 kg one.</p>
+It’s more important for the prediction errors to be small relative to the size of the donkey. In other words a 10 kg error is much worse for a 100 kg donkey than a 200 kg one so we find the relative error of each prediction:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta_hat</span>
@@ -755,12 +754,8 @@ It’s more important for the prediction errors to be small relative to the size
 </div>
 </div>
 </div>
-<div class="cell tag_hide-input docutils container">
-<details class="hide above-input">
-<summary aria-label="Toggle hidden content">
-<span class="collapsed">Show code cell source</span>
-<span class="expanded">Hide code cell source</span>
-</summary>
+<p>Let’s examine a scatter plot of the relative errors:</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;predicted weight&#39;</span><span class="p">:</span> <span class="n">predicted</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">:</span> <span class="n">resids</span><span class="p">})</span>
 <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;predicted weight&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">% e</span><span class="s1">rror&#39;</span><span class="p">,</span>
@@ -768,9 +763,8 @@ It’s more important for the prediction errors to be small relative to the size
 </pre></div>
 </div>
 </div>
-</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/18f9ca1c166cc6a84fc07e7c68bd2eb6777c1be861d046243eacdadf148c3a85.svg" src="../../_images/18f9ca1c166cc6a84fc07e7c68bd2eb6777c1be861d046243eacdadf148c3a85.svg" /></div>
+<img alt="../../_images/eb7bdb8a494944caff37ab534769fa5aaaa676955f063904e5f9b9c86471d700.svg" src="../../_images/eb7bdb8a494944caff37ab534769fa5aaaa676955f063904e5f9b9c86471d700.svg" /></div>
 </div>
 <p>With the simplest model, some of the predictions are off by 20 to 30 percent. Let’s see if a slightly more complicated model improves the predictions.</p>
 </section>
@@ -811,7 +805,7 @@ there are 7 total ways to combine these variables in a model:</p>
 </div>
 </div>
 <p>For each of these variable combinations, we can fit a model with our special loss function.
-Then, we can look at how well each model does on the training set.</p>
+Then, we can look at how well each model does on the training set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_error</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
@@ -935,8 +929,7 @@ is equivalent to:</p>
 \end{aligned}
 \end{split}\]</div>
 <p>Now, let’s apply a one-hot encoding to all three of our categorical variables
-(body condition, age, and  sex).
-We can then see which categorical variables, if any, improve on our two-variable model.</p>
+(body condition, age, and  sex):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_one_hot</span> <span class="o">=</span> <span class="p">(</span>
@@ -1073,13 +1066,16 @@ We can then see which categorical variables, if any, improve on our two-variable
 Since, <code class="docutils literal notranslate"><span class="pre">BCS</span></code>, <code class="docutils literal notranslate"><span class="pre">Age</span></code>, and <code class="docutils literal notranslate"><span class="pre">Sex</span></code> have six, six, and three categories, respectively,
 we have added 12 dummy variables to the design matrix for a total of 15 columns,
 including the intercept term, girth and length.</p>
-<p>We fit the model that includes the dummies from all three categorical features, along with girth and length.</p>
+<p>Let’s see which categorical variables, if any, improve on our two-variable model. To do this, we can fit the model that includes the dummies from all three categorical features, along with girth and length:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X_one_hot</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X_one_hot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
 <span class="n">theta_hat</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+
 <span class="n">y_pred</span> <span class="o">=</span> <span class="n">X_one_hot</span> <span class="o">@</span> <span class="n">theta_hat</span>
 <span class="n">training_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">anes_loss</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">/</span> <span class="n">y_pred</span><span class="p">)))</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training error: </span><span class="si">{</span><span class="n">training_error</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1092,7 +1088,8 @@ including the intercept term, girth and length.</p>
 </div>
 <p>According to average loss, this model does better than the previous model with only <code class="docutils literal notranslate"><span class="pre">Girth</span></code> and <code class="docutils literal notranslate"><span class="pre">Length</span></code>.
 But, let’s try to make this model simpler while keeping its accuracy.
-To do this, we look at the coefficients for each of the dummy variables, to see how close they are to 0 and to one another. In other words, we want to see how much the intercept might change if we include them in the model.</p>
+To do this, we look at the coefficients for each of the dummy variables, to see how close they are to 0 and to one another. In other words, we want to see how much the intercept might change if we include them in the model.
+A plot of the coefficients will make this comparison easy:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -1126,8 +1123,8 @@ To do this, we look at the coefficients for each of the dummy variables, to see 
 <div class="cell_output docutils container">
 <img alt="../../_images/4c00851f08fd2f3662a62789cf5e0a3122c918886bd34787cfedb0ff2dd190ee.svg" src="../../_images/4c00851f08fd2f3662a62789cf5e0a3122c918886bd34787cfedb0ff2dd190ee.svg" /></div>
 </div>
-<p>The coefficients confirm what we saw in the box plots. The coefficients for the sex of the donkey are close to zero, meaning that knowing the sex doesn’t really change the weight prediction. We also see that combining the age categories for donkeys over 5 will simplify the model without losing much. Since there are so few donkeys with a body condition score of 1.5, we are inclined to combine that category with the 2.0 category as well.</p>
-<p>We update the design matrix in view of these findings and refit the simpler model.</p>
+<p>The coefficients confirm what we saw in the box plots. The coefficients for the sex of the donkey are close to zero, meaning that knowing the sex doesn’t really change the weight prediction since the coefficients are close to zero. We also see that combining the age categories for donkeys over 5 years old will simplify the model without losing much. Since there are so few donkeys with a body condition score of 1.5 and its coefficient is close to that of a BCS of 2, we are inclined to combine these two categories.</p>
+<p>We update the design matrix in view of these findings:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">combine_bcs</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
@@ -1146,6 +1143,7 @@ To do this, we look at the coefficients for each of the dummy variables, to see 
 </div>
 </div>
 </div>
+<p>And then we fit the simpler model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">training_loss</span><span class="p">(</span><span class="n">X_one_hot_simple</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
@@ -1243,13 +1241,21 @@ To do this, we look at the coefficients for each of the dummy variables, to see 
 \[
 \text{Weight} \approx -175 + \text{Length} + 2\text{Girth}
 \]</div>
-<p>After this initial approximation, we use the categorical features to make some corrections: subtract 6.5 kg for a donkey with a BCS of 2 or less; subtract 5.1 kg for a BCS of 2.5; add 7.4 kg for a BCS of 3.5; and add 20 kg for a BCS of 4. In addition, we also subtract 6.5 kg for a donkey under 2 years old, and subtract 3.5 kg for a donkey between 2 and 5 years old.</p>
-<p>This model seems quite simple to implement. Let’s see how well the model does in predicting the weights of the donkeys in the test set.</p>
+<p>After this initial approximation, we use the categorical features to make some adjustments:</p>
+<ul class="simple">
+<li><p>BCS 2 or less? subtract 6.5 kg</p></li>
+<li><p>BCS 2.5? subtract 5.1 kg</p></li>
+<li><p>BCS 3.5? add 7.4 kg</p></li>
+<li><p>BCS 4? add 20 kg</p></li>
+<li><p>Age under 2 years? subtract 6.5 kg</p></li>
+<li><p>Age between 2 and 5 years? subtract 3.5 kg</p></li>
+</ul>
+<p>This model seems quite simple to implement since after our initial estimate based on the length and girth of the donkey, we add or subtract a few numbers based on answers to a few yes/no questions. Let’s see how well the model does in predicting the weights of the donkeys in the test set.</p>
 </section>
 <section id="model-assessment">
 <h2><span class="section-number">18.4.5. </span>Model Assessment<a class="headerlink" href="#model-assessment" title="Permalink to this heading">#</a></h2>
 <p>Remember that we put aside 20% of our data before exploring and modeling with the remaining 80%. We are now ready to apply what we have learned from the training set to the test set. That is, we take our fitted model and use it to predict the weights of the donkeys in the test set.
-To do this, we need to prepare the test set. Our model uses the girth and length of the donkey, as well as dummy variables for the donkey’s age and body condition score.</p>
+To do this, we need to prepare the test set. Our model uses the girth and length of the donkey, as well as dummy variables for the donkey’s age and body condition score. We apply all of our transformations on the training set to our test set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_test</span> <span class="o">=</span> <span class="n">test_set</span><span class="p">[</span><span class="s1">&#39;Weight&#39;</span><span class="p">]</span>
@@ -1266,7 +1272,7 @@ To do this, we need to prepare the test set. Our model uses the girth and length
 </div>
 </div>
 </div>
-<p>We consolidated all of our manipulations of the design matrix to create the final version that we settled on in our modeling with the training set. Now we are ready to use the <span class="math notranslate nohighlight">\(\theta\)</span>s that we fitted with the training set to make weight predictions for those donkeys in the test set.</p>
+<p>We consolidated all of our manipulations of the design matrix to create the final version that we settled on in our modeling with the training set. Now we are ready to use the <span class="math notranslate nohighlight">\(\theta\)</span>s that we fitted with the training set to make weight predictions for those donkeys in the test set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">X_test</span> <span class="o">@</span> <span class="n">theta_hat</span>
@@ -1275,6 +1281,7 @@ To do this, we need to prepare the test set. Our model uses the girth and length
 </div>
 </div>
 </div>
+<p>Then, we can plot the relative prediction errors:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -1295,12 +1302,13 @@ To do this, we need to prepare the test set. Our model uses the girth and length
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/745df05dc56e4de169395656850f0cb36f3973549dc4cc2636d872e959d7f88f.svg" src="../../_images/745df05dc56e4de169395656850f0cb36f3973549dc4cc2636d872e959d7f88f.svg" /></div>
+<img alt="../../_images/37c9fef74f1c8706b3f7a0e7e8d4b65688235d5accf05a53535b9809888a7c73.svg" src="../../_images/37c9fef74f1c8706b3f7a0e7e8d4b65688235d5accf05a53535b9809888a7c73.svg" /></div>
 </div>
 <p>Remember that positive relative error means underestimating weight, which is not as critical as overestimating weight. From this residual plot, we see that
 all but six of the test set weights are within 10% of the predictions,
 and five of the six errors that exceed 10% err on the side of underestimation.
-This makes sense given that our loss function penalized overestimation more. The scatter plot below shows the actual and predicted values along with lines marking 10% error.</p>
+This makes sense given that our loss function penalized overestimation more.</p>
+<p>An alternative scatter plot that shows the actual and predicted values along with lines marking 10% error gives a different view:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -1331,11 +1339,12 @@ This makes sense given that our loss function penalized overestimation more. The
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/ec9be4526378335d77a0dad19087bce4d7ad91eb6fef0e1846ac3a250605a92d.svg" src="../../_images/ec9be4526378335d77a0dad19087bce4d7ad91eb6fef0e1846ac3a250605a92d.svg" /></div>
+<img alt="../../_images/6b67e103791879e8006d38d44200a307df92029f876604a8c4ddde5f209cef03.svg" src="../../_images/6b67e103791879e8006d38d44200a307df92029f876604a8c4ddde5f209cef03.svg" /></div>
 </div>
+<p>The 10% lines lay further from the prediction line for larger weights.</p>
 <p>We’ve accomplished our goal!
 We have a model that uses easy-to-get measurements, is simple enough to explain on an instruction sheet, and makes predictions within 10% of the actual donkey weight.
-In the next section, we summarize this case study and reflect on our model.</p>
+Next, we summarize this case study and reflect on our model.</p>
 </section>
 </section>
 

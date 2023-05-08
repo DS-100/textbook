@@ -528,7 +528,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -544,6 +546,14 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-retrieving-info-on-clash-songs-from-spotify">14.4.1. Example: Retrieving Info on Clash Songs from Spotify</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -557,18 +567,19 @@ document.write(`
 <h1><span class="section-number">14.4. </span>REST<a class="headerlink" href="#rest" title="Permalink to this heading">#</a></h1>
 <p>Web services are increasingly implementing the REST (REpresentational State Transfer) architecture for developers to access their data. These include social media platforms like Twitter and Instagram, music apps like Spotify, real estate apps like Zillow, scientific sources of data such as the Climate Data Store, government data at the World Bank, and many many more. The basic idea behind REST is that every URL identifies a resource (data).</p>
 <p>REST is considered stateless meaning that the server does not remember the client from one request to the next. This aspect of REST has a few advantages: the server and the client can understand any message received without seeing previous messages; code can be changed on either the client or server side without impacting the operation of the service; and access is scalable, fast, modular, and independent.</p>
-<p>In this section, we work through an example to retrieve data from Spotify. We use both POST and GET methods in a series of requests to retrieve data on the songs by <a class="reference external" href="https://www.theclash.com/">The Clash</a>. Our example follows <a class="reference external" href="https://stmorse.github.io/journal/spotify-api.html">Steven Morse’s blog post</a>.</p>
+<p>In this section, we work through an example to retrieve data from Spotify.</p>
+<section id="example-retrieving-info-on-clash-songs-from-spotify">
+<h2><span class="section-number">14.4.1. </span>Example: Retrieving Info on Clash Songs from Spotify<a class="headerlink" href="#example-retrieving-info-on-clash-songs-from-spotify" title="Permalink to this heading">#</a></h2>
+<p>Our example follows <a class="reference external" href="https://stmorse.github.io/journal/spotify-api.html">Steven Morse’s blog post</a>, where we
+use both POST and GET methods in a series of requests to retrieve data on songs by <a class="reference external" href="https://www.theclash.com/">The Clash</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>In practice, we wouldn’t write GET and POST requests ourselves for Spotify. Instead, we’d use the <a class="reference external" href="https://spotipy.readthedocs.io/en/2.22.1/"><code class="docutils literal notranslate"><span class="pre">spotipy</span></code></a> library, which has functions to interact with the [Spotify Web API]((<a class="reference external" href="https://developer.spotify.com/">https://developer.spotify.com/</a>). That said, data scientists can often find themselves in the position of wanting to access data available via REST that doesn’t have a Python library available. This section gives a peek behind the curtain and shows how libraries like <code class="docutils literal notranslate"><span class="pre">spotipy</span></code> work.</p>
 </div>
 <p>Typically a REST application provides documentation with examples on how to request their data. Spotify has extensive documentation geared to developers who want to build an app, but we can also access their service just to explore data. To do that, we need to register as a developer and get a client ID and secret. We then use these to identify us to Spotify in our HTTP requests.</p>
 <p>After we register, we can begin to request data. There are basically two steps in this process: authenticate and request resources.</p>
-<dl class="simple myst">
-<dt>Authenticate</dt><dd><p>To authenticate, we issue a POST request, where we give the web service our client ID and secret. We provide these in the header of the request. In return, we receive a token from the server that authorizes us to make requests.</p>
-</dd>
-</dl>
-<p>We begin the process and authenticate.</p>
+<p>To authenticate, we issue a POST request, where we give the web service our client ID and secret. We provide these in the header of the request. In return, we receive a token from the server that authorizes us to make requests.</p>
+<p>We begin the process and authenticate:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AUTH_URL</span> <span class="o">=</span> <span class="s1">&#39;https://accounts.spotify.com/api/token&#39;</span>
@@ -587,7 +598,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>We provided our ID and secret in key:value pairs in the header of our POST request. We can check the status of our request to see if it was successful.</p>
+<p>We provided our ID and secret in key:value pairs in the header of our POST request. We can check the status of our request to see if it was successful:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response</span><span class="o">.</span><span class="n">status_code</span>
@@ -600,7 +611,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>And, let’s check the type of content in the body of the response.</p>
+<p>And, let’s check the type of content in the body of the response:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span>
@@ -613,7 +624,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>The body of the response contains the token that we need in the next step to get the data. Since, this information is JSON formatted, we can check the keys and retrieve the token.</p>
+<p>The body of the response contains the token that we need in the next step to get the data. Since, this information is JSON formatted, we can check the keys and retrieve the token:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_response_data</span> <span class="o">=</span> <span class="n">auth_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -635,7 +646,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>Notice that we did hid our ID and secret so others reading this book can’t imitate us. This request won’t be successful without a valid ID and secret. For example, below we make up an ID and secret and try to authenticate.</p>
+<p>Notice that we did hid our ID and secret so others reading this book can’t imitate us. This request won’t be successful without a valid ID and secret. For example, below we make up an ID and secret and try to authenticate:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bad_ID</span> <span class="o">=</span> <span class="s1">&#39;0123456789&#39;</span>
@@ -649,7 +660,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>We check the status of this “bad” request.</p>
+<p>We check the status of this “bad” request:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">auth_bad</span><span class="o">.</span><span class="n">status_code</span>
@@ -662,17 +673,14 @@ document.write(`
 </div>
 </div>
 </div>
-<p>According to <a class="reference internal" href="web_http.html#response-codes"><span class="std std-numref">Table 14.1</span></a>, a code of 400 means that we issued a bad request. For one more example, Spotify shuts us down if we take too much time making requests. A couple of times we ran into this issue when writing this section and received the following code telling us our token had expired.</p>
+<p>According to <a class="reference internal" href="web_http.html#response-codes"><span class="std std-numref">Table 14.1</span></a>, a code of 400 means that we issued a bad request. For one more example, Spotify shuts us down if we take too much time making requests. A couple of times we ran into this issue when writing this section and received the following code telling us our token had expired:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">res_clash</span><span class="o">.</span><span class="n">status_code</span>
 
 <span class="mi">401</span>
 </pre></div>
 </div>
 <p>Now for the second step, let’s get some data.</p>
-<dl class="simple myst">
-<dt>Resource Requests</dt><dd><p>Requests for resources can be made via GET for Spotify. Other services may require POSTs.  Requests must include the token we received from the web service when we authenticated, which we can use over and over. We pass the access token in the header of our GET request. We construct the name_value pairs as a dictionary.</p>
-</dd>
-</dl>
+<p>Requests for resources can be made via GET for Spotify. Other services may require POSTs.  Requests must include the token we received from the web service when we authenticated, which we can use over and over. We pass the access token in the header of our GET request. We construct the name_value pairs as a dictionary:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
@@ -684,7 +692,7 @@ document.write(`
 </div>
 <p>The developer API tells us that an artist’s albums are available at URLs that look like:
 ‘<a class="reference external" href="https://api.spotify.com/v1/artists/3RGLhK1IP9jnYFH4BRFJBS/albums">https://api.spotify.com/v1/artists/3RGLhK1IP9jnYFH4BRFJBS/albums</a>’  where the code between ‘artists/’ and ‘/albums’ is an artist’s ID. This particular code is for The Clash. Also information about the tracks on an album is available at a URL like:  ‘<a class="reference external" href="https://api.spotify.com/v1/albums/49kzgMsxHU5CTeb2XmFHjo/tracks">https://api.spotify.com/v1/albums/49kzgMsxHU5CTeb2XmFHjo/tracks</a>’ where the identifier here is for the album.</p>
-<p>If we know the ID for an artist, we can retrieve the IDs for their albums, and in turn, we can get data about the tracks on the albums. Our first step was to get the ID for The Clash from Spotify’s site.</p>
+<p>If we know the ID for an artist, we can retrieve the IDs for their albums, and in turn, we can get data about the tracks on the albums. Our first step was to get the ID for The Clash from Spotify’s site:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">artist_id</span> <span class="o">=</span> <span class="s1">&#39;3RGLhK1IP9jnYFH4BRFJBS&#39;</span>
@@ -692,7 +700,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>Our first data request retrieves the group’s albums. We construct the URL using  <code class="docutils literal notranslate"><span class="pre">artist_id</span></code> and pass our access token in the header.</p>
+<p>Our first data request retrieves the group’s albums. We construct the URL using  <code class="docutils literal notranslate"><span class="pre">artist_id</span></code> and pass our access token in the header:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BASE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.spotify.com/v1/&#39;</span>
@@ -716,7 +724,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>Our request was successful. Now let’s check the content-type of the response body.</p>
+<p>Our request was successful. Now let’s check the content-type of the response body:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res_clash</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span>
@@ -729,7 +737,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>The resource returned is JSON so we can load it into a Python dictionary.</p>
+<p>The resource returned is JSON so we can load it into a Python dictionary:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clash_albums</span> <span class="o">=</span> <span class="n">res_clash</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -750,7 +758,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>Let’s print the album ids, names, and release dates for a few albums.</p>
+<p>Let’s print the album ids, names, and release dates for a few albums:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">album</span> <span class="ow">in</span> <span class="n">clash_albums</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][:</span><span class="mi">4</span><span class="p">]:</span>
@@ -767,7 +775,7 @@ ID:  1Au9637RH9pXjBv5uS3JpQ   From Here To Eternity Live ---- 1999-10-04
 </div>
 </div>
 </div>
-<p>We see that some albums are remastered and others are live performances. Next, we cycle through the albums, pick up their IDs, and for each album, request information about the tracks.</p>
+<p>We see that some albums are remastered and others are live performances. Next, we cycle through the albums, pick up their IDs, and for each album, request information about the tracks:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tracks</span> <span class="o">=</span> <span class="p">[]</span>
@@ -794,7 +802,7 @@ ID:  1Au9637RH9pXjBv5uS3JpQ   From Here To Eternity Live ---- 1999-10-04
 </div>
 </div>
 </div>
-<p>Over a dozen features are available to explore on the tracks. Let’s close the example with a plot of danceability and loudness of The Clash songs.</p>
+<p>Over a dozen features are available to explore on the tracks. Let’s close the example with a plot of danceability and loudness of The Clash songs:</p>
 <div class="cell tag_hide-cell docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -855,6 +863,7 @@ ID:  1Au9637RH9pXjBv5uS3JpQ   From Here To Eternity Live ---- 1999-10-04
 And, sometimes a REST API isn’t available for the data we want, and we must extract data from web pages themselves, in HTML, a format similar to XML.
 We describe how to work with these formats next.</p>
 </section>
+</section>
 
     <script type="text/x-thebe-config">
     {
@@ -914,6 +923,20 @@ We describe how to work with these formats next.</p>
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-retrieving-info-on-clash-songs-from-spotify">14.4.1. Example: Retrieving Info on Clash Songs from Spotify</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
