@@ -573,10 +573,10 @@ document.write(`
 <figure class="align-default" id="cvdiagram">
 <img alt="../../_images/CVDiagram.png" src="../../_images/CVDiagram.png" />
 <figcaption>
-<p><span class="caption-number">Fig. 16.3 </span><span class="caption-text">Five-fold Cross-Validation. The train set is divide into 5 parts, which are used in turn to validate models built on the remainder of the data.</span><a class="headerlink" href="#cvdiagram" title="Permalink to this image">#</a></p>
+<p><span class="caption-number">Fig. 16.3 </span><span class="caption-text">Five-fold Cross-Validation. The train set is divided into 5 parts, which are used in turn to validate models built on the remainder of the data.</span><a class="headerlink" href="#cvdiagram" title="Permalink to this image">#</a></p>
 </figcaption>
 </figure>
-<p>Cross-validation can help select the general form of a model. By this we mean, the degree of the polynomial, the number of features in the model, or a cut-off for a regularization penalty (covered in the next section). The basic steps behind <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation go as follows.</p>
+<p>Cross-validation can help select the general form of a model. By this we mean, the degree of the polynomial, the number of features in the model, or a cut-off for a regularization penalty (covered in the next section). The basic steps behind <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation go as follows:</p>
 <ul class="simple">
 <li><p>Divide the train set into <span class="math notranslate nohighlight">\(k\)</span> parts of roughly the same size, each of these parts are called <em>folds</em>. Use the same technique that was used to create the train and test sets to make the folds. Typically, we divide the data at random.</p></li>
 <li><p>Set one fold aside to act as a test set.</p>
@@ -594,24 +594,30 @@ document.write(`
 <section id="example-fitting-a-bent-line-model-with-cross-validation">
 <h2><span class="section-number">16.3.1. </span>Example: Fitting a Bent Line Model with Cross-validation<a class="headerlink" href="#example-fitting-a-bent-line-model-with-cross-validation" title="Permalink to this heading">#</a></h2>
 <p>We demonstrate <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation on the gas consumption example. However, this time we fit a different type of model. The original scatter plot of the data looks like the points fall along two connected line segments. In cold temperatures the relationship between gas consumption and temperature looks roughly linear with a negative slope of about <span class="math notranslate nohighlight">\(-4\)</span> cubic ft/degree, and in warmer months, the relationship appears nearly flat. So, rather than fit a polynomial, we can fit a bent line to the data.</p>
-<p>Let’s start by fitting a line with a bend at 65 degrees. To do this, we create a feature that enables the points with temperatures above 65 to have a different slope. The model is</p>
+<p>Let’s start by fitting a line with a bend at 65 degrees. To do this, we create a feature that enables the points with temperatures above 65 to have a different slope. The model is:</p>
 <div class="math notranslate nohighlight">
 \[
 y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 \]</div>
-<p>Here, <span class="math notranslate nohighlight">\( (~)^+ \)</span> stands for “positive part” so when <span class="math notranslate nohighlight">\( x \)</span> is less than 65 it evaluates to 0, and when <span class="math notranslate nohighlight">\( x \)</span> is 65 or greater, it is just <span class="math notranslate nohighlight">\( x-65 \)</span>.</p>
+<p>Here, <span class="math notranslate nohighlight">\( (~)^+ \)</span> stands for “positive part” so when <span class="math notranslate nohighlight">\( x \)</span> is less than 65 it evaluates to 0, and when <span class="math notranslate nohighlight">\( x \)</span> is 65 or greater, it is just <span class="math notranslate nohighlight">\( x-65 \)</span>. We create this new feature and add it to the design matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[[</span><span class="s1">&#39;temp&#39;</span><span class="p">]]</span>
 <span class="n">X</span><span class="p">[</span><span class="s2">&quot;temp65p&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">65</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">65</span> <span class="p">)</span>
-
-<span class="n">bend</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Let’s overlay this fitted “curve” on the scatter plot to see how well it captures the shape of the data.</p>
+<p>Then, we fit the model with these two features:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bend</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s overlay this fitted “curve” on the scatter plot to see how well it captures the shape of the data:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -650,9 +656,9 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/8d25d1238092959d0b7ef0c06054168870aaa58100b905d6dc6a1a9754b6a41c.svg" src="../../_images/8d25d1238092959d0b7ef0c06054168870aaa58100b905d6dc6a1a9754b6a41c.svg" /></div>
+<img alt="../../_images/f6ee12c7bcf6531c5888a6c6c889de24e0d85449d57b95d211aafa0ef96d1ffc.svg" src="../../_images/f6ee12c7bcf6531c5888a6c6c889de24e0d85449d57b95d211aafa0ef96d1ffc.svg" /></div>
 </div>
-<p>This model appears to fit the data much better than a polynomial. But, there are many bent line models possible. The line might bend at 55 degrees or 60 degrees, and so on. We can use <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation to choose the temperature value at which the line bends. Let’s consider models with bends at <span class="math notranslate nohighlight">\( 40, 41, 42, \ldots, 68, 69 \)</span> degrees. For each of these, we need to create the additional feature to enable the line to bend there.</p>
+<p>This model appears to fit the data much better than a polynomial. But, there are many bent line models possible. The line might bend at 55 degrees or 60 degrees, and so on. We can use <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation to choose the temperature value at which the line bends. Let’s consider models with bends at <span class="math notranslate nohighlight">\( 40, 41, 42, \ldots, 68, 69 \)</span> degrees. For each of these, we need to create the additional feature to enable the line to bend there:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bends</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -784,7 +790,7 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 <p>97 rows × 32 columns</p>
 </div></div></div>
 </div>
-<p>The first step in cross-validation is to create our train and test sets. We choose 22 observations at random to be placed in the test set. That leaves 75 for the train set.</p>
+<p>The first step in cross-validation is to create our train and test sets. Like before, we choose 22 observations at random to be placed in the test set. That leaves 75 for the train set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">heat_df</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span>
@@ -798,7 +804,7 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 </div>
 </div>
 </div>
-<p>Now we can divide the train set into folds. We use three folds so that we have 25 observations in each fold. For each fold, we fit 30 models, one for each bend in the line.</p>
+<p>Now, we can divide the train set into folds. We use three folds so that we have 25 observations in each fold. For each fold, we fit 30 models, one for each bend in the line. For this step, we divide the data with the <code class="docutils literal notranslate"><span class="pre">KFold</span></code> method in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
@@ -831,7 +837,7 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 </div>
 </div>
 </div>
-<p>Then, we combine the validation errors across the 3-folds and plot them against the location of the bend.</p>
+<p>Then, we combine the validation errors across the 3-folds and plot them against the location of the bend:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">totals</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">validation_errors</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="p">]</span>
@@ -864,7 +870,7 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 <div class="cell_output docutils container">
 <img alt="../../_images/b321ed98683ef100803a3550c5577c008e7e77767b8fafc974f47d0a3e1f2689.svg" src="../../_images/b321ed98683ef100803a3550c5577c008e7e77767b8fafc974f47d0a3e1f2689.svg" /></div>
 </div>
-<p>The MSE looks quite flat for 57 to 60 degrees, but the minimum occurs at 58 so we choose that model. To assess this model on the test set, we first fit the bent line model at 58 degrees on the entire train set.</p>
+<p>The MSE looks quite flat for 57 to 60 degrees, but the minimum occurs at 58 so we choose that model. To assess this model on the test set, we first fit the bent line model at 58 degrees on the entire train set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bent_final</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;temp58p&quot;</span><span class="p">]],</span> 
@@ -873,7 +879,7 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 </div>
 </div>
 </div>
-<p>Then we use the fitted model to predict gas consumption for the test set.</p>
+<p>Then we use the fitted model to predict gas consumption for the test set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">bent_final</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;temp58p&quot;</span><span class="p">]])</span>
@@ -883,7 +889,7 @@ y = \theta_0 + \theta_1x + \theta_2(x-65)^+
 </div>
 </div>
 </div>
-<p>Let’s overlay the bent-line fit on the scatter plot and examine the residuals to get an idea as to the quality of the fit.</p>
+<p>Let’s overlay the bent-line fit on the scatter plot and examine the residuals to get an idea as to the quality of the fit:</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/cd5f864073e3f3cbbaf79d8e758e13aacceb861cf984afae5f81438b02866a96.svg" src="../../_images/cd5f864073e3f3cbbaf79d8e758e13aacceb861cf984afae5f81438b02866a96.svg" /></div>
