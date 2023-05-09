@@ -568,7 +568,7 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="example-a-simple-linear-model-for-air-quality">
 <h1><span class="section-number">15.2. </span>Example: A Simple Linear Model for Air Quality<a class="headerlink" href="#example-a-simple-linear-model-for-air-quality" title="Permalink to this heading">#</a></h1>
-<p>Recall from  <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a> that our aim is to use air quality measurements from the accurate Air Quality System  (AQS) sensors operated by the US government to predict the measurements made by PurpleAir (PA) sensors.  The pairs of data values come from neighboring instruments that measure the average daily concentration of particulate matter in the air on the same day. (The unit of measurement is an average count of particles under 2.5 mm in size per cubic liter of air in a 24-hour period.) In this section, we focus on air quality measurements at one location in Georgia. These are a subset of the data we examined in the case study in <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>. The measurements are daily averages from August to mid-November, 2019.</p>
+<p>Recall from  <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a> that our aim is to use air quality measurements from the accurate Air Quality System  (AQS) sensors operated by the US government to predict the measurements made by PurpleAir (PA) sensors.  The pairs of data values come from neighboring instruments that measure the average daily concentration of particulate matter in the air on the same day. (The unit of measurement is an average count of particles under 2.5 mm in size per cubic liter of air in a 24-hour period.) In this section, we focus on air quality measurements at one location in Georgia. These are a subset of the data we examined in the case study in <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>. The measurements are daily averages from August to mid-November, 2019:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
 <summary aria-label="Toggle hidden content">
@@ -691,22 +691,23 @@ document.write(`
 <p>184 rows × 5 columns</p>
 </div></div></div>
 </div>
-<p>The feature <code class="docutils literal notranslate"><span class="pre">pm25aqs</span></code> contains measurements from the AQS sensor and <code class="docutils literal notranslate"><span class="pre">pm25pa</span></code> from the PurpleAir monitor. Since we are interested in studying how well the AQS measurements predict the PurpleAir measurements, our scatter plot places PurpleAir readings on the <span class="math notranslate nohighlight">\(y\)</span>-axis and AQS readings on the <span class="math notranslate nohighlight">\(x\)</span> axis. We also add a trend line.</p>
+<p>The feature <code class="docutils literal notranslate"><span class="pre">pm25aqs</span></code> contains measurements from the AQS sensor and <code class="docutils literal notranslate"><span class="pre">pm25pa</span></code> from the PurpleAir monitor. Since we are interested in studying how well the AQS measurements predict the PurpleAir measurements, our scatter plot places PurpleAir readings on the <span class="math notranslate nohighlight">\(y\)</span>-axis and AQS readings on the <span class="math notranslate nohighlight">\(x\)</span> axis. We also add a trend line:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">GA</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;pm25aqs&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;pm25pa&quot;</span><span class="p">,</span> <span class="n">trendline</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">,</span>
+           <span class="n">trendline_color_override</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
            <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/d5aadb79a4773394f87f7fa1dc4e3e66f25ead75c4a1a4f16b84a23429b96b96.svg" src="../../_images/d5aadb79a4773394f87f7fa1dc4e3e66f25ead75c4a1a4f16b84a23429b96b96.svg" /></div>
+<img alt="../../_images/94d0660b8d543c0c949106df0cae049f4abd5ec9b3a46dcecc6142837aca5bfb.svg" src="../../_images/94d0660b8d543c0c949106df0cae049f4abd5ec9b3a46dcecc6142837aca5bfb.svg" /></div>
 </div>
-<p>The scatter plot shows a linear relationship between the measurements from these two kinds of instruments. The model that we want to fit has the following form:</p>
+<p>This scatter plot shows a linear relationship between the measurements from these two kinds of instruments. The model that we want to fit has the following form:</p>
 <div class="math notranslate nohighlight">
 \[ PA \approx \theta_0 + \theta_1 AQ,\]</div>
 <p>where <span class="math notranslate nohighlight">\(PA\)</span> refers to the  PurpleAir average daily measurement and <span class="math notranslate nohighlight">\(AQ\)</span> to its partner AQS measurement.</p>
-<p>Since <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> objects have built-in methods to compute SDs and correlation coefficients, we can quickly define functions that calculate the best fitting line.</p>
+<p>Since <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> objects have built-in methods to compute SDs and correlation coefficients, we can quickly define functions that calculate the best fitting line:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">theta_1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -725,7 +726,7 @@ document.write(`
 </div>
 </div>
 <p>Now, we can fit the model by computing
-<span class="math notranslate nohighlight">\(\hat{\theta}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\theta}_1\)</span> for these data.</p>
+<span class="math notranslate nohighlight">\(\hat{\theta}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\theta}_1\)</span> for these data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <span class="n">theta_1</span><span class="p">(</span><span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">],</span> <span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">])</span>
@@ -755,7 +756,7 @@ document.write(`
 <p>This model matches the trend line shown in the scatter plot. That’s not by accident. The parameter value for <code class="docutils literal notranslate"><span class="pre">trendline</span></code> in the call to <code class="docutils literal notranslate"><span class="pre">scatter()</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;ols&quot;</span></code>, which stands for <em>ordinary least squares</em>, another name for fitting a linear model by minimizing squared error.</p>
 <p>Let’s examine the errors.
 First, we find the predictions for PA measurements given the AQS measurements, and
-then calculate the errors—the difference between the actual PA measurements and the predictions.</p>
+then calculate the errors—the difference between the actual PA measurements and the predictions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prediction</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">+</span> <span class="n">t1</span> <span class="o">*</span> <span class="n">GA</span><span class="p">[</span><span class="s2">&quot;pm25aqs&quot;</span><span class="p">]</span>
@@ -765,7 +766,7 @@ then calculate the errors—the difference between the actual PA measurements an
 </div>
 </div>
 </div>
-<p>Below, we plot these errors against the predicted values.</p>
+<p>Let’s plot these errors against the predicted values:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;prediction&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
@@ -786,7 +787,7 @@ then calculate the errors—the difference between the actual PA measurements an
 <p>The original scatter plot of paired measurements shows that the PurpleAir recordings are often quite a bit higher than the more accurate AQS measurements. Indeed, the equation for our simple line model has a slope of about 2.1. We interpret the slope to mean that a change of 1 ppm measured by the AQS monitor is associated with a 2 ppm change in the PA measurement, on average. So, if on one day the AQS sensor measures 10 ppm and on the next day it is 5 ppm higher, namely 15 ppm, then our prediction for the PA measurement increases from one day to the next by <span class="math notranslate nohighlight">\(2 * 5 = 10\)</span> ppm.</p>
 <p>Any change in the Purple Air reading is not caused by the change in the AQS reading. Rather, they both reflect the air quality, and our model captures the relationship between the two devices. Often times the term <em>prediction</em> is taken to mean <em>causation</em>, but that is not the case here. Instead, the prediction just refers to our use of the <em>linear association</em> between PA and AQS measurements.</p>
 <p>As for the intercept in the model, we might expect it to be 0, since when there is no particulate matter in the air, we would think that both instruments would measure 0 ppm. But for an AQS of 0, the model predicts <span class="math notranslate nohighlight">\(-3.4\)</span> ppm for PurpleAir, which doesn’t make sense. There can’t be negative amounts of particles in the air. This highlights the problem of using the model outside of the range where measurements were taken. We observed AQS recordings between 3 and 18 ppm, and in this range the model fits well. While it makes sense for the line to have an intercept of 0, practically, such a model doesn’t fit well and the predictions tend to be much worse.</p>
-<p>George Box, a renowned statistician, famously said, “all models are wrong, but some are useful.” Here is a case where despite the intercept of the line not passing through 0, the simple linear model is useful in predicting  air quality measurements for a PurpleAir sensor. Indeed, the correlation between our two features is very high.</p>
+<p>George Box, a renowned statistician, famously said, “all models are wrong, but some are useful.” Here is a case where despite the intercept of the line not passing through 0, the simple linear model is useful in predicting  air quality measurements for a PurpleAir sensor. Indeed, the correlation between our two features is very high:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">GA</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
@@ -836,7 +837,7 @@ then calculate the errors—the difference between the actual PA measurements an
 <section id="assessing-the-fit">
 <h2><span class="section-number">15.2.2. </span>Assessing the Fit<a class="headerlink" href="#assessing-the-fit" title="Permalink to this heading">#</a></h2>
 <p>The earlier plot of the errors against the fitted values gives a visual assessment of the quality of the fit. (This plot is called a  <em>residual plot</em> because the errors are sometimes referred to as <em>residuals</em>.) A good fit should show a cloud of points around the horizontal line at 0 with no clear pattern. When there is a pattern, we can usually conclude that the simple linear model doesn’t entirely capture the signal. We saw earlier that there are no apparent patterns in the residual plot.</p>
-<p>Other types of residual plots that can be useful in a visual assessment of the fit are plots of the residuals against feature that are not included in the model. If we see a pattern, then we may want to include this feature in the model. That is, we may want to fit a multiple linear model. When the data have a time component, we want to check whether there are any patterns in time. For these particular data, since the measurements are daily averages over a four month period, we plot the error against the date the measurement is recorded.</p>
+<p>Other types of residual plots that can be useful in a visual assessment of the fit are plots of the residuals against feature that are not included in the model. If we see a pattern, then we may want to include this feature in the model. That is, we may want to fit a multiple linear model. When the data have a time component, we want to check whether there are any patterns in time. For these particular data, since the measurements are daily averages over a four month period, we plot the error against the date the measurement is recorded:</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <img alt="../../_images/7905b9910a98196212f2dc80463a6128acdf306c64030ac2fda05eaaff87d402.svg" src="../../_images/7905b9910a98196212f2dc80463a6128acdf306c64030ac2fda05eaaff87d402.svg" /></div>
@@ -858,7 +859,7 @@ And, we find the standard deviation of the errors to be about 2.8 ppm:</p>
 </div>
 </div>
 </div>
-<p>In comparison, the standard deviation of the PurpleAir measurements is quite a bit larger.</p>
+<p>In comparison, the standard deviation of the PurpleAir measurements is quite a bit larger:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
