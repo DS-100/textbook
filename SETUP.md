@@ -15,11 +15,12 @@ These instructions were tested for OSX 10.15. We assume that you know how to
 run commands on the `bash` command line. We also assume you have the following
 command-line tools installed:
 
-- `conda`, the Python package manager ([installation instructions][conda])
+- `conda`, the Python package manager ([installation instructions for `mamba`,
+  which implements a much faster version of `conda`][conda])
 - `git`, the version control tool ([installation instructions][git])
 - `brew`, the macOS package manager ([installation instructions][brew])
 
-[conda]: https://docs.anaconda.com/anaconda/install/
+[conda]: https://mamba.readthedocs.io/en/latest/installation.html
 [git]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 [brew]: https://brew.sh/
 
@@ -35,13 +36,13 @@ command-line tools installed:
    the following command:
 
    ```bash
-   conda env create -f environment.yml
+   mamba env create -f environment.yml
    ```
 
    To check that this command succeeds, run:
 
    ```bash
-   conda info --envs
+   mamba env list
    ```
 
    And verify that the `textbook` environment appears in the list.
@@ -63,7 +64,7 @@ Follow these steps **each time** you begin working on the book.
 1. **Activate the `textbook` Python environment.** Run:
 
    ```bash
-   source activate textbook
+   mamba activate textbook
    ```
 
 1. **Checkout a `git` branch for your work.** To make book changes easier to
@@ -119,12 +120,12 @@ Follow these steps **each time** you begin working on the book.
    rebuilds the book whenever you change book content. Once this process
    is running, open http://localhost:8000/ to view the book locally.
 
-1. **Start a Jupyter notebook server.** In a new terminal tab or window,
-   navigate to the `textbook/` folder and run `source activate textbook` again.
+1. **Start a JupyterLab notebook server.** In a new terminal tab or window,
+   conda to the `textbook/` folder and run `mamba activate textbook` again.
    Then, run:
 
    ```bash
-   jupyter notebook
+   jupyter lab
    ```
 
    This should open your browser to a Jupyter server that lists the textbook
