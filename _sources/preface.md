@@ -73,3 +73,149 @@ This book has 21 chapters, divided into six parts:
 - **Part 6 (Ch 19-21): Classification** completes our study or supervised
   learning through logistic regression and optimization. It ends with a case
   study about predicting whether news articles make real or fake statements.
+
+We've also included notes at the end of the book with resources to learn more
+about many of the topics this book introduces.
+
+## Conventions Used in This Book
+
+The following typographical conventions are used in this book:
+
+_Italic_:: Indicates new terms, URLs, email addresses, filenames, and file
+extensions.
+
+`Constant width`:: Used for program listings, as well as within paragraphs to
+refer to program elements such as variable or function names, databases, data
+types, environment variables, statements, and keywords.
+
+**`Constant width bold`**:: Shows commands or other text that should be typed
+literally by the user.
+
+_`Constant width italic`_:: Shows text that should be replaced with
+user-supplied values or by values determined by context.
+
+```{admonition}
+This element signifies a tip or suggestion.
+```
+
+```{note}
+This element signifies a general note.
+```
+
+```{warning}
+This element indicates a warning or caution.
+```
+
+### Using Code Examples
+
+Supplemental material (code examples, exercises, etc.) is available for
+download at link: https://learningds.org.
+
+If you have a technical question or a problem using the code examples, please
+send email to bookquestions@oreilly.com.
+
+This book is here to help you get your job done. In general, if example code is
+offered with this book, you may use it in your programs and documentation. You
+do not need to contact us for permission unless you’re reproducing a
+significant portion of the code. For example, writing a program that uses
+several chunks of code from this book does not require permission. Selling or
+distributing examples from O’Reilly books does require permission. Answering a
+question by citing this book and quoting example code does not require
+permission. Incorporating a significant amount of example code from this book
+into your product’s documentation does require permission.
+
+We appreciate, but generally do not require, attribution. An attribution
+usually includes the title, author, publisher, and ISBN. For example: "Learning
+Data Science by Sam Lau, Deborah Nolan, and Joey Gonzalez (O'Reilly). Copyright
+2023 Sam Lau, Deborah Nolan, and Joey Gonzalez, 978-0-596-xxxx-x."
+
+If you feel your use of code examples falls outside fair use or the permission
+given above, feel free to contact us at bookquestions@oreilly.com.
+
+### O'Reilly Online Learning
+
+```{note}
+For more than 40 years, [O'Reilly Media](https://oreilly.com)
+has provided technology and business training, knowledge, and insight to
+help companies succeed.
+```
+
+Our unique network of experts and innovators share their knowledge and
+expertise through books, articles, and our online learning platform. O’Reilly’s
+online learning platform gives you on-demand access to live training courses,
+in-depth learning paths, interactive coding environments, and a vast collection
+of text and video from O'Reilly and 200+ other publishers. For more
+information, visit [https://oreilly.com](https://oreilly.com).
+
+### How to Contact Us
+
+Please address comments and questions concerning this book to the publisher:
+
+<ul class="simplelist">
+  <li>O’Reilly Media, Inc.</li>
+  <li>1005 Gravenstein Highway North</li>
+  <li>Sebastopol, CA 95472</li>
+  <li>800-998-9938 (in the United States or Canada)</li>
+  <li>707-829-0515 (international or local)</li>
+  <li>707-829-0104 (fax)</li>
+</ul>
+
+We have a web page for this book, where we list errata, examples, and any
+additional information. You can access this page at
+link: https://learningds.org.
+
+Email bookquestions@oreilly.com to comment or ask technical questions about
+this book.
+
+For news and information about our books and courses, visit https://oreilly.com.
+
+Find us on Facebook: https://facebook.com/oreilly
+
+Follow us on Twitter: https://twitter.com/oreillymedia
+
+Watch us on YouTube: https://www.youtube.com/oreillymedia
+
+## Acknowledgements
+
+We are incredibly thankful for the O'Reilly team for all their work to publish
+this book, especially Melissa Potter, Jess Haberman, Aaron Black, Danny
+Elfanbaum, and Mike Loukides. This book is based on six years of our joint
+experience teaching Principles and Techniques of Data Science, an undergraduate
+course at the University of California, Berkeley. We've benefited from
+co-teaching with other with other instructors, and we especially want to
+mention Joe Hellerstein for insights around data wrangling, Fernando Perez for
+NetCDF, and Josh Hug for the inspiration for the PurpleAir case study.
+
+We thank the people who were kind enough to share their data with us for
+the writing of this book:
+
+- Google Flu Trends?
+- Wikipedia data?
+- Stan Lipovetsky
+
+We also make use of many publicly available datasets in this book, and we thank
+the people and organizations that made this data available:
+
+- CalEnviroScreen Project
+- National Oceanic and Atmospheric Administration (NOAA)
+- US Air Quality System
+- PurpleAir
+- Jake VanderPlas
+- Washington State Transportation Center
+- American Kennel Club
+- US Social Security Department
+- U.S. Substance Abuse and Medical Health Services Administration (SAMHSA)
+- DataSF
+- San Francisco Chronicle
+- Cherry Blossom Run
+- US Bureau of Labor Statistics
+- FiveThirtyEight
+- American Presidency Project
+- Climate Data Store
+- Spotify API
+- Wikipedia
+- Opportunity Insights and Raj Chetty
+- California Department of Fish and Game
+- UK Donkey Sanctuary
+- Roy Lawrence Rich
+- Kai Shu
