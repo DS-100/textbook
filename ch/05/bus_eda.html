@@ -1272,15 +1272,17 @@ title="Print to PDF"
 </ul>
 <p>Answering these questions helps us better determine how to model.</p>
 <p>Recall from <a class="reference internal" href="../04/modeling_intro.html#ch-modeling"><span class="std std-numref">Chapter 4</span></a> that we found the median time a bus was late was 3/4 of a minute. But, this doesn’t match the median we calculated for all bus routes and directions (1/2 a minute). Let’s check whether that could be due to the focus on northbound line C buses in that chapter. Let’s create histograms of lateness for each of the six combinations of bus line and direction to address this question and the first two questions on our list:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">bus</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;minutes_late&#39;</span><span class="p">,</span> 
                    <span class="n">histnorm</span><span class="o">=</span><span class="s1">&#39;probability density&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
                    <span class="n">facet_row</span><span class="o">=</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="n">facet_col</span><span class="o">=</span><span class="s1">&#39;route&#39;</span><span class="p">,</span>
+                   <span class="n">facet_row_spacing</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
                    <span class="n">width</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">25</span><span class="p">])</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1300,6 +1302,7 @@ title="Print to PDF"
              <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">50</span><span class="p">])</span>
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1311,16 +1314,78 @@ title="Print to PDF"
 <p>Lastly, to examine the scheduled frequency of the buses, we need to compute the intervals between scheduled bus times. We create a new column in our table that contains the time between the buses scheduled arrival times for the northbound C buses:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus_c_n</span> <span class="o">=</span> <span class="n">bus</span><span class="p">[(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;route&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;C&#39;</span><span class="p">)</span> <span class="o">&amp;</span>
-                 <span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;northbound&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-<span class="n">bus_c_n</span> <span class="o">=</span> <span class="n">bus_c_n</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;scheduled&#39;</span><span class="p">)</span>
-
-<span class="n">minute</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
-<span class="n">bus_c_n</span><span class="p">[</span><span class="s1">&#39;sched_inter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bus_c_n</span><span class="p">[</span><span class="s1">&#39;scheduled&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span> <span class="o">/</span> <span class="n">minute</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">minute</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="s1">&#39;1 minute&#39;</span><span class="p">)</span>
+<span class="n">bus_c_n</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">bus</span><span class="p">[(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;route&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;C&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;northbound&#39;</span><span class="p">)]</span>
+    <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;scheduled&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">sched_inter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;scheduled&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span> <span class="o">/</span> <span class="n">minute</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">bus_c_n</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>route</th>
+      <th>direction</th>
+      <th>scheduled</th>
+      <th>actual</th>
+      <th>minutes_late</th>
+      <th>hour_of_day</th>
+      <th>sched_inter</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>19512</th>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-03-26 00:00:25</td>
+      <td>2016-03-26 00:05:01</td>
+      <td>4.60</td>
+      <td>0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>19471</th>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-03-26 00:30:25</td>
+      <td>2016-03-26 00:30:19</td>
+      <td>-0.10</td>
+      <td>0</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>19487</th>
+      <td>C</td>
+      <td>northbound</td>
+      <td>2016-03-26 01:05:25</td>
+      <td>2016-03-26 01:10:15</td>
+      <td>4.83</td>
+      <td>1</td>
+      <td>35.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>Let’s examine a histogram the distribution of inter-arrival times of these buses.</p>
 <div class="cell docutils container">
@@ -1330,8 +1395,7 @@ title="Print to PDF"
                    <span class="n">width</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Time between consecutive buses&quot;</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">margin</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
