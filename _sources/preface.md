@@ -186,6 +186,11 @@ co-teaching with other with other instructors, and we especially want to
 mention Joe Hellerstein for insights around data wrangling, Fernando Perez for
 NetCDF, and Josh Hug for the inspiration for the PurpleAir case study.
 
+TODO: thank you to:
+
+- technical reviewers
+- students who helped out in the past
+
 We thank the people who were kind enough to share their data with us for
 the writing of this book:
 
