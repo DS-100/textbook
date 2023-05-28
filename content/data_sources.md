@@ -56,7 +56,7 @@ In addition to these case studies, another 20-plus datasets were used as example
 + The Clash songs are obtained using the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
 The retrieval of the data follows [Exploring the Spotify API in Python](https://stmorse.github.io/journal/spotify-api.html) by Morse.
 
-+ The XML plant document is from the [W3 School Plant catalog](https://www.w3schools.com/xml/plant_catalog.xml).
++ `catalog.xml` The XML plant catalog document is from the [W3 School Plant catalog](https://www.w3schools.com/xml/plant_catalog.xml).
 
 + The exchange rates are available from the [European Central Bank](https://www.ecb.europa.eu/stats/eurofxref/). 
 
