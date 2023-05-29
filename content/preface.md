@@ -6,24 +6,24 @@ more. This book, _Learning Data Science_, aims to prepare readers to do data
 science. To achieve this, we've written this book to contain the following
 special features:
 
-1. **A focus on the fundamentals.** Technologies come and go. We talk in detail
+1. _A focus on the fundamentals._ Technologies come and go. We talk in detail
    about individual technologies in this book, but our goal is to equip readers
    with the fundamental building blocks of data science. We do this by teaching
    readers how to think about data science problems and challenges, which will
    serve readers even as technologies change.
-1. **Covering the entire data science lifecycle.** Instead of just focusing on
+1. _Covering the entire data science lifecycle._ Instead of just focusing on
    a single topic, like working with data tables or machine learning, we cover
    the entire data science lifecycle -- the process of asking a question,
    obtaining data, understanding the data, and understanding the world.
-1. **Only using real data.** To be prepared for real data analyses, we consider
+1. _Only using real data._ To be prepared for real data analyses, we consider
    it essential to see examples that use real data. We chose all of the dataset
    examples presented in this book by carefully picking from real-world data
    analyses that have made an impact, not hypothetical or generated data.
-1. **Applying concepts through case studies.** We've sprinkled in extended case
+1. _Applying concepts through case studies._ We've sprinkled in extended case
    studies in the book that replicate or extend analyses from other
    data scientists. These case studies show readers how to apply concepts in
    real settings.
-1. **Both computational and inferential thinking.** On the job, data scientists
+1. _Both computational and inferential thinking._ On the job, data scientists
    need to foresee how the decisions they make when writing code might affect
    statistical conclusions. To prepare readers for their future work, _Learning
    Data Science_ integrates both computational and statistical thinking. We
@@ -51,26 +51,26 @@ intuitively.
 
 This book has 21 chapters, divided into six parts:
 
-- **Part 1 (Ch 1-5): The Data Science Lifecycle** describes what the
+- _Part 1 (Ch 1-5): The Data Science Lifecycle_ describes what the
   lifecycle is, makes one full pass through the lifecycle at a basic level, and
   introduces terminology that we use throughout the book. The part concludes
   with a short case study about bus arrival times.
-- **Part 2 (Ch 6-7): Rectangular Data** introduces data frames and
+- _Part 2 (Ch 6-7): Rectangular Data_ introduces data frames and
   relations and how to wrote code to manipulate data using `pandas` and SQL.
-- **Part 3 (Ch 8-12): Understanding the Data** is all about obtaining data,
+- _Part 3 (Ch 8-12): Understanding the Data_ is all about obtaining data,
   discovering its traits, and spotting issues. After understanding these
   concepts, a reader can take a data file and explain all of the data's
   interesting features to someone else. This part ends with a case study
   about air quality.
-- **Part 4 (Ch 13-14): Other Data Sources** looks at alternative sources of
+- _Part 4 (Ch 13-14): Other Data Sources_ looks at alternative sources of
   data like text, binary, and data from the Web which all have important
   roles in data science.
-- **Part 5 (Ch 15-18): Linear Modeling** focuses on the understanding the world
+- _Part 5 (Ch 15-18): Linear Modeling_ focuses on the understanding the world
   using data. It covers traditional topics like confidence intervals and
   hypothesis testing in additional to modeling, prediction, and inference.
   This part ends with a case study about predicting donkey weights for
   veterinarians in Kenya.
-- **Part 6 (Ch 19-21): Classification** completes our study or supervised
+- _Part 6 (Ch 19-21): Classification_ completes our study or supervised
   learning through logistic regression and optimization. It ends with a case
   study about predicting whether news articles make real or fake statements.
 
@@ -94,7 +94,7 @@ literally by the user.
 _`Constant width italic`_:: Shows text that should be replaced with
 user-supplied values or by values determined by context.
 
-```{admonition}
+```{tip}
 This element signifies a tip or suggestion.
 ```
 
@@ -183,44 +183,9 @@ Elfanbaum, and Mike Loukides. This book is based on six years of our joint
 experience teaching Principles and Techniques of Data Science, an undergraduate
 course at the University of California, Berkeley. We've benefited from
 co-teaching with other with other instructors, and we especially want to
-mention Joe Hellerstein for insights around data wrangling, Fernando Perez for
-NetCDF, and Josh Hug for the inspiration for the PurpleAir case study.
-
-TODO: thank you to:
-
-- technical reviewers
-- students who helped out in the past
-
-We thank the people who were kind enough to share their data with us for
-the writing of this book:
-
-- Google Flu Trends?
-- Wikipedia data?
-- Stan Lipovetsky
-
-We also make use of many publicly available datasets in this book, and we thank
-the people and organizations that made this data available:
-
-- CalEnviroScreen Project
-- National Oceanic and Atmospheric Administration (NOAA)
-- US Air Quality System
-- PurpleAir
-- Jake VanderPlas
-- Washington State Transportation Center
-- American Kennel Club
-- US Social Security Department
-- U.S. Substance Abuse and Medical Health Services Administration (SAMHSA)
-- DataSF
-- San Francisco Chronicle
-- Cherry Blossom Run
-- US Bureau of Labor Statistics
-- FiveThirtyEight
-- American Presidency Project
-- Climate Data Store
-- Spotify API
-- Wikipedia
-- Opportunity Insights and Raj Chetty
-- California Department of Fish and Game
-- UK Donkey Sanctuary
-- Roy Lawrence Rich
-- Kai Shu
+thank Joe Hellerstein for insights around data wrangling, Fernando Perez for
+NetCDF, and Josh Hug for the inspiration for the PurpleAir case study. We also
+thank the Berkeley students who contributed to previous versions of the
+book: Ananth Agarwal, Ashley Chien, Andrew Do, Sona Jeswani, Tiffany Jann,
+Andrew Kim, Jun Seo Park, Allen Shen, Katherine Yen, and Daniel Zhu. Lastly, we
+thank the technical reviewers who helped to review the book before its release.
