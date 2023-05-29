@@ -12,7 +12,7 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - To learn more about the human contexts and ethics of data, see the [HCE Toolkit](https://data.berkeley.edu/hce-toolkit) and Tuskegee University's [National Center for Bioethics in Research and Health Care](https://www.tuskegee.edu/about-us/centers-of-excellence/bioethics-center).
 
-- To learn more about data privacy, see XXX (TODO(sam): fill this in)
+- To learn more about data privacy, see [_Big Data: Seizing Opportunities, Preserving Values_](https://obamawhitehouse.archives.gov/sites/default/files/docs/big_data_privacy_report_may_1_2014.pdf), a concise White House report that provides guidelines and rationale for data privacy.
 
 - Ramdas gave an informative talk on bias, Simpson's paradox, p-hacking, and related topics; see the [screencast](https://www.youtube.com/watch?v=wGcjGH-zIL4) and [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
 
