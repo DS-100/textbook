@@ -1326,25 +1326,68 @@ title="Print to PDF"
 </figure>
 <p>The rationale for the bootstrap goes like this:</p>
 <ul class="simple">
-<li><p>Your sample looks like the population because it is a representative sample so we replace  the population with the sample and call it the bootstrap population.</p></li>
-<li><p>Use the same data generation process that produced the original sample to get a new sample, which is called a <em>bootstrap sample</em> to reflect the change in the population. Calculate the statistic on the bootstrap sample in the same manner as before and call it the <em>bootstrap statistic</em>. The <em>bootstrap sampling distribution</em> of the bootstrap statistic should be similar in shape and spread to the true sampling distribution of the statistic.</p></li>
-<li><p>Simulate the data generation process many times, using the bootstrap population, to get bootstrap samples and their bootstrap statistics. The distribution of the simulated bootstrap statistics approximates the bootstrap sampling distribution of the bootstrap statistic,
-which itself approximates the original sampling distribution.</p></li>
+<li><p>Your sample looks like the population because it is a representative sample,
+so we replace the population with the sample and call it the bootstrap
+population.</p></li>
+<li><p>Use the same data generation process that produced the original sample to get
+a new sample, which is called a <em>bootstrap sample</em> to reflect the change in
+the population. Calculate the statistic on the bootstrap sample in the same
+manner as before and call it the <em>bootstrap statistic</em>. The <em>bootstrap
+sampling distribution</em> of the bootstrap statistic should be similar in shape
+and spread to the true sampling distribution of the statistic.</p></li>
+<li><p>Simulate the data generation process many times, using the bootstrap
+population, to get bootstrap samples and their bootstrap statistics. The
+distribution of the simulated bootstrap statistics approximates the bootstrap
+sampling distribution of the bootstrap statistic, which itself approximates
+the original sampling distribution.</p></li>
 </ul>
-<p>Take a close look at <a class="reference internal" href="#boot-triptych"><span class="std std-numref">Figure 17.2</span></a> and compare it to <a class="reference internal" href="inf_pred_gen_dist.html#triptych"><span class="std std-numref">Figure 17.1</span></a>.  Essentially, the bootstrap simulation involves two approximations: the original sample approximates the population, and the simulation approximates the sampling distribution. We have been using the second approximation in our examples so far; the approximation of the population by the sample is the core notion behind bootstrapping.</p>
-<p>You might be wondering how to take a simple random sample from your bootstrap population and not wind up with the exact same sample each time. After all, if your sample has 100 units in it and you use it as your bootstrap population, then 100 draws from the bootstrap population without replacement will take all of the units and give you the same bootstrap sample every time. There are two approaches to solving this problem. The first is by far the most common.</p>
+<p>Take a close look at <a class="reference internal" href="#boot-triptych"><span class="std std-numref">Figure 17.2</span></a> and compare it to
+<a class="reference internal" href="inf_pred_gen_dist.html#triptych"><span class="std std-numref">Figure 17.1</span></a>.  Essentially, the bootstrap simulation
+involves two approximations: the original sample approximates the population,
+and the simulation approximates the sampling distribution. We have been using
+the second approximation in our examples so far; the approximation of the
+population by the sample is the core notion behind bootstrapping.</p>
+<p>You might be wondering how to take a simple random sample from your bootstrap
+population and not wind up with the exact same sample each time. After all, if
+your sample has 100 units in it and you use it as your bootstrap population,
+then 100 draws from the bootstrap population without replacement will take all
+of the units and give you the same bootstrap sample every time. There are two
+approaches to solving this problem. The first is by far the most common.</p>
 <ul class="simple">
-<li><p>If the original population is very large, then there is little difference between sampling with and without replacement so when sampling from the bootstrap population, make draws with replacement.</p></li>
-<li><p>“Blow up the sample” to be the same size as the original population. That is, tally up the fraction of each unique value in the sample, and add units to the bootstrap population so it is the same size as the original population, while maintaining the proportions. For example, if the sample is size 30 and 1/3 of the sample values are 0, then a bootstrap population of 750 should include 250 zeroes. Once you have this bootstrap population, use the original data generation procedure to take the bootstrap samples.</p></li>
+<li><p>If the original population is very large, then there is little difference
+between sampling with and without replacement so when sampling from the
+bootstrap population, make draws with replacement.</p></li>
+<li><p>“Blow up the sample” to be the same size as the original population. That is,
+tally up the fraction of each unique value in the sample, and add units to
+the bootstrap population so it is the same size as the original population,
+while maintaining the proportions. For example, if the sample is size 30 and
+1/3 of the sample values are 0, then a bootstrap population of 750 should
+include 250 zeroes. Once you have this bootstrap population, use the original
+data generation procedure to take the bootstrap samples.</p></li>
 </ul>
-<p>The example of vaccine efficacy, used a bootstrap-like process, called the <em>parameterized bootstrap</em>. Our null model specified 0-1 urns, but we didn’t know how many 0s and 1s to put in the urn. We used the sample to determine the proportions of 0s and 1s; that is, the sample specified the parameters of the multivariate hypergeometric.</p>
+<p>The example of vaccine efficacy, used a bootstrap-like process, called the
+<em>parameterized bootstrap</em>. Our null model specified 0-1 urns, but we didn’t
+know how many 0s and 1s to put in the urn. We used the sample to determine the
+proportions of 0s and 1s; that is, the sample specified the parameters of the
+multivariate hypergeometric.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>It’s a common mistake to think that the center of the bootstrap sampling distribution is the same as the center of the true sampling distribution. If the mean of the sample is not 0 then the mean of the bootstrap population is also not 0. That’s why we use the spread of the bootstrap distribution, and not its center, in hypothesis testing. The next example shows how we might use the bootstrap to test a hypothesis.</p>
 </div>
 <section id="boostrapping-a-test-for-a-regression-coefficient">
 <h2><span class="section-number">17.3.1. </span>Boostrapping a Test for a Regression Coefficient<a class="headerlink" href="#boostrapping-a-test-for-a-regression-coefficient" title="Permalink to this headline">#</a></h2>
-<p>The case study on calibrating air quality monitors (see <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>) fitted a model to adjust the measurements from an inexpensive monitor to more accurately reflected true air quality. This adjustment included a term in the model related to humidity. The fitted coefficient was about <span class="math notranslate nohighlight">\(0.2\)</span>, so that on days of high humidity the  measurement is adjusted upward more than on days of low humidity. However, this coefficient is close to 0, and we might wonder whether including humidity in the model is really needed. In other words, we want to test the hypothesis that the coefficient for humidity in the linear model is 0. Unfortunately, we can’t fully specify the model because it is based on measurements taken over a particular time period from a set of air monitors (both PurpleAir and those maintained by the EPA). This is where the bootstrap can help.</p>
+<p>The case study on calibrating air quality monitors
+(see <a class="reference internal" href="../12/pa_intro.html#ch-pa"><span class="std std-numref">Chapter 12</span></a>) fit a model to adjust the measurements from
+an inexpensive monitor to more accurately reflect true air quality. This
+adjustment included a term in the model related to humidity. The fitted
+coefficient was about <span class="math notranslate nohighlight">\(0.2\)</span>, so that on days of high humidity the measurement
+is adjusted upward more than on days of low humidity. However, this coefficient
+is close to 0, and we might wonder whether including humidity in the model is
+really needed. In other words, we want to test the hypothesis that the
+coefficient for humidity in the linear model is 0. Unfortunately, we can’t
+fully specify the model because it is based on measurements taken over a
+particular time period from a set of air monitors (both PurpleAir and those
+maintained by the EPA). This is where the bootstrap can help.</p>
 <p>Our model makes the assumption that the air quality measurements taken resemble the population of measurements. Note that weather conditions, the time of year, and the location of the monitors makes this statement a bit hand-wavy; what we mean here is that the measurements are similar to others taken under the same conditions as those when the original measurement were taken. Also, since we can imagine a virtually infinite supply of air quality measurements, we think of the procedure for generating measurements as draws with replacement from the urn. Recall that in <a class="reference internal" href="../02/data_scope_intro.html#ch-data-scope"><span class="std std-numref">Chapter 2</span></a> we modeled the urn as repeated draws with replacement from an urn of measurement errors. This situation is a bit different because we
 are also including the other factors mentioned already (weather, season, location).</p>
 <p>Our model is focussed on the coefficient for humidity in the linear model:</p>
@@ -1367,11 +1410,16 @@ The null hypothesis is <span class="math notranslate nohighlight">\(\theta_2 = 0
 <p>Our bootstrap population consists of the measurements from Georgia that we used in <a class="reference internal" href="../15/linear_intro.html#ch-linear"><span class="std std-numref">Chapter 15</span></a>). Now, we sample rows from the data frame (which is equivalent to our urn) with replacement using the chance mechanism <code class="docutils literal notranslate"><span class="pre">randint</span></code>. This function takes random samples with replacement from a set of integers. We use the random sample of indices to create the bootstrap sample from the data frame. Then we fit the linear model and get the coefficient for humidity (our bootstrap statistic). The <code class="docutils literal notranslate"><span class="pre">boot_stat</span></code> function below performs this simulation process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">boot_stat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">randint</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
-    
-    <span class="n">theta2</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">r</span><span class="p">])</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">randint</span>
+
+<span class="k">def</span> <span class="nf">boot_stat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">bootstrap_indexes</span> <span class="o">=</span> <span class="n">randint</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">theta2</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">LinearRegression</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">bootstrap_indexes</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">bootstrap_indexes</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">theta2</span>
 </pre></div>
 </div>
@@ -1380,19 +1428,15 @@ The null hypothesis is <span class="math notranslate nohighlight">\(\theta_2 = 0
 <p>We set up the design matrix and the outcome variable and check our <code class="docutils literal notranslate"><span class="pre">boot_stat</span></code> function once to test it.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">randint</span>
-
-
-<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">GA</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]]</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[</span><span class="s1">&#39;pm25pa&#39;</span><span class="p">]</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">GA</span><span class="p">[[</span><span class="s1">&#39;pm25aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">]]</span>
 
 <span class="n">boot_stat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.20390167910281556
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.24518321638444746
 </pre></div>
 </div>
 </div>
@@ -1400,9 +1444,8 @@ The null hypothesis is <span class="math notranslate nohighlight">\(\theta_2 = 0
 <p>When we repeat this process 10,000 times, we get an approximation to the bootstrap sampling distribution of the bootstrap statistic (the fitted humidity coefficient).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="n">boot_theta_hat</span> <span class="o">=</span> <span class="p">[</span><span class="n">boot_stat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">)]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">boot_theta_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">boot_stat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -1411,13 +1454,13 @@ The null hypothesis is <span class="math notranslate nohighlight">\(\theta_2 = 0
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">boot_theta_hat</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-            <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Bootstrapped Humidity Coefficient&#39;</span><span class="p">),</span>
-            <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+             <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Bootstrapped Humidity Coefficient&#39;</span><span class="p">),</span>
+             <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/inf_pred_gen_boot_15_0.svg" src="../../_images/inf_pred_gen_boot_15_0.svg" /></div>
+<img alt="../../_images/inf_pred_gen_boot_18_0.svg" src="../../_images/inf_pred_gen_boot_18_0.svg" /></div>
 </div>
 <p>By design, the center of the bootstrap sampling distribution will be near <span class="math notranslate nohighlight">\(\hat{\theta}\)</span> because the bootstrap population consists of the observed data.
 So, rather than compute the chance of a value at least as large as the observed statistic, we find the chance of a value at least as small as 0.

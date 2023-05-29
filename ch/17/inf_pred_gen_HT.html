@@ -1327,19 +1327,57 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="basics-of-hypothesis-testing">
 <h1><span class="section-number">17.2. </span>Basics of Hypothesis Testing<a class="headerlink" href="#basics-of-hypothesis-testing" title="Permalink to this headline">#</a></h1>
-<p>Hypothesis testing can be often one of the more challenging areas of data science—both challenging to learn and also challenging to apply. But, this is not because hypothesis testing is deeply technical; instead, it’s because it can be counterintuitive and is fundamentally built on contradictions.
-As the name suggests, we often start hypothesis testing with an hypothesis: a statement about the world that we would like to verify.</p>
-<p>We would like to prove our hypothesis is true. Unfortunately, we don’t typically have access to all the information needed to determine the truth. For example, we might hypothesize that a new vaccine is effective, but the mechanisms for which a vaccine works cannot be observed. We would need to understand all the details of the biology that govern vaccine efficacy. Sadly, this is beyond contemporary medicine, so we turn to the tools of probability, random sampling, and data design.</p>
-<p>Recall the randomized clinical trial of the J&amp;J vaccine (<a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>), where 43,738 people enrolled in the trial were randomly split into two equal groups. The treatment group was given the vaccine, and the control was given a fake vaccine, called a placebo.  This random assignment created two groups that were similar in every way except for the vaccine.</p>
-<p>One reason hypothesis testing can be confusing is that it’s a lot like “proof by contradiction”, where we assume the opposite of our hypothesis is true and try to show that the data we observe is inconsistent with that assumption. We approach the problem this way because often something can be true for many reasons but we only need a single example to contradict an assumption. We call this “opposite hypothesis” the <em>Null Hypothesis</em> and our original hypothesis the <em>Alternative Hypothesis</em>.</p>
-<p>To make matters a bit more confusing, the tools of probability don’t directly prove or disprove things. Instead, they tell us how likely or unlikely something we observe is under assumptions, like the assumptions of the Null Hypothesis. That’s why it’s so important to design the data collection well.</p>
-<p>In the vaccine trial of <a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>, 117 people in the treatment group fell ill and 351 in the control group got sick. Since we want to provide convincing evidence that the vaccine works, we start with a Null Hypothesis that it doesn’t work; meaning it was just by chance that the random assignment led to so few illnesses in the treatment group. We used probability to calculate the chance of observing so few sick people in the treatment group. The probability calculations are based on the urn that has 43,738 marble in it, with 468 marked 1 to denote a sick person. We found the chance of at most 117 marbles being drawn in 21,869 draws with replacement from the urn. It was nearly impossible.  We take this as evidence to reject the Null Hypothesis in favor of the alternative that the vaccine works. The J&amp;J experiment was well-designed so a rejection of the Null leads us to conclude the vaccine works. In other words, the truth of the hypothesis is left to us and how willing we are to be potentially wrong.</p>
-<p>In the rest of this section, we go over the four basic steps of a hypothesis test. We then provide two examples that continue two of the examples from Chapter 3, and delve deeper into the formalities for testing.</p>
+<p>In our experience, hypothesis testing is one of the more challenging areas of
+data science—challenging to learn and challenging to apply. This is not
+necessarily because hypothesis testing is deeply technical; instead, hypothesis
+testing can be counterintuitive because it makes use of contradictions. As the
+name suggests, we often start hypothesis testing with an hypothesis: a
+statement about the world that we would like to verify.</p>
+<p>In an ideal world, we would directly prove our hypothesis is true.
+Unfortunately, we often don’t have access to all the information needed to
+determine the truth. For example, we might hypothesize that a new vaccine is
+effective, but contemporary medicine doesn’t yet understand all the details of
+the biology that govern vaccine efficacy. Instead, we turn to the tools of
+probability, random sampling, and data design.</p>
+<p>One reason hypothesis testing can be confusing is that it’s a lot like “proof
+by contradiction”, where we assume the opposite of our hypothesis is true and
+try to show that the data we observe is inconsistent with that assumption. We
+approach the problem this way because often something can be true for many
+reasons but we only need a single example to contradict an assumption. We call
+this “opposite hypothesis” the <em>Null Hypothesis</em> and our original hypothesis
+the <em>Alternative Hypothesis</em>.</p>
+<p>To make matters a bit more confusing, the tools of probability don’t directly
+prove or disprove things. Instead, they tell us how likely or unlikely
+something we observe is under assumptions, like the assumptions of the Null
+Hypothesis. That’s why it’s so important to design the data collection well.</p>
+<p>Recall the randomized clinical trial of the J&amp;J vaccine
+(<a class="reference internal" href="../03/theory_intro.html#ch-theory-datadesign"><span class="std std-numref">Chapter 3</span></a>), where 43,738 people enrolled in the trial were
+randomly split into two equal groups. The treatment group was given the
+vaccine, and the control was given a fake vaccine, called a placebo. This
+random assignment created two groups that were similar in every way except for
+the vaccine.</p>
+<p>In this trial, 117 people in the treatment group fell ill and 351 in the
+control group got sick. Since we want to provide convincing evidence that the
+vaccine works, we start with a Null Hypothesis that it doesn’t work; meaning it
+was just by chance that the random assignment led to so few illnesses in the
+treatment group. We can then use probability to calculate the chance of
+observing so few sick people in the treatment group. The probability
+calculations are based on the urn that has 43,738 marbles in it, with 468
+marked 1 to denote a sick person. We then found that the probability of at most
+117 marbles being drawn in 21,869 draws with replacement from the urn was
+nearly zero. We take this as evidence to reject the Null Hypothesis in favor of
+the Alternative Hypothesis that the vaccine works. Because the J&amp;J experiment
+was well-designed, a rejection of the Null leads us to conclude the vaccine
+works. In other words, the truth of the hypothesis is left to us and how
+willing we are to be potentially wrong.</p>
+<p>In the rest of this section, we go over the four basic steps of a hypothesis
+test. We then provide two examples that continue two of the examples from
+Chapter 3, and delve deeper into the formalities for testing.</p>
 <p>There are four basic steps to hypothesis testing:</p>
 <ol class="simple">
 <li><p>Set up: You have your data, and you want to test whether a particular model is reasonably consistent with the data. So, you specify a statistic, <span class="math notranslate nohighlight">\(\hat{\theta}\)</span>, such as the sample average, fraction of zeros in a sample, or fitted regression coefficient, with the goal of comparing your data’s statistic to what might have been produced under the model.</p></li>
 <li><p>Model: You spell out the model that you want to test in the form of a data generation mechanism, along with any specific assumptions about the population. This model typically includes specifying <span class="math notranslate nohighlight">\(\theta^*\)</span>, which may be the population mean, the proportion of zeros, or a regression coefficient. The sampling distribution of the statistic under this model is referred to as the null distribution, and the model itself is called the <em>Null Hypothesis</em>.</p></li>
-<li><p>Compute: How likely, according to the null model in Step 2, is it to get data (and the resulting statistic) at least as extreme as what you actually got in Step 1?  In formal inference, this probability is called the <span class="math notranslate nohighlight">\(p\)</span>-<em>value</em>. To approximate the <span class="math notranslate nohighlight">\(p\)</span>-value, we often use the computer to generate a large number of repeated random trials using the assumptions in the model and find the fraction of samples that give a value of the statistic at least as extreme as our observed value. At other times we use mathematical theory to find the <span class="math notranslate nohighlight">\(p\)</span>-value.</p></li>
+<li><p>Compute: How likely, according to the null model in Step 2, is it to get data (and the resulting statistic) at least as extreme as what you actually got in Step 1?  In formal inference, this probability is called the <span class="math notranslate nohighlight">\(p\)</span>-<em>value</em>. To approximate the <span class="math notranslate nohighlight">\(p\)</span>-value, we often use the computer to generate a large number of repeated random trials using the assumptions in the model and find the fraction of samples that give a value of the statistic at least as extreme as our observed value. Other times, we can instead use mathematical theory to find the <span class="math notranslate nohighlight">\(p\)</span>-value.</p></li>
 <li><p>Interpret: The p-value is used as a measure of surprise.  If the model that you spelled out in Step 2 is believable, how surprised should you be to get the data (and summary statistic) that you actually got?  A moderate sized p-value means that the observed statistic is pretty much what you would expect to get for data generated by the null model.  A tiny p-value raises doubts about the null model. In other words, if the model is correct (or approximately correct), then it would be very unusual to get such an extreme value of the test statistic from data generated by the model.  In this case, either the null model is wrong or a very unlikely outcome has occurred. Statistical logic says to conclude that the pattern is real; that it is more than just coincidence.  Then, it’s up to you to explain why the data generation process led to such an unusual value. This is when a careful consideration of the scope is important.</p></li>
 </ol>
 <p>Let’s demonstrate these steps in the testing process with a couple examples.</p>
@@ -1475,18 +1513,19 @@ As the name suggests, we often start hypothesis testing with an hypothesis: a st
 <p>To carry out this simulation, we set up the urn as the <code class="docutils literal notranslate"><span class="pre">ranks</span></code> array from the data. Shuffling the 200 values in the array and taking the first 100 represents a randomly sampled treatment group. We write a function to shuffle the array of ranks and find the average of the first 100.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rank_avg</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">rank_avg</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="n">rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">ranks</span><span class="p">[</span><span class="n">n</span><span class="p">:])</span>      
 </pre></div>
 </div>
 </div>
 </div>
-<p>Our simulation  “mixes the marbles in the urn and draws 100 times”, computes the average rank for the 100 draws, and repeats this 100,000 times.</p>
+<p>Our simulation mixes the marbles in the urn, draws 100 times, computes the
+average rank for the 100 draws, and repeats this 100,000 times.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">rank_avg_simulation</span> <span class="o">=</span> <span class="p">[</span><span class="n">rank_avg</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rank_avg_simulation</span> <span class="o">=</span> <span class="p">[</span><span class="n">rank_avg</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100_000</span><span class="p">)]</span> 
 </pre></div>
 </div>
 </div>
@@ -1495,10 +1534,12 @@ As the name suggests, we often start hypothesis testing with an hypothesis: a st
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">rank_avg_simulation</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-            <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Average Rank of the Treatment Group&#39;</span><span class="p">),</span>
-            <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">87</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Approximate&lt;br&gt;Sampling Distribution&quot;</span><span class="p">)</span>
+    <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;Average Rank of the Treatment Group&quot;</span><span class="p">),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_annotation</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="mi">87</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Approximate&lt;br&gt;Sampling Distribution&quot;</span>
+<span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1509,44 +1550,27 @@ As the name suggests, we often start hypothesis testing with an hypothesis: a st
 <p>As we expected, the sampling distribution of the average rank is centered on 100 (100.5 actually) and is bell-shaped. The center of this distribution reflects the assumptions of the treatment having no effect. Our observed statistic is well outside the typical range of simulated average ranks, and we use this simulated sampling distribution to find the approximate <span class="math notranslate nohighlight">\(p\)</span>-value for observing a statistic at least as big as ours.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rank_avg_simulation</span> <span class="k">if</span> <span class="n">elem</span> <span class="o">&gt;=</span> <span class="n">observed</span><span class="p">])</span> <span class="o">/</span> <span class="mi">100000</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rank_avg_simulation</span> <span class="o">&gt;</span> <span class="n">observed</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00052
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00058
 </pre></div>
 </div>
 </div>
 </div>
 <p>This is a big surprise. Under the null, the chance of seeing an average rank at least as large as ours is about 5 in 10,000.</p>
 <p>This test raises doubt about the null model. Statistical logic has us conclude that the pattern is real. How do we interpret this? The experiment was well designed. The 200 contributors were selected at random from the top 1%, and then they were divided at random into two groups. These chance processes say that we can rely on the sample of 200 being representative of top contributors, and on the treatment and control groups being similar to each other in every way except for the application of the treatment (the award). Given the careful design, we conclude that informal awards have a positive effect on productivity for top contributors.</p>
-<p>Although, we carried out a simulation to find the <span class="math notranslate nohighlight">\(p\)</span>-value for our observed statistic, rank tests are commonly used and made available in most statistical software.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wiki</span><span class="p">[</span><span class="n">wiki</span><span class="o">.</span><span class="n">experiment</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;postproductivity&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100      4
-101    866
-102    654
-      ... 
-197     72
-198    480
-199    496
-Name: postproductivity, Length: 100, dtype: int64
-</pre></div>
-</div>
-</div>
-</div>
+<p>Above, we implemented a simulation to find the <span class="math notranslate nohighlight">\(p\)</span>-value for our observed
+statistic. In practice, rank tests are commonly used and made available in most
+statistical software:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ranksums</span>
 
-<span class="n">ranksums</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">wiki</span><span class="p">[</span><span class="n">wiki</span><span class="o">.</span><span class="n">experiment</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;postproductivity&#39;</span><span class="p">],</span>
-         <span class="n">y</span><span class="o">=</span><span class="n">wiki</span><span class="p">[</span><span class="n">wiki</span><span class="o">.</span><span class="n">experiment</span> <span class="o">==</span> <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;postproductivity&#39;</span><span class="p">])</span>
+<span class="n">ranksums</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">wiki</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">wiki</span><span class="o">.</span><span class="n">experiment</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;postproductivity&#39;</span><span class="p">],</span>
+         <span class="n">y</span><span class="o">=</span><span class="n">wiki</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">wiki</span><span class="o">.</span><span class="n">experiment</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;postproductivity&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1606,7 +1630,7 @@ Name: postproductivity, Length: 100, dtype: int64
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">43738</span>
 <span class="n">n_samp</span> <span class="o">=</span> <span class="mi">21869</span>
-<span class="n">N_groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">293</span><span class="p">,</span> <span class="mi">293</span><span class="p">,</span> <span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">586</span><span class="p">)])</span>
+<span class="n">N_groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">293</span><span class="p">,</span> <span class="mi">293</span><span class="p">,</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">586</span><span class="p">)])</span>
 
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_hypergeom</span>
 
@@ -1622,8 +1646,8 @@ Name: postproductivity, Length: 100, dtype: int64
 <p>Now, we can simulate the clinical trial 100,000 times and calculate the vaccine efficacy for each trial.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">642</span><span class="p">)</span>
-<span class="n">sim_vacc_eff</span> <span class="o">=</span> <span class="p">[</span><span class="n">vacc_eff</span><span class="p">(</span><span class="n">N_groups</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">sim_vacc_eff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vacc_eff</span><span class="p">(</span><span class="n">N_groups</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100_000</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -1637,24 +1661,30 @@ Name: postproductivity, Length: 100, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/inf_pred_gen_HT_37_0.svg" src="../../_images/inf_pred_gen_HT_37_0.svg" /></div>
+<img alt="../../_images/inf_pred_gen_HT_36_0.svg" src="../../_images/inf_pred_gen_HT_36_0.svg" /></div>
 </div>
 <p>The sampling distribution is centered at 0.5, which agrees with our model assumptions. We see that 0.667 is far out in the tail of this distribution.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">sim_vacc_eff</span> <span class="k">if</span> <span class="n">elem</span> <span class="o">&gt;=</span> <span class="mf">0.667</span><span class="p">])</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sim_vacc_eff</span> <span class="o">&gt;</span> <span class="mf">0.667</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1e-05
 </pre></div>
 </div>
 </div>
 </div>
-<p>A handful of the 100,000 simulations have a vaccine efficacy as large as the observed 0.667. This is a rare event, and that’s why the CDC approved the Johnson &amp; Johnson vaccine for distribution.</p>
-<p>In this example of hypothesis testing, we were not able to completely specify the model and we had to provide approximate values for <span class="math notranslate nohighlight">\(p_C\)</span> and <span class="math notranslate nohighlight">\(p_T\)</span> based on our observed values of <span class="math notranslate nohighlight">\(\hat{p}_C\)</span> and <span class="math notranslate nohighlight">\(\hat{p}_T\)</span>. At times the null model isn’t entirely specified, and we must rely on the data to set up the model.
-The next section introduces a general approach, called the bootstrap, to approximate the model using the data.</p>
+<p>Only a tiny handful of the 100,000 simulations have a vaccine efficacy as large
+as the observed 0.667. This is a rare event, and that’s why the CDC approved
+the Johnson &amp; Johnson vaccine for distribution.</p>
+<p>In this example of hypothesis testing, we were not able to completely specify
+the model and we had to provide approximate values for <span class="math notranslate nohighlight">\(p_C\)</span> and <span class="math notranslate nohighlight">\(p_T\)</span> based on
+our observed values of <span class="math notranslate nohighlight">\(\hat{p}_C\)</span> and <span class="math notranslate nohighlight">\(\hat{p}_T\)</span>. At times the null model
+isn’t entirely specified, and we must rely on the data to set up the model. The
+next section introduces a general approach, called the bootstrap, to
+approximate the model using the data.</p>
 </section>
 </section>
 
