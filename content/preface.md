@@ -1,33 +1,28 @@
 # Preface
 
-Data science is exciting work. The ability to draw conclusions from messy data
-is valuable for all kinds of decisions across business, medicine, policy, and
+Data science is exciting work. The ability to draw insights from messy data
+is valuable for all kinds of decision-making across business, medicine, policy, and
 more. This book, _Learning Data Science_, aims to prepare readers to do data
-science. To achieve this, we've written this book to contain the following
-special features:
+science. To achieve this, we've created this book with the following special features:
 
-1. _A focus on the fundamentals._ Technologies come and go. We talk in detail
-   about individual technologies in this book, but our goal is to equip readers
-   with the fundamental building blocks of data science. We do this by teaching
-   readers how to think about data science problems and challenges, which will
-   serve readers even as technologies change.
-1. _Covering the entire data science lifecycle._ Instead of just focusing on
-   a single topic, like working with data tables or machine learning, we cover
+1. _Focus on the fundamentals._ Technologies come and go. While we work with specific
+   technologies in this book, our goal is to equip readers
+   with the fundamental building blocks of data science. We do this by revealing 
+   how to think about data science problems and challenges, and by covering the fundamentals behind the individual technologies.  Our aim is to serve readers even as technologies change.
+1. _Cover the entire data science lifecycle._ Instead of just focusing on
+   a single topic, like how to work with data tables or how to apply machine learning techniques, we cover
    the entire data science lifecycle -- the process of asking a question,
-   obtaining data, understanding the data, and understanding the world.
-1. _Only using real data._ To be prepared for real data analyses, we consider
-   it essential to see examples that use real data. We chose all of the dataset
-   examples presented in this book by carefully picking from real-world data
-   analyses that have made an impact, not hypothetical or generated data.
-1. _Applying concepts through case studies._ We've sprinkled in extended case
-   studies in the book that replicate or extend analyses from other
-   data scientists. These case studies show readers how to apply concepts in
-   real settings.
-1. _Both computational and inferential thinking._ On the job, data scientists
-   need to foresee how the decisions they make when writing code might affect
-   statistical conclusions. To prepare readers for their future work, _Learning
-   Data Science_ integrates both computational and statistical thinking. We
-   also motivate statistical concepts through simulations rather than
+   obtaining data, understanding the data, and understanding the world. This can often by the hardest part of being a data scientist.
+1. _Use real data._ To be prepared for working on real problems, we consider
+   it essential to learn from examples that use real data, warts and all. We chose the datasets presented in this book by carefully picking from actual data analyses that have made an impact, and not just overly refined or synthetic data.
+1. _Apply concepts through case studies._ We've included extended case
+   studies throughout the book that follow or extend analyses by other
+   data scientists. These case studies show readers how to navigate the data science lifecycle in real settings.
+1. _Combine both computational and inferential thinking._ On the job, data scientists
+   need to foresee how the decisions they make when writing code and how the size of a 
+   dataset might affect statistical analysis. To prepare readers for their future work,
+   _Learning Data Science_ integrates computational and statistical thinking. We
+   also motivate statistical concepts through simulation studies rather than
    mathematical proofs.
 
 The text and code for this book are open source and [available on
@@ -37,10 +32,10 @@ GitHub][github].
 
 ## Expected Background Knowledge
 
-We expect that readers are proficient in Python and understand how to use
+We expect readers to be proficient in Python and understand how to: use
 built-in data structures like lists, dictionaries, and sets; import and use
 functions and classes from other packages; and write functions from scratch. We
-will use the `numpy` Python package without introduction but don't expect
+also use the `numpy` Python package without introduction but don't expect
 readers to have much prior experience using it.
 
 Readers will get more from this book if they also know a bit of probability,
@@ -59,23 +54,22 @@ This book has 21 chapters, divided into six parts:
   relations and how to wrote code to manipulate data using `pandas` and SQL.
 - _Part 3 (Ch 8-12): Understanding the Data_ is all about obtaining data,
   discovering its traits, and spotting issues. After understanding these
-  concepts, a reader can take a data file and explain all of the data's
+  concepts, a reader can take a data file and describe the data's
   interesting features to someone else. This part ends with a case study
   about air quality.
 - _Part 4 (Ch 13-14): Other Data Sources_ looks at alternative sources of
-  data like text, binary, and data from the Web which all have important
-  roles in data science.
+  data like text, binary, and data from the Web which are widespread sources or data.
 - _Part 5 (Ch 15-18): Linear Modeling_ focuses on the understanding the world
-  using data. It covers traditional topics like confidence intervals and
-  hypothesis testing in additional to modeling, prediction, and inference.
+  using data. It covers inferential topics like confidence intervals and
+  hypothesis testing in addition to model fitting, feature engineering, and model selection.
   This part ends with a case study about predicting donkey weights for
   veterinarians in Kenya.
 - _Part 6 (Ch 19-21): Classification_ completes our study or supervised
-  learning through logistic regression and optimization. It ends with a case
-  study about predicting whether news articles make real or fake statements.
+  learning with logistic regression and optimization. It ends with a case
+  study on predicting whether news articles make real or fake statements.
 
 We've also included notes at the end of the book with resources to learn more
-about many of the topics this book introduces.
+about many of the topics this book introduces, and the complete list of datasets used throughout the book.
 
 ## Conventions Used in This Book
 
@@ -124,7 +118,7 @@ question by citing this book and quoting example code does not require
 permission. Incorporating a significant amount of example code from this book
 into your product’s documentation does require permission.
 
-We appreciate, but generally do not require, attribution. An attribution
+We appreciate attribution. An attribution
 usually includes the title, author, publisher, and ISBN. For example: "Learning
 Data Science by Sam Lau, Deborah Nolan, and Joey Gonzalez (O'Reilly). Copyright
 2023 Sam Lau, Deborah Nolan, and Joey Gonzalez, 978-0-596-xxxx-x."
@@ -177,15 +171,14 @@ Watch us on YouTube: https://www.youtube.com/oreillymedia
 
 ## Acknowledgements
 
-We are incredibly thankful for the O'Reilly team for all their work to publish
-this book, especially Melissa Potter, Jess Haberman, Aaron Black, Danny
-Elfanbaum, and Mike Loukides. This book is based on six years of our joint
-experience teaching Principles and Techniques of Data Science, an undergraduate
-course at the University of California, Berkeley. We've benefited from
-co-teaching with other with other instructors, and we especially want to
-thank Joe Hellerstein for insights around data wrangling, Fernando Perez for
-NetCDF, and Josh Hug for the inspiration for the PurpleAir case study. We also
-thank the Berkeley students who contributed to previous versions of the
+This book has come about from our joint experience designing and teaching Principles and Techniques of Data Science, an undergraduate
+course at the University of California, Berkeley. We first taught "Data 100" in Spring 2017 in response to students demand for a second course in data science, one that would prepare them for advanced courses and for the workforce. The thousands of students  we have taught since then have been an inspiration for us.  
+We've also benefited from co-teaching with other instructors, including Ani Adhikari, Andrew Bray, Joe Hellerstein, Josh Hug, Anthony Joseph, Fernando Perez, Lisa Yan, and Bin Yu. We especially thank Joe Hellerstein for insights around data wrangling, Fernando Perez for encouraging us to include more complex data structures like NetCDF, Josh Hug for the inspiration of the PurpleAir case study, and Duncan Temple Lang for collaboration on an earlier version of the course. We also
+thank the Berkeley students who have been our teaching assistants, and especially mention those who have contributed to previous versions of the
 book: Ananth Agarwal, Ashley Chien, Andrew Do, Sona Jeswani, Tiffany Jann,
-Andrew Kim, Jun Seo Park, Allen Shen, Katherine Yen, and Daniel Zhu. Lastly, we
-thank the technical reviewers who helped to review the book before its release.
+Andrew Kim, Jun Seo Park, Allen Shen, Katherine Yen, and Daniel Zhu.
+
+A core part of this book are the many datasets that we wrangle and analyze, and we are immensely thankful to the individuals and organizations who made their data open and available to us. We list them along with the original data sources, and related research papers, blog posts, and reports at the end of this book. 
+
+Lastly, we are grateful to the O'Reilly team for their work to bring this book from class notes to publication, especially Melissa Potter, Jess Haberman, Aaron Black, Danny
+Elfanbaum, and Mike Loukides, and we thank the technical reviewers whose comments have improved the book.
