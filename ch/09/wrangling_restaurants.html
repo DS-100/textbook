@@ -1765,15 +1765,24 @@ we find that some of the businesses have inspection dates that are close but don
 We could do a fuzzy match where inspections with dates that are only one or two days apart are matched.
 But for now, we just leave them as <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p>
 <p>Let’s examine the relationship between the number of violations and the inspection score:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">ins_and_num_vios</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;num_vio&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span>
-         <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">ins_and_num_vios</span><span class="p">,</span>
+                 <span class="n">x</span><span class="o">=</span><span class="n">jitter</span><span class="p">(</span><span class="n">ins_and_num_vios</span><span class="p">[</span><span class="s1">&#39;num_vio&#39;</span><span class="p">],</span> <span class="n">amt</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+                 <span class="n">y</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> 
+                 <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;Number of violations&quot;</span><span class="p">,</span>
+                  <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Inspection score&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_restaurants_25_0.svg" src="../../_images/wrangling_restaurants_25_0.svg" /></div>
+<img alt="../../_images/wrangling_restaurants_26_0.svg" src="../../_images/wrangling_restaurants_26_0.svg" /></div>
 </div>
 <p>As we might expect there is a negative relationship between the inspection score and the number of violations. We can also see variability in score. The variability in scores grows with the number of violations. It appears that some violations are more serious than others and have a greater impact on the score. We extract information about the kinds of violations next.</p>
 </section>
@@ -1805,11 +1814,7 @@ But for now, we just leave them as <code class="docutils literal notranslate"><s
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>count</th>
-    </tr>
-    <tr>
       <th>description</th>
-      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -1862,11 +1867,11 @@ But for now, we just leave them as <code class="docutils literal notranslate"><s
       <td>52</td>
     </tr>
     <tr>
-      <th>Improper storage of equipment utensils or linens</th>
+      <th>Permit license or inspection report not posted</th>
       <td>41</td>
     </tr>
     <tr>
-      <th>Permit license or inspection report not posted</th>
+      <th>Improper storage of equipment utensils or linens</th>
       <td>41</td>
     </tr>
     <tr>
@@ -2269,7 +2274,7 @@ visualization code, we hide the code here.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">features</span> <span class="o">=</span> <span class="n">ins_and_vios</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;business_id&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">],</span>
-                             <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;feature&#39;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;num_vios&#39;</span><span class="p">)</span>
+                             <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;violation&#39;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;num_vios&#39;</span><span class="p">)</span>
 <span class="n">features</span><span class="p">[</span><span class="s1">&#39;vio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="s1">&#39;num_vios&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="n">any_vio</span> <span class="o">=</span> <span class="p">{</span><span class="kc">False</span><span class="p">:</span><span class="s2">&quot;No&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span><span class="s2">&quot;Yes&quot;</span><span class="p">}</span>
 <span class="n">features</span><span class="p">[</span><span class="s1">&#39;vio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="s1">&#39;vio&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">any_vio</span><span class="p">)</span>
@@ -2279,13 +2284,15 @@ visualization code, we hide the code here.</p>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">catplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">features</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;vio&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="s1">&#39;feature&#39;</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">catplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">features</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;vio&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="s1">&#39;violation&#39;</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">g</span><span class="o">.</span><span class="n">set_axis_labels</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">,</span> <span class="s2">&quot;Inspection score&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/wrangling_restaurants_42_0.svg" src="../../_images/wrangling_restaurants_42_0.svg" /></div>
+<img alt="../../_images/wrangling_restaurants_43_0.svg" src="../../_images/wrangling_restaurants_43_0.svg" /></div>
 </div>
 <p>There are several interesting takeaways in these box plots.
 As we’d expect, the more violations, the worse the restaurant score.
