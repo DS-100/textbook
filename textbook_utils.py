@@ -59,7 +59,10 @@ def display_df(
 
 
 def dfs_side_by_side(*dfs):
-    """Displays two or more dataframes side by side"""
+    """
+    Displays two or more dataframes side by side. Sadly we can't use this
+    function anymore because it doesn't build in the PDF.
+    """
     display(
         HTML(
             f"""
