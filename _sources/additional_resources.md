@@ -14,7 +14,7 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - To learn more about data privacy, see [_Big Data: Seizing Opportunities, Preserving Values_](https://obamawhitehouse.archives.gov/sites/default/files/docs/big_data_privacy_report_may_1_2014.pdf), a concise White House report that provides guidelines and rationale for data privacy.
 
-- Ramdas gave an informative talk on bias, Simpson's paradox, p-hacking, and related topics; see the [screencast](https://www.youtube.com/watch?v=wGcjGH-zIL4) and [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
+- Ramdas gave an informative talk on bias, Simpson's paradox, p-hacking, and related topics; see the [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
 
 - For an introductory treatment of the urn model, confidence intervals, and hypothesis tests, we recommend [_Statistics_](https://wwnorton.com/books/Statistics/) by Freedman, Pisani, and Purves.
 
@@ -56,8 +56,6 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 - The many topics related to modeling, including transformations, one-hot encoding, model-selection, cross-validation, and regularization can be found in several sources. We recommend: [_Linear Models with Python_](https://julianfaraway.github.io/LMP/) by Faraway, [_Applied Regression Analysis and Generalized Linear Models_](https://us.sagepub.com/en-us/nam/applied-regression-analysis-and-generalized-linear-models/book237254) by Fox, [_An Introduction to Statistical Learning: With Applications in Python_](https://www.statlearning.com/) by James, Witten, Hastie, Tibshirani, and Taylor, and [_Applied Linear Regression_](https://doi.org/10.1002/0471704091) by Weisberg.
 
 - Chapter 10 in Fox gives an informative treatment of vector geometry of least squares.
-
-- xkcd has a fun cartoon explaining [confounding variables](https://www.explainxkcd.com/wiki/index.php/2560:_Confounding_Variables).
 
 - Chapter 12 in Fox and Chapter 5 in Faraway cover the topic of weighted regression.
 

@@ -1,7 +1,7 @@
 (ax:data_source)=
 # Data Sources
 
-All of the data analyzed in this book are available at the book's website, [LearningDS.org](https://learningds.org/) and on the github repository for the book SAM.  These datasets are from open repositories and from individuals. We acknowledge them all here, and include, as appropriate, the file name for data stored in our repository, a link to the original source, a related publication, and the author(s)/owner(s).
+All of the data analyzed in this book are available at the book's website, [LearningDS.org](https://learningds.org/) and on the [GitHub repository](https://github.com/DS-100/textbook/) for the book.  These datasets are from open repositories and from individuals. We acknowledge them all here, and include, as appropriate, the file name for data stored in our repository, a link to the original source, a related publication, and the author(s)/owner(s).
 
 To begin, we provide the sources for the four case studies in the book. Our analysis of the data in these case studies is based on research articles or, in one case, a blog post. We generally follow the line of inquiry in these sources, but we have usually simplified the analyses to match the level of the book.  
 
@@ -71,3 +71,5 @@ The retrieval of the data follows [Exploring the Spotify API in Python](https://
 
 + `black_spruce.csv` The wind-damaged tree data were collected by Rich for his thesis [Large wind disturbance in the Boundary Waters Canoe Area Wilderness. Forest dynamics and development changes associated with the July 4th 1999 blowdown](https://www.proquest.com/docview/305463532?pq-origsite=gscholar&fromopenview=true) and made available online in the [alr4 package](https://cran.r-project.org/web/packages/alr4/alr4.pdf). 
 The analysis is based on Chapter 12 of [Applied Linear Regression](https://doi.org/10.1002/0471704091) by Weisberg. 
+
+[github]: https://github.com/DS-100/textbook/

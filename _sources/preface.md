@@ -113,10 +113,10 @@ offered with this book, you may use it in your programs and documentation. You
 do not need to contact us for permission unless you’re reproducing a
 significant portion of the code. For example, writing a program that uses
 several chunks of code from this book does not require permission. Selling or
-distributing examples from O’Reilly books does require permission. Answering a
+distributing examples from O'Reilly books does require permission. Answering a
 question by citing this book and quoting example code does not require
 permission. Incorporating a significant amount of example code from this book
-into your product’s documentation does require permission.
+into your product's documentation does require permission.
 
 We appreciate attribution. An attribution
 usually includes the title, author, publisher, and ISBN. For example: "Learning
@@ -173,7 +173,7 @@ Watch us on YouTube: https://www.youtube.com/oreillymedia
 
 This book has come about from our joint experience designing and teaching Principles and Techniques of Data Science, an undergraduate
 course at the University of California, Berkeley. We first taught "Data 100" in Spring 2017 in response to students demand for a second course in data science, one that would prepare them for advanced courses and for the workforce. The thousands of students  we have taught since then have been an inspiration for us.  
-We've also benefited from co-teaching with other instructors, including Ani Adhikari, Andrew Bray, Joe Hellerstein, Josh Hug, Anthony Joseph, Fernando Perez, Lisa Yan, and Bin Yu. We especially thank Joe Hellerstein for insights around data wrangling, Fernando Perez for encouraging us to include more complex data structures like NetCDF, Josh Hug for the inspiration of the PurpleAir case study, and Duncan Temple Lang for collaboration on an earlier version of the course. We also
+We've also benefited from co-teaching with other instructors, including Ani Adhikari, Andrew Bray, John DeNero, Sandrine Dudoit, Will Fithian, Joe Hellerstein, Josh Hug, Anthony Joseph, Scott Lee, Fernando Perez, Alvin Wan, Lisa Yan, and Bin Yu. We especially thank Joe Hellerstein for insights around data wrangling, Fernando Perez for encouraging us to include more complex data structures like NetCDF, Josh Hug for the inspiration of the PurpleAir case study, and Duncan Temple Lang for collaboration on an earlier version of the course. We also
 thank the Berkeley students who have been our teaching assistants, and especially mention those who have contributed to previous versions of the
 book: Ananth Agarwal, Ashley Chien, Andrew Do, Sona Jeswani, Tiffany Jann,
 Andrew Kim, Jun Seo Park, Allen Shen, Katherine Yen, and Daniel Zhu.
