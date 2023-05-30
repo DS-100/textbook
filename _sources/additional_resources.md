@@ -14,7 +14,7 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - To learn more about data privacy, see [_Big Data: Seizing Opportunities, Preserving Values_](https://obamawhitehouse.archives.gov/sites/default/files/docs/big_data_privacy_report_may_1_2014.pdf), a concise White House report that provides guidelines and rationale for data privacy.
 
-- Ramdas gave an informative talk on bias, Simpson's paradox, p-hacking, and related topics; see the [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
+- Ramdas gave a fun, informative talk in our class on on bias, Simpson's paradox, p-hacking, and related topics, and we recommend his [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
 
 - For an introductory treatment of the urn model, confidence intervals, and hypothesis tests, we recommend [_Statistics_](https://wwnorton.com/books/Statistics/) by Freedman, Pisani, and Purves.
 
@@ -30,9 +30,9 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - A good resource for data wrangling can be found in [_Principles of Data Wrangling: Practical Techniques for Data Preparation_](https://www.oreilly.com/library/view/principles-of-data/9781491938911/) by Rattenbury, Hellerstein, Heer, Kandel, and Carreras.
 
-- For how to handle missing data, see [_Statistical Analysis with Missing Data_](https://www.wiley.com/en-us/Statistical+Analysis+with+Missing+Data,+3rd+Edition-p-9780470526798) by Little and Rubin.
+- For how to handle missing data, see Chapter 8 in Lohr and [_Statistical Analysis with Missing Data_](https://www.wiley.com/en-us/Statistical+Analysis+with+Missing+Data,+3rd+Edition-p-9780470526798) by Little and Rubin.
 
-- The original text by Tukey, [_Exploratory Data Analysis_](https://archive.org/details/exploratorydataa00tuke_0), offers an introduction to the topic.
+- The original text by Tukey, [_Exploratory Data Analysis_](https://archive.org/details/exploratorydataa00tuke_0), offers an excellent introduction to the topic.
 
 - The smooth density curve is covered in detail in [_Density Estimation for Statistics and Data Analysis_](https://www.routledge.com/Density-Estimation-for-Statistics-and-Data-Analysis/Silverman/p/book/9780412246203) by Silverman.
 
@@ -44,9 +44,9 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - For practice with regular expressions there are many on-line resources such as the W3 School tutorial [Python RegEx](https://www.w3schools.com/python/python_regex.asp), regular expression checkers like [Regular Expressions 101](https://regex101.com/), and introductions to the topic like [An introduction to regular expressions](https://www.oreilly.com/content/an-introduction-to-regular-expressions/) by Nield. For a text see [_Mastering Regular Expressions_](https://dl.acm.org/doi/10.5555/1209014) by Friedl.
 
-- Chapter 13 in [Fox](https://us.sagepub.com/en-us/nam/applied-regression-analysis-and-generalized-linear-models/book237254) and Chapter 10 in [James, et al.](https://www.statlearning.com/) discuss Principal Components. (See below for the titles of these references.)
+- Chapter 13 in [Fox](https://us.sagepub.com/en-us/nam/applied-regression-analysis-and-generalized-linear-models/book237254) and Chapter 10 in [James, et al.](https://www.statlearning.com/) discuss Principal Components. (See below for the titles of these resources.)
 
-- Tompkins has an online tutorial on how to work with netCDF climate data; see [The Beauty of NetCDF](https://www.youtube.com/watch?v=UvNBnjiTXa0).
+- Tompkins has a helpful online tutorial on how to work with netCDF climate data: [The Beauty of NetCDF](https://www.youtube.com/watch?v=UvNBnjiTXa0).
 
 - There are many resources on web services. Some accessible introductory material can be found at [_RESTful Web Services_](https://dl.acm.org/doi/10.5555/1406352)
   by Richardson and Ruby.
@@ -67,7 +67,7 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - A more formal treatment of confidence intervals, prediction intervals, testing, and the bootstrap can be found in [_Mathematical Statistics and Data Analysis_](https://www.cengage.com/c/mathematical-statistics-and-data-analysis-3e-rice/9780534399429/) by Rice.
 
-- The [The ASA Statement on p-Values: Context, Process, and Purpose](https://doi.org/10.1080/00031305.2016.1154108) by Wasserstein and Lazar provides valuable insights into the $p$-value. Additionally, the topic of p-hacking is addressed in [The Statistical Crisis in Science](https://doi.org/10.1511/2014.111.460) by Gelman and Loken.
+- The [The ASA Statement on p-Values: Context, Process, and Purpose](https://doi.org/10.1080/00031305.2016.1154108) by Wasserstein and Lazar provides valuable insights into $p$-values. Additionally, the topic of p-hacking is addressed in [The Statistical Crisis in Science](https://doi.org/10.1511/2014.111.460) by Gelman and Loken.
 
 - Information about rank tests and other nonparametric statistics can be found in [_Nonparametric Rank Tests_](https://doi.org/10.1007/978-3-642-04898-2_417_) by Hettmansperger.
 

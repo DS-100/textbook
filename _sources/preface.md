@@ -3,7 +3,7 @@
 Data science is exciting work. The ability to draw insights from messy data
 is valuable for all kinds of decision-making across business, medicine, policy, and
 more. This book, _Learning Data Science_, aims to prepare readers to do data
-science. To achieve this, we've created this book with the following special features:
+science. To achieve this, we've designed this book with the following special features:
 
 1. _Focus on the fundamentals._ Technologies come and go. While we work with specific
    technologies in this book, our goal is to equip readers
@@ -14,9 +14,9 @@ science. To achieve this, we've created this book with the following special fea
    the entire data science lifecycle -- the process of asking a question,
    obtaining data, understanding the data, and understanding the world. This can often by the hardest part of being a data scientist.
 1. _Use real data._ To be prepared for working on real problems, we consider
-   it essential to learn from examples that use real data, warts and all. We chose the datasets presented in this book by carefully picking from actual data analyses that have made an impact, and not just overly refined or synthetic data.
+   it essential to learn from examples that use real data, with their warts and all. We chose the datasets presented in this book by carefully picking from actual data analyses that have made an impact, rather than using overly refined or synthetic data.
 1. _Apply concepts through case studies._ We've included extended case
-   studies throughout the book that follow or extend analyses by other
+   studies throughout the book that follow or extend analyses from other
    data scientists. These case studies show readers how to navigate the data science lifecycle in real settings.
 1. _Combine both computational and inferential thinking._ On the job, data scientists
    need to foresee how the decisions they make when writing code and how the size of a 
@@ -51,14 +51,14 @@ This book has 21 chapters, divided into six parts:
   introduces terminology that we use throughout the book. The part concludes
   with a short case study about bus arrival times.
 - _Part 2 (Ch 6-7): Rectangular Data_ introduces data frames and
-  relations and how to wrote code to manipulate data using `pandas` and SQL.
+  relations and how to write code to manipulate data using `pandas` and SQL.
 - _Part 3 (Ch 8-12): Understanding the Data_ is all about obtaining data,
   discovering its traits, and spotting issues. After understanding these
-  concepts, a reader can take a data file and describe the data's
+  concepts, a reader can take a data file and describe the dataset's
   interesting features to someone else. This part ends with a case study
   about air quality.
 - _Part 4 (Ch 13-14): Other Data Sources_ looks at alternative sources of
-  data like text, binary, and data from the Web which are widespread sources or data.
+  data like text, binary, and data from the Web, which are widely used alternative sources of data.
 - _Part 5 (Ch 15-18): Linear Modeling_ focuses on the understanding the world
   using data. It covers inferential topics like confidence intervals and
   hypothesis testing in addition to model fitting, feature engineering, and model selection.
@@ -171,14 +171,15 @@ Watch us on YouTube: https://www.youtube.com/oreillymedia
 
 ## Acknowledgements
 
-This book has come about from our joint experience designing and teaching Principles and Techniques of Data Science, an undergraduate
-course at the University of California, Berkeley. We first taught "Data 100" in Spring 2017 in response to students demand for a second course in data science, one that would prepare them for advanced courses and for the workforce. The thousands of students  we have taught since then have been an inspiration for us.  
-We've also benefited from co-teaching with other instructors, including Ani Adhikari, Andrew Bray, John DeNero, Sandrine Dudoit, Will Fithian, Joe Hellerstein, Josh Hug, Anthony Joseph, Scott Lee, Fernando Perez, Alvin Wan, Lisa Yan, and Bin Yu. We especially thank Joe Hellerstein for insights around data wrangling, Fernando Perez for encouraging us to include more complex data structures like NetCDF, Josh Hug for the inspiration of the PurpleAir case study, and Duncan Temple Lang for collaboration on an earlier version of the course. We also
+This book has come about from our joint experience designing and teaching *Principles and Techniques of Data Science*, an undergraduate
+course at the University of California, Berkeley. We first taught "Data 100" in Spring 2017 in response to student demand for a second course in data science; they wanted a course that would prepare them for advanced study in data science and for the workforce. 
+
+The thousands of students we have taught since that first offering have been an inspiration for us. We've also benefited from co-teaching with other instructors, including Ani Adhikari, Andrew Bray, John DeNero, Sandrine Dudoit, Will Fithian, Joe Hellerstein, Josh Hug, Anthony Joseph, Scott Lee, Fernando Perez, Alvin Wan, Lisa Yan, and Bin Yu. We especially thank Joe Hellerstein for insights around data wrangling, Fernando Perez for encouraging us to include more complex data structures like NetCDF, Josh Hug for the idea of the PurpleAir case study, and Duncan Temple Lang for collaboration on an earlier version of the course. We also
 thank the Berkeley students who have been our teaching assistants, and especially mention those who have contributed to previous versions of the
 book: Ananth Agarwal, Ashley Chien, Andrew Do, Sona Jeswani, Tiffany Jann,
 Andrew Kim, Jun Seo Park, Allen Shen, Katherine Yen, and Daniel Zhu.
 
-A core part of this book are the many datasets that we wrangle and analyze, and we are immensely thankful to the individuals and organizations who made their data open and available to us. We list them along with the original data sources, and related research papers, blog posts, and reports at the end of this book. 
+A core part of this book are the many datasets that we wrangle and analyze, and we are immensely thankful to the individuals and organizations who made their data open and available to us. At the end of this book, we list these contributors along with the original data sources, and related research papers, blog posts, and reports. 
 
 Lastly, we are grateful to the O'Reilly team for their work to bring this book from class notes to publication, especially Melissa Potter, Jess Haberman, Aaron Black, Danny
 Elfanbaum, and Mike Loukides, and we thank the technical reviewers whose comments have improved the book.
