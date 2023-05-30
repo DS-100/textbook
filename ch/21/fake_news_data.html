@@ -1254,10 +1254,10 @@ Let’s take a look at one of the articles labeled real.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>total 0
-drwxr-xr-x  2 sam  staff  64 Jul 14  2022 politifact100
-drwxr-xr-x  3 sam  staff  96 Jul 14  2022 politifact1013
-drwxr-xr-x  3 sam  staff  96 Jul 14  2022 politifact1014
-drwxr-xr-x  2 sam  staff  64 Jul 14  2022 politifact10185
+drwxr-xr-x  2 sam  staff  64 Jul 14  2022 <span class=" -Color -Color-Blue">politifact100</span>
+drwxr-xr-x  3 sam  staff  96 Jul 14  2022 <span class=" -Color -Color-Blue">politifact1013</span>
+drwxr-xr-x  3 sam  staff  96 Jul 14  2022 <span class=" -Color -Color-Blue">politifact1014</span>
+drwxr-xr-x  2 sam  staff  64 Jul 14  2022 <span class=" -Color -Color-Blue">politifact10185</span>
 ls: stdout: Undefined error: 0
 </pre></div>
 </div>
@@ -1483,17 +1483,21 @@ regular expressions:</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
 
-<span class="n">archive_prefix_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;https://web.archive.org/web/\d+/&#39;</span><span class="p">)</span>
-<span class="n">site_prefix_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(https?://)?(www\.)?&#39;</span><span class="p">)</span>
-<span class="n">port_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;:\d+&#39;</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">combine_content</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
-
+<span class="c1"># [1], [2]</span>
 <span class="k">def</span> <span class="nf">drop_nans</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">|</span>
                 <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">|</span> 
                 <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">))]</span>
+
+<span class="c1"># [3]</span>
+<span class="k">def</span> <span class="nf">parse_timestamps</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;publish_date&#39;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">)</span>
+
+<span class="c1"># [4], [5]</span>
+<span class="n">archive_prefix_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;https://web.archive.org/web/\d+/&#39;</span><span class="p">)</span>
+<span class="n">site_prefix_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(https?://)?(www\.)?&#39;</span><span class="p">)</span>
+<span class="n">port_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;:\d+&#39;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">url_basename</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">archive_prefix_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
@@ -1501,17 +1505,21 @@ regular expressions:</p>
     <span class="n">site</span> <span class="o">=</span> <span class="n">site_prefix_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">port_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">site</span><span class="p">)</span>
 
+<span class="c1"># [6]</span>
+<span class="k">def</span> <span class="nf">combine_content</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+
 <span class="k">def</span> <span class="nf">subset_df</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;baseurl&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">]]</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_raw</span>
-      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_nans</span><span class="p">)</span>
-      <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-      <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">baseurl</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">url_basename</span><span class="p">))</span>
-      <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;publish_date&#39;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">))</span>
-      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_content</span><span class="p">)</span>
-      <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_df</span><span class="p">)</span>
-     <span class="p">)</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">drop_nans</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">baseurl</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">url_basename</span><span class="p">))</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">parse_timestamps</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">combine_content</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">subset_df</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
