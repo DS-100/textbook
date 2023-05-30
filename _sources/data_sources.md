@@ -51,14 +51,14 @@ In addition to these case studies, another 20-plus datasets were used as example
 
 + `'CDS_ERA5_22-12.nc'` These data were collected from the [Climate Data Store](https://cds.climate.copernicus.eu/), which is supported by the [European Centre for Medium-Range Weather Forecasts](https://www.ecmwf.int/).
 
-+ Wikipedia 1500 meter world records were scraped from the Wikipedia page [1500 metres world record progression](https://en.wikipedia.org/wiki/1500_metres_world_record_progression). 
++ 'world_record_1500m.csv' Wikipedia 1500 meter world records were scraped from the Wikipedia page [1500 metres world record progression](https://en.wikipedia.org/wiki/1500_metres_world_record_progression). 
 
-+ The Clash songs are obtained using the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
++ 'the_clash.csv' The Clash songs are obtained using the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
 The retrieval of the data follows [Exploring the Spotify API in Python](https://stmorse.github.io/journal/spotify-api.html) by Morse.
 
 + `catalog.xml` The XML plant catalog document is from the [W3 School Plant catalog](https://www.w3schools.com/xml/plant_catalog.xml).
 
-+ The exchange rates are available from the [European Central Bank](https://www.ecb.europa.eu/stats/eurofxref/). 
++ 'ECB_EU_exchange.csv' The exchange rates are available from the [European Central Bank](https://www.ecb.europa.eu/stats/eurofxref/). 
 
 + `mobility.csv` These data were made available at [Opportunity Insights](https://opportunityinsights.org/paper/land-of-opportunity/) and 
 [Where Is the Land of Opportunity? The Geography of Intergenerational Mobility in the United States](https://doi.org/10.1093/qje/qju022) by Chetty, Hendren, Kline, and Saez. 
