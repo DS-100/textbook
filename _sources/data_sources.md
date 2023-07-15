@@ -24,7 +24,7 @@ In addition to these case studies, another 20-plus datasets were used as example
 
 - `WikipediaExp.csv`: The data for the Wikipedia experiment were made available by van de Rijt. These data were analyzed in [Experimental Study of Informal Rewards in Peer Production](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0034358) by Restivo and van de Rijt.
 
-- `co2_mm_mlo.txt`: The CO2 concentrations measured at Mauna Loa by the [National Oceanic and Atmospheric Administration (NOAA)](https://www.noaa.gov/) are available from the [Global Monitoring Laboratory](https://gml.noaa.gov/obop/mlo/).
+- `co2_mm_mlo.txt`: The CO<sub>2</sub> concentrations measured at Mauna Loa by the [National Oceanic and Atmospheric Administration (NOAA)](https://www.noaa.gov/) are available from the [Global Monitoring Laboratory](https://gml.noaa.gov/obop/mlo/).
 
 - `pm30.csv`: These air quality measurements were downloaded for one day and one sensor from the [PurpleAir Map](https://www2.purpleair.com/).
 
