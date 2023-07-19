@@ -1,4 +1,5 @@
 (ax:data_source)=
+
 # Data Sources
 
 All of the data analyzed in this book are available on the book's website, [LearningDS.org](https://learningds.org/) and on the [GitHub repository](https://github.com/DS-100/textbook/) for the book. These datasets are from open repositories and from individuals. We acknowledge them all here, and include, as appropriate, the file name for the data stored in our repository, a link to the original source, a related publication, and the author(s)/owner(s).
@@ -15,7 +16,7 @@ To begin, we provide the sources for the four case studies in the book. Our anal
   Our analysis is based on [How to Weigh a Donkey in the Kenyan Countryside](https://doi.org/10.1111/j.1740-9713.2014.00768.x) by Milner and Rougier.
 
 - `fake_news.csv`: The hand-classified fake news data are from
-  [Fakenewsnet: A Data Repository with News Content, Social Context, and Spatiotemporal Information for Studying Fake News on Social Media]() by Shu, Mahudeswaran, Wang, Lee, and Liu.
+  [Fakenewsnet: A Data Repository with News Content, Social Context, and Spatiotemporal Information for Studying Fake News on Social Media](https://arxiv.org/abs/1809.01286) by Shu, Mahudeswaran, Wang, Lee, and Liu.
 
 In addition to these case studies, another 20-plus datasets were used as examples throughout the book. We acknowledge the people and organizations that made these datasets available in the order in which they appeared in the book.
 
