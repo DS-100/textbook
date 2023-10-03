@@ -2,8 +2,10 @@
 
 **By [Sam Lau][sam], [Joey Gonzalez][joey], and [Deb Nolan][deb].**
 
-Learning Data Science is an introductory textbook for data science that will be
-published with O'Reilly Media in 2023. It covers foundational skills in
+<img alt="Front cover of textbook" src="book-cover.png" height="400px">
+
+Learning Data Science is an introductory textbook for data science
+published by O'Reilly Media in 2023. It covers foundational skills in
 programming and statistics that encompass the data science lifecycle. The
 reader's assumed background is detailed in the [Preface][preface].
 
