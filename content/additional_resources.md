@@ -13,7 +13,7 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - To learn more about data privacy, see [_Big Data: Seizing Opportunities, Preserving Values_](https://obamawhitehouse.archives.gov/sites/default/files/docs/big_data_privacy_report_may_1_2014.pdf), a concise White House report that provides guidelines and rationale for data privacy.
 
-- Ramdas gave a fun, informative talk in our class on on bias, Simpson's paradox, p-hacking, and related topics, and we recommend his [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
+- Ramdas gave a fun, informative talk in our class on bias, Simpson's paradox, p-hacking, and related topics, and we recommend his [slides](https://drive.google.com/file/d/0B7gkaDYGT5X5c245RV93MVRRSjQ/view?resourcekey=0-8nQDM50Tta2SuLkFqAXEqQ).
 
 - For an introductory treatment of the urn model, confidence intervals, and hypothesis tests, we recommend [_Statistics_](https://wwnorton.com/books/Statistics/) by Freedman, Pisani, and Purves.
 
@@ -41,7 +41,7 @@ Collected here are a variety of resources for a more in-depth treatment of the l
 
 - See [Statistical Calibration: A Review](https://doi.org/10.2307/1403690) by Osborne for more on calibration.
 
-- For practice with regular expressions there are many on-line resources such as the W3 School tutorial [Python RegEx](https://www.w3schools.com/python/python_regex.asp), regular expression checkers like [Regular Expressions 101](https://regex101.com/), and introductions to the topic like [An introduction to regular expressions](https://www.oreilly.com/content/an-introduction-to-regular-expressions/) by Nield. For a text see [_Mastering Regular Expressions_](https://dl.acm.org/doi/10.5555/1209014) by Friedl.
+- For practice with regular expressions there are many on-line resources such as the W3 School tutorial [Python RegEx](https://www.w3schools.com/python/python_regex.asp), regular expression checkers like [Regular Expressions 101](https://regex101.com/) and [Pyrexp](https://pythonium.net/regex), and introductions to the topic like [An introduction to regular expressions](https://www.oreilly.com/content/an-introduction-to-regular-expressions/) by Nield. For a text see [_Mastering Regular Expressions_](https://dl.acm.org/doi/10.5555/1209014) by Friedl.
 
 - Chapter 13 in [Fox](https://us.sagepub.com/en-us/nam/applied-regression-analysis-and-generalized-linear-models/book237254) and Chapter 10 in [James, et al.](https://www.statlearning.com/) discuss Principal Components. (See below for the titles of these resources.)
 
