@@ -12,7 +12,7 @@ reader's assumed background is detailed in the [Preface][preface].
 The contents of this book are licensed for free consumption under the following license:
 [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-[sam]: http://www.samlau.me/
+[sam]: https://lau.ucsd.edu/
 [joey]: https://people.eecs.berkeley.edu/~jegonzal/
 [deb]: https://www.stat.berkeley.edu/~nolan/
 [preface]: /preface
